@@ -3,11 +3,22 @@ schema {
   mutation: Mutation
 }
 
+"This directive allows results to be deferred during execution"
+directive @defer(
+    "Deferred behaviour is controlled by this argument"
+    if: Boolean! = true,
+    "A unique label that represents the fragment being deferred"
+    label: String
+  ) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
 "Marks the field, argument, input field or enum value as deprecated"
 directive @deprecated(
     "The reason for the deprecation"
-    reason: String = "No longer supported"
+    reason: String! = "No longer supported"
   ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM_VALUE | INPUT_FIELD_DEFINITION
+
+"This directive disables error propagation when a non nullable field returns null for the given operation."
+directive @experimental_disableErrorPropagation on QUERY | MUTATION | SUBSCRIPTION
 
 "Directs the executor to include this field or fragment only when the `if` argument is true"
 directive @include(
@@ -88,15 +99,6 @@ type AccountGroup {
   globalRole: GlobalRole
   id: ID!
   name: String
-}
-
-type Action {
-  "enabled field"
-  enabled: Boolean
-  id: String
-  name: String
-  type: String
-  uri: String
 }
 
 "Output type for the addSlotWorkflow mutation."
@@ -389,19 +391,8 @@ type Branch implements Authorizable & ProjectEntity {
   favourite: Boolean
   "Git branch"
   gitBranchConfigurationProperty: Property
-  gitChangeLog(
-    "Name of the build to start the change log with"
-    from: String!,
-    "Name of the build to end the change log with"
-    to: String!
-  ): GitChangeLog
   "Registered GitHub ingestion configuration"
   gitHubIngestionConfig: GitHubIngestionConfig
-  "Graph of dependencies for this branch"
-  graph(
-    "Direction for the dependencies"
-    direction: BranchLinksDirection!
-  ): BranchLinksNode! @deprecated(reason : "Graph UI will be dropped in 4.6 and `graph` fields in 5.0.")
   id: ID!
   "List of information components attached to this entity"
   information: [EntityInformation!]!
@@ -501,41 +492,6 @@ type BranchLink {
   targetBuild: Build!
 }
 
-type BranchLinksDecoration {
-  "Optional longer text, typically used as a tooltip"
-  description: String
-  "Feature contributing to this decoration"
-  feature: ExtensionFeatureDescription!
-  "Optional name to an image for the decoration. This name is used together with the [feature] and the [id] to build a URL on the client side"
-  icon: String
-  "ID of the decoration provider"
-  id: String!
-  "Short text to display at edge level for the decoration"
-  text: String!
-  "Optional link from the decoration to another page"
-  url: String
-}
-
-"BranchLinksEdge"
-type BranchLinksEdge {
-  "decorations field"
-  decorations: [BranchLinksDecoration!]!
-  "direction field"
-  direction: BranchLinksDirection!
-  "linkedTo field"
-  linkedTo: BranchLinksNode!
-}
-
-"BranchLinksNode"
-type BranchLinksNode {
-  "Branch associated to this node"
-  branch: Branch!
-  "Actual build for this node"
-  build: Build
-  "Edges coming out of this node to other nodes"
-  edges: [BranchLinksEdge!]!
-}
-
 type Build implements Authorizable & ProjectEntity {
   "Description with links."
   annotatedDescription: String
@@ -566,19 +522,12 @@ type Build implements Authorizable & ProjectEntity {
     type: String
   ): [Decoration!]!
   description: String
+  "Display name for this build or the build's name if not available"
+  displayName: String!
   "List of slots this eligible to"
   eligibleSlots: [Slot!]!
-  gitChangeLog(
-    "Name of the build to end the change log with. If not set, compares with the previous build."
-    to: String
-  ): GitChangeLog
   "Git commit"
   gitCommitProperty: Property
-  "Graph of dependencies for this build"
-  graph(
-    "Direction for the dependencies"
-    direction: BranchLinksDirection!
-  ): BranchLinksNode! @deprecated(reason : "Graph UI will be dropped in 4.6 and `graph` fields in 5.0.")
   id: ID!
   "List of information components attached to this entity"
   information: [EntityInformation!]!
@@ -639,17 +588,6 @@ type Build implements Authorizable & ProjectEntity {
     qualifier: String
   ): [Slot!]!
   "List of builds using this one."
-  usedBy(
-    "Keeps only links targeted from this branch. `project` argument is also required."
-    branch: String,
-    "Offset for the page"
-    offset: Int = 0,
-    "Keeps only links targeted from this project"
-    project: String,
-    "Size of the page"
-    size: Int = 20
-  ): BuildPaginated @deprecated(reason : "usedByQualified must be used instead")
-  "List of builds using this one."
   usedByQualified(
     "Keeps only links targeted from this branch. `project` argument is also required."
     branch: String,
@@ -662,17 +600,6 @@ type Build implements Authorizable & ProjectEntity {
   ): BuildLinkPaginated
   "List of actions available for this entity"
   userMenuActions: [UserMenuAction!]!
-  "List of builds being used by this one."
-  using(
-    "Keeps only links targeted from this branch. `project` argument is also required."
-    branch: String,
-    "Offset for the page"
-    offset: Int = 0,
-    "Keeps only links targeted from this project"
-    project: String,
-    "Size of the page"
-    size: Int = 20
-  ): BuildPaginated @deprecated(reason : "usingQualified must be used instead")
   "List of builds being used by this one."
   usingQualified(
     "Keeps only links targeted from this branch. `project` argument is also required."
@@ -827,11 +754,6 @@ type CasC {
   schema: JSON
   "Renders the current settings as YAML"
   yaml: String!
-}
-
-type ChangePasswordPayload implements PayloadInterface {
-  "List of errors"
-  errors: [PayloadUserError]
 }
 
 "Output type for the changeValidationRunStatusComment mutation."
@@ -1157,6 +1079,12 @@ type DeleteAutoVersioningConfigPayload implements Payload {
   errors: [UserError]
 }
 
+"Output type for the deleteBranchById mutation."
+type DeleteBranchByIdPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 "Output type for the deleteBranchGitConfigPropertyById mutation."
 type DeleteBranchGitConfigPropertyByIdPayload implements Payload {
   "Branch updated"
@@ -1217,6 +1145,12 @@ type DeleteBranchReleaseValidationPropertyByIdPayload implements Payload {
 type DeleteBranchReleaseValidationPropertyPayload implements Payload {
   "Branch updated"
   branch: Branch
+  "List of errors"
+  errors: [UserError]
+}
+
+"Output type for the deleteBuildById mutation."
+type DeleteBuildByIdPayload implements Payload {
   "List of errors"
   errors: [UserError]
 }
@@ -1703,6 +1637,12 @@ type DeleteValidationStampByIdPayload implements Payload {
   errors: [UserError]
 }
 
+"Output type for the deleteValidationStampFilterById mutation."
+type DeleteValidationStampFilterByIdPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 "Output type for the deleteValidationStampMessagePropertyById mutation."
 type DeleteValidationStampMessagePropertyByIdPayload implements Payload {
   "List of errors"
@@ -1867,8 +1807,6 @@ type EventSubscriptionPayload {
   channel: String!
   "Channel configuration"
   channelConfig: JSON!
-  "Textual description of the channel configuration"
-  channelConfigText: String!
   "Optional template to use for the message"
   contentTemplate: String
   "If this subscription is disabled"
@@ -1898,16 +1836,6 @@ type EventType {
   description: String!
   "id field"
   id: String!
-}
-
-"Definition of an export format for the issues."
-type ExportFormat {
-  "ID of the format"
-  id: String!
-  "Display name of the format"
-  name: String!
-  "MIME type of the format"
-  type: String!
 }
 
 type ExtensionFeatureDescription {
@@ -1951,97 +1879,6 @@ type GenerateTokenPayload implements Payload {
   errors: [UserError]
   "Generated token"
   token: Token
-}
-
-type GitChangeLog {
-  "From build"
-  buildFrom: Build!
-  "To build"
-  buildTo: Build!
-  "List of commits in the change log"
-  commits: [GitUICommit!]!
-  "List of commits as a plot"
-  commitsPlot: JSON
-  "Gets the change of some dependency"
-  depChangeLog(
-    "Name of the project to follow"
-    project: String!
-  ): GitChangeLog
-  "Link to a diff between the two builds"
-  diffLink: String
-  "Export of the change log according to some specifications"
-  export(
-    "Export specifications"
-    request: IssueChangeLogExportRequest
-  ): String
-  "List of files changes"
-  files: GitChangeLogFiles!
-  "Checking if a change log can have issues"
-  hasIssues: Boolean!
-  "List of issues in the change log"
-  issues: GitChangeLogIssues
-  "All dependency changes"
-  linkChanges: [LinkChange!]!
-  "Project linked to the change log"
-  project: Project!
-  "If an error has occured during the synchronization"
-  syncError: Boolean
-  "UUID of the change log."
-  uuid: String!
-}
-
-"Change on one file"
-type GitChangeLogFile {
-  "changeType field"
-  changeType: SCMChangeLogFileChangeType!
-  "newPath field"
-  newPath: String!
-  "oldPath field"
-  oldPath: String!
-  "Old path if set, new path otherwiser"
-  path: String!
-  "url field"
-  url: String!
-}
-
-"List of files changes"
-type GitChangeLogFiles {
-  "List of individual file changes"
-  list: [GitChangeLogFile!]!
-}
-
-"Description for an issue"
-type GitChangeLogIssue {
-  "Issue representation with minimal fields"
-  issue: Issue!
-  "Issue representation as JSON"
-  issueObject: JSON
-}
-
-"List of issues associated with their issue service representation"
-type GitChangeLogIssues {
-  "Configuration of the issue service associated with this list of issues"
-  issueServiceConfiguration: IssueServiceConfigurationRepresentation
-  "List of issues"
-  list: [GitChangeLogIssue!]!
-}
-
-"GitCommit"
-type GitCommit {
-  "author field"
-  author: GitPerson!
-  "commitTime field"
-  commitTime: LocalDateTime!
-  "committer field"
-  committer: GitPerson!
-  "fullMessage field"
-  fullMessage: String!
-  "id field"
-  id: String!
-  "shortId field"
-  shortId: String!
-  "shortMessage field"
-  shortMessage: String!
 }
 
 "GitHub App token information"
@@ -2263,14 +2100,6 @@ type GitHubRepository {
   owner: GitHubOwner!
 }
 
-"GitPerson"
-type GitPerson {
-  "email field"
-  email: String!
-  "name field"
-  name: String!
-}
-
 "Git pull request associated to a branch"
 type GitPullRequest {
   "PR id"
@@ -2293,32 +2122,6 @@ type GitPullRequest {
   title: String!
   "Link to the PR web page"
   url: String!
-}
-
-"GitUICommit"
-type GitUICommit {
-  "annotatedMessage field"
-  annotatedMessage: String!
-  "author field"
-  author: String!
-  "authorEmail field"
-  authorEmail: String!
-  "Build associated with this commit"
-  build: Build
-  "commit field"
-  commit: GitCommit!
-  "fullAnnotatedMessage field"
-  fullAnnotatedMessage: String!
-  "id field"
-  id: String!
-  "link field"
-  link: String!
-  "message field"
-  message: String!
-  "shortId field"
-  shortId: String!
-  "timestamp field"
-  timestamp: LocalDateTime!
 }
 
 "Granted global permission"
@@ -2360,14 +2163,6 @@ type GroupMapping {
   group: AccountGroup!
   "IdP group name"
   idpGroup: String!
-}
-
-"Home page settings"
-type HomePageSettingsType {
-  "Maximum of branches to display per favorite project"
-  maxBranches: Int!
-  "Maximum of projects starting from which we need to switch to a search mode"
-  maxProjects: Int!
 }
 
 "HookInfoLink"
@@ -2533,11 +2328,6 @@ type IndicatorPortfolio {
     "Number of seconds (> 0) to get indicator trends from."
     duration: Int
   ): [IndicatorCategoryStats!]! @deprecated(reason : "Use viewStats with viewId = null. This field will be removed in V5.")
-  "Global indicator stats"
-  globalStats(
-    "Number of seconds (> 0) to get indicator trends from."
-    duration: Int
-  ): [IndicatorCategoryStats!]! @deprecated(reason : "Use indicator views. This field will be removed in V5.")
   "ID of the portfolio"
   id: String
   "Label for this portfolio"
@@ -2553,14 +2343,6 @@ type IndicatorPortfolio {
     "ID of the indicator view, set to null to use the portfolio default configuration"
     id: String
   ): [IndicatorCategoryStats!]
-}
-
-"List of portfolios"
-type IndicatorPortfolioOfPortfolios {
-  "Global indicator categories"
-  categories: [IndicatorCategory!]! @deprecated(reason : "Use indicator views")
-  "List of portfolios"
-  portfolios: [IndicatorPortfolio!]!
 }
 
 "Indicator stats from the past"
@@ -2858,14 +2640,6 @@ type Issue {
   updateTime: String
   "URL to the issue"
   url: String
-}
-
-"Format for exporting a list of issues"
-type IssueExportFormat {
-  "Unique ID for this format"
-  id: String!
-  "Display name for this format"
-  name: String!
 }
 
 "Technical representation of an issue service and its configuration"
@@ -3192,8 +2966,6 @@ type Mutation {
     "Input for the mutation"
     input: CancelSlotPipelineInput
   ): CancelSlotPipelinePayload
-  "Changing the password of the current user"
-  changePassword(input: ChangePasswordInput!): ChangePasswordPayload
   "Change the status of a validation run"
   changeValidationRunStatus(
     "Input for the mutation"
@@ -3339,6 +3111,11 @@ type Mutation {
     "Input for the mutation"
     input: DeleteAutoVersioningConfigInput
   ): DeleteAutoVersioningConfigPayload
+  "Deletes a branch using its ID"
+  deleteBranchById(
+    "Input for the mutation"
+    input: DeleteBranchByIdInput
+  ): DeleteBranchByIdPayload
   "Deletes the git branch property on a branch identified by name."
   deleteBranchGitConfigProperty(
     "Input for the mutation"
@@ -3379,6 +3156,11 @@ type Mutation {
     "Input for the mutation"
     input: DeleteBranchReleaseValidationPropertyByIdInput
   ): DeleteBranchReleaseValidationPropertyByIdPayload
+  "Deletes a build by ID"
+  deleteBuildById(
+    "Input for the mutation"
+    input: DeleteBuildByIdInput
+  ): DeleteBuildByIdPayload
   "Deletes a build filter for current user and for all users if shared"
   deleteBuildFilter(
     "Input for the mutation"
@@ -3708,6 +3490,11 @@ type Mutation {
     "Input for the mutation"
     input: DeleteValidationStampByIdInput
   ): DeleteValidationStampByIdPayload
+  "Deletes a validation stamp filter"
+  deleteValidationStampFilterById(
+    "Input for the mutation"
+    input: DeleteValidationStampFilterByIdInput
+  ): DeleteValidationStampFilterByIdPayload
   "Deletes the message property on a validation stamp identified by name."
   deleteValidationStampMessageProperty(
     "Input for the mutation"
@@ -4635,24 +4422,6 @@ type NotificationSourceData {
   id: String!
 }
 
-"Information about a commit"
-type OntrackGitCommitInfo {
-  "Associated branch info per types of branches"
-  branchInfosList: [BranchInfos!]!
-  "Information about the commit itself"
-  uiCommit: GitUICommit
-}
-
-"Information about an issue"
-type OntrackGitIssueInfo {
-  "Information about the last commit associated with this issue"
-  commitInfo: OntrackGitCommitInfo
-  "JSON representation of the issue"
-  issue: JSON
-  "Issue service associated with the issue"
-  issueServiceConfigurationRepresentation: IssueServiceConfigurationRepresentation
-}
-
 "Output type for the overridePipelineRule mutation."
 type OverridePipelineRulePayload implements Payload {
   "List of errors"
@@ -4775,6 +4544,8 @@ type Project implements Authorizable & ProjectEntity {
   branches(
     "Maximum number of branches to return. No limit if not specified."
     count: Int,
+    "If null, does not filter on the branch disabled status. If true, looks only for enabled branches. If false, looks only for disabled branches."
+    enabled: Boolean,
     "Gets only favorite branches"
     favourite: Boolean,
     "Regular expression to match against the branch name"
@@ -4798,24 +4569,8 @@ type Project implements Authorizable & ProjectEntity {
   disabled: Boolean!
   "Is this project a favourite of the current user?"
   favourite: Boolean
-  "Information about a Git commit in the project"
-  gitCommitInfo(
-    "Full or abbreviated hash of the commit to look for"
-    commit: String!,
-    "Flag to display only the first branch per type"
-    first: Boolean
-  ): OntrackGitCommitInfo
   "Associates the project with a GitHub repository"
   gitHubProjectConfigurationProperty: Property
-  "List of formats supported for the export of issues in this project"
-  gitIssueExportFormats: [ExportFormat!]! @deprecated(reason : "List of issue export formats can be taken from the root and is now called issueExportFormats.")
-  "Information about an issue in the project"
-  gitIssueInfo(
-    "Flag to display only the first branch per type"
-    first: Boolean,
-    "Key or full name of an issue"
-    token: String!
-  ): OntrackGitIssueInfo
   "Associates the project with a GitLab repository"
   gitLabProjectConfigurationProperty: Property
   "Associates the project with a Git repository"
@@ -4827,8 +4582,6 @@ type Project implements Authorizable & ProjectEntity {
   indicatorPortfolios: [IndicatorPortfolio!]!
   "List of information components attached to this entity"
   information: [EntityInformation!]!
-  "List of links to follow when displaying information about an issue."
-  jIRAFollowLinksProperty: Property
   "Link to a Jenkins Job"
   jenkinsJobProperty: Property
   "Labels for this project"
@@ -5367,6 +5120,8 @@ type Query {
     "Filter on the environments"
     filter: EnvironmentFilter
   ): [Environment!]!
+  "Returns the number of environments"
+  environmentsCount: Int!
   "List of event subscriptions"
   eventSubscriptions(
     "Filter for the subscriptions"
@@ -5383,22 +5138,6 @@ type Query {
     "Parameters for getting the chart"
     input: GetChartInput!
   ): JSON
-  gitChangeLog(
-    "ID of the build to start the change log with"
-    from: Int!,
-    "ID of the build to end the change log with"
-    to: Int!
-  ): GitChangeLog @deprecated(reason : "Will be removed in V5. Prefer using the `scmChangeLog` query.")
-  "Gets a change log by its UUID"
-  gitChangeLogByUUID(
-    "UUID of the change log"
-    uuid: String!
-  ): GitChangeLog @deprecated(reason : "Will be removed in V5. Prefer using the `scmChangeLog` query.")
-  "Getting Ontrack information about a Git commit and a project."
-  gitCommitInfo(
-    "Commit hash (full form) to look for."
-    commit: String!
-  ): OntrackGitCommitInfo
   "List of GitHub configurations"
   gitHubConfigurations(
     "Name of the configuration to get"
@@ -5435,11 +5174,6 @@ type Query {
     "Filter on the UUID"
     uuid: String
   ): GitHubIngestionHookPayloadPaginated
-  "Getting Ontrack information about a Git issue and a project."
-  gitIssueInfo(
-    "Issue key"
-    issue: String!
-  ): OntrackGitIssueInfo
   "List of global messages"
   globalMessages: [Message!]!
   "List of global permissions"
@@ -5464,8 +5198,6 @@ type Query {
   ): HookRecordingPaginated
   "List of indicator categories"
   indicatorCategories: IndicatorCategories
-  "List of all portfolios"
-  indicatorPortfolioOfPortfolios: IndicatorPortfolioOfPortfolios
   "List of indicator portfolios"
   indicatorPortfolios(
     "ID of the indicator portfolio"
@@ -5479,8 +5211,6 @@ type Query {
   indicatorsManagement: IndicatorsManagement! @deprecated(reason : "Will be removed in 4.6")
   "Gets information about the application"
   info: Info
-  "List of available export formats"
-  issueExportFormats: [IssueExportFormat!]! @deprecated(reason : "Use the templating service")
   "List of issue services"
   issueServiceConfigurations: [IssueServiceConfigurationRepresentation!]!
   "Getting a Jenkins configuration by name"
@@ -6862,8 +6592,6 @@ type SetValidationStampPropertyPayload implements Payload {
 
 "Ontrack settings"
 type Settings {
-  "Home page settings"
-  homePage: HomePageSettingsType!
   "List of all settings and their values"
   list: [SettingsEntry!]!
   "Getting some settings using their ID"
@@ -6986,8 +6714,12 @@ type Slot implements Authorizable {
   lastDeployedPipeline: SlotPipeline
   "Paginated list of pipelines"
   pipelines(
+    "Name of the branch to get the pipelines for"
+    branchName: String,
     "Filtering on a build"
     buildId: Int,
+    "Filtering on finished pipelines"
+    done: Boolean,
     "Offset for the page"
     offset: Int = 0,
     "Size of the page"
@@ -8025,6 +7757,7 @@ enum AutoVersioningAuditState {
   CREATED
   ERROR
   POST_PROCESSING_END
+  POST_PROCESSING_LAUNCHED
   POST_PROCESSING_START
   PROCESSING_ABORTED
   PROCESSING_CANCELLED
@@ -8051,12 +7784,6 @@ enum AutoVersioningNotificationScope {
   ERROR
   PR_TIMEOUT
   SUCCESS
-}
-
-"Direction for dependencies"
-enum BranchLinksDirection {
-  USED_BY
-  USING
 }
 
 "CHML values"
@@ -8193,16 +7920,6 @@ enum QueueRecordState {
   ROUTING_READY
   SENT
   STARTED
-}
-
-"Type of change on a file."
-enum SCMChangeLogFileChangeType {
-  ADDED
-  COPIED
-  DELETED
-  MODIFIED
-  RENAMED
-  UNDEFINED
 }
 
 "Type of change in a deployment"
@@ -8436,16 +8153,6 @@ input CancelSlotPipelineInput {
   pipelineId: String!
   "reason field"
   reason: String!
-}
-
-"""
- =================================================================================
- User change password
- =================================================================================
-"""
-input ChangePasswordInput {
-  newPassword: String!
-  oldPassword: String!
 }
 
 "Input type for the changeValidationRunStatusComment mutation."
@@ -8798,6 +8505,12 @@ input DeleteAutoVersioningConfigInput {
   branchId: Int!
 }
 
+"Input type for the deleteBranchById mutation."
+input DeleteBranchByIdInput {
+  "ID of the branch to delete"
+  id: Int!
+}
+
 "Input type for the deleteBranchGitConfigPropertyById mutation."
 input DeleteBranchGitConfigPropertyByIdInput {
   "ID of the branch"
@@ -8852,6 +8565,12 @@ input DeleteBranchReleaseValidationPropertyInput {
   branch: String!
   "Project name"
   project: String!
+}
+
+"Input type for the deleteBuildById mutation."
+input DeleteBuildByIdInput {
+  "ID of the build to delete"
+  id: Int!
 }
 
 "Input type for the deleteBuildFilter mutation."
@@ -9315,6 +9034,12 @@ input DeleteValidationStampByIdInput {
   id: Int!
 }
 
+"Input type for the deleteValidationStampFilterById mutation."
+input DeleteValidationStampFilterByIdInput {
+  "ID of the validation stamp filter"
+  id: Int!
+}
+
 "Input type for the deleteValidationStampMessagePropertyById mutation."
 input DeleteValidationStampMessagePropertyByIdInput {
   "ID of the validation stamp"
@@ -9367,10 +9092,8 @@ input DisableProjectInput {
 
 "Input type for the disableSubscription mutation."
 input DisableSubscriptionInput {
-  "ID of the subscription to disable"
-  id: String
   "Name of the subscription to disable"
-  name: String
+  name: String!
   "Target project entity (null for global events)"
   projectEntity: ProjectEntityIDInput
 }
@@ -9409,10 +9132,8 @@ input EnableProjectInput {
 
 "Input type for the enableSubscription mutation."
 input EnableSubscriptionInput {
-  "ID of the subscription to enable"
-  id: String
   "Name of the subscription to enable"
-  name: String
+  name: String!
   "Target project entity (null for global events)"
   projectEntity: ProjectEntityIDInput
 }
@@ -9429,10 +9150,6 @@ input EventSubscriptionFilter {
   channel: String
   "Filter against the channel configuration (channel is required)"
   channelConfig: String
-  "Subscriptions created before or on this date"
-  createdBefore: LocalDateTime
-  "Name of the user who created this subscription"
-  creator: String
   "Entity subscribed to."
   entity: ProjectEntityIDInput
   "Event type"

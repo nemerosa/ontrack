@@ -1,5 +1,5 @@
 import {expect} from "@playwright/test";
-import {expectOnPage} from "../../support/page-utils";
+import {confirmBox} from "../../support/confirm";
 
 export class ProjectPage {
 
@@ -9,14 +9,13 @@ export class ProjectPage {
         this.ontrack = ontrack
     }
 
-    async expectOnPage() {
-        await expectOnPage(this.page, "project")
+    async checkOnPage() {
         await expect(this.page.getByText(this.project.name)).toBeVisible()
     }
 
     async goTo() {
         await this.page.goto(`${this.ontrack.connection.ui}/project/${this.project.id}`)
-        await this.expectOnPage()
+        await this.checkOnPage()
     }
 
     async checkNoDisabledBanner() {
@@ -52,4 +51,10 @@ export class ProjectPage {
         await expect(this.page.getByRole('link', {name: branchName, exact: true})).toBeVisible()
     }
 
+    async deleteProject() {
+        const button = this.page.getByRole('button', {name: 'Delete project'})
+        await expect(button).toBeVisible()
+        await button.click()
+        await confirmBox(this.page, "Delete project", {okText: "Delete"})
+    }
 }

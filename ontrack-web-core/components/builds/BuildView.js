@@ -25,6 +25,8 @@ import UserMenuActions from "@components/entities/UserMenuActions";
 import EditBuildCommand from "@components/builds/EditBuildCommand";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import {useRefresh} from "@components/common/RefreshUtils";
+import BuildDeleteCommand from "@components/builds/BuildDeleteCommand";
+import {isAuthorized} from "@components/common/authorizations";
 
 export default function BuildView({id}) {
 
@@ -91,7 +93,7 @@ export default function BuildView({id}) {
             ).then(data => {
                 setBuild(data.build)
                 setLoadingBuild(false)
-                setCommands([
+                const commands = [
                     <UserMenuActions
                         key="tools"
                         actions={data.build.userMenuActions}
@@ -103,14 +105,24 @@ export default function BuildView({id}) {
                         text="Links"
                         title="Displays downstream and upstream dependencies"
                     />,
-                    <EditBuildCommand
-                        build={data.build}
-                        onSuccess={refresh}
-                        key="edit"
-                    />,
+                ]
+                if (isAuthorized(build, "build", "edit")) {
+                    commands.push(
+                        <EditBuildCommand
+                            build={data.build}
+                            onSuccess={refresh}
+                            key="edit"
+                        />
+                    )
+                }
+                commands.push(
                     <StoredGridLayoutResetCommand key="reset"/>,
-                    <CloseCommand key="close" href={branchUri(data.build.branch)}/>,
-                ])
+                )
+                if (isAuthorized(data.build, "build", "delete")) {
+                    commands.push(<BuildDeleteCommand key="delete" id={data.build.id}/>)
+                }
+                commands.push(<CloseCommand key="close" href={branchUri(data.build.branch)}/>)
+                setCommands(commands)
             })
         }
     }, [client, id, refreshState])

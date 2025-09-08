@@ -17,10 +17,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.graphql.execution.ErrorType
 import java.time.LocalDateTime
 import kotlin.jvm.optionals.getOrNull
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
-import kotlin.test.fail
+import kotlin.test.*
 
 /**
  * Integration tests around the `builds` root query.
@@ -1683,6 +1680,33 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         listOf(vs1, vs3).sortedBy { it.name }.map { it.id() },
                         vsIds
                     )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Deleting a build by ID`() {
+        project {
+            branch {
+                build {
+                    run(
+                        """
+                            mutation {
+                                deleteBuildById(input: {id: $id}) {
+                                    errors {
+                                        message
+                                    }
+                                }
+                            }
+                        """.trimIndent()
+                    ) { data ->
+                        checkGraphQLUserErrors(data, "deleteBuildById")
+                        assertNull(
+                            structureService.findBuildByID(id),
+                            "Build has been deleted"
+                        )
+                    }
                 }
             }
         }

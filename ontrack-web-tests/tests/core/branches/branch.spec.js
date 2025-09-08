@@ -2,9 +2,7 @@ const {login} = require("../login");
 const {BranchPage} = require("./branch");
 const {test} = require("../../fixtures/connection");
 const {waitUntilCondition} = require("../../support/timing");
-const {HomePage} = require("../home/home");
 const {generate} = require("@ontrack/utils");
-const {expect} = require("@playwright/test");
 const {ProjectPage} = require("../projects/project");
 
 test('branch creation', async ({page, ontrack}) => {
@@ -73,4 +71,22 @@ test('branch disabling and enabling', async ({page, ontrack}) => {
 
     // Checking that there is NO banner showing that the branch is disabled
     await branchPage.checkNoDisabledBanner()
+})
+
+test('deleting a branch', async ({page, ontrack}) => {
+    // Provisioning
+    const project = await ontrack.createProject()
+    const branch = await project.createBranch()
+    // Login
+    await login(page, ontrack)
+    // Navigating to the branch
+    const branchPage = new BranchPage(page, branch)
+    await branchPage.goTo()
+
+    // Deleting the branch
+    await branchPage.deleteBranch()
+
+    // Checking we are on the project page
+    const projectPage = new ProjectPage(page, ontrack, project)
+    await projectPage.checkOnPage()
 })

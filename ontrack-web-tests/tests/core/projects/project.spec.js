@@ -62,3 +62,21 @@ test('project disabling and enabling', async ({page, ontrack}) => {
     // Checking that there is NO banner showing that the project is disabled
     await projectPage.checkNoDisabledBanner()
 })
+
+test('deleting a project', async ({page, ontrack}) => {
+    // Provisioning
+    const project = await ontrack.createProject()
+    // Login
+    await login(page, ontrack)
+    // Navigating to the project
+    const projectPage = new ProjectPage(page, ontrack, project)
+    await projectPage.goTo()
+
+    // Deleting the project
+    await projectPage.deleteProject()
+
+    // Checking we are on the home page
+    const homePage = new HomePage(page, ontrack)
+    await homePage.checkOnPage()
+})
+

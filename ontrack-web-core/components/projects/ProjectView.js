@@ -31,6 +31,7 @@ import {gqlBranchContentFragment} from "@components/branches/BranchGraphQLFragme
 import NewBranchCommand from "@components/branches/NewBranchCommand";
 import ProjectEnvironmentsCommand from "@components/extension/environments/project/ProjectEnvironmentsCommand";
 import ProjectBuildSearchCommand from "@components/projects/ProjectBuildSearchCommand";
+import ProjectDeleteCommand from "@components/projects/ProjectDeleteCommand";
 
 export default function ProjectView({id}) {
 
@@ -138,6 +139,15 @@ export default function ProjectView({id}) {
                     <ProjectBuildSearchCommand key="search" id={project.id}/>,
                     <UserMenuActions key="userMenuActions" actions={project.userMenuActions}/>,
                     <JumpToBranch key="branch" projectName={project.name}/>,
+                )
+                // Deleting the project
+                if (isAuthorized(project, 'project', 'delete')) {
+                    commands.push(
+                        <ProjectDeleteCommand key="delete" id={project.id}/>
+                    )
+                }
+                // All the rest of commands
+                commands.push(
                     <CloseCommand key="close" href={homeUri()}/>,
                 )
                 // Setting the commands

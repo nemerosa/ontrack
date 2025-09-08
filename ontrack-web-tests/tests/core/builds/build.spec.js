@@ -1,5 +1,6 @@
 const {login} = require("../login");
 const {BuildPage} = require("../builds/build");
+const {BranchPage} = require("../branches/branch");
 const {test} = require("../../fixtures/connection");
 
 test('build page', async ({page, ontrack}) => {
@@ -86,4 +87,23 @@ test('graph of links between builds', async ({page, ontrack}) => {
     await buildLinks.expectOnGraphView()
     await buildLinks.expectBuildGraphNodeVisible(build)
     await buildLinks.expectBuildGraphNodeVisible(target)
+})
+
+test('deleting a build', async ({page, ontrack}) => {
+    // Provisioning
+    const project = await ontrack.createProject()
+    const branch = await project.createBranch()
+    const build = await branch.createBuild()
+    // Login
+    await login(page, ontrack)
+    // Navigating to the build
+    const buildPage = new BuildPage(page, build)
+    await buildPage.goTo()
+
+    // Deleting the build
+    await buildPage.deleteBuild()
+
+    // Checking we are on the branch page
+    const branchPage = new BranchPage(page, branch)
+    await branchPage.checkOnPage()
 })

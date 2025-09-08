@@ -9,6 +9,10 @@ export class HomePage {
         this.ontrack = ontrack
     }
 
+    async checkOnPage() {
+        await expect(this.page.getByRole('button', {name: 'New project'})).toBeVisible()
+    }
+
     async newProject({name, description, disabled}) {
         await this.page.getByRole('button', {name: 'New project'}).click()
         await expect(this.page.getByPlaceholder('Project name')).toBeVisible()
