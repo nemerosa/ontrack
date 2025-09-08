@@ -2,6 +2,7 @@ import {gql} from "graphql-request";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {gqlBranchContentFragment} from "@components/branches/BranchGraphQLFragments";
+import {useQuery} from "@components/services/useQuery";
 
 export const gqlUserMenuActionFragment = gql`
     fragment userMenuActionFragment on UserMenuAction {
@@ -56,6 +57,93 @@ export const usePromotionLevel = (id) => {
         }
     }, [client, id]);
     return promotionLevel
+}
+
+export const useBuild = (id) => {
+    const {loading, data: build} = useQuery(
+        gql`
+            query Build($id: Int!) {
+                build(id: $id) {
+                    id
+                    name
+                    displayName
+                    creation {
+                        time
+                        user
+                    }
+                    description
+                    annotatedDescription
+                    branch {
+                        id
+                        name
+                        displayName
+                        project {
+                            id
+                            name
+                        }
+                    }
+                }
+            }
+        `,
+        {
+            variables: {id},
+            dataFn: data => data.build,
+        }
+    )
+    return {loading, build}
+}
+
+export const useBranch = (id) => {
+    const {loading, data: branch} = useQuery(
+        gql`
+            query Branch($id: Int!) {
+                branch(id: $id) {
+                    id
+                    name
+                    displayName
+                    creation {
+                        time
+                        user
+                    }
+                    description
+                    annotatedDescription
+                    project {
+                        id
+                        name
+                    }
+                }
+            }
+        `,
+        {
+            variables: {id},
+            dataFn: data => data.branch,
+        }
+    )
+    return {loading, branch}
+}
+
+export const useProject = (id) => {
+    const {loading, data: project} = useQuery(
+        gql`
+            query Project($id: Int!) {
+                project(id: $id) {
+                    id
+                    name
+                    creation {
+                        time
+                        user
+                    }
+                    description
+                    annotatedDescription
+                }
+            }
+        `,
+        {
+            variables: {id},
+            dataFn: data => data.project,
+        }
+    )
+    return {loading, project}
 }
 
 export const gqlValidationStampFragment = gql`

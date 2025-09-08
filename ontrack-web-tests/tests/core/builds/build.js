@@ -1,5 +1,6 @@
 import {BuildLinksPage} from "./buildLinks";
 import {PromotionInfoSection} from "./PromotionInfoSection";
+import {confirmBox} from "../../support/confirm";
 
 const {ui} = require("@ontrack/connection");
 const {expect} = require("@playwright/test");
@@ -30,6 +31,13 @@ export class BuildPage {
         const section = this.page.getByTestId('promotions')
         await expect(section).toBeVisible()
         return new PromotionInfoSection(this.page, section, this.build)
+    }
+
+    async deleteBuild() {
+        const button = this.page.getByRole('button', {name: 'Delete build'})
+        await expect(button).toBeVisible()
+        await button.click()
+        await confirmBox(this.page, "Delete build", {okText: "Delete"})
     }
 
 }

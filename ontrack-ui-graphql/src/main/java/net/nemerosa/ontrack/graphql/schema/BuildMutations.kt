@@ -158,6 +158,13 @@ class BuildMutations(
             // Return the origin
             from
         },
+        unitMutation(
+            name = "deleteBuildById",
+            description = "Deletes a build by ID",
+            input = DeleteBuildByIdInput::class
+        ) { input ->
+            structureService.deleteBuild(ID.of(input.id))
+        },
     )
 
 
@@ -346,6 +353,11 @@ data class LinksBuildInputItem(
     val build: String,
     @APIDescription("Qualifier for the link")
     val qualifier: String?,
+)
+
+data class DeleteBuildByIdInput(
+    @APIDescription("ID of the build to delete")
+    val id: Int,
 )
 
 @Component
