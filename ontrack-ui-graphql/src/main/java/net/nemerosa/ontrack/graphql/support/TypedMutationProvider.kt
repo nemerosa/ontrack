@@ -43,7 +43,7 @@ abstract class TypedMutationProvider protected constructor(
     ): Mutation = UnitTypedMutation(
         name = name,
         description = description,
-        deprecation = description,
+        deprecation = deprecation,
         input = input,
         outputFields = outputFields,
         fetcher = fetcher

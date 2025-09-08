@@ -156,19 +156,18 @@ class BitbucketServerSCMExtension(
             // Auto approval
             if (autoApproval) {
                 // Auto merge token must be set
-                if (configuration.autoMergeToken.isNullOrBlank()) {
-                    throw BitbucketServerSCMMissingAutoMergeTokenException(configuration.name)
+                if (!configuration.autoMergeToken.isNullOrBlank()) {
+                    if (configuration.autoMergeUser.isNullOrBlank()) {
+                        throw BitbucketServerSCMMissingAutoMergeUserException(configuration.name)
+                    }
+                    // Approving using the auto merge account
+                    client.approvePR(
+                        repo = repo,
+                        prId = pr.id,
+                        user = configuration.autoMergeUser,
+                        token = configuration.autoMergeToken,
+                    )
                 }
-                if (configuration.autoMergeUser.isNullOrBlank()) {
-                    throw BitbucketServerSCMMissingAutoMergeUserException(configuration.name)
-                }
-                // Approving using the auto merge account
-                client.approvePR(
-                    repo = repo,
-                    prId = pr.id,
-                    user = configuration.autoMergeUser,
-                    token = configuration.autoMergeToken,
-                )
                 // Auto merge
                 if (remoteAutoMerge) {
                     error("Server-side auto merge is not supported for Bitbucket Server")

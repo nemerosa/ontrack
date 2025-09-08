@@ -647,6 +647,8 @@ type Build implements Authorizable & ProjectEntity {
         type: String
     ): [Decoration!]!
     description: String
+    "Display name for this build or the build's name if not available"
+    displayName: String!
     "List of slots this eligible to"
     eligibleSlots: [Slot!]!
     gitChangeLog(
@@ -1817,6 +1819,12 @@ type DeleteValidationRunMetaInfoPropertyPayload implements Payload {
 
 "Output type for the deleteValidationStampById mutation."
 type DeleteValidationStampByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the deleteValidationStampFilterById mutation."
+type DeleteValidationStampFilterByIdPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -3349,17 +3357,17 @@ type Mutation {
     bulkUpdatePromotionLevelById(
         "Input for the mutation"
         input: BulkUpdatePromotionLevelByIdInput
-    ): BulkUpdatePromotionLevelByIdPayload @deprecated(reason: "Bulk update of a promotion level")
+    ): BulkUpdatePromotionLevelByIdPayload
     "Bulk update of a validation stamp"
     bulkUpdateValidationStampById(
         "Input for the mutation"
         input: BulkUpdateValidationStampByIdInput
-    ): BulkUpdateValidationStampByIdPayload @deprecated(reason: "Bulk update of a validation stamp")
+    ): BulkUpdateValidationStampByIdPayload
     "Cancelling a pipeline"
     cancelSlotPipeline(
         "Input for the mutation"
         input: CancelSlotPipelineInput
-    ): CancelSlotPipelinePayload @deprecated(reason: "Cancelling a pipeline")
+    ): CancelSlotPipelinePayload
     "Changing the password of the current user"
     changePassword(input: ChangePasswordInput!): ChangePasswordPayload
     "Change the status of a validation run"
@@ -3376,7 +3384,7 @@ type Mutation {
     checkAutoVersioning(
         "Input for the mutation"
         input: CheckAutoVersioningInput
-    ): CheckAutoVersioningPayload @deprecated(reason: "Checks the status of the auto versioning compared to the latest versions and creates an appropriate validation")
+    ): CheckAutoVersioningPayload
     "Creates a new branch"
     createBranch(
         "Input for the mutation"
@@ -3406,7 +3414,7 @@ type Mutation {
     createConfiguration(
         "Input for the mutation"
         input: CreateConfigurationInput
-    ): CreateConfigurationPayload @deprecated(reason: "Creates a configuration")
+    ): CreateConfigurationPayload
     "Creates a new environment"
     createEnvironment(
         "Input for the mutation"
@@ -3421,7 +3429,7 @@ type Mutation {
     createJenkinsConfiguration(
         "Input for the mutation"
         input: CreateJenkinsConfigurationInput
-    ): CreateJenkinsConfigurationPayload @deprecated(reason: "Creates a Jenkins configuration")
+    ): CreateJenkinsConfigurationPayload
     "Creates a new predefined promotion level"
     createPredefinedPromotionLevel(
         "Input for the mutation"
@@ -3491,7 +3499,7 @@ type Mutation {
     deleteAutoVersioningConfig(
         "Input for the mutation"
         input: DeleteAutoVersioningConfigInput
-    ): DeleteAutoVersioningConfigPayload @deprecated(reason: "Deletes the auto-versioning configuration from a branch")
+    ): DeleteAutoVersioningConfigPayload
     "Deletes the git branch property on a branch identified by name."
     deleteBranchGitConfigProperty(
         "Input for the mutation"
@@ -3536,7 +3544,7 @@ type Mutation {
     deleteBuildFilter(
         "Input for the mutation"
         input: DeleteBuildFilterInput
-    ): DeleteBuildFilterPayload @deprecated(reason: "Deletes a build filter for current user and for all users if shared")
+    ): DeleteBuildFilterPayload
     "Deletes the git commit property on a build identified by name."
     deleteBuildGitCommitProperty(
         "Input for the mutation"
@@ -3581,51 +3589,51 @@ type Mutation {
     deleteConfiguration(
         "Input for the mutation"
         input: DeleteConfigurationInput
-    ): DeleteConfigurationPayload @deprecated(reason: "Deletes a configuration")
+    ): DeleteConfigurationPayload
     "Deletes a dashboard"
     deleteDashboard(input: DeleteDashboardInput!): DeletionPayload
     "Deletes a deployment"
     deleteDeployment(
         "Input for the mutation"
         input: DeleteDeploymentInput
-    ): DeleteDeploymentPayload @deprecated(reason: "Deletes a deployment")
+    ): DeleteDeploymentPayload
     "Deletes an existing environment"
     deleteEnvironment(
         "Input for the mutation"
         input: DeleteEnvironmentInput
-    ): DeleteEnvironmentPayload @deprecated(reason: "Deletes an existing environment")
+    ): DeleteEnvironmentPayload
     "Generic deletion for a property and an entity"
     deleteGenericProperty(
         "Input for the mutation"
         input: DeleteGenericPropertyInput
-    ): DeleteGenericPropertyPayload @deprecated(reason: "Generic deletion for a property and an entity")
+    ): DeleteGenericPropertyPayload
     "Deletes a Jenkins configuration"
     deleteJenkinsConfiguration(
         "Input for the mutation"
         input: DeleteJenkinsConfigurationInput
-    ): DeleteJenkinsConfigurationPayload @deprecated(reason: "Deletes a Jenkins configuration")
+    ): DeleteJenkinsConfigurationPayload
     "Deletes a job"
     deleteJob(id: Int!): JobActionResult!
     "Deleting notification records"
     deleteNotificationRecords(
         "Input for the mutation"
         input: DeleteNotificationRecordsInput
-    ): DeleteNotificationRecordsPayload @deprecated(reason: "Deleting notification records")
+    ): DeleteNotificationRecordsPayload
     "Deletes an existing predefined promotion level"
     deletePredefinedPromotionLevel(
         "Input for the mutation"
         input: DeletePredefinedPromotionLevelInput
-    ): DeletePredefinedPromotionLevelPayload @deprecated(reason: "Deletes an existing predefined promotion level")
+    ): DeletePredefinedPromotionLevelPayload
     "Deletes an existing predefined validation stamp"
     deletePredefinedValidationStamp(
         "Input for the mutation"
         input: DeletePredefinedValidationStampInput
-    ): DeletePredefinedValidationStampPayload @deprecated(reason: "Deletes an existing predefined validation stamp")
+    ): DeletePredefinedValidationStampPayload
     "Deletes an existing project"
     deleteProject(
         "Input for the mutation"
         input: DeleteProjectInput
-    ): DeleteProjectPayload @deprecated(reason: "Deletes an existing project")
+    ): DeleteProjectPayload
     "Deletes the auto promotion levels property on a project identified by name."
     deleteProjectAutoPromotionLevelProperty(
         "Input for the mutation"
@@ -3760,7 +3768,7 @@ type Mutation {
     deletePromotionLevelById(
         "Input for the mutation"
         input: DeletePromotionLevelByIdInput
-    ): DeletePromotionLevelByIdPayload @deprecated(reason: "Deletes an existing promotion level")
+    ): DeletePromotionLevelByIdPayload
     "Deletes the message property on a promotion level identified by name."
     deletePromotionLevelMessageProperty(
         "Input for the mutation"
@@ -3785,7 +3793,7 @@ type Mutation {
     deletePromotionRun(
         "Input for the mutation"
         input: DeletePromotionRunInput
-    ): DeletePromotionRunPayload @deprecated(reason: "Deletes an existing promotion run")
+    ): DeletePromotionRunPayload
     "Deletes the message property on a promotion run identified by name."
     deletePromotionRunMessageProperty(
         "Input for the mutation"
@@ -3810,22 +3818,22 @@ type Mutation {
     deleteSlot(
         "Input for the mutation"
         input: DeleteSlotInput
-    ): DeleteSlotPayload @deprecated(reason: "Deletes a slot using its ID")
+    ): DeleteSlotPayload
     "Deletes an admission rule for a slot"
     deleteSlotAdmissionRuleConfig(
         "Input for the mutation"
         input: DeleteSlotAdmissionRuleConfigInput
-    ): DeleteSlotAdmissionRuleConfigPayload @deprecated(reason: "Deletes an admission rule for a slot")
+    ): DeleteSlotAdmissionRuleConfigPayload
     "Deletes a workflow from a slot"
     deleteSlotWorkflow(
         "Input for the mutation"
         input: DeleteSlotWorkflowInput
-    ): DeleteSlotWorkflowPayload @deprecated(reason: "Deletes a workflow from a slot")
+    ): DeleteSlotWorkflowPayload
     "Deletes an existing subscription using its ID"
     deleteSubscription(
         "Input for the mutation"
         input: DeleteSubscriptionInput
-    ): DeleteSubscriptionPayload @deprecated(reason: "Deletes an existing subscription using its ID")
+    ): DeleteSubscriptionPayload
     "Deletes the message property on a validation run identified by name."
     deleteValidationRunMessageProperty(
         "Input for the mutation"
@@ -3850,7 +3858,12 @@ type Mutation {
     deleteValidationStampById(
         "Input for the mutation"
         input: DeleteValidationStampByIdInput
-    ): DeleteValidationStampByIdPayload @deprecated(reason: "Deletes an existing validation stamp")
+    ): DeleteValidationStampByIdPayload
+    "Deletes a validation stamp filter"
+    deleteValidationStampFilterById(
+        "Input for the mutation"
+        input: DeleteValidationStampFilterByIdInput
+    ): DeleteValidationStampFilterByIdPayload
     "Deletes the message property on a validation stamp identified by name."
     deleteValidationStampMessageProperty(
         "Input for the mutation"
@@ -3875,7 +3888,7 @@ type Mutation {
     deleteWebhook(
         "Input for the mutation"
         input: DeleteWebhookInput
-    ): DeleteWebhookPayload @deprecated(reason: "Deleting an existing webhook")
+    ): DeleteWebhookPayload
     "Disables an account"
     disableAccount(
         "Input for the mutation"
@@ -3985,7 +3998,7 @@ type Mutation {
     grantGlobalRoleToAccount(
         "Input for the mutation"
         input: GrantGlobalRoleToAccountInput
-    ): GrantGlobalRoleToAccountPayload @deprecated(reason: "Grants a global role to an account")
+    ): GrantGlobalRoleToAccountPayload
     "Launches a job"
     launchJob(id: Int!): JobActionResult!
     "Launches an existing workflow"
@@ -4017,12 +4030,12 @@ type Mutation {
     overridePipelineRule(
         "Input for the mutation"
         input: OverridePipelineRuleInput
-    ): OverridePipelineRulePayload @deprecated(reason: "Overriding a rule into a pipeline")
+    ): OverridePipelineRulePayload
     "Overrides the execution of a workflow for a pipeline"
     overridePipelineWorkflow(
         "Input for the mutation"
         input: OverridePipelineWorkflowInput
-    ): OverridePipelineWorkflowPayload @deprecated(reason: "Overrides the execution of a workflow for a pipeline")
+    ): OverridePipelineWorkflowPayload
     "Pausing the execution of all jobs"
     pauseAllJobs: JobActionResult!
     "Pauses a job"
@@ -4049,12 +4062,12 @@ type Mutation {
     reorderPredefinedPromotionLevelById(
         "Input for the mutation"
         input: ReorderPredefinedPromotionLevelByIdInput
-    ): ReorderPredefinedPromotionLevelByIdPayload @deprecated(reason: "Reordering the predefining promotion levels")
+    ): ReorderPredefinedPromotionLevelByIdPayload
     "Reordering the promotion levels in a branch"
     reorderPromotionLevelById(
         "Input for the mutation"
         input: ReorderPromotionLevelByIdInput
-    ): ReorderPromotionLevelByIdPayload @deprecated(reason: "Reordering the promotion levels in a branch")
+    ): ReorderPromotionLevelByIdPayload
     "Resuming the execution of all jobs"
     resumeAllJobs: JobActionResult!
     "Resumes a job"
@@ -4063,19 +4076,19 @@ type Mutation {
     revokeAccountTokens(
         "Input for the mutation"
         input: RevokeAccountTokensInput
-    ): RevokeAccountTokensPayload @deprecated(reason: "Revoke all tokens of the given account")
+    ): RevokeAccountTokensPayload
     "Revokes all tokens"
     revokeAllTokens: RevokeAllTokensPayload
     "Revoke the given token"
     revokeToken(
         "Input for the mutation"
         input: RevokeTokenInput
-    ): RevokeTokenPayload @deprecated(reason: "Revoke the given token")
+    ): RevokeTokenPayload
     "Saves a build filter in the user preferences"
     saveBuildFilter(
         "Input for the mutation"
         input: SaveBuildFilterInput
-    ): SaveBuildFilterPayload @deprecated(reason: "Saves a build filter in the user preferences")
+    ): SaveBuildFilterPayload
     "Saves a dashboard"
     saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
     "Saves a workflow which is defined as JSON"
@@ -4521,14 +4534,14 @@ type Mutation {
     shareBuildFilter(
         "Input for the mutation"
         input: ShareBuildFilterInput
-    ): ShareBuildFilterPayload @deprecated(reason: "Shares a build filter for all users")
+    ): ShareBuildFilterPayload
     "Shares a dashboard"
     shareDashboard(input: ShareDashboardInput!): ShareDashboardPayload
     "Shares or updates a filter at project level"
     shareSCMFileChangeFilter(
         "Input for the mutation"
         input: ShareSCMFileChangeFilterInput
-    ): ShareSCMFileChangeFilterPayload @deprecated(reason: "Shares or updates a filter at project level")
+    ): ShareSCMFileChangeFilterPayload
     "Starts a pipeline for a slot and a build"
     startSlotPipeline(
         "Input for the mutation"
@@ -4545,7 +4558,7 @@ type Mutation {
     stopWorkflow(
         "Input for the mutation"
         input: StopWorkflowInput
-    ): StopWorkflowPayload @deprecated(reason: "Stopping a running workflow. Does not do anything if already stopped.")
+    ): StopWorkflowPayload
     "Set a list of subscriptions on a branch identified by name."
     subscribeBranchToEvents(
         "Input for the mutation"
@@ -4615,7 +4628,7 @@ type Mutation {
     unshareSCMFileChangeFilter(
         "Input for the mutation"
         input: UnshareSCMFileChangeFilterInput
-    ): UnshareSCMFileChangeFilterPayload @deprecated(reason: "Unshares a filter at project level")
+    ): UnshareSCMFileChangeFilterPayload
     "Updates an existing build"
     updateBuild(
         "Input for the mutation"
@@ -4625,17 +4638,17 @@ type Mutation {
     updateConfiguration(
         "Input for the mutation"
         input: UpdateConfigurationInput
-    ): UpdateConfigurationPayload @deprecated(reason: "Updates a configuration")
+    ): UpdateConfigurationPayload
     "Updates a Jenkins configuration"
     updateJenkinsConfiguration(
         "Input for the mutation"
         input: UpdateJenkinsConfigurationInput
-    ): UpdateJenkinsConfigurationPayload @deprecated(reason: "Updates a Jenkins configuration")
+    ): UpdateJenkinsConfigurationPayload
     "Updating the pipeline admission data"
     updatePipelineData(
         "Input for the mutation"
         input: UpdatePipelineDataInput
-    ): UpdatePipelineDataPayload @deprecated(reason: "Updating the pipeline admission data")
+    ): UpdatePipelineDataPayload
     "Updates an existing predefined promotion level"
     updatePredefinedPromotionLevel(
         "Input for the mutation"
@@ -4908,6 +4921,8 @@ type Project implements Authorizable & ProjectEntity {
     branches(
         "Maximum number of branches to return. No limit if not specified."
         count: Int,
+        "If null, does not filter on the branch disabled status. If true, looks only for enabled branches. If false, looks only for disabled branches."
+        enabled: Boolean,
         "Gets only favorite branches"
         favourite: Boolean,
         "Regular expression to match against the branch name"
@@ -7295,8 +7310,12 @@ type Slot implements Authorizable {
     lastDeployedPipeline: SlotPipeline
     "Paginated list of pipelines"
     pipelines(
+        "Name of the branch to get the pipelines for"
+        branchName: String,
         "Filtering on a build"
         buildId: Int,
+        "Filtering on finished pipelines"
+        done: Boolean,
         "Offset for the page"
         offset: Int = 0,
         "Size of the page"
@@ -8415,6 +8434,7 @@ enum AutoVersioningAuditState {
     CREATED
     ERROR
     POST_PROCESSING_END
+    POST_PROCESSING_LAUNCHED
     POST_PROCESSING_START
     PROCESSING_ABORTED
     PROCESSING_CANCELLED
@@ -9673,6 +9693,12 @@ input DeleteValidationRunMetaInfoPropertyInput {
 "Input type for the deleteValidationStampById mutation."
 input DeleteValidationStampByIdInput {
     "Validation stamp ID"
+    id: Int!
+}
+
+"Input type for the deleteValidationStampFilterById mutation."
+input DeleteValidationStampFilterByIdInput {
+    "ID of the validation stamp filter"
     id: Int!
 }
 
