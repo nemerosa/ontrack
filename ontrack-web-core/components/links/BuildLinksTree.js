@@ -1,8 +1,9 @@
-import {Alert, Skeleton, Space, Tree} from "antd";
+import {Skeleton, Space, Tree} from "antd";
 import {useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {collectDownstreamNodesAsTreeData} from "@components/links/BuildLinksUtils";
 import BuildLinksTreeNode from "@components/links/BuildLinksTreeNode";
+import CloseableAlert from "@components/common/CloseableAlert";
 
 export default function BuildLinksTree({build, changeDependencyLinksMode}) {
 
@@ -38,7 +39,8 @@ export default function BuildLinksTree({build, changeDependencyLinksMode}) {
         <>
             <Skeleton active loading={loading}>
                 <Space direction="vertical" className="ot-line">
-                    <Alert
+                    <CloseableAlert
+                        id="tree-view-alert"
                         message={
                             <>
                                 The tree view below displays only downstream dependencies. To get also
@@ -46,8 +48,6 @@ export default function BuildLinksTree({build, changeDependencyLinksMode}) {
                             </>
                         }
                         type="info"
-                        showIcon={true}
-                        closable={true}
                     />
                     <Tree
                         showIcon={true}
