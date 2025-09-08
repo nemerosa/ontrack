@@ -53,6 +53,46 @@ You can easily use the <<feeding-cli,Ontrack CLI>> from your GitHub workflows by
     indexation: 120
 ----
 
+===== Creating a build
+
+https://github.com/nemerosa/ontrack-github-actions-cli-build[`nemerosa/ontrack-github-actions-cli-build`] - creates a build based on GitHub information:
+
+[source,yaml]
+----
+- name: Ontrack build
+  uses: nemerosa/ontrack-github-actions-cli-build@v1
+----
+
+and if you want to add some release information:
+
+[source,yaml]
+----
+- name: Ontrack build
+  uses: nemerosa/ontrack-github-actions-cli-build@v1
+  with:
+    release: ${{ env.VERSION }}
+----
+
+This steps:
+
+* creates or updates the build
+* sets the commit property
+* sets the release property if provided
+* sets some run info
+* sets a link to the GH workflow
+
+By default, the build name will be the workflow run number, you can change this by using the `build` input:
+
+[source,yaml]
+----
+- name: Ontrack build
+  uses: nemerosa/ontrack-github-actions-cli-build@v1
+  with:
+    build: <your build name>
+----
+
+===== Validating a build
+
 * https://github.com/nemerosa/ontrack-github-actions-cli-validation[`nemerosa/ontrack-github-actions-cli-validation`] - creates a validation run for a build based on GitHub information:
 
 [source,yaml]
