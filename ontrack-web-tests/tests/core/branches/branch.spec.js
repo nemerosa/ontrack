@@ -88,5 +88,5 @@ test('deleting a branch', async ({page, ontrack}) => {
 
     // Checking we are on the project page
     const projectPage = new ProjectPage(page, ontrack, project)
-    await projectPage.checkOnPage()
+    await projectPage.expectOnPage()
 })
