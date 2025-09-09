@@ -630,12 +630,18 @@ For the global configuration, you can go to _Settings > GitHub Auto Versioning P
 
 The `postProcessingConfig` <<auto-versioning-config,property>> at branch level must contain the following parameters:
 
-* `dockerImage` - This image defines the environment for the upgrade command to run in
-* `dockerCommand` - Command to run in the Docker container
-* `commitMessage`  - Commit message to use to commit and push the result of the post-processing
+* `dockerImage` - (required) This image defines the environment for the upgrade command to run in
+* `dockerCommand` - (required) Command to run in the Docker container
+* `commitMessage`  - (required) Commit message to use to commit and push the result of the post-processing
+* `version` - (required) the version which is upgraded to
 * `config` - GitHub configuration to use for the connection (optional, using defaults if not specified)
 * `workflow` - If defined, name of the workflow in _this_ repository containing the post-processing (like `post-processing.yml`)
-* `version` - the version which is upgraded to
+
+The following parameters are <<appendix-templating,templated>>:
+
+* `dockerImage`
+* `dockerCommand`
+* `commitMessage`
 
 The `workflow` branch configuration property can be used to set the post-processing workflow to one in the very branch targeted by the auto versioning process.
 This would override the global settings.
