@@ -41,8 +41,16 @@ class GQLRootQuerySCMChangeLog(
             val from: Int = env.getArgument(ARG_FROM)!!
             val to: Int = env.getArgument(ARG_TO)!!
             val projects: List<String>? = env.getArgument(ARG_PROJECTS)
-            val buildFrom = structureService.getBuild(ID.of(from))
-            val buildTo = structureService.getBuild(ID.of(to))
+            var buildFrom = structureService.getBuild(ID.of(from))
+            var buildTo = structureService.getBuild(ID.of(to))
+
+            // Inverting the boundaries so that "buildTo" is the most recent
+            if (buildTo.signature.time < buildFrom.signature.time) {
+                val tmp = buildFrom
+                buildFrom = buildTo
+                buildTo = tmp
+            }
+
             runBlocking {
                 scmChangeLogService.getChangeLog(
                     from = buildFrom,
