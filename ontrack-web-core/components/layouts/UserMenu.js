@@ -32,6 +32,7 @@ import {useLogout} from "@components/providers/ConnectionContextProvider";
 import LegacyLink from "@components/common/LegacyLink";
 import UserMenuItemLink from "@components/layouts/UserMenuItemLink";
 import {useRefData} from "@components/providers/RefDataProvider";
+import SonarqubeIcon from "@components/extension/sonarqube/SonarqubeIcon";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -80,6 +81,7 @@ export default function UserMenu({userMenu}) {
         'extension/license/info': <FaCertificate/>,
         'extension/casc/casc': <FaCode/>,
         'extension/queue/records': <FaBars/>,
+        'extension/sonarqube/configurations': <SonarqubeIcon/>,
     }
 
     useEffect(() => {

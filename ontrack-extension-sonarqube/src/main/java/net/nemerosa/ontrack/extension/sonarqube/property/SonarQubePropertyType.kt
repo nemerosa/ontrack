@@ -96,14 +96,14 @@ class SonarQubePropertyType(
         val configuration = configurationService.getConfiguration(configurationName)
         // OK
         return SonarQubeProperty(
-            configuration,
-            node.path("key").asText(),
-            node.path("validationStamp").asText().ifBlank { SonarQubeProperty.DEFAULT_VALIDATION_STAMP },
-            node.path("measures").map { it.asText() },
-            node.path("override").asBoolean(),
-            node.path("branchModel").asBoolean(),
-            JsonUtils.get(node, "branchPattern", null),
-            node.getBooleanField(SonarQubeProperty::validationMetrics.name) ?: true,
+            configuration = configuration,
+            key = node.path("key").asText(),
+            validationStamp = node.path("validationStamp").asText().ifBlank { SonarQubeProperty.DEFAULT_VALIDATION_STAMP },
+            measures = node.path("measures").map { it.asText() },
+            override = node.path("override").asBoolean(),
+            branchModel = node.path("branchModel").asBoolean(),
+            branchPattern = JsonUtils.get(node, "branchPattern", null),
+            validationMetrics = node.getBooleanField(SonarQubeProperty::validationMetrics.name) ?: true,
         )
     }
 
