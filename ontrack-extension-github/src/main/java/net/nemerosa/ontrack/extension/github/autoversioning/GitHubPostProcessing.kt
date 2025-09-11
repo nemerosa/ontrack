@@ -59,47 +59,41 @@ class GitHubPostProcessing(
         val ghConfig = gitHubConfigurationService.findConfiguration(ghConfigName)
             ?: throw GitHubPostProcessingConfigException("Cannot find GitHub configuration with name: $ghConfigName")
 
-        // Local repository
-        if (!config.workflow.isNullOrBlank()) {
-            runPostProcessing(
-                ghConfig = ghConfig,
-                config = config,
-                repository = repository,
-                workflow = config.workflow,
-                branch = upgradeBranch,
-                inputs = emptyMap(),
-                settings = settings,
-                avTemplateRenderer = avTemplateRenderer,
-                onPostProcessingInfo = onPostProcessingInfo,
-            )
-        }
-        // Common repository
-        else {
-            if (settings.repository.isNullOrBlank()) {
-                throw GitHubPostProcessingConfigException("Default GitHub repository for auto versioning post processing is not defined.")
-            }
-            if (settings.workflow.isNullOrBlank()) {
-                throw GitHubPostProcessingConfigException("Default GitHub workflow for auto versioning post processing is not defined.")
-            }
-            runPostProcessing(
-                ghConfig = ghConfig,
-                config = config,
-                repository = settings.repository,
-                workflow = settings.workflow,
-                branch = settings.branch,
-                inputs = mapOf(
-                    "repository" to repository,
-                    "upgrade_branch" to upgradeBranch,
-                    "docker_image" to avTemplateRenderer.render(config.dockerImage, PlainEventRenderer.INSTANCE),
-                    "docker_command" to avTemplateRenderer.render(config.dockerCommand, PlainEventRenderer.INSTANCE),
-                    "commit_message" to avTemplateRenderer.render(config.commitMessage, PlainEventRenderer.INSTANCE),
-                    "version" to autoVersioningOrder.targetVersion,
-                ),
-                settings = settings,
-                avTemplateRenderer = avTemplateRenderer,
-                onPostProcessingInfo = onPostProcessingInfo,
-            )
-        }
+        // Repository
+        val ppRepository = config.repository?.takeIf { it.isNotBlank() }
+            ?: settings.repository
+            ?: throw GitHubPostProcessingConfigException("Cannot find any repository to launch the GitHub auto-versioning post-processing")
+
+        // Workflow
+        val workflow = config.workflow?.takeIf { it.isNotBlank() }
+            ?: settings.workflow
+            ?: throw GitHubPostProcessingConfigException("Cannot find any workflow to launch the GitHub auto-versioning post-processing")
+
+        // Branch
+        val branch = config.branch?.takeIf { it.isNotBlank() }
+            ?: settings.branch
+                .let { avTemplateRenderer.render(it, PlainEventRenderer.INSTANCE) }
+
+        // Launching the post-processing
+        runPostProcessing(
+            ghConfig = ghConfig,
+            config = config,
+            repository = ppRepository,
+            workflow = workflow,
+            branch = branch,
+            inputs = mapOf(
+                "repository" to repository,
+                "upgrade_branch" to upgradeBranch,
+                "docker_image" to avTemplateRenderer.render(config.dockerImage, PlainEventRenderer.INSTANCE),
+                "docker_command" to avTemplateRenderer.render(config.dockerCommand, PlainEventRenderer.INSTANCE),
+                "commit_message" to avTemplateRenderer.render(config.commitMessage, PlainEventRenderer.INSTANCE),
+                "version" to autoVersioningOrder.targetVersion,
+            ),
+            settings = settings,
+            avTemplateRenderer = avTemplateRenderer,
+            onPostProcessingInfo = onPostProcessingInfo,
+        )
+
     }
 
     private fun runPostProcessing(

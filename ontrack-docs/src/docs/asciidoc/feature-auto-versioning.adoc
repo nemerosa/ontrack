@@ -635,6 +635,8 @@ The `postProcessingConfig` <<auto-versioning-config,property>> at branch level m
 * `commitMessage`  - (required) Commit message to use to commit and push the result of the post-processing
 * `version` - (required) the version which is upgraded to
 * `config` - GitHub configuration to use for the connection (optional, using defaults if not specified)
+* `repository` - GitHub repository (`owner/repo`). To be set to override the default settings
+* `branch` - If defined, overrides the default settings for the branch to use when launching the workflow
 * `workflow` - If defined, name of the workflow in _this_ repository containing the post-processing (like `post-processing.yml`)
 
 The following parameters are <<appendix-templating,templated>>:
@@ -642,6 +644,7 @@ The following parameters are <<appendix-templating,templated>>:
 * `dockerImage`
 * `dockerCommand`
 * `commitMessage`
+* `branch`
 
 The `workflow` branch configuration property can be used to set the post-processing workflow to one in the very branch targeted by the auto versioning process.
 This would override the global settings.

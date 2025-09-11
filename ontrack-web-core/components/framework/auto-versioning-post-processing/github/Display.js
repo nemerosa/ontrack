@@ -33,6 +33,18 @@ export default function Display({
             span: 12,
         },
         {
+            key: 'repository',
+            label: "Specific GitHub repository for the workflow job",
+            children: <Typography.Text code>{repository}</Typography.Text>,
+            span: 12,
+        },
+        {
+            key: 'branch',
+            label: "Specific GitHub repository branch for the workflow job",
+            children: <Typography.Text code>{branch}</Typography.Text>,
+            span: 12,
+        },
+        {
             key: 'workflow',
             label: "Specific GitHub workflow job",
             children: <Typography.Text code>{workflow}</Typography.Text>,
