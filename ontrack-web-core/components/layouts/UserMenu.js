@@ -29,6 +29,7 @@ import {
 import {MainLayoutContext} from "@components/layouts/MainLayout";
 import UserMenuItemLink from "@components/layouts/UserMenuItemLink";
 import {useRefData} from "@components/providers/RefDataProvider";
+import SonarqubeIcon from "@components/extension/sonarqube/SonarqubeIcon";
 import {signOut} from "next-auth/react";
 import Link from "next/link";
 
@@ -80,6 +81,7 @@ export default function UserMenu({userMenu}) {
         'extension/license/info': <FaCertificate/>,
         'extension/casc/casc': <FaCode/>,
         'extension/queue/records': <FaBars/>,
+        'extension/sonarqube/configurations': <SonarqubeIcon/>,
     }
 
     useEffect(() => {
