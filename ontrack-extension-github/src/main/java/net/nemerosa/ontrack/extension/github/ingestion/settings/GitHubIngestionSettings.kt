@@ -37,6 +37,18 @@ class GitHubIngestionSettings(
     @APIDescription("Is the ingestion of the GitHub events enabled?")
     val enabled: Boolean = DEFAULT_ENABLED,
 ) {
+
+    fun obfuscate() =GitHubIngestionSettings(
+        token = "",
+        retentionDays = retentionDays,
+        orgProjectPrefix = orgProjectPrefix,
+        indexationInterval = indexationInterval,
+        repositoryIncludes = repositoryIncludes,
+        repositoryExcludes = repositoryExcludes,
+        issueServiceIdentifier = issueServiceIdentifier,
+        enabled = enabled
+    )
+
     companion object {
         /**
          * Keeping the payloads 30 days by default.

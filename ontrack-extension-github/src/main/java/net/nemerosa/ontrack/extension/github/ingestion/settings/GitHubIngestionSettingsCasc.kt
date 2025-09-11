@@ -27,4 +27,6 @@ class GitHubIngestionSettingsCasc(
             GitHubIngestionSettings::issueServiceIdentifier to GitHubIngestionSettings.DEFAULT_ISSUE_SERVICE_IDENTIFIER,
             GitHubIngestionSettings::enabled to GitHubIngestionSettings.DEFAULT_ENABLED,
         )
+
+    override fun obfuscate(settings: GitHubIngestionSettings) = settings.obfuscate()
 }

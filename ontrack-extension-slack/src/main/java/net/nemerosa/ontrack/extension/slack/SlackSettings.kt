@@ -17,4 +17,11 @@ class SlackSettings(
     @APILabel("Endpoint")
     @APIDescription("Slack API endpoint (leave blank for default)")
     val endpoint: String? = "",
-)
+) {
+    fun obfuscate() = SlackSettings(
+        enabled = enabled,
+        token = "",
+        emoji = emoji,
+        endpoint = endpoint
+    )
+}
