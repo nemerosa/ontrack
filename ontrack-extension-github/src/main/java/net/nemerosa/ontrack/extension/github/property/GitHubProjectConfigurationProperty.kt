@@ -21,5 +21,12 @@ class GitHubProjectConfigurationProperty(
     val indexationInterval: Int,
     @APIDescription("Identifier for the issue service")
     val issueServiceConfigurationIdentifier: String?
-) : ConfigurationProperty<GitHubEngineConfiguration>
+) : ConfigurationProperty<GitHubEngineConfiguration> {
+
+    /**
+     * URL to the repository
+     */
+    val url: String = "${configuration.url}/$repository"
+
+}
 

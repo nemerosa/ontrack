@@ -3,10 +3,10 @@ import {FaGithub} from "react-icons/fa";
 
 export default function GitHubProjectDecorator({decoration}) {
     return (
-        <Tooltip title={`GitHub repository: ${decoration.data}`}>
-            <Typography.Text>
+        <Tooltip title={`GitHub repository: ${decoration.data.displayText}`}>
+            <Typography.Link href={decoration.data.url}>
                 <FaGithub/>
-            </Typography.Text>
+            </Typography.Link>
         </Tooltip>
     )
 }
