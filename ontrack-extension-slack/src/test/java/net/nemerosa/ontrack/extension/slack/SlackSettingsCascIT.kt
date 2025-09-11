@@ -73,4 +73,23 @@ class SlackSettingsCascIT : AbstractCascTestSupport() {
         }
     }
 
+    @Test
+    fun `Slack token obfuscated when rendered in CasC`() {
+        asAdmin {
+            withCleanSettings<SlackSettings> {
+                settingsManagerService.saveSettings(SlackSettings(enabled = true, token = "some-token", emoji = ":yontrack:"))
+                val json = slackSettingsCascContext.render()
+                assertEquals(
+                    mapOf(
+                        "enabled" to true,
+                        "token" to "",
+                        "emoji" to ":yontrack:",
+                        "endpoint" to "",
+                    ).asJson(),
+                    json
+                )
+            }
+        }
+    }
+
 }

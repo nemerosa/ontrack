@@ -142,4 +142,31 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
         }
     }
 
+    @Test
+    fun `Token obfuscated when rendered in CasC`() {
+        asAdmin {
+            withCleanSettings<GitHubIngestionSettings> {
+                settingsManagerService.saveSettings(
+                    GitHubIngestionSettings(
+                        token = "secret",
+                        enabled = true,
+                    )
+                )
+                val json = gitHubIngestionSettingsCasc.render()
+                assertEquals(
+                    mapOf(
+                        "token" to "",
+                        "retentionDays" to 30, "orgProjectPrefix" to false,
+                        "indexationInterval" to 30,
+                        "repositoryIncludes" to ".*",
+                        "repositoryExcludes" to "",
+                        "issueServiceIdentifier" to "self",
+                        "enabled" to true
+                    ).asJson(),
+                    json
+                )
+            }
+        }
+    }
+
 }
