@@ -9,4 +9,20 @@ data class WorkflowRun(
     @JsonProperty("head_branch")
     val headBranch: String,
     val status: String,
-)
+    val conclusion: String?,
+) {
+    /**
+     * If the run is finished and successful, returns `true`.
+     *
+     * If the run is finished and not successful, returns `false`.
+     *
+     * If the run is not finished, returns `null`
+     */
+    val success: Boolean?
+        get() = if (status == "completed") {
+            conclusion == "success"
+        } else {
+            null
+        }
+
+}
