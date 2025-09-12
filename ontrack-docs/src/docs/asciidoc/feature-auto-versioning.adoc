@@ -704,14 +704,9 @@ jobs:
     steps:
       - name: logging
         run: |
-          echo id = ${{ inputs.id }} > inputs.properties
-          echo repository = ${{ inputs.repository }} >> inputs.properties
-          echo upgrade_branch = ${{ inputs.upgrade_branch }} >> inputs.properties
-          echo docker_image = ${{ inputs.docker_image }} >> inputs.properties
-          echo docker_command = ${{ inputs.docker_command }} >> inputs.properties
-          echo commit_message = ${{ inputs.commit_message }} >> inputs.properties
+          touch inputs.properties
       - name: artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: inputs-${{ inputs.id }}.properties
           path: inputs.properties
