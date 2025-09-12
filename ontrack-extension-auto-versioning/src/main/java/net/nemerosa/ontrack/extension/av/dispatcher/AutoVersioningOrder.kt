@@ -14,6 +14,7 @@ data class AutoVersioningOrder(
     val sourcePromotionRunId: Int?, // Can be null if the AV is not linked to a promotion
     val sourcePromotion: String?, // Can be null if the AV is not linked to a promotion
     val sourceBackValidation: String?,
+    val qualifier: String? = null,
     // Target information
     val branch: Branch,
     val targetPath: String,

@@ -258,6 +258,8 @@ type AutoVersioningOrder {
     postProcessing: String
     "JSON configuration for the post processing"
     postProcessingConfig: JSON
+    "Qualifier for the link between the source and target"
+    qualifier: String
     "Link to the target repository"
     repositoryHtmlURL: String
     "List of reviewers to always add to the pull request"

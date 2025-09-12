@@ -74,6 +74,7 @@ export default function AutoVersioningAuditEntryView({uuid}) {
                                             name
                                         }
                                     }
+                                    qualifier
                                     repositoryHtmlURL
                                     targetPath
                                     targetRegex
