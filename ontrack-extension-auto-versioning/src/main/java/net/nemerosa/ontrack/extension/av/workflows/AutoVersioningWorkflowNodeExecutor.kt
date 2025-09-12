@@ -102,6 +102,7 @@ class AutoVersioningWorkflowNodeExecutor(
             sourcePromotionRunId = null,
             sourcePromotion = null,
             sourceBackValidation = null,
+            qualifier = null,
             branch = targetBranch,
             targetPath = resolvedData.targetPath,
             targetRegex = resolvedData.targetRegex,
