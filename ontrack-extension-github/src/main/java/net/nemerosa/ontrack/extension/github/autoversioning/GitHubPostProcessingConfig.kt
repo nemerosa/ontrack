@@ -16,11 +16,11 @@ data class GitHubPostProcessingConfig(
     @APIDescription("GitHub configuration to use for the connection (optional, using defaults if not specified)")
     val config: String?,
     @APIDescription("GitHub repository (`owner/repo`). To be set to override the default settings.")
-    val repository: String?,
+    val repository: String? = null,
     @APIDescription("If defined, name of the workflow in _this_ repository containing the post-processing (like `post-processing.yml`)")
     val workflow: String?,
     @APIDescription("If defined, overrides the default settings for the branch to use when launching the workflow")
-    val branch: String?,
+    val branch: String? = null,
     @APIDescription("List of extra parameters to pass to the workflow (optional, none by default)")
     @ListRef
     val parameters: List<GitHubPostProcessingConfigParam> = emptyList(),
