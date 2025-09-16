@@ -3,6 +3,7 @@ const {expect} = require("@playwright/test");
 const {ValidationRunHistoryDialog} = require("../validationRuns/ValidationRunHistoryDialog");
 const {SCMChangeLogPage} = require("../../extensions/scm/scm");
 const {PromotionsPage} = require("../promotionLevels/PromotionsPage");
+const {confirmBox} = require("../../support/confirm");
 
 class BranchPage {
     constructor(page, branch) {
@@ -11,11 +12,15 @@ class BranchPage {
         this.changeLogButton = this.page.getByRole('button', {name: 'Change log', exact: true})
     }
 
-    async goTo() {
-        await this.page.goto(`${ui()}/branch/${this.branch.id}`)
+    async checkOnPage() {
         await expect(this.page.getByText(this.branch.name)).toBeVisible()
         // Loading finished
         await expect(this.page.getByTestId('loading-builds')).toBeHidden()
+    }
+
+    async goTo() {
+        await this.page.goto(`${ui()}/branch/${this.branch.id}`)
+        await this.checkOnPage()
     }
 
     async checkChangeLogButtonPresent({disabled}) {
@@ -75,6 +80,13 @@ class BranchPage {
         const promotionsPage = new PromotionsPage(this.page, this.branch)
         await promotionsPage.checkOnPage()
         return promotionsPage
+    }
+
+    async deleteBranch() {
+        const button = this.page.getByRole('button', {name: 'Delete branch'})
+        await expect(button).toBeVisible()
+        await button.click()
+        await confirmBox(this.page, "Delete branch", {okText: "Delete"})
     }
 }
 

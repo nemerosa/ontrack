@@ -8,6 +8,10 @@ export class HomePage {
         this.page = page
     }
 
+    async checkOnPage() {
+        await expect(this.page.getByRole('button', {name: 'New project'})).toBeVisible()
+    }
+
     async legacyHome() {
         await this.page.getByRole('link', {name: 'Legacy home'}).click()
         return new LegacyHomePage(this.page)

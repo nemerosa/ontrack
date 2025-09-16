@@ -12,6 +12,7 @@ data class AutoVersioningAuditStoreData(
     val sourcePromotionRunId: Int?, // Nullable for backward compatibility
     val sourcePromotion: String?, // Nullable for backward compatibility
     val sourceBackValidation: String?, // Nullable for backward compatibility
+    val qualifier: String?, // Nullable for backward compatibility
     val targetPaths: List<String>,
     val targetRegex: String?,
     val targetProperty: String?,
@@ -45,6 +46,7 @@ data class AutoVersioningAuditStoreData(
         sourcePromotionRunId = sourcePromotionRunId,
         sourcePromotion = sourcePromotion,
         sourceBackValidation = sourceBackValidation,
+        qualifier = qualifier,
         targetPaths = targetPaths,
         targetRegex = targetRegex,
         targetProperty = targetProperty,

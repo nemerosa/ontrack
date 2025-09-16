@@ -107,6 +107,13 @@ class BranchMutations(
             val branch = structureService.getBranch(ID(input.id))
             structureService.enableBranch(branch)
         },
+        unitMutation(
+            name = "deleteBranchById",
+            description = "Deletes a branch using its ID",
+            input = DeleteBranchByIdInput::class
+        ) { input ->
+            structureService.deleteBranch(ID.of(input.id))
+        }
     )
 
 
@@ -218,5 +225,10 @@ data class DisableBranchInput(
 
 data class EnableBranchInput(
     @APIDescription("Branch ID")
+    val id: Int
+)
+
+data class DeleteBranchByIdInput(
+    @APIDescription("ID of the branch to delete")
     val id: Int
 )

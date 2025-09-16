@@ -150,6 +150,7 @@ export default function AutoVersioningAuditView() {
                                             name
                                         }
                                     }
+                                    qualifier
                                     repositoryHtmlURL
                                     targetPath
                                     targetRegex
@@ -305,6 +306,14 @@ export default function AutoVersioningAuditView() {
                             title="Promotion"
                             render={(_, entry) =>
                                 <Typography.Text>{entry.order.sourcePromotion}</Typography.Text>
+                            }
+                        />
+
+                        <Column
+                            key="qualifier"
+                            title="Qualifier"
+                            render={(_, entry) =>
+                                <Typography.Text>{entry.order.qualifier}</Typography.Text>
                             }
                         />
 

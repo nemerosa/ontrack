@@ -25,6 +25,11 @@ class ProjectAuthorizationContributor(
                     securityService.isProjectFunctionGranted<ProjectDisable>(project)
                 ),
                 Authorization(
+                    CoreAuthorizationContributor.PROJECT,
+                    Authorization.DELETE,
+                    securityService.isProjectFunctionGranted<ProjectDelete>(project)
+                ),
+                Authorization(
                     CoreAuthorizationContributor.BRANCH,
                     Authorization.CREATE,
                     securityService.isProjectFunctionGranted<BranchCreate>(project)

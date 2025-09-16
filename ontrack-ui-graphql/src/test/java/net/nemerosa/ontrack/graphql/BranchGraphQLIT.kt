@@ -12,10 +12,7 @@ import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.execution.ErrorType
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class BranchGraphQLIT : AbstractQLKTITSupport() {
 
@@ -772,6 +769,31 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
                                 ?.path("authorized")?.asBoolean()
                         )
                     }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Deleting a branch by ID`() {
+        project {
+            branch {
+                run(
+                    """
+                        mutation {
+                            deleteBranchById(input: {id: $id}) {
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                ) { data ->
+                    checkGraphQLUserErrors(data, "deleteBranchById")
+                    assertNull(
+                        structureService.findBuildByID(id),
+                        "Branch has been deleted"
+                    )
                 }
             }
         }

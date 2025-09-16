@@ -258,6 +258,8 @@ type AutoVersioningOrder {
     postProcessing: String
     "JSON configuration for the post processing"
     postProcessingConfig: JSON
+    "Qualifier for the link between the source and target"
+    qualifier: String
     "Link to the target repository"
     repositoryHtmlURL: String
     "List of reviewers to always add to the pull request"
@@ -1289,6 +1291,12 @@ type DeleteAutoVersioningConfigPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the deleteBranchById mutation."
+type DeleteBranchByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the deleteBranchGitConfigPropertyById mutation."
 type DeleteBranchGitConfigPropertyByIdPayload implements Payload {
     "Branch updated"
@@ -1349,6 +1357,12 @@ type DeleteBranchReleaseValidationPropertyByIdPayload implements Payload {
 type DeleteBranchReleaseValidationPropertyPayload implements Payload {
     "Branch updated"
     branch: Branch
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the deleteBuildById mutation."
+type DeleteBuildByIdPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -3500,6 +3514,11 @@ type Mutation {
         "Input for the mutation"
         input: DeleteAutoVersioningConfigInput
     ): DeleteAutoVersioningConfigPayload
+    "Deletes a branch using its ID"
+    deleteBranchById(
+        "Input for the mutation"
+        input: DeleteBranchByIdInput
+    ): DeleteBranchByIdPayload
     "Deletes the git branch property on a branch identified by name."
     deleteBranchGitConfigProperty(
         "Input for the mutation"
@@ -3540,6 +3559,11 @@ type Mutation {
         "Input for the mutation"
         input: DeleteBranchReleaseValidationPropertyByIdInput
     ): DeleteBranchReleaseValidationPropertyByIdPayload
+    "Deletes a build by ID"
+    deleteBuildById(
+        "Input for the mutation"
+        input: DeleteBuildByIdInput
+    ): DeleteBuildByIdPayload
     "Deletes a build filter for current user and for all users if shared"
     deleteBuildFilter(
         "Input for the mutation"
@@ -9191,6 +9215,12 @@ input DeleteAutoVersioningConfigInput {
     branchId: Int!
 }
 
+"Input type for the deleteBranchById mutation."
+input DeleteBranchByIdInput {
+    "ID of the branch to delete"
+    id: Int!
+}
+
 "Input type for the deleteBranchGitConfigPropertyById mutation."
 input DeleteBranchGitConfigPropertyByIdInput {
     "ID of the branch"
@@ -9245,6 +9275,12 @@ input DeleteBranchReleaseValidationPropertyInput {
     branch: String!
     "Project name"
     project: String!
+}
+
+"Input type for the deleteBuildById mutation."
+input DeleteBuildByIdInput {
+    "ID of the build to delete"
+    id: Int!
 }
 
 "Input type for the deleteBuildFilter mutation."

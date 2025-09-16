@@ -155,6 +155,7 @@ class AutoVersioningAuditStoreDataTest {
             sourcePromotionRunId = null,
             sourcePromotion = null,
             sourceBackValidation = null,
+            qualifier = null,
             targetPaths = listOf("gradle.properties"),
             targetRegex = null,
             targetProperty = "version",
@@ -196,6 +197,7 @@ class AutoVersioningAuditStoreDataTest {
             sourcePromotionRunId = null,
             sourcePromotion = null,
             sourceBackValidation = null,
+            qualifier = null,
             targetPaths = listOf("gradle.properties"),
             targetRegex = null,
             targetProperty = "version",
@@ -237,6 +239,7 @@ class AutoVersioningAuditStoreDataTest {
             sourcePromotionRunId = null,
             sourcePromotion = null,
             sourceBackValidation = null,
+            qualifier = null,
             targetPaths = listOf("gradle.properties"),
             targetRegex = null,
             targetProperty = "version",
@@ -279,6 +282,7 @@ class AutoVersioningAuditStoreDataTest {
             sourcePromotionRunId = null,
             sourcePromotion = null,
             sourceBackValidation = null,
+            qualifier = null,
             targetPaths = listOf("gradle.properties"),
             targetRegex = null,
             targetProperty = "version",
@@ -309,6 +313,44 @@ class AutoVersioningAuditStoreDataTest {
         // Parsing
         val parsed = json.parse<AutoVersioningAuditStoreData>()
         assertEquals(AutoVersioningAuditState.RECEIVED, parsed.mostRecentState)
+    }
+
+    @Test
+    fun `Qualifier backward compatibility`() {
+        val json = mapOf(
+            "sourceProject" to "test",
+            "targetPaths" to listOf(
+                "gradle.properties"
+            ),
+            "targetRegex" to null,
+            "targetProperty" to "version",
+            "targetPropertyRegex" to null,
+            "targetPropertyType" to null,
+            "targetVersion" to "2.0.0",
+            "autoApproval" to true,
+            "upgradeBranchPattern" to "feature/version-<version>",
+            "postProcessing" to null,
+            "postProcessingConfig" to null,
+            "validationStamp" to null,
+            "running" to true,
+            "autoApprovalMode" to "CLIENT",
+            "states" to listOf(
+                mapOf(
+                    "state" to "CREATED",
+                    "data" to emptyMap<String, String>(),
+                    "signature" to mapOf(
+                        "time" to Time.store(Time.now()),
+                        "user" to mapOf(
+                            "name" to "test"
+                        )
+                    )
+                )
+            ),
+            "routing" to "routing",
+            "queue" to null,
+        ).asJson()
+        val data: AutoVersioningAuditStoreData = json.parse()
+        assertNull(data.qualifier)
     }
 
 }

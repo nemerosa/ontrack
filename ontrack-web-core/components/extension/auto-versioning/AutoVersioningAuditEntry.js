@@ -41,6 +41,11 @@ export default function AutoVersioningAuditEntry({entry}) {
             children: entry.order.sourcePromotion,
         },
         {
+            key: 'qualifier',
+            label: "Qualifier",
+            children: entry.order.qualifier,
+        },
+        {
             key: 'version',
             label: "Version",
             children: entry.order.targetVersion,

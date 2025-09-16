@@ -14,4 +14,6 @@ class SlackSettingsCascContext(
     SlackSettings::class,
     settingsManagerService,
     cachedSettingsService,
-)
+) {
+    override fun obfuscate(settings: SlackSettings) = settings.obfuscate()
+}

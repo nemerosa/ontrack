@@ -36,6 +36,11 @@ class BuildAuthorizationContributor(
                     Authorization.EDIT,
                     securityService.isProjectFunctionGranted<BuildEdit>(build)
                 ),
+                Authorization(
+                    BUILD,
+                    Authorization.DELETE,
+                    securityService.isProjectFunctionGranted<BuildDelete>(build)
+                ),
             )
         }
 }

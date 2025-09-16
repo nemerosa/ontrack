@@ -6,6 +6,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.runIf
+import net.nemerosa.ontrack.common.untilTimeout
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.model.*
@@ -25,8 +26,10 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForObject
+import java.net.URLEncoder
 import java.time.Duration
 import java.time.LocalDateTime
+import java.util.*
 
 /**
  * GitHub client which uses the GitHub Rest API at https://docs.github.com/en/rest
@@ -788,6 +791,94 @@ class DefaultOntrackGitHubClient(
             }
         }.reversed()
     }
+
+    override fun launchWorkflowRun(
+        repository: String,
+        workflow: String,
+        branch: String,
+        inputs: Map<String, String>,
+        retries: Int,
+        retriesDelaySeconds: Int,
+    ): WorkflowRun {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Generating a unique ID to find the launched workflow back
+        val id = UUID.randomUUID().toString()
+        client.postForLocation(
+            "/repos/$repository/actions/workflows/$workflow/dispatches",
+            mapOf(
+                "ref" to branch,
+                "inputs" to (inputs + mapOf("id" to id)),
+            ),
+        )
+        // Looking for the launched workflow run
+        return runBlocking {
+            untilTimeout(
+                name = "Getting workflow run for $repository/$workflow/$branch",
+                retryCount = retries,
+                retryDelay = Duration.ofSeconds(retriesDelaySeconds.toLong()),
+            ) {
+                // Gets the list of runs
+                val runs = getWorkflowRuns(client, repository, branch)
+                // Checks the artifacts for each run
+                runs.find { run ->
+                    hasWorkflowId(client, repository, run.id, id)
+                }
+            }
+        }
+    }
+
+    override fun waitUntilWorkflowRun(repository: String, runId: Long, retries: Int, retriesDelaySeconds: Int) {
+        val client = createGitHubRestTemplate()
+        val success = runBlocking {
+            untilTimeout(
+                name = "Waiting for workflow run $repository/$runId",
+                retryCount = retries,
+                retryDelay = Duration.ofSeconds(retriesDelaySeconds.toLong()),
+            ) {
+                val run = client.getForObject<WorkflowRun>("/repos/$repository/actions/runs/$runId")
+                run.success
+            }
+        }
+        if (!success) {
+            throw GitHubWorkflowRunFailedException(repository, runId)
+        }
+    }
+
+    private fun getWorkflowRuns(
+        client: RestTemplate,
+        repository: String,
+        branch: String,
+    ): List<WorkflowRun> {
+        val encodedBranch = URLEncoder.encode(branch, Charsets.UTF_8)
+        return client.getForObject<JsonNode>("/repos/$repository/actions/runs?event=workflow_dispatch&branch=$encodedBranch")
+            .path("workflow_runs")
+            .map {
+                it.parse()
+            }
+    }
+
+    private fun hasWorkflowId(
+        client: RestTemplate,
+        repository: String,
+        runId: Long,
+        id: String,
+    ): Boolean {
+        val expectedName = "inputs-$id.properties"
+        val artifacts = client.getForObject<JsonNode>("/repos/$repository/actions/runs/$runId/artifacts")
+            .path("artifacts")
+            .map {
+                it.parse<Artifact>()
+            }
+        return artifacts.any {
+            it.name == expectedName
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class Artifact(
+        val name: String,
+    )
 
     private fun JsonNode.getUserField(field: String): GitHubUser? =
         getJsonField(field)?.run {

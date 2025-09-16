@@ -2,7 +2,11 @@ package net.nemerosa.ontrack.extension.github.client
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
+import net.nemerosa.ontrack.extension.github.autoversioning.GitHubPostProcessingSettings.Companion.DEFAULT_RETRIES
+import net.nemerosa.ontrack.extension.github.autoversioning.GitHubPostProcessingSettings.Companion.DEFAULT_RETRIES_DELAY_SECONDS
 import net.nemerosa.ontrack.extension.github.model.*
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APILabel
 import org.springframework.web.client.RestTemplate
 
 
@@ -248,5 +252,40 @@ interface OntrackGitHubClient {
         base: String,
         head: String,
     ): List<GitHubCommit>
+
+    /**
+     * Launching a workflow run and getting its ID.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param workflow Name of the workflow, like `my-workflow.yml`
+     * @param branch Branch where to launch the workflow
+     * @param inputs List of parameters to pass to the workflow
+     * @param retries The amount of times we check for successful scheduling
+     * @param retriesDelaySeconds The time (in seconds) between two checks for successful scheduling
+     * @return Launched workflow
+     */
+    fun launchWorkflowRun(
+        repository: String,
+        workflow: String,
+        branch: String,
+        inputs: Map<String, String>,
+        retries: Int = 10,
+        retriesDelaySeconds: Int = 30,
+    ): WorkflowRun
+
+    /**
+     * Waits until a workflow completes.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param runId ID of the workflow run
+     * @param retries The amount of times we check for completion
+     * @param retriesDelaySeconds The time (in seconds) between two checks for completion
+     */
+    fun waitUntilWorkflowRun(
+        repository: String,
+        runId: Long,
+        retries: Int = 10,
+        retriesDelaySeconds: Int = 30,
+    )
 
 }

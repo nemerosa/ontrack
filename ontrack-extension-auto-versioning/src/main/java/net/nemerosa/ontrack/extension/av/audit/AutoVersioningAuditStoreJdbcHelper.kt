@@ -60,6 +60,7 @@ class AutoVersioningAuditStoreJdbcHelper(
                     sourcePromotionRunId = data.sourcePromotionRunId,
                     sourcePromotion = data.sourcePromotion,
                     sourceBackValidation = data.sourceBackValidation,
+                    qualifier = data.qualifier,
                     targetPath = AutoVersioningSourceConfigPath.toString(data.targetPaths),
                     targetRegex = data.targetRegex,
                     targetProperty = data.targetProperty,

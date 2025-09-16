@@ -1,10 +1,6 @@
 package net.nemerosa.ontrack.extension.github.autoversioning
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
-import kotlinx.coroutines.runBlocking
-import net.nemerosa.ontrack.common.untilTimeout
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
@@ -17,13 +13,9 @@ import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.getForObject
-import java.net.URLEncoder
-import java.time.Duration
-import java.util.*
 
 @Component
 class GitHubPostProcessing(
@@ -67,60 +59,72 @@ class GitHubPostProcessing(
         val ghConfig = gitHubConfigurationService.findConfiguration(ghConfigName)
             ?: throw GitHubPostProcessingConfigException("Cannot find GitHub configuration with name: $ghConfigName")
 
-        // Local repository
-        if (!config.workflow.isNullOrBlank()) {
-            runPostProcessing(
-                ghConfig = ghConfig,
-                repository = repository,
-                workflow = config.workflow,
-                branch = upgradeBranch,
-                inputs = emptyMap(),
-                settings = settings,
-                onPostProcessingInfo = onPostProcessingInfo,
-            )
-        }
-        // Common repository
-        else {
-            if (settings.repository.isNullOrBlank()) {
-                throw GitHubPostProcessingConfigException("Default GitHub repository for auto versioning post processing is not defined.")
-            }
-            if (settings.workflow.isNullOrBlank()) {
-                throw GitHubPostProcessingConfigException("Default GitHub workflow for auto versioning post processing is not defined.")
-            }
-            runPostProcessing(
-                ghConfig = ghConfig,
-                repository = settings.repository,
-                workflow = settings.workflow,
-                branch = settings.branch,
-                inputs = mapOf(
-                    "repository" to repository,
-                    "upgrade_branch" to upgradeBranch,
-                    "docker_image" to config.dockerImage,
-                    "docker_command" to config.dockerCommand,
-                    "commit_message" to config.commitMessage,
-                    "version" to autoVersioningOrder.targetVersion,
-                ),
-                settings = settings,
-                onPostProcessingInfo = onPostProcessingInfo,
-            )
-        }
+        // Repository
+        val ppRepository = config.repository?.takeIf { it.isNotBlank() }
+            ?: settings.repository
+            ?: throw GitHubPostProcessingConfigException("Cannot find any repository to launch the GitHub auto-versioning post-processing")
+
+        // Workflow
+        val workflow = config.workflow?.takeIf { it.isNotBlank() }
+            ?: settings.workflow
+            ?: throw GitHubPostProcessingConfigException("Cannot find any workflow to launch the GitHub auto-versioning post-processing")
+
+        // Branch
+        val branch = config.branch?.takeIf { it.isNotBlank() }
+            ?: settings.branch
+                .let { avTemplateRenderer.render(it, PlainEventRenderer.INSTANCE) }
+
+        // Launching the post-processing
+        runPostProcessing(
+            ghConfig = ghConfig,
+            config = config,
+            repository = ppRepository,
+            workflow = workflow,
+            branch = branch,
+            inputs = mapOf(
+                "repository" to repository,
+                "upgrade_branch" to upgradeBranch,
+                "docker_image" to avTemplateRenderer.render(config.dockerImage, PlainEventRenderer.INSTANCE),
+                "docker_command" to avTemplateRenderer.render(config.dockerCommand, PlainEventRenderer.INSTANCE),
+                "commit_message" to avTemplateRenderer.render(config.commitMessage, PlainEventRenderer.INSTANCE),
+                "version" to autoVersioningOrder.targetVersion,
+            ),
+            settings = settings,
+            avTemplateRenderer = avTemplateRenderer,
+            onPostProcessingInfo = onPostProcessingInfo,
+        )
+
     }
 
     private fun runPostProcessing(
         ghConfig: GitHubEngineConfiguration,
+        config: GitHubPostProcessingConfig,
         repository: String,
         workflow: String,
         branch: String,
         inputs: Map<String, String>,
         settings: GitHubPostProcessingSettings,
+        avTemplateRenderer: AutoVersioningTemplateRenderer,
         onPostProcessingInfo: (info: PostProcessingInfo) -> Unit,
     ) {
         // Getting the GH client
-        val client = ontrackGitHubClientFactory.create(ghConfig).createGitHubRestTemplate()
+        val client = ontrackGitHubClientFactory.create(ghConfig)
+        // Preparation of the parameters
+        val parameters = inputs.toMutableMap()
+        parameters.putAll(
+            config.parameters.associate {
+                it.name to avTemplateRenderer.render(it.value, PlainEventRenderer.INSTANCE)
+            }
+        )
         // Launches the workflow run
-        val id = launchWorkflowRun(client, repository, workflow, branch, inputs)
-        // Getting the workflow run
-        val runId = findWorkflowRun(client, repository, workflow, branch, id, settings)
+        val runId = client.launchWorkflowRun(
+            repository = repository,
+            workflow = workflow,
+            branch = branch,
+            inputs = parameters.toMap(),
+            retries = settings.retries,
+            retriesDelaySeconds = settings.retriesDelaySeconds,
+        ).id
         // Sending back the URL of the workflow run
         val url = "${ghConfig.url}/${repository}/actions/runs/${runId}"
         onPostProcessingInfo(
@@ -131,118 +135,10 @@ class GitHubPostProcessing(
             )
         )
         // Waiting until the workflow run completes
-        waitUntilWorkflowRun(
-            client = client,
+        client.waitUntilWorkflowRun(
             repository = repository,
             runId = runId,
-            settings = settings,
         )
-    }
-
-    private fun waitUntilWorkflowRun(
-        client: RestTemplate,
-        repository: String,
-        runId: Long,
-        settings: GitHubPostProcessingSettings,
-    ) {
-        runBlocking {
-            untilTimeout(
-                name = "Waiting for workflow run $repository/$runId",
-                retryCount = settings.retries,
-                retryDelay = Duration.ofSeconds(settings.retriesDelaySeconds.toLong()),
-            ) {
-                val status = client.getForObject<WorkflowRun>("/repos/$repository/actions/runs/$runId").status
-                if (status == "completed") {
-                    true
-                } else {
-                    null // Not finished yet
-                }
-            }
-        }
-    }
-
-    private fun findWorkflowRun(
-        client: RestTemplate,
-        repository: String,
-        workflow: String,
-        branch: String,
-        id: String,
-        settings: GitHubPostProcessingSettings,
-    ): Long =
-        runBlocking {
-            untilTimeout(
-                name = "Getting workflow run for $repository/$workflow/$branch",
-                retryCount = settings.retries,
-                retryDelay = Duration.ofSeconds(settings.retriesDelaySeconds.toLong()),
-            ) {
-                // Gets the list of runs
-                val runs = getWorkflowRuns(client, repository, branch)
-                // Checks the artifacts for each run
-                runs.find { run ->
-                    hasWorkflowId(client, repository, run.id, id)
-                }?.id
-            }
-        }
-
-    private fun hasWorkflowId(
-        client: RestTemplate,
-        repository: String,
-        runId: Long,
-        id: String,
-    ): Boolean {
-        val expectedName = "inputs-$id.properties"
-        val artifacts = client.getForObject<JsonNode>("/repos/$repository/actions/runs/$runId/artifacts")
-            .path("artifacts")
-            .map {
-                it.parse<Artifact>()
-            }
-        return artifacts.any {
-            it.name == expectedName
-        }
-    }
-
-    private fun getWorkflowRuns(
-        client: RestTemplate,
-        repository: String,
-        branch: String,
-    ): List<WorkflowRun> {
-        val encodedBranch = URLEncoder.encode(branch, Charsets.UTF_8)
-        return client.getForObject<JsonNode>("/repos/$repository/actions/runs?event=workflow_dispatch&branch=$encodedBranch")
-            .path("workflow_runs")
-            .map {
-                it.parse()
-            }
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private data class Artifact(
-        val name: String,
-    )
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private data class WorkflowRun(
-        val id: Long,
-        @JsonProperty("head_branch")
-        val headBranch: String,
-        val status: String,
-    )
-
-    private fun launchWorkflowRun(
-        client: RestTemplate,
-        repository: String,
-        workflow: String,
-        branch: String,
-        inputs: Map<String, String>,
-    ): String {
-        val id = UUID.randomUUID().toString()
-        client.postForLocation(
-            "/repos/$repository/actions/workflows/$workflow/dispatches",
-            mapOf(
-                "ref" to branch,
-                "inputs" to (inputs + mapOf("id" to id)),
-            ),
-        )
-        return id
     }
 
 }

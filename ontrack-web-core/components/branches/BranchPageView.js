@@ -21,6 +21,7 @@ import {isAuthorized} from "@components/common/authorizations";
 import DisableBranchCommand from "@components/branches/DisableBranchCommand";
 import {useEventForRefresh} from "@components/common/EventsContext";
 import NewBuildCommand from "@components/builds/NewBuildCommand";
+import BranchDeleteCommand from "@components/branches/BranchDeleteCommand";
 
 export default function BranchPageView({id}) {
     const [loadingBranch, setLoadingBranch] = useState(true)
@@ -94,6 +95,14 @@ export default function BranchPageView({id}) {
                         <DisableBranchCommand
                             key="disable-enable"
                             branch={branch}
+                        />
+                    )
+                }
+                if (isAuthorized(branch, "branch", "delete")) {
+                    commands.push(
+                        <BranchDeleteCommand
+                            key="delete"
+                            id={branch.id}
                         />
                     )
                 }

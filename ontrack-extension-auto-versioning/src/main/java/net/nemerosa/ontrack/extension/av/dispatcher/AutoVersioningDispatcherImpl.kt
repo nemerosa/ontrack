@@ -101,6 +101,7 @@ class AutoVersioningDispatcherImpl(
                 sourcePromotionRunId = promotionRun.id(),
                 sourcePromotion = promotionRun.promotionLevel.name,
                 sourceBackValidation = config.backValidation,
+                qualifier = config.qualifier,
                 branch = branch,
                 targetPath = config.targetPath,
                 targetRegex = config.targetRegex,
