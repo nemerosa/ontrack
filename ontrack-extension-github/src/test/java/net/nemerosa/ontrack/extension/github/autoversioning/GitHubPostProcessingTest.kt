@@ -67,6 +67,12 @@ class GitHubPostProcessingTest {
         val avTemplateRenderer = mockk<AutoVersioningTemplateRenderer>()
         every {
             avTemplateRenderer.render(
+                "main",
+                PlainEventRenderer.INSTANCE
+            )
+        } returns "main"
+        every {
+            avTemplateRenderer.render(
                 "docker/image",
                 PlainEventRenderer.INSTANCE
             )
