@@ -88,6 +88,7 @@ class PredefinedValidationStampMutationsIT : AbstractQLKTITSupport() {
 //                            assertEquals(
 //                                mapOf(
 //                                    "warningIfSkipped" to false,
+//                                    "failWhenNoResults" to false,
 //                                ).asJson(),
 //                                dataType.config.asJson()
 //                            )
