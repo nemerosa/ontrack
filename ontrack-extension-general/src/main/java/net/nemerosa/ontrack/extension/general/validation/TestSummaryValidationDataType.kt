@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.YesNo
+import net.nemerosa.ontrack.model.form.yesNoField
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.MetricsColors
 import net.nemerosa.ontrack.model.structure.NumericValidationDataType
@@ -70,11 +71,14 @@ class TestSummaryValidationDataType(
             node?.parse()
 
     override fun getConfigForm(config: TestSummaryValidationConfig?): Form = Form.create()
-            .with(
-                    YesNo.of("warningIfSkipped")
-                            .label("Warning if skipped")
-                            .help("If set to Yes, the status is set to warning if there is at least one skipped test.")
-            )
+        .yesNoField(
+            TestSummaryValidationConfig::warningIfSkipped,
+            config?.warningIfSkipped
+        )
+        .yesNoField(
+            TestSummaryValidationConfig::failWhenNoResults,
+            config?.failWhenNoResults
+        )
 
     override fun configToFormJson(config: TestSummaryValidationConfig?): JsonNode? =
             config?.toJson()
