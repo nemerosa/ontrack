@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.general.validation
 
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -9,50 +11,83 @@ class TestSummaryValidationConfigTest {
     @Test
     fun `Status failed when at least one failure`() {
         assertEquals(
-                ValidationRunStatusID.FAILED,
-                TestSummaryValidationConfig(false).computeStatus(
-                        TestSummaryValidationData(100, 100, 1)
-                ).id
+            ValidationRunStatusID.FAILED,
+            TestSummaryValidationConfig(false).computeStatus(
+                TestSummaryValidationData(100, 100, 1)
+            ).id
         )
     }
 
     @Test
     fun `Status warning when at least one skipped test and warning mode on`() {
         assertEquals(
-                ValidationRunStatusID.WARNING,
-                TestSummaryValidationConfig(true).computeStatus(
-                        TestSummaryValidationData(100, 1, 0)
-                ).id
+            ValidationRunStatusID.WARNING,
+            TestSummaryValidationConfig(true).computeStatus(
+                TestSummaryValidationData(100, 1, 0)
+            ).id
         )
     }
 
     @Test
     fun `Status passed when at least one skipped test and warning mode off`() {
         assertEquals(
-                ValidationRunStatusID.PASSED,
-                TestSummaryValidationConfig(false).computeStatus(
-                        TestSummaryValidationData(100, 1, 0)
-                ).id
+            ValidationRunStatusID.PASSED,
+            TestSummaryValidationConfig(false).computeStatus(
+                TestSummaryValidationData(100, 1, 0)
+            ).id
         )
     }
 
     @Test
     fun `Status passed when only passed tests`() {
         assertEquals(
-                ValidationRunStatusID.PASSED,
-                TestSummaryValidationConfig(true).computeStatus(
-                        TestSummaryValidationData(100, 0, 0)
-                ).id
+            ValidationRunStatusID.PASSED,
+            TestSummaryValidationConfig(true).computeStatus(
+                TestSummaryValidationData(100, 0, 0)
+            ).id
         )
     }
 
     @Test
     fun `Status passed when no test`() {
         assertEquals(
-                ValidationRunStatusID.PASSED,
-                TestSummaryValidationConfig(true).computeStatus(
-                        TestSummaryValidationData(0, 0, 0)
-                ).id
+            ValidationRunStatusID.PASSED,
+            TestSummaryValidationConfig().computeStatus(
+                TestSummaryValidationData(0, 0, 0)
+            ).id
+        )
+    }
+
+    @Test
+    fun `Status passed when no test at all but failWhenNoResults = false`() {
+        assertEquals(
+            ValidationRunStatusID.PASSED,
+            TestSummaryValidationConfig(failWhenNoResults = false).computeStatus(
+                TestSummaryValidationData(0, 0, 0)
+            ).id
+        )
+    }
+
+    @Test
+    fun `Status failed when no test at all but failWhenNoResults = true`() {
+        assertEquals(
+            ValidationRunStatusID.FAILED,
+            TestSummaryValidationConfig(failWhenNoResults = true).computeStatus(
+                TestSummaryValidationData(0, 0, 0)
+            ).id
+        )
+    }
+
+    @Test
+    fun `Backward compatibility with failWhenNoResults`() {
+        assertEquals(
+            mapOf(
+                "warningIfSkipped" to false,
+            ).asJson().parse(),
+            TestSummaryValidationConfig(
+                warningIfSkipped = false,
+                failWhenNoResults = false,
+            )
         )
     }
 
