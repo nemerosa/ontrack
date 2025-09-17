@@ -54,6 +54,47 @@ class TestSummaryValidationDataTypeGraphQLMutationIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    fun `Creation of a test summary validation stamp with failWhenNoResults`() {
+        asAdmin {
+            project {
+                branch {
+                    run("""
+                        mutation {
+                            setupTestSummaryValidationStamp(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                validation: "test",
+                                warningIfSkipped: false,
+                                failWhenNoResults: true
+                            }) {
+                                validationStamp {
+                                    id
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """).let { data ->
+                        val node = assertNoUserError(data, "setupTestSummaryValidationStamp")
+                        assertTrue(node.path("validationStamp").path("id").asInt() != 0, "VS created")
+
+                        assertPresent(structureService.findValidationStampByName(project.name, name, "test")) {
+                            assertEquals("test", it.name)
+                            assertEquals("net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType",
+                                it.dataType?.descriptor?.id)
+                            assertEquals(
+                                TestSummaryValidationConfig(warningIfSkipped = false, failWhenNoResults = true),
+                                it.dataType?.config
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Update of a test summary validation stamp`() {
         asAdmin {
             project {

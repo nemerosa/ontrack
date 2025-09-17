@@ -24,13 +24,18 @@ class TestSummaryValidationDataTypeGraphQLMutation(
         optionalBooleanInputField(
             TestSummaryValidationConfig::warningIfSkipped.name,
             "If set to true, the status is set to warning if there is at least one skipped test."
-        )
+        ),
+        optionalBooleanInputField(
+            TestSummaryValidationConfig::failWhenNoResults.name,
+            "If set, the status is set to failure if there is are no test at all."
+        ),
     )
 
     override fun readInput(input: MutationInput): ValidationDataTypeConfig<TestSummaryValidationConfig> {
         return testSummaryValidationDataType.config(
             TestSummaryValidationConfig(
-                warningIfSkipped = input.getInput<Boolean>(TestSummaryValidationConfig::warningIfSkipped.name) ?: false
+                warningIfSkipped = input.getInput<Boolean>(TestSummaryValidationConfig::warningIfSkipped.name) ?: false,
+                failWhenNoResults = input.getInput<Boolean>(TestSummaryValidationConfig::failWhenNoResults.name) ?: false,
             )
         )
     }
