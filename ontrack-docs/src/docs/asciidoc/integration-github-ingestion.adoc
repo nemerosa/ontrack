@@ -318,6 +318,7 @@ setup:
         type: test-summary
         config:
           warningIfSkipped: true
+          failWhenNoResults: false
 ----
 
 and
@@ -332,6 +333,7 @@ setup:
         type: net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
         config:
           warningIfSkipped: true
+          failWhenNoResults: false
 ----
 
 The following shortcuts are supported:
