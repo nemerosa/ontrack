@@ -27,7 +27,7 @@ class GitBranchSearchIndexer(
 
     override val indexName: String = GIT_BRANCH_SEARCH_INDEX
 
-    override val indexMapping: SearchIndexMapping? = indexMappings<GitBranchSearchItem> {
+    override val indexMapping: SearchIndexMapping? = indexMappings {
         +GitBranchSearchItem::branchId to id { index = false }
         +GitBranchSearchItem::gitBranch to keyword { scoreBoost = 4.0 } to text()
     }
