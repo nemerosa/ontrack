@@ -10,4 +10,6 @@ object ElasticSearchJobs {
 
     val indexationAllJobKey = indexationJobType.getKey("all")
 
+    val indexationClearJobKey = indexationJobType.getKey("clear")
+
 }

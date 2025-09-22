@@ -10,8 +10,9 @@ import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchIndexer
 import net.nemerosa.ontrack.model.structure.SearchItem
-import net.nemerosa.ontrack.model.support.JobProvider
+import net.nemerosa.ontrack.model.structure.SearchService
 import net.nemerosa.ontrack.service.elasticsearch.ElasticSearchJobs.indexationAllJobKey
+import net.nemerosa.ontrack.service.elasticsearch.ElasticSearchJobs.indexationClearJobKey
 import net.nemerosa.ontrack.service.elasticsearch.ElasticSearchJobs.indexationJobType
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit
 class ElasticSearchIndexationJobs(
     private val applicationContext: ApplicationContext,
     private val elasticSearchService: SearchIndexService,
+    private val searchService: SearchService,
     private val jobScheduler: JobScheduler
 ) : JobOrchestratorSupplier {
 
@@ -36,7 +38,7 @@ class ElasticSearchIndexationJobs(
             !indexer.isIndexationDisabled
         }.map { indexer ->
             createIndexationJobRegistration(indexer)
-        } + createGlobalIndexationJob()
+        } + createGlobalIndexationJob() + createClearIndexationJob()
 
     private fun createGlobalIndexationJob() = JobRegistration(
         schedule = Schedule.NONE,
@@ -65,6 +67,22 @@ class ElasticSearchIndexationJobs(
                         jobs.joinAll()
                     }
                 }
+            }
+        }
+    )
+
+    private fun createClearIndexationJob() = JobRegistration(
+        schedule = Schedule.NONE,
+        job = object : Job {
+            override fun isDisabled(): Boolean = false
+
+            override fun getKey(): JobKey = indexationClearJobKey
+
+            override fun getDescription(): String = "Clear all search indexes"
+
+            override fun getTask() = JobRun { listener ->
+                listener.message("Clearing all search indexes...")
+                searchService.indexReset(reindex = false)
             }
         }
     )
