@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.node.TextNode
+import net.nemerosa.ontrack.extension.general.ReleaseProperty
+import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.TextValidationDataType
@@ -501,6 +503,76 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                     assertEquals("url-to-github", runInfo.path("sourceUri").asText())
                     assertEquals("push", runInfo.path("triggerType").asText())
                     assertEquals(14, runInfo.path("runTime").asInt())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a validation run using a release label`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    setProperty(this, ReleasePropertyType::class.java, ReleaseProperty("1.2"))
+                    val data = run("""
+                        mutation CreateValidationRun {
+                            createValidationRunByRelease(input: {
+                                project: "${project.name}",
+                                buildRelease: "1.2",
+                                validationStamp: "${vs.name}",
+                                validationRunStatus: "PASSED"
+                            }) {
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """)
+                    assertNoUserError(data, "createValidationRunByRelease")
+                    val runs = structureService.getValidationRunsForBuildAndValidationStamp(
+                        buildId = id,
+                        validationStampId = vs.id,
+                        offset = 0,
+                        count = 10
+                    )
+                    assertEquals(1, runs.size)
+                    val run = runs.first()
+                    assertEquals(
+                        ValidationRunStatusID.PASSED,
+                        run.lastStatus.statusID.id
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a validation run using a release label when not found`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    // setProperty(this, ReleasePropertyType::class.java, ReleaseProperty("1.2"))
+                    val data = run("""
+                        mutation CreateValidationRun {
+                            createValidationRunByRelease(input: {
+                                project: "${project.name}",
+                                buildRelease: "1.2",
+                                validationStamp: "${vs.name}",
+                                validationRunStatus: "PASSED"
+                            }) {
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """)
+                    assertUserError(data, "createValidationRunByRelease",
+                        message = """Could not find build with release "1.2" in ${project.name}.""",
+                        exception = null
+                    )
                 }
             }
         }
