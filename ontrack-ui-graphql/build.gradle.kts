@@ -22,6 +22,7 @@ dependencies {
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(testFixtures(project(":ontrack-extension-api")))
+    testImplementation(":ontrack-extension-general")
     testImplementation(testFixtures(project(":ontrack-extension-general")))
 
     testFixturesImplementation(project(":ontrack-it-utils"))
