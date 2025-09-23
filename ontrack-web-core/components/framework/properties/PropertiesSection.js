@@ -42,7 +42,7 @@ export default function PropertiesSection({entityType, entityId}) {
                 `,
                 {
                     type: entityType,
-                    id: entityId,
+                    id: Number(entityId),
                 }
             )
 

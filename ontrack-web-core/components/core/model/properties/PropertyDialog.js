@@ -86,7 +86,7 @@ export const usePropertyDialog = () => {
 
             return {
                 entityType,
-                entityId,
+                entityId: Number(entityId),
                 type: type,
                 value: preparedValues,
             }

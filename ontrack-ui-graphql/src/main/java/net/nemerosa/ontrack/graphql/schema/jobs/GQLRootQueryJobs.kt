@@ -23,7 +23,7 @@ class GQLRootQueryJobs(
     private val jobScheduler: JobScheduler,
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
-        gqlPaginatedListFactory.createPaginatedField<Any?, JobStatus>(
+        gqlPaginatedListFactory.createRootPaginatedField<JobStatus>(
             cache = GQLTypeCache(),
             fieldName = "jobs",
             fieldDescription = "List of background jobs",
@@ -36,7 +36,7 @@ class GQLRootQueryJobs(
                 stringArgument(ARG_CATEGORY, "Category key"),
                 stringArgument(ARG_TYPE, "Type key"),
             ),
-            itemPaginatedListProvider = { env, _, offset, size ->
+            itemPaginatedListProvider = { env, offset, size ->
                 securityService.checkGlobalFunction(ApplicationManagement::class.java)
 
                 val description: String? = env.getArgument(ARG_DESCRIPTION)
