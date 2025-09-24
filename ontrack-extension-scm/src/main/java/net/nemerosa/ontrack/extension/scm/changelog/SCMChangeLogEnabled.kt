@@ -45,4 +45,13 @@ interface SCMChangeLogEnabled : SCM {
      */
     fun findBuildByCommit(project: Project, id: String): Build?
 
+    /**
+     * Getting information about a commit
+     *
+     * @param project Project holding the commit
+     * @param id ID of the commit
+     * @return Commit information or null if not found
+     */
+    fun getCommit(project: Project, id: String): SCMCommit?
+
 }

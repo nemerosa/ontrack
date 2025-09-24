@@ -11,6 +11,11 @@ import {Empty} from "antd";
 import SCMCommitInfo from "@components/extension/scm/SCMCommitInfo";
 
 export default function GitCommitInfoView({projectId, commit}) {
+
+    /**
+     * TODO For the time being, we may have to stick to pure Git commit
+     */
+
     const {loading, data} = useQuery(
         gql`
             query GitCommitInfo(
@@ -20,7 +25,7 @@ export default function GitCommitInfoView({projectId, commit}) {
                 project(id: $projectId) {
                     id
                     name
-                    scmCommitInfo(commit: $commit) {
+                    gitCommitInfo(commit: $commit) {
                         scmCommit {
                             id
                             shortId

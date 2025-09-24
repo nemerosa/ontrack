@@ -67,9 +67,9 @@ class MockSCMTester(
                 )
         }
 
-        fun Build.withRepositoryCommit(message: String, property: Boolean = true) {
+        fun Build.withRepositoryCommit(message: String, property: Boolean = true): String {
             val branchProperty = propertyService.getPropertyValue(branch, MockSCMBranchPropertyType::class.java)
-            if (branchProperty != null) {
+            return if (branchProperty != null) {
                 val id = mockSCMExtension.repository(repositoryName).registerCommit(
                     scmBranch = branchProperty.name,
                     message = message
@@ -81,6 +81,7 @@ class MockSCMTester(
                         MockSCMBuildCommitProperty(id)
                     )
                 }
+                id
             } else {
                 fail("Branch not configured for Mock SCM")
             }

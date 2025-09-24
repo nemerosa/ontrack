@@ -276,6 +276,9 @@ class MockSCMExtension(
             }
         }
 
+        fun getCommit(id: String): SCMCommit? =
+            branches.flatMap { it.commits }.find { it.id == id }
+
     }
 
     private inner class MockSCM(
@@ -359,6 +362,12 @@ class MockSCMExtension(
             }.firstOrNull { build ->
                 build.project.id == project.id
             }
+
+        override fun getCommit(
+            project: Project,
+            id: String
+        ): SCMCommit? =
+            repository(mockScmProjectProperty.name).getCommit(id)
     }
 
     class MockIssueServiceConfiguration : IssueServiceConfiguration {
