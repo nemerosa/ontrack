@@ -124,7 +124,7 @@ class BitbucketClientImpl(
                 uri += "?at=$branch"
             }
             template.getForObject<ByteArray>(uri)
-        } catch (ignored: NotFound) {
+        } catch (_: NotFound) {
             null
         }
 
@@ -224,6 +224,18 @@ class BitbucketClientImpl(
             "/rest/api/latest/projects/${repo.project}/repos/${repo.repository}/commits?since=$fromCommit&until=$toCommit&limit=$maxCommits"
         ).path("values").map {
             it.parse<BitbucketServerCommit>()
+        }
+
+    override fun getCommit(
+        repository: BitbucketRepository,
+        commit: String
+    ): BitbucketServerCommit? =
+        try {
+            template.getForObject<JsonNode>(
+                "/rest/api/latest/projects/${repository.project}/repos/${repository.repository}/commits/${commit}"
+            ).parse<BitbucketServerCommit>()
+        } catch (_: NotFound) {
+            null
         }
 
     private val template = RestTemplateBuilder()

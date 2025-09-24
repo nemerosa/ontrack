@@ -242,6 +242,16 @@ class GitHubSCMExtension(
             }
         }
 
+        override fun getCommit(
+            id: String
+        ): SCMCommit? =
+            client.getCommit(
+                repository = repository,
+                commit = id,
+            )?.let {
+                GitHubSCMCommit(it)
+            }
+
         override fun findBuildByCommit(project: Project, id: String): Build? =
             propertyService.findByEntityTypeAndSearchArguments(
                 entityType = ProjectEntityType.BUILD,

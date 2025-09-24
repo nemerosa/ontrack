@@ -340,8 +340,8 @@ class DefaultOntrackGitHubClient(
 
     private fun createGitHubTemplate(graphql: Boolean, token: String?): RestTemplate = RestTemplateBuilder()
         .rootUri(getApiRoot(configuration.url, graphql))
-        .setConnectTimeout(timeout)
-        .setReadTimeout(timeout)
+        .connectTimeout(timeout)
+        .readTimeout(timeout)
         .run {
             if (token != null) {
                 defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer $token")
@@ -783,6 +783,26 @@ class DefaultOntrackGitHubClient(
                 commitNode.parse()
             }
         }.reversed()
+    }
+
+    override fun getCommit(
+        repository: String,
+        commit: String
+    ): GitHubCommit? {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        return try {
+            client("Getting commit $commit") {
+                getForObject<GitHubCommit?>(
+                    "/repos/$owner/$name/commits/$commit"
+                )
+            }
+        } catch (_: HttpClientErrorException.NotFound) {
+            null
+        }
     }
 
     override fun launchWorkflowRun(

@@ -205,6 +205,15 @@ class BitbucketServerSCMExtension(
                 }
         }
 
+        override fun getCommit(id: String): SCMCommit? =
+            client.getCommit(repo, id)?.let {
+                BitbucketServerSCMCommit(
+                    root = configuration.url,
+                    repo = repo,
+                    commit = it
+                )
+            }
+
         override fun getConfiguredIssueService(): ConfiguredIssueService? =
             issueServiceConfigurationIdentifier?.let { issueServiceRegistry.getConfiguredIssueService(it) }
 

@@ -48,10 +48,9 @@ interface SCMChangeLogEnabled : SCM {
     /**
      * Getting information about a commit
      *
-     * @param project Project holding the commit
      * @param id ID of the commit
      * @return Commit information or null if not found
      */
-    fun getCommit(project: Project, id: String): SCMCommit?
+    fun getCommit(id: String): SCMCommit?
 
 }

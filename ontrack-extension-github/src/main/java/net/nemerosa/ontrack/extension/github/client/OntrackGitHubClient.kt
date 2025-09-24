@@ -2,11 +2,7 @@ package net.nemerosa.ontrack.extension.github.client
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
-import net.nemerosa.ontrack.extension.github.autoversioning.GitHubPostProcessingSettings.Companion.DEFAULT_RETRIES
-import net.nemerosa.ontrack.extension.github.autoversioning.GitHubPostProcessingSettings.Companion.DEFAULT_RETRIES_DELAY_SECONDS
 import net.nemerosa.ontrack.extension.github.model.*
-import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.annotations.APILabel
 import org.springframework.web.client.RestTemplate
 
 
@@ -252,6 +248,18 @@ interface OntrackGitHubClient {
         base: String,
         head: String,
     ): List<GitHubCommit>
+
+    /**
+     * Gets information about a commit
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param commit Commit SHA
+     * @return Commit information or null if not found
+     */
+    fun getCommit(
+        repository: String,
+        commit: String,
+    ): GitHubCommit?
 
     /**
      * Launching a workflow run and getting its ID.

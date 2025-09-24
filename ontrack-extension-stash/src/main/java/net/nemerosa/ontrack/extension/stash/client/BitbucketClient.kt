@@ -106,6 +106,18 @@ interface BitbucketClient {
     fun getCommits(repo: BitbucketRepository, fromCommit: String, toCommit: String): List<BitbucketServerCommit>
 
     /**
+     * Gets information about a commit
+     *
+     * @param repository Repository
+     * @param commit Commit SHA
+     * @return Commit information or null if not found
+     */
+    fun getCommit(
+        repository: BitbucketRepository,
+        commit: String,
+    ): BitbucketServerCommit?
+
+    /**
      * Deletes a branch.
      *
      * @param repo Repository where the PR is

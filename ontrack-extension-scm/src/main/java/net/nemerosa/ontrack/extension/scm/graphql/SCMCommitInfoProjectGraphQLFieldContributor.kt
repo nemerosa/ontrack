@@ -45,7 +45,7 @@ class SCMCommitInfoProjectGraphQLFieldContributor(
     private fun getSCMCommitInfo(project: Project, commitId: String): SCMCommitInfo? {
         val scm = scmDetector.getSCM(project) ?: return null
         return if (scm is SCMChangeLogEnabled) {
-            val commit = scm.getCommit(project = project, id = commitId)
+            val commit = scm.getCommit(id = commitId)
             if (commit != null) {
                 SCMCommitInfo(
                     scmDecoratedCommit = SCMDecoratedCommit(

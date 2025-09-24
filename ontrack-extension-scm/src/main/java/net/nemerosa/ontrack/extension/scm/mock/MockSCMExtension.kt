@@ -364,7 +364,6 @@ class MockSCMExtension(
             }
 
         override fun getCommit(
-            project: Project,
             id: String
         ): SCMCommit? =
             repository(mockScmProjectProperty.name).getCommit(id)
