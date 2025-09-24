@@ -224,6 +224,8 @@ type AutoVersioningOrder {
   postProcessing: String
   "JSON configuration for the post processing"
   postProcessingConfig: JSON
+  "Qualifier for the link between the source and target"
+  qualifier: String
   "Link to the target repository"
   repositoryHtmlURL: String
   "List of reviewers to always add to the pull request"
@@ -998,6 +1000,14 @@ type CreateTestAccountPayload implements Payload {
 
 "Output type for the createValidationRunById mutation."
 type CreateValidationRunByIdPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+  "Created validation run"
+  validationRun: ValidationRun
+}
+
+"Output type for the createValidationRunByRelease mutation."
+type CreateValidationRunByReleasePayload implements Payload {
   "List of errors"
   errors: [UserError]
   "Created validation run"
@@ -3081,6 +3091,11 @@ type Mutation {
     "Input for the mutation"
     input: CreateValidationRunByIdInput
   ): CreateValidationRunByIdPayload
+  "Creating a validation run for a build identified by its release label"
+  createValidationRunByRelease(
+    "Input for the mutation"
+    input: CreateValidationRunByReleaseInput
+  ): CreateValidationRunByReleasePayload
   "Creates a new validation stamp from a branch ID"
   createValidationStampById(
     "Input for the mutation"
@@ -4628,6 +4643,11 @@ type Project implements Authorizable & ProjectEntity {
   ): [Property!]!
   "SCM catalog entry the project is linked with, if any"
   scmCatalogEntry: SCMCatalogEntry
+  "SCM information about a commit"
+  scmCommitInfo(
+    "ID of the commit"
+    commitId: String!
+  ): SCMCommitInfo
   "List of saved SCM file filters for the project"
   scmFileChangeFilters: SCMFileChangeFilters!
   "Graph of environment slots for a project"
@@ -5822,6 +5842,12 @@ type SCMCommit {
   shortId: String!
   "Timestamp of the commit"
   timestamp: LocalDateTime!
+}
+
+"Information about a commit"
+type SCMCommitInfo {
+  "Associated decorated SCM commit"
+  scmDecoratedCommit: SCMDecoratedCommit!
 }
 
 "SCMDecoratedCommit"
@@ -8429,6 +8455,26 @@ input CreateValidationRunByIdInput {
   validationStamp: String!
 }
 
+"Input type for the createValidationRunByRelease mutation."
+input CreateValidationRunByReleaseInput {
+  "Build release"
+  buildRelease: String!
+  "Data to associated with the validation"
+  data: JSON
+  "Type of the data to associated with the validation"
+  dataTypeId: String
+  "Validation description"
+  description: String
+  "Project name"
+  project: String!
+  "Run info"
+  runInfo: RunInfoInput
+  "Validation run status"
+  validationRunStatus: String
+  "Validation stamp name"
+  validationStamp: String!
+}
+
 "Input type for the createValidationRun mutation."
 input CreateValidationRunInput {
   "Branch name"
@@ -10747,6 +10793,8 @@ input SetupTestSummaryValidationStampInput {
   branch: String!
   "Description of the validation stamp"
   description: String
+  "If set, the status is set to failure if there is are no test at all."
+  failWhenNoResults: Boolean
   "Name of the project"
   project: String!
   "Name of the validation stamp"

@@ -25,14 +25,17 @@ export default function GitCommitInfoView({projectId, commit}) {
                 project(id: $projectId) {
                     id
                     name
-                    gitCommitInfo(commit: $commit) {
-                        scmCommit {
-                            id
-                            shortId
-                            author
-                            timestamp
-                            message
-                            link
+                    scmCommitInfo(commitId: $commit) {
+                        scmDecoratedCommit {
+                            commit {
+                                id
+                                shortId
+                                author
+                                timestamp
+                                message
+                                link
+                            }
+                            annotatedMessage
                         }
                     }
                 }
