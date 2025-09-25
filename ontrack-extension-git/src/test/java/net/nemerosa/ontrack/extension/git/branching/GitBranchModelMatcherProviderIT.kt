@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.git.branching
 
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelProperty
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelPropertyType
 import net.nemerosa.ontrack.model.structure.BranchModelMatcherService
 import net.nemerosa.ontrack.model.support.NameValue
 import org.junit.jupiter.api.Test
@@ -47,11 +49,12 @@ class GitBranchModelMatcherProviderIT : AbstractGitTestSupport() {
             project {
                 gitProject(repo)
                 setProperty(this, BranchingModelPropertyType::class.java,
-                        BranchingModelProperty(listOf(
-                                NameValue("Development", "main"),
-                                NameValue("Release", "release/.*")
+                    BranchingModelProperty(
+                        listOf(
+                            NameValue("Development", "main"),
+                            NameValue("Release", "release/.*")
                         )
-                        )
+                    )
                 )
                 val main = branch("main") { gitBranch("main") }
                 val develop = branch("develop") { gitBranch("develop") }
@@ -78,13 +81,13 @@ class GitBranchModelMatcherProviderIT : AbstractGitTestSupport() {
             project {
                 gitProject(repo)
                 setProperty(this, BranchingModelPropertyType::class.java,
-                        BranchingModelProperty(
-                                patterns = listOf(
-                                        NameValue("Development", "main|gatekeeper"),
-                                        NameValue("Maintenance", "maintenance/.*"),
-                                        NameValue("Release", "release/.*")
-                                )
+                    BranchingModelProperty(
+                        patterns = listOf(
+                            NameValue("Development", "main|gatekeeper"),
+                            NameValue("Maintenance", "maintenance/.*"),
+                            NameValue("Release", "release/.*")
                         )
+                    )
                 )
                 val main = branch("main") { gitBranch("main") }
                 val gatekeeper = branch("gatekeeper") { gitBranch("gatekeeper") }

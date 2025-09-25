@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.branching
 
 import net.nemerosa.ontrack.extension.git.service.GitService
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchModelMatcher
 import net.nemerosa.ontrack.model.structure.BranchModelMatcherProvider
@@ -9,8 +10,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class GitBranchModelMatcherProvider(
-        private val branchingModelService: BranchingModelService,
-        private val gitService: GitService
+    private val branchingModelService: BranchingModelService,
+    private val gitService: GitService
 ) : BranchModelMatcherProvider {
     override fun getBranchModelMatcher(project: Project): BranchModelMatcher? {
         val projectConfiguration = gitService.getProjectConfiguration(project)

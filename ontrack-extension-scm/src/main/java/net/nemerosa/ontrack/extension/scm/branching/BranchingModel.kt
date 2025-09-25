@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.git.branching
+package net.nemerosa.ontrack.extension.scm.branching
 
 import net.nemerosa.ontrack.model.support.NameValue
 

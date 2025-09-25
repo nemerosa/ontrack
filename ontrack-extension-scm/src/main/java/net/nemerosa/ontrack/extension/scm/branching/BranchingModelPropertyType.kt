@@ -1,7 +1,7 @@
-package net.nemerosa.ontrack.extension.git.branching
+package net.nemerosa.ontrack.extension.scm.branching
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.extension.git.GitExtensionFeature
+import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.security.ProjectConfig
@@ -12,21 +12,21 @@ import org.springframework.stereotype.Component
 
 @Component
 class BranchingModelPropertyType(
-        extensionFeature: GitExtensionFeature
+    extensionFeature: SCMExtensionFeature,
 ) : AbstractPropertyType<BranchingModelProperty>(extensionFeature) {
     override val name: String = "Branching Model"
 
     override val description: String =
-            "Defines the branching model used by a project"
+        "Defines the branching model used by a project"
 
     override val supportedEntityTypes =
-            setOf(ProjectEntityType.PROJECT)
+        setOf(ProjectEntityType.PROJECT)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
-            securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
+        securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean =
-            true
+        true
 
     override fun fromClient(node: JsonNode): BranchingModelProperty {
         return fromStorage(node)

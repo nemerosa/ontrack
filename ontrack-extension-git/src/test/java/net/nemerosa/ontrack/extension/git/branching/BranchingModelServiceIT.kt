@@ -1,6 +1,10 @@
 package net.nemerosa.ontrack.extension.git.branching
 
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModel
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelProperty
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelPropertyType
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelService
 import net.nemerosa.ontrack.model.support.NameValue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,12 +30,13 @@ class BranchingModelServiceIT : AbstractGitTestSupport() {
     fun `Specific property`() {
         project {
             setProperty(this, BranchingModelPropertyType::class.java,
-                    BranchingModelProperty(listOf(
-                            NameValue("Development", "main|gatekeeper"),
-                            NameValue("Maintenance", "maintenance/.*"),
-                            NameValue("Release", "release/.*")
+                BranchingModelProperty(
+                    listOf(
+                        NameValue("Development", "main|gatekeeper"),
+                        NameValue("Maintenance", "maintenance/.*"),
+                        NameValue("Release", "release/.*")
                     )
-                    )
+                )
             )
             val model = branchingModelService.getBranchingModel(project)
             assertEquals(

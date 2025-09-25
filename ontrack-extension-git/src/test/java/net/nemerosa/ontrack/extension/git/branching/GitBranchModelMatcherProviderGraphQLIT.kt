@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.git.branching
 
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelProperty
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelPropertyType
 import net.nemerosa.ontrack.model.support.NameValue
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -52,11 +54,12 @@ class GitBranchModelMatcherProviderGraphQLIT : AbstractGitTestSupport() {
             project {
                 gitProject(repo)
                 setProperty(this, BranchingModelPropertyType::class.java,
-                        BranchingModelProperty(listOf(
-                                NameValue("Development", "main"),
-                                NameValue("Release", "release/.*")
+                    BranchingModelProperty(
+                        listOf(
+                            NameValue("Development", "main"),
+                            NameValue("Release", "release/.*")
                         )
-                        )
+                    )
                 )
                 branch("main") { gitBranch("main") }
                 branch("develop") { gitBranch("develop") }

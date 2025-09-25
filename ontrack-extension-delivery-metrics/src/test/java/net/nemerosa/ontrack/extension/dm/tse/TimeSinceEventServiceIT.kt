@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.dm.tse
 
 import net.nemerosa.ontrack.extension.api.support.TestMetricsExportExtension
-import net.nemerosa.ontrack.extension.git.branching.BranchingModelProperty
-import net.nemerosa.ontrack.extension.git.branching.BranchingModelPropertyType
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelProperty
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelPropertyType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Branch
