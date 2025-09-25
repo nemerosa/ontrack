@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
+import net.nemerosa.ontrack.extension.scm.index.SCMBuildIndexEnabled
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
 import net.nemerosa.ontrack.extension.scm.service.SCMPath
@@ -279,11 +280,16 @@ class MockSCMExtension(
         fun getCommit(id: String): SCMCommit? =
             branches.flatMap { it.commits }.find { it.id == id }
 
+        fun getBranchesForCommit(commit: String): List<String> =
+            branches.filter { branch ->
+                branch.commits.any { it.id == commit }
+            }.map { it.name }
+
     }
 
     private inner class MockSCM(
         private val mockScmProjectProperty: MockSCMProjectProperty,
-    ) : SCM, SCMChangeLogEnabled {
+    ) : SCM, SCMChangeLogEnabled, SCMBuildIndexEnabled {
 
         override val type: String = "mock"
         override val engine: String = "mock"
@@ -363,10 +369,31 @@ class MockSCMExtension(
                 build.project.id == project.id
             }
 
+        override fun findBranchFromScmBranchName(project: Project, scmBranch: String): Branch? =
+            propertyService.findByEntityTypeAndSearchArguments(
+                entityType = ProjectEntityType.BRANCH,
+                propertyType = MockSCMBranchPropertyType::class,
+                searchArguments = MockSCMBranchProperty.getSearchArguments(scmBranch)
+            ).map { branchId ->
+                structureService.getBranch(branchId)
+            }.firstOrNull { branch ->
+                branch.project.id == project.id
+            }
+
         override fun getCommit(
             id: String
         ): SCMCommit? =
             repository(mockScmProjectProperty.name).getCommit(id)
+
+        override fun getBranchesForCommit(commit: String): List<String> =
+            repository(mockScmProjectProperty.name).getBranchesForCommit(commit)
+
+        override fun findEarliestBuildAfterCommit(
+            branch: Branch,
+            commit: String
+        ): Build? {
+            TODO("Not yet implemented")
+        }
     }
 
     class MockIssueServiceConfiguration : IssueServiceConfiguration {

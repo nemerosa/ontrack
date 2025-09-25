@@ -71,7 +71,8 @@ class ProjectScmCommitInfoGraphQLIT : AbstractQLKTITSupport() {
 
                     build("1.01") {
                         repositoryIssue("ISS-20", "Some issue")
-                        val commitId = withRepositoryCommit("ISS-20 Some commit")
+                        withRepositoryCommit("ISS-20 Some commit associated with the build", property = true)
+                        val commitId = withRepositoryCommit("ISS-20 Some ulterior commit", property = false)
                         promote(pl)
 
                         run(

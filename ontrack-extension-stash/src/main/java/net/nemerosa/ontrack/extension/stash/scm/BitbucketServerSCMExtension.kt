@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyTypeUtils
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
@@ -227,6 +228,17 @@ class BitbucketServerSCMExtension(
             }.firstOrNull { build ->
                 build.project.id == project.id
             }
+
+        override fun findBranchFromScmBranchName(
+            project: Project,
+            scmBranch: String
+        ): Branch? =
+            GitBranchConfigurationPropertyTypeUtils.findBranchFromScmBranchName(
+                propertyService = propertyService,
+                structureService = structureService,
+                project = project,
+                scmBranch = scmBranch,
+            )
 
         private fun waitAndMerge(prId: Int, from: String, message: String): Boolean {
             // Waits for the PR checks to be OK

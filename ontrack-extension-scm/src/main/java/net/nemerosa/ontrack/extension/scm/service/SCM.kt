@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.service
 
 import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Project
 
 /**
  * High-level interaction with the remote repository of a project.
@@ -118,11 +119,13 @@ interface SCM {
     fun getDiffLink(commitFrom: String, commitTo: String): String?
 
     /**
-     * Gets the list of all branches which contain the given commit.
+     * Given the name of a branch in the SCM, returns the corresponding
+     * branch in Yontrack.
      *
-     * @param commit The commit SHA
-     * @return List of branch names (simple names, like `main` and not `refs/heads/main`)
+     * @param project The project the branch belongs to
+     * @param scmBranch Name of the branch (simple name, like `main` and not `refs/heads/main`)
+     * @return Yontrack branch if one has been found
      */
-    fun getBranchesForCommit(commit: String): List<String>
+    fun findBranchFromScmBranchName(project: Project, scmBranch: String): Branch?
 
 }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyTypeUtils
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
 import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension
@@ -262,6 +263,17 @@ class GitHubSCMExtension(
             }.firstOrNull { build ->
                 build.project.id == project.id
             }
+
+        override fun findBranchFromScmBranchName(
+            project: Project,
+            scmBranch: String
+        ): Branch? =
+            GitBranchConfigurationPropertyTypeUtils.findBranchFromScmBranchName(
+                propertyService = propertyService,
+                structureService = structureService,
+                project = project,
+                scmBranch = scmBranch,
+            )
 
         private val client: OntrackGitHubClient by lazy {
             clientFactory.create(configuration)

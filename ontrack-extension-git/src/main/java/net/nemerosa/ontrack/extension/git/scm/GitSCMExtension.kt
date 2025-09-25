@@ -110,6 +110,13 @@ class GitSCMExtension(
             }
         }
 
+        override fun findBranchFromScmBranchName(
+            project: Project,
+            scmBranch: String
+        ): Branch? {
+            unsupported("findBranchFromScmBranchName")
+        }
+
         private fun unsupported(operation: String): Nothing =
             throw IllegalStateException(
                 """

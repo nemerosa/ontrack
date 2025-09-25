@@ -96,6 +96,13 @@ class TestSCMExtension(
         override fun getBranchLastCommit(branch: String): String? {
             TODO("Not yet implemented")
         }
+
+        override fun findBranchFromScmBranchName(
+            project: Project,
+            scmBranch: String
+        ): Branch? {
+            TODO("Not yet implemented")
+        }
     }
 
     class TestSCMExtensionFile(
