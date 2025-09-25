@@ -35,6 +35,24 @@ fun <T> MeterRegistry.time(
     return timer.record(code)
 }
 
+/**
+ * Utility method to record a time metric, variant for non-null returns.
+ *
+ * @param T Return type of the code to measure
+ * @param name Name of the timer
+ * @param tags List of tags to associate with the metric.
+ * @param code Code whose execution duration must be recorded
+ * @return Value returned by the code being measured
+ */
+fun <T> MeterRegistry.timeNotNull(
+        name: String,
+        vararg tags: Pair<String, String>,
+        code: () -> T
+): T {
+    val timer = timer(name, tags.map { Tag.of(it.first, it.second) })
+    return timer.record(code)!!
+}
+
 
 /**
  * Utility method to collect REB metrics

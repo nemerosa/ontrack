@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.git
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurationProperty
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
-import net.nemerosa.ontrack.extension.git.model.BranchInfo
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.property.*
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
@@ -11,6 +10,7 @@ import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.git.support.*
 import net.nemerosa.ontrack.extension.issues.mock.TestIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.model.toIdentifier
+import net.nemerosa.ontrack.extension.scm.model.BranchInfo
 import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.support.GitRepo

@@ -59,4 +59,76 @@ class ProjectScmCommitInfoGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    @AsAdminTest
+    fun `Getting the branch info info for a commit in a project`() {
+        mockSCMTester.withMockSCMRepository {
+            project {
+                branch {
+                    configureMockSCMBranch()
+
+                    val pl = promotionLevel()
+
+                    build("1.01") {
+                        repositoryIssue("ISS-20", "Some issue")
+                        val commitId = withRepositoryCommit("ISS-20 Some commit")
+                        promote(pl)
+
+                        run(
+                            """
+                                {
+                                    project(id: ${project.id}) {
+                                        scmCommitInfo(commitId: "$commitId") {
+                                            scmDecoratedCommit {
+                                                commit {
+                                                    id
+                                                }
+                                            }
+                                            branchInfos {
+                                                type
+                                                branchInfoList {
+                                                    branch {
+                                                        name
+                                                    }
+                                                    firstBuild {
+                                                        name
+                                                    }
+                                                    promotions {
+                                                        promotionLevel {
+                                                            name
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            """
+                        ) { data ->
+                            val scmCommitInfo = data.path("project").path("scmCommitInfo")
+
+                            val scmCommit = scmCommitInfo.path("scmDecoratedCommit").path("commit")
+                            assertEquals(commitId, scmCommit.path("id").asText())
+
+                            val branchInfosList = scmCommitInfo.path("branchInfosList")
+                            assertEquals(1, branchInfosList.size())
+                            val branchInfosListItem = branchInfosList.first()
+
+                            assertEquals("main", branchInfosListItem.path("type").asText())
+
+                            val branchInfo = branchInfosListItem.path("branchInfoList").first()
+                            assertEquals(name, branchInfo.path("branch").path("name").asText())
+                            assertEquals("1.01", branchInfo.path("firstBuild").path("name").asText())
+                            assertEquals(1, branchInfo.path("promotions").size())
+                            assertEquals(
+                                pl.name,
+                                branchInfo.path("promotions").first().path("promotionLevel").path("name").asText()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
