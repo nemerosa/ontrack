@@ -90,6 +90,9 @@ class SCMBuildCommitIndexServiceImpl(
         return count
     }
 
+    override fun getBuildCommit(build: Build): SCMBuildCommitIndexData? =
+        getIndexedCommit(build.id())
+
     private fun getIndexedCommit(buildId: Int): SCMBuildCommitIndexData? =
         namedParameterJdbcTemplate?.queryForObjectOrNull(
             sql = """
@@ -110,11 +113,22 @@ class SCMBuildCommitIndexServiceImpl(
             }
         )
 
+    override fun indexBuildCommit(build: Build, commit: String) {
+        val scm = scmDetector.getSCM(build.project)
+        if (scm !is SCMChangeLogEnabled) return
+        val commit = scm.getBuildCommit(build) ?: return
+        val scmCommit = scm.getCommit(commit) ?: return
+
+        indexCommit(build.id(), scmCommit)
+    }
+
     private fun indexCommit(buildId: Int, scmCommit: SCMCommit) {
         namedParameterJdbcTemplate?.update(
             """
                 INSERT INTO SCM_BUILD_COMMIT_INDEX(BUILD_ID, COMMIT_ID, COMMIT_TIMESTAMP, COMMIT_DATA)
                 VALUES (:buildId, :commitId, :commitTimestamp, CAST(:commitData AS JSONB))
+                ON CONFLICT (BUILD_ID, COMMIT_ID) DO 
+                UPDATE SET COMMIT_TIMESTAMP = :commitTimestamp, COMMIT_DATA = CAST(:commitData AS JSONB)
             """,
             mapOf(
                 "buildId" to buildId,

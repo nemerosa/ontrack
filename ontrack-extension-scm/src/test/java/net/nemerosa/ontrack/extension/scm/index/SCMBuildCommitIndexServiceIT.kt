@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.structure.Build
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class SCMBuildCommitIndexServiceIT : AbstractDSLTestSupport() {
 
@@ -15,6 +16,48 @@ class SCMBuildCommitIndexServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var scmBuildCommitIndexService: SCMBuildCommitIndexService
+
+    @Test
+    @AsAdminTest
+    fun `Indexing a build commit`() {
+        mockSCMTester.withMockSCMRepository {
+            project {
+                branch {
+                    configureMockSCMBranch()
+                    build {
+                        val commit = withRepositoryCommit("Commit 1")
+                        scmBuildCommitIndexService.indexBuildCommit(this, commit)
+                        val info = scmBuildCommitIndexService.getBuildCommit(this)
+                        assertNotNull(info) {
+                            assertEquals(id(), it.buildId)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Indexing a build commit when it's already indexed`() {
+        mockSCMTester.withMockSCMRepository {
+            project {
+                branch {
+                    configureMockSCMBranch()
+                    build {
+                        val commit = withRepositoryCommit("Commit 1")
+                        repeat(2) {
+                            scmBuildCommitIndexService.indexBuildCommit(this, commit)
+                        }
+                        val info = scmBuildCommitIndexService.getBuildCommit(this)
+                        assertNotNull(info) {
+                            assertEquals(id(), it.buildId)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     @AsAdminTest

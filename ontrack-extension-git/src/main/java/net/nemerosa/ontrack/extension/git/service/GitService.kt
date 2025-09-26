@@ -217,6 +217,7 @@ interface GitService : SCMService {
     /**
      * Collects and stores the [IndexableGitCommit]s one build.
      */
+    @Deprecated("Will be removed in V6. Use the SCMBuildCommitIndexService instead.")
     fun collectIndexableGitCommitForBuild(build: Build)
 
     /**
