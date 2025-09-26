@@ -106,6 +106,16 @@ class BitbucketClientImpl(
         return response.values.any { it.displayId == branch }
     }
 
+    override fun getBranchesForCommit(
+        repo: BitbucketRepository,
+        commit: String
+    ): List<String> {
+        val response = template.getForObject<BranchInfoCommitResponse>(
+            "/rest/branch-utils/1.0/projects/${repo.project}/repos/${repo.repository}/branches/info/${commit}"
+        )
+        return response.values.filter { it.type == "BRANCH" }.map { it.displayId }
+    }
+
     override fun geBranchLastCommit(repo: BitbucketRepository, branch: String): String? {
         if (isBranchExisting(repo, branch)) {
             val response = template.getForObject<GetBranchLastCommitResponse>(
@@ -250,6 +260,15 @@ class BitbucketClientImpl(
         .rootUri(configuration.url)
         .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer $token")
         .build()
+
+    private class BranchInfoCommitResponse(
+        val values: List<BranchInfoCommit>,
+    )
+
+    private class BranchInfoCommit(
+        val displayId: String,
+        val type: String,
+    )
 
     private class PRResponse(
         val id: Int,

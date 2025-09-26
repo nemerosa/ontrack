@@ -142,4 +142,9 @@ interface BitbucketClient {
      */
     fun geBranchLastCommit(repo: BitbucketRepository, branch: String): String?
 
+    /**
+     * Given a commit, returns the list of branches where this commit is present.
+     */
+    fun getBranchesForCommit(repo: BitbucketRepository, commit: String): List<String>
+
 }
