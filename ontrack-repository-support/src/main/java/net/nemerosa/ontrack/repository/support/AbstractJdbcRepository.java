@@ -117,6 +117,10 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
         return Time.forStorage(time);
     }
 
+    /**
+     * @deprecated Use ResultSet.readLocalDateTime or ResultSet.readLocalDateTimeNotNull
+     */
+    @Deprecated
     protected static @Nullable
     LocalDateTime dateTimeFromDB(@Nullable String value) {
         return Time.fromStorage(value);
