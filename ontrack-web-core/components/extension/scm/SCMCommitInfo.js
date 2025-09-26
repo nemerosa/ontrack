@@ -2,6 +2,7 @@ import PageSection from "@components/common/PageSection";
 import {Divider, Space, Typography} from "antd";
 import SafeHTMLComponent from "@components/common/SafeHTMLComponent";
 import TimestampText from "@components/common/TimestampText";
+import SCMBranchInfos from "@components/extension/scm/SCMBranchInfos";
 
 export default function SCMCommitInfo({scmCommitInfo}) {
     return (
@@ -31,6 +32,13 @@ export default function SCMCommitInfo({scmCommitInfo}) {
                             <TimestampText value={scmCommitInfo.scmDecoratedCommit.commit.timestamp}/>
                         </Typography.Text>
                     </Space>
+
+                    <Typography.Paragraph>
+                        This commit is available in the following branches:
+                    </Typography.Paragraph>
+
+                    <SCMBranchInfos branchInfos={scmCommitInfo.branchInfos}/>
+
                 </Space>
             </PageSection>
         </>

@@ -37,6 +37,45 @@ export default function GitCommitInfoView({projectId, commit}) {
                             }
                             annotatedMessage
                         }
+                        branchInfos {
+                            type
+                            branchInfoList {
+                                branch {
+                                    id
+                                    name
+                                    displayName
+                                    disabled
+                                    project {
+                                        id
+                                        name
+                                    }
+                                }
+                                firstBuild {
+                                    id
+                                    name
+                                    displayName
+                                    creation {
+                                        time
+                                    }
+                                }
+                                promotions {
+                                    id
+                                    promotionLevel {
+                                        id
+                                        name
+                                        image
+                                    }
+                                    build {
+                                        id
+                                        name
+                                        displayName
+                                    }
+                                    creation {
+                                        time
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

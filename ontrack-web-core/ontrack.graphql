@@ -462,22 +462,22 @@ type Branch implements Authorizable & ProjectEntity {
   validationStatuses(names: [String!]!): [ValidationRun!]!
 }
 
-"Branch and associated information"
+"Information about a branch"
 type BranchInfo {
   "Associated branch"
-  branch: Branch
-  "First build which contains the commit"
+  branch: Branch!
+  "First build on this branch"
   firstBuild: Build
-  "First promotion for every promotion level"
+  "List of promotions on this branch"
   promotions: [PromotionRun!]!
 }
 
-"Type of branch associated with information about the corresponding branches."
+"Collecting information about a set of branches."
 type BranchInfos {
-  "List of branches and their associated information"
+  "List of information per branch"
   branchInfoList: [BranchInfo!]!
-  "Type of branch"
-  type: String
+  "Name of the group of branches"
+  type: String!
 }
 
 "Qualified link to a branch"
@@ -5846,6 +5846,8 @@ type SCMCommit {
 
 "Information about a commit"
 type SCMCommitInfo {
+  "Information about the branches associated with this commit"
+  branchInfos: [BranchInfos!]!
   "Associated decorated SCM commit"
   scmDecoratedCommit: SCMDecoratedCommit!
 }
