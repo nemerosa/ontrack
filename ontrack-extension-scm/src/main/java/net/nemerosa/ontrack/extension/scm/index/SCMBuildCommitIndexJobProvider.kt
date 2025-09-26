@@ -20,7 +20,10 @@ class SCMBuildCommitIndexJobProvider(
                 createSCMBuildCommitIndexJob(),
                 Schedule.EVERY_DAY,
             ),
-            // TODO Reset job
+            JobRegistration(
+                createSCMBuildCommitIndexCleanupJob(),
+                Schedule.NONE,
+            ),
         )
 
     private fun createSCMBuildCommitIndexJob() = object : Job {
@@ -43,6 +46,23 @@ class SCMBuildCommitIndexJobProvider(
         }
 
         override fun getDescription(): String = "SCM Build Commit Indexation"
+
+        override fun isDisabled(): Boolean = false
+
+    }
+
+    private fun createSCMBuildCommitIndexCleanupJob() = object : Job {
+        override fun getKey(): JobKey =
+            SCMJobs.category
+                .getType("build-commit-index").withName("SCM Build Commit Indexes")
+                .getKey("cleanup")
+
+        override fun getTask() = JobRun { listener ->
+            listener.message("Clearing the SCM build/commit links for all projects...")
+            scmBuildCommitIndexService.clearBuildCommits()
+        }
+
+        override fun getDescription(): String = "SCM Build Commit Index Cleanup"
 
         override fun isDisabled(): Boolean = false
 

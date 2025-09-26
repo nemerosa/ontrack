@@ -10,4 +10,6 @@ interface SCMBuildCommitIndexService {
 
     fun indexBuildCommits(project: Project): Int
 
+    fun clearBuildCommits()
+
 }

@@ -20,6 +20,13 @@ class SCMBuildCommitIndexServiceImpl(
     private val structureService: StructureService,
 ) : SCMBuildCommitIndexService, AbstractJdbcRepository(dataSource) {
 
+    override fun clearBuildCommits() {
+        @Suppress("SqlWithoutWhere")
+        jdbcTemplate?.update(
+            "DELETE FROM SCM_BUILD_COMMIT_INDEX"
+        )
+    }
+
     override fun indexBuildCommits(project: Project): Int {
         val scm = scmDetector.getSCM(project) ?: return -1
         if (scm !is SCMChangeLogEnabled) return -1
