@@ -325,7 +325,7 @@ class DefaultOntrackGitHubClient(
                 val json = ex.responseBodyAsString
                 try {
                     val error: GitHubErrorMessage = json.parseAsJson().parse()
-                    throw GitHubErrorsException(message, error, ex.rawStatusCode)
+                    throw GitHubErrorsException(message, error, ex.statusCode.value())
                 } catch (_: JsonParseException) {
                     throw ex
                 }
@@ -799,6 +799,12 @@ class DefaultOntrackGitHubClient(
                 getForObject<GitHubCommit?>(
                     "/repos/$owner/$name/commits/$commit"
                 )
+            }
+        } catch (ex: GitHubErrorsException) {
+            if (ex.status == 404) {
+                null
+            } else {
+                throw ex
             }
         } catch (_: HttpClientErrorException.NotFound) {
             null
