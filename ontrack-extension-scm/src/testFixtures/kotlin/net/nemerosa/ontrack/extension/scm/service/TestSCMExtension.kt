@@ -103,6 +103,10 @@ class TestSCMExtension(
         ): Branch? {
             TODO("Not yet implemented")
         }
+
+        override fun getBranchesForCommit(commit: String): List<String> {
+            TODO("Not yet implemented")
+        }
     }
 
     class TestSCMExtensionFile(

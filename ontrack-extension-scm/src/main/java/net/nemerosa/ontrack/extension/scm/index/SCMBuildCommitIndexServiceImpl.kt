@@ -113,11 +113,12 @@ class SCMBuildCommitIndexServiceImpl(
             }
         )
 
-    override fun indexBuildCommit(build: Build, commit: String) {
+    override fun indexBuildCommit(build: Build, commit: String?) {
         val scm = scmDetector.getSCM(build.project)
         if (scm !is SCMChangeLogEnabled) return
-        val commit = scm.getBuildCommit(build) ?: return
-        val scmCommit = scm.getCommit(commit) ?: return
+        val existingCommit = scm.getBuildCommit(build) ?: return
+        if (commit != null && existingCommit != commit) return
+        val scmCommit = scm.getCommit(existingCommit) ?: return
 
         indexCommit(build.id(), scmCommit)
     }

@@ -128,4 +128,12 @@ interface SCM {
      */
     fun findBranchFromScmBranchName(project: Project, scmBranch: String): Branch?
 
+    /**
+     * Gets the list of all branches which contain the given commit.
+     *
+     * @param commit The commit SHA
+     * @return List of branch names (simple names, like `main` and not `refs/heads/main`)
+     */
+    fun getBranchesForCommit(commit: String): List<String>
+
 }

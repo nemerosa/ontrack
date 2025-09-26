@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.graphql
 
+import net.nemerosa.ontrack.extension.scm.index.SCMBuildCommitIndexService
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AsAdminTest
@@ -11,6 +12,9 @@ class ProjectScmCommitInfoGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var mockSCMTester: MockSCMTester
+
+    @Autowired
+    private lateinit var scmBuildCommitIndexService: SCMBuildCommitIndexService
 
     @Test
     @AsAdminTest
@@ -71,8 +75,11 @@ class ProjectScmCommitInfoGraphQLIT : AbstractQLKTITSupport() {
 
                     build("1.01") {
                         repositoryIssue("ISS-20", "Some issue")
+                        val commitId = withRepositoryCommit("ISS-20 Some previous commit", property = false)
                         withRepositoryCommit("ISS-20 Some commit associated with the build", property = true)
-                        val commitId = withRepositoryCommit("ISS-20 Some ulterior commit", property = false)
+
+                        scmBuildCommitIndexService.indexBuildCommits(project)
+
                         promote(pl)
 
                         run(
@@ -111,14 +118,14 @@ class ProjectScmCommitInfoGraphQLIT : AbstractQLKTITSupport() {
                             val scmCommit = scmCommitInfo.path("scmDecoratedCommit").path("commit")
                             assertEquals(commitId, scmCommit.path("id").asText())
 
-                            val branchInfosList = scmCommitInfo.path("branchInfosList")
+                            val branchInfosList = scmCommitInfo.path("branchInfos")
                             assertEquals(1, branchInfosList.size())
                             val branchInfosListItem = branchInfosList.first()
 
-                            assertEquals("main", branchInfosListItem.path("type").asText())
+                            assertEquals("Development", branchInfosListItem.path("type").asText())
 
                             val branchInfo = branchInfosListItem.path("branchInfoList").first()
-                            assertEquals(name, branchInfo.path("branch").path("name").asText())
+                            assertEquals(branch.name, branchInfo.path("branch").path("name").asText())
                             assertEquals("1.01", branchInfo.path("firstBuild").path("name").asText())
                             assertEquals(1, branchInfo.path("promotions").size())
                             assertEquals(

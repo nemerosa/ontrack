@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
-import net.nemerosa.ontrack.extension.scm.index.SCMBuildIndexEnabled
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
 import net.nemerosa.ontrack.extension.scm.service.SCMPath
@@ -289,7 +288,7 @@ class MockSCMExtension(
 
     private inner class MockSCM(
         private val mockScmProjectProperty: MockSCMProjectProperty,
-    ) : SCM, SCMChangeLogEnabled, SCMBuildIndexEnabled {
+    ) : SCM, SCMChangeLogEnabled {
 
         override val type: String = "mock"
         override val engine: String = "mock"
@@ -388,12 +387,6 @@ class MockSCMExtension(
         override fun getBranchesForCommit(commit: String): List<String> =
             repository(mockScmProjectProperty.name).getBranchesForCommit(commit)
 
-        override fun findEarliestBuildAfterCommit(
-            branch: Branch,
-            commit: String
-        ): Build? {
-            TODO("Not yet implemented")
-        }
     }
 
     class MockIssueServiceConfiguration : IssueServiceConfiguration {

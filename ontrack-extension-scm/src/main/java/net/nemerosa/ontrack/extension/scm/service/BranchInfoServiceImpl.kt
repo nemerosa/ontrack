@@ -2,7 +2,8 @@ package net.nemerosa.ontrack.extension.scm.service
 
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.scm.branching.BranchingModelService
-import net.nemerosa.ontrack.extension.scm.index.SCMBuildIndexEnabled
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
+import net.nemerosa.ontrack.extension.scm.index.SCMBuildCommitIndexService
 import net.nemerosa.ontrack.extension.scm.model.BranchInfo
 import net.nemerosa.ontrack.extension.scm.model.BranchInfos
 import net.nemerosa.ontrack.model.metrics.time
@@ -19,6 +20,7 @@ class BranchInfoServiceImpl(
     private val meterRegistry: MeterRegistry,
     private val branchingModelService: BranchingModelService,
     private val structureService: StructureService,
+    private val scmBuildCommitIndexService: SCMBuildCommitIndexService,
 ) : BranchInfoService {
 
     private val logger: Logger = LoggerFactory.getLogger(BranchInfoServiceImpl::class.java)
@@ -32,7 +34,7 @@ class BranchInfoServiceImpl(
         val scm = scmDetector.getSCM(project) ?: return emptyList()
 
         // Controlling the indexation
-        return if (scm is SCMBuildIndexEnabled) {
+        return if (scm is SCMChangeLogEnabled) {
 
             // Gets all the branches which contain this commit
             val scmBranches = meterRegistry.timeNotNull(
@@ -65,7 +67,7 @@ class BranchInfoServiceImpl(
                         "project" to project.name,
                         "branch" to branch.name,
                     ) {
-                        scm.findEarliestBuildAfterCommit(
+                        scmBuildCommitIndexService.findEarliestBuildAfterCommit(
                             branch = branch,
                             commit = commit,
                         )
@@ -111,7 +113,7 @@ class BranchInfoServiceImpl(
                 """
                     Tried to get SCM branch info on ${project.name} but SCM build index 
                     is not enabled
-                    (${scm::class.java.name} does not implement ${SCMBuildIndexEnabled::class}).
+                    (${scm::class.java.name} does not implement ${SCMChangeLogEnabled::class}).
                 """.trimIndent()
             )
             emptyList()

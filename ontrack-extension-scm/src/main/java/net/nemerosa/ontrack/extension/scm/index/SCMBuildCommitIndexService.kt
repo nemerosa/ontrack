@@ -10,7 +10,7 @@ interface SCMBuildCommitIndexService {
 
     fun indexBuildCommits(project: Project): Int
 
-    fun indexBuildCommit(build: Build, commit: String)
+    fun indexBuildCommit(build: Build, commit: String? = null)
 
     fun getBuildCommit(build: Build): SCMBuildCommitIndexData?
 
