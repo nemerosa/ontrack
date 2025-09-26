@@ -41,7 +41,7 @@ class BranchInfoServiceImpl(
                 METRIC_ONTRACK_EXTENSION_SCM_BRANCH_INFO_BRANCHES,
                 "project" to project.name,
             ) {
-                scm.getBranchesForCommit(commit)
+                scm.getBranchesForCommit(project, commit)
             }
 
             // Using the branching model to get branch groups

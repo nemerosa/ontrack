@@ -131,9 +131,10 @@ interface SCM {
     /**
      * Gets the list of all branches which contain the given commit.
      *
+     * @param project The project the commit belongs to
      * @param commit The commit SHA
      * @return List of branch names (simple names, like `main` and not `refs/heads/main`)
      */
-    fun getBranchesForCommit(commit: String): List<String>
+    fun getBranchesForCommit(project: Project, commit: String): List<String>
 
 }

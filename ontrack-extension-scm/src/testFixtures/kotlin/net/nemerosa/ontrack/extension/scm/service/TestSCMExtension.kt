@@ -104,7 +104,7 @@ class TestSCMExtension(
             TODO("Not yet implemented")
         }
 
-        override fun getBranchesForCommit(commit: String): List<String> {
+        override fun getBranchesForCommit(project: Project, commit: String): List<String> {
             TODO("Not yet implemented")
         }
     }

@@ -117,7 +117,7 @@ class GitSCMExtension(
             unsupported("findBranchFromScmBranchName")
         }
 
-        override fun getBranchesForCommit(commit: String): List<String> {
+        override fun getBranchesForCommit(project: Project, commit: String): List<String> {
             unsupported("findBranchFromScmBranchName")
         }
 

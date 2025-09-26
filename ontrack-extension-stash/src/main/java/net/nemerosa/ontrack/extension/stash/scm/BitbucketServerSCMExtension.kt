@@ -240,7 +240,7 @@ class BitbucketServerSCMExtension(
                 scmBranch = scmBranch,
             )
 
-        override fun getBranchesForCommit(commit: String): List<String> =
+        override fun getBranchesForCommit(project: Project, commit: String): List<String> =
             client.getBranchesForCommit(repo, commit)
 
         private fun waitAndMerge(prId: Int, from: String, message: String): Boolean {

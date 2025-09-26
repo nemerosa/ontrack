@@ -384,7 +384,7 @@ class MockSCMExtension(
         ): SCMCommit? =
             repository(mockScmProjectProperty.name).getCommit(id)
 
-        override fun getBranchesForCommit(commit: String): List<String> =
+        override fun getBranchesForCommit(project: Project, commit: String): List<String> =
             repository(mockScmProjectProperty.name).getBranchesForCommit(commit)
 
     }
