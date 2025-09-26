@@ -4,7 +4,7 @@ export default function Display({property}) {
 
     return (
         <>
-            <Typography.Text code>{property.value.commit}</Typography.Text>
+            <Typography.Text code copyable>{property.value.commit}</Typography.Text>
         </>
     )
 }
