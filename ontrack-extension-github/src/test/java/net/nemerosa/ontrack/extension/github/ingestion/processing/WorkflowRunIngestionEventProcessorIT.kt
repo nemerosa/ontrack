@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
+import net.nemerosa.ontrack.extension.github.client.UseGitHubClientMock
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
@@ -27,6 +28,7 @@ import kotlin.jvm.optionals.getOrNull
 import kotlin.test.*
 
 @ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
+@UseGitHubClientMock
 class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
 
     @Autowired
@@ -707,7 +709,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                             getProperty(
                                 build,
                                 BuildGitHubWorkflowRunPropertyType::class.java
-                            )?.workflows?.firstOrNull(),
+                            ).workflows.firstOrNull(),
                             "GitHub workflow run URL"
                         ) {
                             assertEquals(htmlUrl, it.url)

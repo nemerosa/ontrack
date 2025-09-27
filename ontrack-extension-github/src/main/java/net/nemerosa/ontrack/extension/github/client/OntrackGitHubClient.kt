@@ -296,4 +296,10 @@ interface OntrackGitHubClient {
         retriesDelaySeconds: Int = 30,
     )
 
+    companion object {
+        const val PROPERTY_GITHUB_CLIENT_TYPE = "ontrack.extension.github.client.type"
+        const val PROPERTY_GITHUB_CLIENT_TYPE_DEFAULT = "default"
+        const val PROPERTY_GITHUB_CLIENT_TYPE_MOCK = "mock"
+    }
+
 }
