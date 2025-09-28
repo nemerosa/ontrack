@@ -195,6 +195,7 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_CHANGELOG_MESSAGES = 'nemerosa/ontrack#978 Promotion image|nemerosa/ontrack#978 Validation image|nemerosa/ontrack#928 Explicitly skipping the jobs|nemerosa/ontrack#928 Sample GitHub ingestion configuration file'
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_FROM = '36e95eded56bcfead06a55238ccb315fbfe211a8'
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_ISSUE = '1'
+                ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_ISSUE_COMMIT = '901130bc4655a8180c2034f0619768c7343095bb'
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_ISSUESUMMARY = 'Test issue'
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_TO = '901130bc4655a8180c2034f0619768c7343095bb'
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_MESSAGES = '#1 Commit with issue'

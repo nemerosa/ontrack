@@ -20,6 +20,11 @@ class MockJIRAClient(
     override fun getIssue(key: String, configuration: JIRAConfiguration): JIRAIssue? =
         instance.getIssue(key)
 
+    override fun getIssueLastCommit(
+        key: String,
+        configuration: JIRAConfiguration
+    ): String? = null
+
     override fun createIssue(
         configuration: JIRAConfiguration,
         project: String,

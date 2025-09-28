@@ -12,10 +12,6 @@ import SCMCommitInfo from "@components/extension/scm/SCMCommitInfo";
 
 export default function GitCommitInfoView({projectId, commit}) {
 
-    /**
-     * TODO For the time being, we may have to stick to pure Git commit
-     */
-
     const {loading, data} = useQuery(
         gql`
             query GitCommitInfo(

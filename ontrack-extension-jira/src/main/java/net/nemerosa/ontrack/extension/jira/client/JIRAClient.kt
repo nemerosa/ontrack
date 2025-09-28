@@ -10,6 +10,8 @@ interface JIRAClient : AutoCloseable {
 
     fun getIssue(key: String, configuration: JIRAConfiguration): JIRAIssue?
 
+    fun getIssueLastCommit(key: String, configuration: JIRAConfiguration): String?
+
     val projects: List<String>
 
     fun createIssue(

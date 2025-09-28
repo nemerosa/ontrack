@@ -11,6 +11,15 @@ data class MockIssue(
     val message: String,
     val types: Set<String>? = null,
 ) : Issue {
+
+    val commits = mutableListOf<String>()
+
+    fun addCommitId(id: String) {
+        commits.add(id)
+    }
+
+    fun lastCommitId() = commits.lastOrNull()
+
     override val summary: String = message
     override val url: String = "mock://$repositoryName/issue/$key"
     override val status: IssueStatus = MockIssueStatus(name = "open")

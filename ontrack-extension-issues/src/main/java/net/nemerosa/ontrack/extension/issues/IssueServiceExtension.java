@@ -93,4 +93,13 @@ public interface IssueServiceExtension extends Extension {
     }
 
     @NotNull Set<String> getIssueTypes(@NotNull IssueServiceConfiguration issueServiceConfiguration, @NotNull Issue issue);
+
+    /**
+     * Given an issue key, returns, if any, its last associated commit.
+     *
+     * @param issueServiceConfiguration Configuration for the service
+     * @param key                       Key ID
+     * @return Commit ID or null if none.
+     */
+    @Nullable String getLastCommit(@NotNull IssueServiceConfiguration issueServiceConfiguration, @NotNull String key);
 }

@@ -123,6 +123,13 @@ class GitLabIssueServiceExtension(
         return HashSet(wrapper.labels)
     }
 
+    override fun getLastCommit(
+        issueServiceConfiguration: IssueServiceConfiguration,
+        key: String
+    ): String? {
+        TODO("Not yet implemented")
+    }
+
     companion object {
         const val GITLAB_SERVICE_ID: String = "gitlab"
         private const val GITLAB_ISSUE_PATTERN = "(#(\\d+))"

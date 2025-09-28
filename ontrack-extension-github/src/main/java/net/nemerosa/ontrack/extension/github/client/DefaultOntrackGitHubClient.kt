@@ -864,6 +864,28 @@ class DefaultOntrackGitHubClient(
         }
     }
 
+    override fun getIssueLastCommit(repository: String, key: Int): String? {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Search commits mentioning the issue, sorted by most recent
+        return try {
+            client("Get last commit for issue #$key") {
+                val encodedQuery = URLEncoder.encode("repo:$owner/$name #$key", Charsets.UTF_8)
+                val node = getForObject<JsonNode>("/search/commits?q=$encodedQuery&sort=committer-date&order=desc")
+                val items = node.path("items")
+                if (items.isArray && items.size() > 0) {
+                    items[0].path("sha").asText(null)
+                } else {
+                    null
+                }
+            }
+        } catch (_: HttpClientErrorException.NotFound) {
+            null
+        }
+    }
+
     private fun getWorkflowRuns(
         client: RestTemplate,
         repository: String,

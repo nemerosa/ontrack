@@ -40,4 +40,11 @@ data class ConfiguredIssueService(
         return issueServiceExtension.getDisplayKey(issueServiceConfiguration, key)
     }
 
+    /**
+     * Given an existing issue, gets its last commit
+     */
+    fun getLastCommit(issue: Issue): String? {
+        return issueServiceExtension.getLastCommit(issueServiceConfiguration, issue.key)
+    }
+
 }

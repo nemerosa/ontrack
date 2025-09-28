@@ -296,6 +296,14 @@ interface OntrackGitHubClient {
         retriesDelaySeconds: Int = 30,
     )
 
+    /**
+     * Gets the last commit for a given issue
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param key Issue key, like `1234`
+     */
+    fun getIssueLastCommit(repository: String, key: Int): String?
+
     companion object {
         const val PROPERTY_GITHUB_CLIENT_TYPE = "ontrack.extension.github.client.type"
         const val PROPERTY_GITHUB_CLIENT_TYPE_DEFAULT = "default"

@@ -35,6 +35,37 @@ class JIRAClientImpl(
         }
     }
 
+    override fun getIssueLastCommit(
+        key: String,
+        configuration: JIRAConfiguration
+    ): String? {
+        return try {
+            // Uses JIRA "dev-status" integration to get commits linked to this issue.
+            // API: /rest/dev-status/1.0/issue/detail?issueId=<id>&applicationType=github|stash|bitbucket&dataType=repository
+            val details = restTemplate.getForObject<JsonNode>(
+                "/rest/dev-status/1.0/issue/detail?issueId=$key&applicationType=github&dataType=repository"
+            )
+            val repositories = details.path("detail").firstOrNull()?.path("repositories")
+            if (repositories != null && repositories.isArray) {
+                // Flattens all commits from all repositories and takes the most recent one
+                val allCommits = repositories.flatMap { repo ->
+                    repo.path("commits").map { commitNode ->
+                        val authorTimestamp = commitNode.path("authorTimestamp").asLong(0L)
+                        val id = commitNode.path("id").asText(null)
+                        authorTimestamp to id
+                    }
+                }.filter { it.second != null }
+                allCommits.maxByOrNull { it.first }?.second
+            } else {
+                null
+            }
+        } catch (_: Forbidden) {
+            null
+        } catch (_: NotFound) {
+            null
+        }
+    }
+
     private fun fetchIssue(key: String, configuration: JIRAConfiguration): JIRAIssue? {
         try {
             val node = restTemplate.getForObject<JsonNode>("/rest/api/2/issue/$key?expand=names")

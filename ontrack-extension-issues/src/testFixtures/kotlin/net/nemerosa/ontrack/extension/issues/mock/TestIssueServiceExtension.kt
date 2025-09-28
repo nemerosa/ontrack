@@ -69,7 +69,7 @@ class TestIssueServiceExtension(
             }
         }
         // OK
-        return result;
+        return result
     }
 
     override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator? {
@@ -89,7 +89,7 @@ class TestIssueServiceExtension(
         )
     }
 
-    protected fun getIssueId(issueKey: String): Int {
+    private fun getIssueId(issueKey: String): Int {
         return issueKey.trimStart('#').toInt()
     }
 
@@ -110,4 +110,9 @@ class TestIssueServiceExtension(
     } else {
         emptySet()
     }
+
+    override fun getLastCommit(
+        issueServiceConfiguration: IssueServiceConfiguration,
+        key: String
+    ): String? = null
 }

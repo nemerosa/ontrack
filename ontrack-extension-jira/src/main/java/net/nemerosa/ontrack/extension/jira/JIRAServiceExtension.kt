@@ -138,6 +138,18 @@ class JIRAServiceExtension(
         return result
     }
 
+    override fun getLastCommit(
+        issueServiceConfiguration: IssueServiceConfiguration,
+        key: String
+    ): String? {
+        val configuration = issueServiceConfiguration as JIRAConfiguration
+        transactionService.start().use { tx ->
+            val session = getJIRASession(tx, configuration)
+            // Gets the JIRA issue
+            return session.client.getIssueLastCommit(key, configuration)
+        }
+    }
+
     companion object {
         const val SERVICE: String = "jira"
     }

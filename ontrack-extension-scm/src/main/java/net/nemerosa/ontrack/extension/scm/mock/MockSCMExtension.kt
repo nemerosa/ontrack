@@ -105,6 +105,14 @@ class MockSCMExtension(
                 id = id,
                 message = message,
             )
+
+            // Collects associated issues and associates the commit to them
+            issueRegex.findAll(message).forEach { matchResult ->
+                val issueKey = matchResult.groupValues[1]
+                val existingIssue = issues[issueKey]
+                existingIssue?.addCommitId(id)
+            }
+
             return id
         }
 
@@ -132,7 +140,6 @@ class MockSCMExtension(
             title: String,
             body: String,
             autoApproval: Boolean,
-            remoteAutoMerge: Boolean,
             reviewers: List<String>,
         ): SCMPullRequest {
             val id = createdPullRequests.size + 1
@@ -185,7 +192,7 @@ class MockSCMExtension(
 
         fun getBranch(namePattern: String): MockBranch? {
             val branch = if (namePattern.endsWith("*")) {
-                createdBranches.entries.firstOrNull { (name, branch) ->
+                createdBranches.entries.firstOrNull { (name, _) ->
                     branchMatches(name, namePattern)
                 }?.value
             } else {
@@ -245,7 +252,7 @@ class MockSCMExtension(
                 val newestBranchIndex = branches.indexOfFirst { it.name == newestBranch.name }
                 (oldestBranchIndex..newestBranchIndex).forEach { index ->
                     val branch = branches[index]
-                    // If oldest branch, take commits only from the oldest commit (excluded)
+                    // If it is the oldest branch, take commits only from the oldest commit (excluded)
                     if (branch.name == oldestBranch.name) {
                         var found = false
                         branch.commits.forEach { commit ->
@@ -334,7 +341,6 @@ class MockSCMExtension(
             title = title,
             body = description,
             autoApproval = autoApproval,
-            remoteAutoMerge = remoteAutoMerge,
             reviewers = reviewers,
         )
 
@@ -402,9 +408,6 @@ class MockSCMExtension(
         private val repositoryName: String,
     ) : IssueServiceExtension {
 
-        private val issuePattern = "([A-Z]+-\\d+)"
-        private val issueRegex = issuePattern.toRegex()
-
         override fun getId(): String = "mock"
 
         override fun getName(): String = "Mock issues"
@@ -413,7 +416,11 @@ class MockSCMExtension(
 
         override fun getConfigurationByName(name: String): IssueServiceConfiguration? = null
 
-        private fun validIssueToken(token: String?): Boolean = true // Anything goes
+        override fun getLastCommit(
+            issueServiceConfiguration: IssueServiceConfiguration,
+            key: String
+        ): String? =
+            repository(repositoryName).findIssue(key)?.lastCommitId()
 
         override fun extractIssueKeysFromMessage(
             issueServiceConfiguration: IssueServiceConfiguration,
@@ -455,3 +462,7 @@ class MockSCMExtension(
 
     }
 }
+
+
+private const val issuePattern = "([A-Z]+-\\d+)"
+private val issueRegex = issuePattern.toRegex()

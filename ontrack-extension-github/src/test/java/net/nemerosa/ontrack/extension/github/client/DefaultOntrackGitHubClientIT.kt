@@ -212,4 +212,16 @@ class DefaultOntrackGitHubClientIT {
         )
     }
 
+    @Test
+    fun `Getting the last commit for an issue`() {
+        val commit = client.getIssueLastCommit(
+            repository = githubTestEnv.fullRepository,
+            key = githubTestEnv.issues.issue,
+        )
+        assertEquals(
+            githubTestEnv.issues.issueCommit,
+            commit,
+        )
+    }
+
 }

@@ -125,6 +125,18 @@ class GitHubIssueServiceExtension(
         return gitHubIssue.labels.stream().map(GitHubLabel::name).collect(Collectors.toSet())
     }
 
+    override fun getLastCommit(
+        issueServiceConfiguration: IssueServiceConfiguration,
+        key: String
+    ): String? {
+        val numericKey = getIssueId(key)
+        val configuration = issueServiceConfiguration as GitHubIssueServiceConfiguration
+        val client = gitHubClientFactory.create(
+            configuration.configuration
+        )
+        return client.getIssueLastCommit(configuration.repository, numericKey)
+    }
+
     companion object {
         const val GITHUB_SERVICE_ID: String = "github"
         const val GITHUB_ISSUE_PATTERN: String = "(#(\\d+))"
