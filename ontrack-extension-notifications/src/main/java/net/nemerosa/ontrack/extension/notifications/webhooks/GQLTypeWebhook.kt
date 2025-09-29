@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.booleanField
 import net.nemerosa.ontrack.graphql.support.getTypeDescription
+import net.nemerosa.ontrack.graphql.support.jsonFieldGetter
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.graphql.support.stringField
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
@@ -19,6 +20,7 @@ class GQLTypeWebhook(
     private val gqlTypeWebhookExchange: GQLTypeWebhookExchange,
     private val gqlPaginatedListFactory: GQLPaginatedListFactory,
     private val webhookExchangeService: WebhookExchangeService,
+    private val webhookAuthenticatorRegistry: WebhookAuthenticatorRegistry,
 ) : GQLType {
 
     override fun getTypeName(): String = Webhook::class.java.simpleName
@@ -47,6 +49,14 @@ class GQLTypeWebhook(
                         val webhook: Webhook = env.getSource()!!
                         webhook.authentication.type
                     }
+            }
+            .jsonFieldGetter<Webhook>(
+                "authenticationConfig",
+                "Configuration for the webhook authentication"
+            ) { webhook, _ ->
+                val authenticator = webhookAuthenticatorRegistry.findWebhookAuthenticator(webhook.authentication.type)
+                    ?: throw WebhookAuthenticatorNotFoundException(webhook.authentication.type)
+                authenticator.obfuscateJson(webhook.authentication.config)
             }
             .field(
                 gqlPaginatedListFactory.createPaginatedField<Webhook, WebhookExchange>(

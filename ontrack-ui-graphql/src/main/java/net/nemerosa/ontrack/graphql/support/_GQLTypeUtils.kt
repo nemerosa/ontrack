@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.support
 
+import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars.*
 import graphql.schema.*
 import net.nemerosa.ontrack.graphql.schema.GQLType
@@ -127,6 +128,28 @@ fun TypeBuilder.jsonField(
                 }
             }
             .type(GQLScalarJSON.INSTANCE)
+    }
+
+fun <P> TypeBuilder.jsonFieldGetter(
+    name: String,
+    description: String? = null,
+    deprecation: String? = null,
+    code: (source: P, env: DataFetchingEnvironment) -> JsonNode?
+): GraphQLObjectType.Builder =
+    field {
+        it.name(name)
+            .description(description)
+            .apply {
+                if (!deprecation.isNullOrBlank()) {
+                    deprecate(deprecation)
+                }
+            }
+            .type(GQLScalarJSON.INSTANCE)
+            .dataFetcher { env ->
+                val source: P = env.getSource()!!
+                code(source, env)
+            }
+
     }
 
 fun TypeBuilder.booleanField(property: KProperty<Boolean>, description: String? = null): GraphQLObjectType.Builder =

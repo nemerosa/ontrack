@@ -20,10 +20,22 @@ class BearerWebhookAuthenticator : AbstractWebhookAuthenticator<BearerWebhookAut
         builder.header("Authorization", "Bearer ${config.token}")
     }
 
+    override fun obfuscate(config: BearerWebhookAuthenticatorConfig) = config.obfuscate()
+
+    override fun merge(
+        input: BearerWebhookAuthenticatorConfig,
+        existing: BearerWebhookAuthenticatorConfig
+    ) = BearerWebhookAuthenticatorConfig(
+        token = merge(input.token, existing.token),
+    )
 }
 
 data class BearerWebhookAuthenticatorConfig(
     @APILabel("Token")
     @APIDescription("Token used to connect to the webhook")
-    val token: String,
-)
+    val token: String = "",
+) {
+    fun obfuscate() = BearerWebhookAuthenticatorConfig(
+        token = "",
+    )
+}

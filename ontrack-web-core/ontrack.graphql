@@ -4260,6 +4260,11 @@ type Mutation {
     "Input for the mutation"
     input: TestJenkinsConfigurationInput
   ): TestJenkinsConfigurationPayload
+  "Tests a webhook"
+  testWebhook(
+    "Input for the mutation"
+    input: TestWebhookInput
+  ): TestWebhookPayload
   "Unmarks a branch as favourite"
   unfavouriteBranch(
     "Input for the mutation"
@@ -4325,6 +4330,11 @@ type Mutation {
     "Input for the mutation"
     input: UpdateValidationStampFilterInput
   ): UpdateValidationStampFilterPayload
+  "Updating an existing webhook"
+  updateWebhook(
+    "Input for the mutation"
+    input: UpdateWebhookInput
+  ): UpdateWebhookPayload
   "Validates a build identified by id with CHML data"
   validateBuildByIdWithCHML(
     "Input for the mutation"
@@ -5533,6 +5543,13 @@ type Query {
     "Part of the name to look for"
     token: String!
   ): [String!]!
+  "List of available webhook authenticators"
+  webhookAuthenticators: [WebhookAuthenticator!]!
+  "Getting a webhook using its name"
+  webhookByName(
+    "Name of the webhook"
+    name: String!
+  ): Webhook
   "List of registred webhooks"
   webhooks(
     "Name of the webhook"
@@ -7121,6 +7138,12 @@ type TestJenkinsConfigurationPayload implements Payload {
   errors: [UserError]
 }
 
+"Output type for the testWebhook mutation."
+type TestWebhookPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 "Authentication token"
 type Token {
   "Token creation date."
@@ -7247,6 +7270,12 @@ type UpdateValidationStampFilterPayload implements Payload {
   errors: [UserError]
   "Validation stamp filter having been updated"
   validationStampFilter: ValidationStampFilter
+}
+
+"Output type for the updateWebhook mutation."
+type UpdateWebhookPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
 }
 
 "Representation of the current user"
@@ -7593,6 +7622,8 @@ type VersionInfo {
 
 "Webhook registration"
 type Webhook {
+  "Configuration for the webhook authentication"
+  authenticationConfig: JSON
   "Webhook authentication"
   authenticationType: String
   "Webhook enabled or not"
@@ -7612,6 +7643,14 @@ type Webhook {
   timeoutSeconds: Int
   "Webhook endpoint"
   url: String!
+}
+
+"Webhook authenticator"
+type WebhookAuthenticator {
+  "Webhook authentication display name"
+  displayName: String!
+  "Webhook authentication identifier"
+  type: String!
 }
 
 "Webhook exchange"
@@ -11133,6 +11172,12 @@ input TestJenkinsConfigurationInput {
   user: String
 }
 
+"Input type for the testWebhook mutation."
+input TestWebhookInput {
+  "Name of the webhook to test"
+  name: String!
+}
+
 "Input type for the unfavouriteBranch mutation."
 input UnfavouriteBranchInput {
   "Branch ID"
@@ -11261,6 +11306,22 @@ input UpdateValidationStampFilterInput {
   id: Int!
   "Validation stamp names"
   vsNames: [String!]!
+}
+
+"Input type for the updateWebhook mutation."
+input UpdateWebhookInput {
+  "authenticationConfig field"
+  authenticationConfig: JSON!
+  "authenticationType field"
+  authenticationType: String!
+  "enabled field"
+  enabled: Boolean!
+  "name field"
+  name: String!
+  "timeoutSeconds field"
+  timeoutSeconds: Long!
+  "url field"
+  url: String!
 }
 
 "Input type for the validateBuildByIdWithCHML mutation."

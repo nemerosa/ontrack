@@ -4,11 +4,11 @@ import net.nemerosa.ontrack.json.asJson
 
 object WebhookFixtures {
 
-    fun webhookAuthentication() = WebhookAuthentication(
+    fun webhookAuthentication(value: String = "xxxx") = WebhookAuthentication(
         type = "header",
         config = mapOf(
             "name" to "X-Ontrack-Token",
-            "value" to "xxxx",
+            "value" to value,
         ).asJson()
     )
 

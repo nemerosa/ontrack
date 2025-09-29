@@ -20,6 +20,15 @@ class HeaderWebhookAuthenticator : AbstractWebhookAuthenticator<HeaderWebhookAut
         builder.header(config.name, config.value)
     }
 
+    override fun obfuscate(config: HeaderWebhookAuthenticatorConfig) = config.obfuscate()
+
+    override fun merge(
+        input: HeaderWebhookAuthenticatorConfig,
+        existing: HeaderWebhookAuthenticatorConfig
+    ) = HeaderWebhookAuthenticatorConfig(
+        name = input.name,
+        value = merge(input.value, existing.value),
+    )
 }
 
 data class HeaderWebhookAuthenticatorConfig(
@@ -28,5 +37,10 @@ data class HeaderWebhookAuthenticatorConfig(
     val name: String,
     @APILabel("Header value")
     @APIDescription("Value of the header to send to the webhook")
-    val value: String,
-)
+    val value: String = "",
+) {
+    fun obfuscate() = HeaderWebhookAuthenticatorConfig(
+        name = name,
+        value = ""
+    )
+}

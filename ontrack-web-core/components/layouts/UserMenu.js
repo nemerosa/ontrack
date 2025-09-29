@@ -87,6 +87,7 @@ export default function UserMenu({userMenu}) {
         'extension/stash/configurations': <FaBitbucket/>,
         'extension/bitbucket-cloud/configurations': <FaBitbucket/>,
         'extension/gitlab/configurations': <FaGitlab/>,
+        'extension/notifications/webhooks': <FaPaperPlane/>,
     }
 
     useEffect(() => {

@@ -24,6 +24,15 @@ class BasicWebhookAuthenticator : AbstractWebhookAuthenticator<BasicWebhookAuthe
         builder.header("Authorization", "Basic $encoded")
     }
 
+    override fun obfuscate(config: BasicWebhookAuthenticatorConfig) = config.obfuscate()
+
+    override fun merge(
+        input: BasicWebhookAuthenticatorConfig,
+        existing: BasicWebhookAuthenticatorConfig
+    ) = BasicWebhookAuthenticatorConfig(
+        username = input.username,
+        password = merge(input.password, existing.password),
+    )
 }
 
 data class BasicWebhookAuthenticatorConfig(
@@ -32,5 +41,10 @@ data class BasicWebhookAuthenticatorConfig(
     val username: String,
     @APILabel("Password")
     @APIDescription("Password used to connect to the webhook")
-    val password: String,
-)
+    val password: String = "",
+) {
+    fun obfuscate() = BasicWebhookAuthenticatorConfig(
+        username = username,
+        password = "",
+    )
+}

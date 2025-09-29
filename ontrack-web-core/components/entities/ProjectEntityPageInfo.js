@@ -118,7 +118,7 @@ export const useProjectEntityPageInfo = (type, id, what) => {
                                     }
                                 }
                             }
-                        `, {id}
+                        `, {id: Number(id)}
                     ).then(data => {
                         setEntityTypeName("Project")
                         setTitle(projectTitleName(data.project, what))
@@ -153,7 +153,7 @@ export const useProjectEntityPageInfo = (type, id, what) => {
                                     }
                                 }
                             }
-                        `, {id}
+                        `, {id: Number(id)}
                     ).then(data => {
                         setEntityTypeName("Branch")
                         setTitle(branchTitleName(data.branch, what))
@@ -187,7 +187,7 @@ export const useProjectEntityPageInfo = (type, id, what) => {
                                     }
                                 }
                             }
-                        `, {id}
+                        `, {id: Number(id)}
                     ).then(data => {
                         setEntityTypeName("Promotion level")
                         setTitle(promotionLevelTitleName(data.promotionLevel, what))
@@ -232,7 +232,7 @@ export const useProjectEntityPageInfo = (type, id, what) => {
                                     }
                                 }
                             }
-                        `, {id}
+                        `, {id: Number(id)}
                     ).then(data => {
                         setEntityTypeName("Validation stamp")
                         setTitle(validationStampTitleName(data.validationStamp, what))
