@@ -46,8 +46,7 @@ class JIRAServiceExtensionTest {
             extensionFeature = JIRAExtensionFeature(),
             jiraConfigurationService = jiraConfigurationService,
             jiraSessionFactory = jiraSessionFactory,
-            transactionService = transactionService,
-            propertyService = propertyService
+            transactionService = transactionService
         )
     }
 
@@ -218,6 +217,7 @@ class JIRAServiceExtensionTest {
 
     private fun createIssue(i: Int) =
         JIRAIssue(
+            "1",
             "http://host/browser/TEST-$i",
             "TEST-$i",
             "Issue $i",

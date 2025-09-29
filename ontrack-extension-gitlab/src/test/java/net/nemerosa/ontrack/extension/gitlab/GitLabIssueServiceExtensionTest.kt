@@ -68,7 +68,7 @@ class GitLabIssueServiceExtensionTest {
 
     @Test
     fun list_of_configurations_is_not_exposed() {
-        assertTrue(extension.configurationList.isEmpty())
+        assertTrue(extension.getConfigurationList().isEmpty())
     }
 
     @Test

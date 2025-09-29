@@ -20,7 +20,7 @@ class GQLRootQueryIssueServiceConfigurations(
             .type(listType(issueServiceConfigurationRepresentationGQLType.typeRef))
             .dataFetcher {
                 issueServiceRegistry.issueServices.flatMap { service ->
-                    service.configurationList.map { config ->
+                    service.getConfigurationList().map { config ->
                         IssueServiceConfigurationRepresentation.of(
                             issueServiceExtension = service,
                             issueServiceConfiguration = config,

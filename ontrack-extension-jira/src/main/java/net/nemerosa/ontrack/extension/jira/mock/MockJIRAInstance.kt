@@ -26,6 +26,7 @@ class MockJIRAInstance {
         val projectName = key.substringBefore("-")
         val openStatus = JIRAStatus("Open", "https://mock/status/Open")
         val issue = JIRAIssue(
+            id = "1",
             url = "mock://jira/$projectName/$key",
             key = key,
             summary = summary,

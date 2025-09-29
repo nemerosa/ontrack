@@ -20,6 +20,7 @@ import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
@@ -238,6 +239,11 @@ class GitHubSCMExtension(
                 issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier)
             }
         }
+
+        override val issueRepositoryContext = IssueRepositoryContext(
+            repositoryType = "github",
+            repositoryName = repository,
+        )
 
         override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMCommit> {
             val commits = client.compareCommits(repository, fromCommit, toCommit)

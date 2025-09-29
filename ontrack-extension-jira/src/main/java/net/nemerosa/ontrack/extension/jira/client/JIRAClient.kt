@@ -10,7 +10,20 @@ interface JIRAClient : AutoCloseable {
 
     fun getIssue(key: String, configuration: JIRAConfiguration): JIRAIssue?
 
-    fun getIssueLastCommit(key: String, configuration: JIRAConfiguration): String?
+    /**
+     * Getting the last commit for a given issue.
+     *
+     * @param key Key of the issue
+     * @param configuration Jira configuration
+     * @param applicationType Type of application providing the meta-information (stash, github, ...)
+     * @param repositoryName Name of the repository as recorded by Jira
+     */
+    fun getIssueLastCommit(
+        key: String,
+        configuration: JIRAConfiguration,
+        applicationType: String,
+        repositoryName: String,
+    ): String?
 
     val projects: List<String>
 

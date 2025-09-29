@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.issues.model
 
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
@@ -43,8 +44,12 @@ data class ConfiguredIssueService(
     /**
      * Given an existing issue, gets its last commit
      */
-    fun getLastCommit(issue: Issue): String? {
-        return issueServiceExtension.getLastCommit(issueServiceConfiguration, issue.key)
+    fun getLastCommit(issue: Issue, issueRepositoryContext: IssueRepositoryContext): String? {
+        return issueServiceExtension.getLastCommit(
+            issueServiceConfiguration = issueServiceConfiguration,
+            repositoryContext = issueRepositoryContext,
+            key = issue.key,
+        )
     }
 
 }

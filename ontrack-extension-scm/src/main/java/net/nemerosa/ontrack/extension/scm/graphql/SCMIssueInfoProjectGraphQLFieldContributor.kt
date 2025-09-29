@@ -49,7 +49,10 @@ class SCMIssueInfoProjectGraphQLFieldContributor(
             val configuredIssueService = scm.getConfiguredIssueService() ?: return null
             val issue = configuredIssueService.getIssue(issueKey) ?: return null
             // Looking for the last commit of this issue
-            val commitId: String? = configuredIssueService.getLastCommit(issue)
+            val commitId: String? = configuredIssueService.getLastCommit(
+                issue,
+                scm.issueRepositoryContext,
+                )
             val scmCommitInfo: SCMCommitInfo? = if (commitId != null) {
                 val commit = scm.getCommit(commitId)
                 if (commit != null) {

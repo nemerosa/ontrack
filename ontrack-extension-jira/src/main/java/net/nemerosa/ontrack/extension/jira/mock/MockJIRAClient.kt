@@ -22,7 +22,9 @@ class MockJIRAClient(
 
     override fun getIssueLastCommit(
         key: String,
-        configuration: JIRAConfiguration
+        configuration: JIRAConfiguration,
+        applicationType: String,
+        repositoryName: String
     ): String? = null
 
     override fun createIssue(
@@ -40,6 +42,7 @@ class MockJIRAClient(
         val key = "$project-$id"
         val url = "${configuration.url}/browse/$key"
         val issue = JIRAIssue(
+            id = "1",
             url = url,
             key = key,
             summary = title,

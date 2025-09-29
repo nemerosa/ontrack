@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.github.model.GitHubLabel
 import net.nemerosa.ontrack.extension.github.property.GitHubGitConfiguration
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
@@ -59,10 +60,10 @@ class GitHubIssueServiceExtension(
 
     override fun extractIssueKeysFromMessage(
         issueServiceConfiguration: IssueServiceConfiguration,
-        message: String
+        message: String?
     ): Set<String> {
         val result: MutableSet<String> = HashSet()
-        if (message.isNotBlank()) {
+        if (!message.isNullOrBlank()) {
             val matcher = Pattern.compile(GITHUB_ISSUE_PATTERN).matcher(message)
             while (matcher.find()) {
                 // Gets the issue
@@ -100,8 +101,8 @@ class GitHubIssueServiceExtension(
         )
     }
 
-    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String): String? {
-        return if (token.toIntOrNull() != null || validIssueToken(token)) {
+    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String?): String? {
+        return if (token != null && (token.toIntOrNull() != null || validIssueToken(token))) {
             getIssueId(token).toString()
         } else {
             null
@@ -127,6 +128,7 @@ class GitHubIssueServiceExtension(
 
     override fun getLastCommit(
         issueServiceConfiguration: IssueServiceConfiguration,
+        repositoryContext: IssueRepositoryContext,
         key: String
     ): String? {
         val numericKey = getIssueId(key)

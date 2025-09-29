@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.jira
 
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
@@ -7,7 +8,6 @@ import net.nemerosa.ontrack.extension.jira.model.JIRAIssue
 import net.nemerosa.ontrack.extension.jira.model.JIRALink
 import net.nemerosa.ontrack.extension.jira.tx.JIRASession
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
-import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.support.MessageAnnotation
 import net.nemerosa.ontrack.model.support.MessageAnnotator
 import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
@@ -21,8 +21,7 @@ class JIRAServiceExtension(
     extensionFeature: JIRAExtensionFeature,
     private val jiraConfigurationService: JIRAConfigurationService,
     private val jiraSessionFactory: JIRASessionFactory,
-    private val transactionService: TransactionService,
-    private val propertyService: PropertyService
+    private val transactionService: TransactionService
 ) : AbstractIssueServiceExtension(extensionFeature, SERVICE, "JIRA") {
 
     override fun getConfigurationList(): List<IssueServiceConfiguration> {
@@ -33,8 +32,8 @@ class JIRAServiceExtension(
         return jiraConfigurationService.findConfiguration(name)
     }
 
-    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String): String? =
-        if (issueServiceConfiguration is JIRAConfiguration && issueServiceConfiguration.isValidIssueKey(token)) {
+    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String?): String? =
+        if (token != null && issueServiceConfiguration is JIRAConfiguration && issueServiceConfiguration.isValidIssueKey(token)) {
             token
         } else {
             null
@@ -42,9 +41,9 @@ class JIRAServiceExtension(
 
     override fun extractIssueKeysFromMessage(
         issueServiceConfiguration: IssueServiceConfiguration,
-        message: String
+        message: String?
     ): Set<String> {
-        return extractJIRAIssuesFromMessage(issueServiceConfiguration as JIRAConfiguration, message)
+        return extractJIRAIssuesFromMessage(issueServiceConfiguration as JIRAConfiguration, message ?: "")
     }
 
     override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator {
@@ -140,13 +139,19 @@ class JIRAServiceExtension(
 
     override fun getLastCommit(
         issueServiceConfiguration: IssueServiceConfiguration,
+        repositoryContext: IssueRepositoryContext,
         key: String
     ): String? {
         val configuration = issueServiceConfiguration as JIRAConfiguration
-        transactionService.start().use { tx ->
+        return transactionService.start().use { tx ->
             val session = getJIRASession(tx, configuration)
             // Gets the JIRA issue
-            return session.client.getIssueLastCommit(key, configuration)
+            session.client.getIssueLastCommit(
+                key = key,
+                configuration = configuration,
+                applicationType = repositoryContext.repositoryType,
+                repositoryName = repositoryContext.repositoryName,
+            )
         }
     }
 

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.mock
 
 import net.nemerosa.ontrack.common.RunProfile
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
@@ -363,6 +364,11 @@ class MockSCMExtension(
                 )
             }
 
+        override val issueRepositoryContext = IssueRepositoryContext(
+            repositoryType = "mock",
+            repositoryName = mockScmProjectProperty.name,
+        )
+
         override fun findBuildByCommit(project: Project, id: String): Build? =
             propertyService.findByEntityTypeAndSearchArguments(
                 entityType = ProjectEntityType.BUILD,
@@ -408,9 +414,9 @@ class MockSCMExtension(
         private val repositoryName: String,
     ) : IssueServiceExtension {
 
-        override fun getId(): String = "mock"
+        override val id: String = "mock"
 
-        override fun getName(): String = "Mock issues"
+        override val name: String = "Mock issues"
 
         override fun getConfigurationList(): List<IssueServiceConfiguration> = emptyList()
 
@@ -418,15 +424,16 @@ class MockSCMExtension(
 
         override fun getLastCommit(
             issueServiceConfiguration: IssueServiceConfiguration,
+            repositoryContext: IssueRepositoryContext,
             key: String
         ): String? =
             repository(repositoryName).findIssue(key)?.lastCommitId()
 
         override fun extractIssueKeysFromMessage(
             issueServiceConfiguration: IssueServiceConfiguration,
-            message: String,
+            message: String?,
         ): Set<String> =
-            issueRegex.findAll(message).map { m ->
+            issueRegex.findAll(message ?: "").map { m ->
                 m.groupValues[1]
             }.toSet()
 
@@ -451,7 +458,7 @@ class MockSCMExtension(
             repository(repositoryName).findIssue(issueKey)
 
         override fun getIssueId(
-            issueServiceConfiguration: IssueServiceConfiguration?,
+            issueServiceConfiguration: IssueServiceConfiguration,
             token: String?
         ): String? {
             TODO("Not yet implemented")

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.issues.mock
 
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
@@ -58,7 +59,7 @@ class TestIssueServiceExtension(
         }
 
     override fun extractIssueKeysFromMessage(
-        issueServiceConfiguration: IssueServiceConfiguration?,
+        issueServiceConfiguration: IssueServiceConfiguration,
         message: String?
     ): MutableSet<String> {
         val result = mutableSetOf<String>()
@@ -72,7 +73,7 @@ class TestIssueServiceExtension(
         return result
     }
 
-    override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator? {
+    override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator {
         return RegexMessageAnnotator("(#\\d+)".toRegex()) { token ->
             MessageAnnotation.of("a")
                 .attr("href", "http://issue/${token.substring(1)}")
@@ -93,8 +94,8 @@ class TestIssueServiceExtension(
         return issueKey.trimStart('#').toInt()
     }
 
-    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String): String? {
-        val value = token.toIntOrNull()
+    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String?): String? {
+        val value = token?.toIntOrNull()
         return if (value != null && validIssueToken(token)) {
             getIssueId(token).toString()
         } else {
@@ -113,6 +114,7 @@ class TestIssueServiceExtension(
 
     override fun getLastCommit(
         issueServiceConfiguration: IssueServiceConfiguration,
+        repositoryContext: IssueRepositoryContext,
         key: String
     ): String? = null
 }

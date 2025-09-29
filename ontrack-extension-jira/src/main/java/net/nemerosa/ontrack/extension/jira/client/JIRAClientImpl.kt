@@ -30,32 +30,35 @@ class JIRAClientImpl(
             issues.getOrPut(configuration.url to key) {
                 fetchIssue(key, configuration) ?: throw IssueNotFoundException()
             }
-        } catch (ignored: IssueNotFoundException) {
+        } catch (_: IssueNotFoundException) {
             null
         }
     }
 
     override fun getIssueLastCommit(
         key: String,
-        configuration: JIRAConfiguration
+        configuration: JIRAConfiguration,
+        applicationType: String,
+        repositoryName: String,
     ): String? {
+        // Gets the issue first
+        val issue = getIssue(key, configuration) ?: return null
         return try {
             // Uses JIRA "dev-status" integration to get commits linked to this issue.
             // API: /rest/dev-status/1.0/issue/detail?issueId=<id>&applicationType=github|stash|bitbucket&dataType=repository
             val details = restTemplate.getForObject<JsonNode>(
-                "/rest/dev-status/1.0/issue/detail?issueId=$key&applicationType=github&dataType=repository"
+                "/rest/dev-status/1.0/issue/detail?issueId={issueId}&applicationType={applicationType}&dataType={dataType}",
+                mapOf(
+                    "issueId" to issue.id,
+                    "applicationType" to applicationType,
+                    "dataType" to "repository"
+                )
             )
-            val repositories = details.path("detail").firstOrNull()?.path("repositories")
+            val repositories = details.path("details").firstOrNull()?.path("repositories")
             if (repositories != null && repositories.isArray) {
-                // Flattens all commits from all repositories and takes the most recent one
-                val allCommits = repositories.flatMap { repo ->
-                    repo.path("commits").map { commitNode ->
-                        val authorTimestamp = commitNode.path("authorTimestamp").asLong(0L)
-                        val id = commitNode.path("id").asText(null)
-                        authorTimestamp to id
-                    }
-                }.filter { it.second != null }
-                allCommits.maxByOrNull { it.first }?.second
+                // Gets the matching repository
+                val repository = repositories.find { it.path("name").asText() == repositoryName }
+                repository?.path("commits")?.firstOrNull()?.path("id")?.asText()
             } else {
                 null
             }
@@ -70,11 +73,11 @@ class JIRAClientImpl(
         try {
             val node = restTemplate.getForObject<JsonNode>("/rest/api/2/issue/$key?expand=names")
             return toIssue(configuration, node)
-        } catch (ex: Forbidden) {
+        } catch (_: Forbidden) {
             // The issue cannot be accessed
             // For the moment, ignoring silently
             return null
-        } catch (ex: NotFound) {
+        } catch (_: NotFound) {
             return null
         }
 
@@ -91,11 +94,11 @@ class JIRAClientImpl(
                     url = jiraConfiguration.getIssueURL(key),
                 )
             }
-        } catch (ex: Forbidden) {
+        } catch (_: Forbidden) {
             // The issues cannot be accessed
             // For the moment, ignoring silently
             emptyList()
-        } catch (ex: NotFound) {
+        } catch (_: NotFound) {
             emptyList()
         }
 
@@ -252,17 +255,18 @@ class JIRAClientImpl(
 
             // JIRA issue
             return JIRAIssue(
-                configuration.getIssueURL(key),
-                key,
-                fieldValue(node, "summary"),
-                status,
-                field(node, "assignee").path("name").asText(),
-                parseFromJIRA(fieldValue(node, "updated")),
-                fields,
-                affectedVersions,
-                fixVersions,
-                field(node, "issuetype").path("name").asText(),
-                links
+                id = node.path("id").asText(),
+                url = configuration.getIssueURL(key),
+                key = key,
+                summary = fieldValue(node, "summary"),
+                status = status,
+                assignee = field(node, "assignee").path("name").asText(),
+                updateTime = parseFromJIRA(fieldValue(node, "updated")),
+                fields = fields,
+                affectedVersions = affectedVersions,
+                fixVersions = fixVersions,
+                issueType = field(node, "issuetype").path("name").asText(),
+                links = links
             )
         }
 

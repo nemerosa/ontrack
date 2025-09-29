@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueServiceConfigurati
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper
 import net.nemerosa.ontrack.extension.gitlab.property.GitLabGitConfiguration
 import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
@@ -59,10 +60,10 @@ class GitLabIssueServiceExtension(
 
     override fun extractIssueKeysFromMessage(
         issueServiceConfiguration: IssueServiceConfiguration,
-        message: String
+        message: String?
     ): Set<String> {
         val result: MutableSet<String> = HashSet()
-        if (StringUtils.isNotBlank(message)) {
+        if (!message.isNullOrBlank()) {
             val matcher = Pattern.compile(GITLAB_ISSUE_PATTERN).matcher(message)
             while (matcher.find()) {
                 // Gets the issue
@@ -98,8 +99,8 @@ class GitLabIssueServiceExtension(
         )
     }
 
-    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String): String? {
-        return if (StringUtils.isNumeric(token) || validIssueToken(token)) {
+    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String?): String? {
+        return if (token != null && (StringUtils.isNumeric(token) || validIssueToken(token))) {
             getIssueId(token).toString()
         } else {
             null
@@ -125,6 +126,7 @@ class GitLabIssueServiceExtension(
 
     override fun getLastCommit(
         issueServiceConfiguration: IssueServiceConfiguration,
+        repositoryContext: IssueRepositoryContext,
         key: String
     ): String? {
         TODO("Not yet implemented")

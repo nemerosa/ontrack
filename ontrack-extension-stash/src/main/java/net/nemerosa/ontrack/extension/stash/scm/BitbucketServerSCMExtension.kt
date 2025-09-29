@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyTypeUtils
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
@@ -217,6 +218,11 @@ class BitbucketServerSCMExtension(
 
         override fun getConfiguredIssueService(): ConfiguredIssueService? =
             issueServiceConfigurationIdentifier?.let { issueServiceRegistry.getConfiguredIssueService(it) }
+
+        override val issueRepositoryContext = IssueRepositoryContext(
+            repositoryType = "stash",
+            repositoryName = repositoryName,
+        )
 
         override fun findBuildByCommit(project: Project, id: String): Build? =
             propertyService.findByEntityTypeAndSearchArguments(

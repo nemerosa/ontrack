@@ -29,7 +29,7 @@ class IssueServiceRegistryImpl(
         get() {
             val issueServiceConfigurationRepresentations = mutableListOf<IssueServiceConfigurationRepresentation>()
             for (issueServiceExtension in issueServiceExtensionMap.values) {
-                val configurationList = issueServiceExtension.configurationList
+                val configurationList = issueServiceExtension.getConfigurationList()
                 for (issueServiceConfiguration in configurationList) {
                     issueServiceConfigurationRepresentations.add(
                         of(
