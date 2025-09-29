@@ -10,6 +10,7 @@ import {
     FaCogs,
     FaExpandArrowsAlt,
     FaGithub,
+    FaGitlab,
     FaInfo,
     FaJenkins,
     FaJira,
@@ -85,6 +86,7 @@ export default function UserMenu({userMenu}) {
         'extension/sonarqube/configurations': <SonarqubeIcon/>,
         'extension/stash/configurations': <FaBitbucket/>,
         'extension/bitbucket-cloud/configurations': <FaBitbucket/>,
+        'extension/gitlab/configurations': <FaGitlab/>,
     }
 
     useEffect(() => {
