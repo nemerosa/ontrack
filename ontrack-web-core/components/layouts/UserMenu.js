@@ -4,6 +4,7 @@ import {UserContext} from "@components/providers/UserProvider";
 import {legacyGraphiQLUri} from "@components/common/Links";
 import {
     FaBars,
+    FaBitbucket,
     FaCertificate,
     FaCode,
     FaCog,
@@ -82,6 +83,8 @@ export default function UserMenu({userMenu}) {
         'extension/casc/casc': <FaCode/>,
         'extension/queue/records': <FaBars/>,
         'extension/sonarqube/configurations': <SonarqubeIcon/>,
+        'extension/stash/configurations': <FaBitbucket/>,
+        'extension/bitbucket-cloud/configurations': <FaBitbucket/>,
     }
 
     useEffect(() => {
