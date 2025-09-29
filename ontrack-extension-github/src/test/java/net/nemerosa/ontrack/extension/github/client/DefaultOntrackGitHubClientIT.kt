@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.client
 
+import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.mockk
 import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.extension.github.app.DefaultGitHubAppTokenService
@@ -22,6 +23,8 @@ class DefaultOntrackGitHubClientIT {
 
     private lateinit var client: OntrackGitHubClient
 
+    private val meterRegistry: MeterRegistry = mockk(relaxed = true)
+
     @BeforeEach
     fun init() {
         client = DefaultOntrackGitHubClient(
@@ -31,7 +34,7 @@ class DefaultOntrackGitHubClientIT {
                 ontrackConfigProperties = OntrackConfigProperties(),
             ),
             timeout = Duration.ofSeconds(60),
-            gitHubAppRateLimitMetrics = mockk(),
+            meterRegistry = meterRegistry,
         )
     }
 

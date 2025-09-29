@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.client
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
+import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.BaseException
@@ -14,6 +15,7 @@ import net.nemerosa.ontrack.extension.github.model.*
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.git.support.GitConnectionRetry
 import net.nemerosa.ontrack.json.*
+import net.nemerosa.ontrack.model.metrics.increment
 import org.apache.commons.codec.binary.Base64
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -40,7 +42,7 @@ class DefaultOntrackGitHubClient(
     private val interval: Duration = Duration.ofSeconds(30),
     private val notFoundRetries: UInt = 6u,
     private val notFoundInterval: Duration = Duration.ofSeconds(5),
-    private val gitHubAppRateLimitMetrics: GitHubAppRateLimitMetrics,
+    private val meterRegistry: MeterRegistry,
 ) : OntrackGitHubClient {
 
     private val logger: Logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
@@ -900,7 +902,10 @@ class DefaultOntrackGitHubClient(
             val error = ex.getJsonGitHubErrorMessage()
             if (error != null && "rate limit exceeded" in error.message) {
                 // The search API has very restrictive API rate limits
-                gitHubAppRateLimitMetrics.searchAPIRateLimitExceeded(repository)
+                meterRegistry.increment(
+                    GitHubAppRateLimitMetrics.RATE_LIMIT_SEARCH_EXCEEDED,
+                    "repository" to repository
+                )
                 null
             } else {
                 throw ex

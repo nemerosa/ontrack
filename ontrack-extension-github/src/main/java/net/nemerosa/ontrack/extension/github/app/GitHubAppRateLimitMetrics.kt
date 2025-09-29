@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.extension.github.client.GitHubRateLimit
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
-import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.support.ConfigurationServiceListener
 import net.nemerosa.ontrack.model.support.StartupService
 import org.slf4j.Logger
@@ -122,13 +121,6 @@ class GitHubAppRateLimitMetrics(
         }
     }
 
-    fun searchAPIRateLimitExceeded(repository: String) {
-        meterRegistry.increment(
-            RATE_LIMIT_CORE_LIMIT_METRIC,
-            "repository" to repository
-        )
-    }
-
     companion object {
         private const val RATE_LIMIT_METRIC = "ontrack_extension_github_ratelimit"
         private const val RATE_LIMIT_CORE_LIMIT_METRIC = "${RATE_LIMIT_METRIC}_core_limit"
@@ -137,6 +129,7 @@ class GitHubAppRateLimitMetrics(
         private const val RATE_LIMIT_GRAPHQL_LIMIT_METRIC = "${RATE_LIMIT_METRIC}_graphql_limit"
         private const val RATE_LIMIT_GRAPHQL_REMAINING_METRIC = "${RATE_LIMIT_METRIC}_graphql_remaining_limit"
         private const val RATE_LIMIT_GRAPHQL_USED_METRIC = "${RATE_LIMIT_METRIC}_graphql_used"
-        private const val RATE_LIMIT_SEARCH_EXCEEDED = "${RATE_LIMIT_METRIC}_search_exceeded"
+
+        const val RATE_LIMIT_SEARCH_EXCEEDED = "${RATE_LIMIT_METRIC}_search_exceeded"
     }
 }
