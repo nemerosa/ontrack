@@ -4650,6 +4650,11 @@ type Project implements Authorizable & ProjectEntity {
   ): SCMCommitInfo
   "List of saved SCM file filters for the project"
   scmFileChangeFilters: SCMFileChangeFilters!
+  "SCM information about an issue"
+  scmIssueInfo(
+    "Key of the issue"
+    issueKey: String!
+  ): SCMIssueInfo
   "Graph of environment slots for a project"
   slotGraph(
     "Qualifier for the slots"
@@ -5876,6 +5881,16 @@ type SCMFileChangeFilters {
   canManage: Boolean!
   "List of filters"
   filters: [SCMFileChangeFilter!]!
+}
+
+"Information about an issue and linked SCM information."
+type SCMIssueInfo {
+  "issue field"
+  issue: Issue!
+  "issueServiceConfigurationRepresentation field"
+  issueServiceConfigurationRepresentation: IssueServiceConfigurationRepresentation!
+  "scmCommitInfo field"
+  scmCommitInfo: SCMCommitInfo
 }
 
 "Output type for the saveBuildFilter mutation."
