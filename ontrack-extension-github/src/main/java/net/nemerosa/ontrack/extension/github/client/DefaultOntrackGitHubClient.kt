@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.runIf
 import net.nemerosa.ontrack.common.untilTimeout
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
+import net.nemerosa.ontrack.extension.github.app.GitHubAppRateLimitMetrics
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.model.*
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
@@ -39,6 +40,7 @@ class DefaultOntrackGitHubClient(
     private val interval: Duration = Duration.ofSeconds(30),
     private val notFoundRetries: UInt = 6u,
     private val notFoundInterval: Duration = Duration.ofSeconds(5),
+    private val gitHubAppRateLimitMetrics: GitHubAppRateLimitMetrics,
 ) : OntrackGitHubClient {
 
     private val logger: Logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
@@ -320,18 +322,26 @@ class DefaultOntrackGitHubClient(
                 code()
             }
         } catch (ex: RestClientResponseException) {
-            val contentType: Any? = ex.responseHeaders?.contentType
-            if (contentType != null && contentType is MediaType && contentType.includes(MediaType.APPLICATION_JSON)) {
-                val json = ex.responseBodyAsString
-                try {
-                    val error: GitHubErrorMessage = json.parseAsJson().parse()
-                    throw GitHubErrorsException(message, error, ex.statusCode.value())
-                } catch (_: JsonParseException) {
-                    throw ex
-                }
+            val error = ex.getJsonGitHubErrorMessage()
+            if (error != null) {
+                throw GitHubErrorsException(message, error, ex.statusCode.value())
             } else {
                 throw ex
             }
+        }
+    }
+
+    private fun RestClientResponseException.getJsonGitHubErrorMessage(): GitHubErrorMessage? {
+        val contentType: Any? = this.responseHeaders?.contentType
+        return if (contentType != null && contentType is MediaType && contentType.includes(MediaType.APPLICATION_JSON)) {
+            val json = this.responseBodyAsString
+            return try {
+                json.parseAsJson().parseOrNull<GitHubErrorMessage>()
+            } catch (_: JsonParseException) {
+                null
+            }
+        } else {
+            null
         }
     }
 
@@ -871,18 +881,30 @@ class DefaultOntrackGitHubClient(
         val (owner, name) = getRepositoryParts(repository)
         // Search commits mentioning the issue, sorted by most recent
         return try {
-            client("Get last commit for issue #$key") {
-                val encodedQuery = URLEncoder.encode("repo:$owner/$name #$key", Charsets.UTF_8)
-                val node = getForObject<JsonNode>("/search/commits?q=$encodedQuery&sort=committer-date&order=desc")
-                val items = node.path("items")
-                if (items.isArray && items.size() > 0) {
-                    items[0].path("sha").asText(null)
-                } else {
-                    null
-                }
+            val url = "/search/commits?q={query}&sort={sort}&order={order}"
+            val params = mapOf(
+                "query" to "repo:$owner/$name #$key",
+                "sort" to "committer-date",
+                "order" to "desc"
+            )
+            val node = client.getForObject<JsonNode>(url, params)
+            val items = node.path("items")
+            if (items.isArray && items.size() > 0) {
+                items[0].path("sha").asText(null)
+            } else {
+                null
             }
         } catch (_: HttpClientErrorException.NotFound) {
             null
+        } catch (ex: HttpClientErrorException.Forbidden) {
+            val error = ex.getJsonGitHubErrorMessage()
+            if (error != null && "rate limit exceeded" in error.message) {
+                // The search API has very restrictive API rate limits
+                gitHubAppRateLimitMetrics.searchAPIRateLimitExceeded(repository)
+                null
+            } else {
+                throw ex
+            }
         }
     }
 
