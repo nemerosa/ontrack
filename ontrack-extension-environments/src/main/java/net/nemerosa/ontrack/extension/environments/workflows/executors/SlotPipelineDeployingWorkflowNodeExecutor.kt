@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.environments.workflows.executors
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.environments.EnvironmentsExtensionFeature
+import net.nemerosa.ontrack.extension.environments.EnvironmentsLicense
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.service.getPipelineById
@@ -21,7 +22,10 @@ class SlotPipelineDeployingWorkflowNodeExecutor(
     extensionFeature: EnvironmentsExtensionFeature,
     private val slotService: SlotService,
     private val securityService: SecurityService,
+    environmentsLicense: EnvironmentsLicense,
 ) : AbstractExtension(extensionFeature), WorkflowNodeExecutor {
+
+    override val enabled: Boolean = environmentsLicense.environmentFeatureEnabled
 
     override val id: String = "slot-pipeline-deploying"
     override val displayName: String = "Deploying pipeline"

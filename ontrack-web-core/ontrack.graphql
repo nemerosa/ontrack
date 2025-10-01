@@ -455,8 +455,6 @@ type Branch implements Authorizable & ProjectEntity {
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
-    "Mock SCM used for testing only"
-    mockSCMBranchProperty: Property
     name: String
     "List of other branches in the same project"
     otherBranches: [Branch!]!
@@ -638,11 +636,6 @@ type Build implements Authorizable & ProjectEntity {
     "Link to the GitHub Workflow Run which created this build."
     buildGitHubWorkflowRunProperty: Property
     creation: Signature
-    "Gets the list of slots where this build is actually deployed"
-    currentDeployments(
-        "Qualifier to use"
-        qualifier: String = ""
-    ): [SlotPipeline!]!
     "List of decorations"
     decorations(
         "Fully qualified name of the decoration type"
@@ -651,8 +644,6 @@ type Build implements Authorizable & ProjectEntity {
     description: String
     "Display name for this build or the build's name if not available"
     displayName: String!
-    "List of slots this eligible to"
-    eligibleSlots: [Slot!]!
     gitChangeLog(
         "Name of the build to end the change log with. If not set, compares with the previous build."
         to: String
@@ -677,8 +668,6 @@ type Build implements Authorizable & ProjectEntity {
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
-    "Mock SCM used for testing only"
-    mockSCMBuildCommitProperty: Property
     name: String
     "Next build"
     nextBuild: Build
@@ -711,20 +700,6 @@ type Build implements Authorizable & ProjectEntity {
     ): String!
     "Run info associated with this build"
     runInfo: RunInfo
-    "List of pipelines this build is associated with"
-    slotPipelines(
-        "Sorting by decreasing environment order"
-        sortedByEnvironment: Boolean,
-        "Filtering on the pipeline status"
-        status: SlotPipelineStatus
-    ): [SlotPipeline!]!
-    "List of deployment slots this build is associated with"
-    slots(
-        "Name of the environment"
-        environment: String,
-        "Qualifier for the project"
-        qualifier: String
-    ): [Slot!]!
     "List of builds using this one."
     usedBy(
         "Keeps only links targeted from this branch. `project` argument is also required."
@@ -1222,6 +1197,14 @@ type CreateSlotsPayload implements Payload {
 
 "Output type for the createValidationRunById mutation."
 type CreateValidationRunByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Created validation run"
+    validationRun: ValidationRun
+}
+
+"Output type for the createValidationRunByRelease mutation."
+type CreateValidationRunByReleasePayload implements Payload {
     "List of errors"
     errors: [UserError]
     "Created validation run"
@@ -3494,6 +3477,11 @@ type Mutation {
         "Input for the mutation"
         input: CreateValidationRunByIdInput
     ): CreateValidationRunByIdPayload
+    "Creating a validation run for a build identified by its release label"
+    createValidationRunByRelease(
+        "Input for the mutation"
+        input: CreateValidationRunByReleaseInput
+    ): CreateValidationRunByReleasePayload
     "Creates a new validation stamp from a branch ID"
     createValidationStampById(
         "Input for the mutation"
@@ -5024,8 +5012,6 @@ type Project implements Authorizable & ProjectEntity {
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
-    "Mock SCM used for testing only"
-    mockSCMProjectProperty: Property
     name: String
     "Makes a promotion conditional based on the fact that a previous promotion has been granted."
     previousPromotionConditionProperty: Property
@@ -5052,11 +5038,6 @@ type Project implements Authorizable & ProjectEntity {
     scmCatalogEntry: SCMCatalogEntry
     "List of saved SCM file filters for the project"
     scmFileChangeFilters: SCMFileChangeFilters!
-    "Graph of environment slots for a project"
-    slotGraph(
-        "Qualifier for the slots"
-        qualifier: String = ""
-    ): SlotGraph!
     "Association with a SonarQube project."
     sonarQubeProperty: Property
     "Allows to disable or delete stale branches"
@@ -5860,11 +5841,6 @@ type Query {
     ): [Project!]!
     "License"
     licenseInfo: LicenseResponse!
-    "Getting a list of texts generated for a mock workflow"
-    mockWorkflowTexts(
-        "ID of the workflow instance"
-        instanceId: String
-    ): [String!]!
     "List of all notification channels"
     notificationChannels: [NotificationChannel!]!
     "Getting a notification record using its ID"
@@ -6134,7 +6110,10 @@ type Query {
         triggerId: String
     ): WorkflowInstancePaginated
     "List of all workflow node executors"
-    workflowNodeExecutors: [WorkflowNodeExecutor!]!
+    workflowNodeExecutors(
+        "Gets only the matching executors"
+        enabled: Boolean
+    ): [WorkflowNodeExecutor!]!
 }
 
 "QueueDispatchResult"
@@ -8429,6 +8408,8 @@ type WorkflowNode {
 type WorkflowNodeExecutor {
     "displayName field"
     displayName: String!
+    "Checks if this node executor is enabled."
+    enabled: Boolean
     "id field"
     id: String!
 }
@@ -9143,6 +9124,26 @@ input CreateValidationRunByIdInput {
     dataTypeId: String
     "Validation description"
     description: String
+    "Run info"
+    runInfo: RunInfoInput
+    "Validation run status"
+    validationRunStatus: String
+    "Validation stamp name"
+    validationStamp: String!
+}
+
+"Input type for the createValidationRunByRelease mutation."
+input CreateValidationRunByReleaseInput {
+    "Build release"
+    buildRelease: String!
+    "Data to associated with the validation"
+    data: JSON
+    "Type of the data to associated with the validation"
+    dataTypeId: String
+    "Validation description"
+    description: String
+    "Project name"
+    project: String!
     "Run info"
     runInfo: RunInfoInput
     "Validation run status"
@@ -11441,6 +11442,8 @@ input SetupTestSummaryValidationStampInput {
     branch: String!
     "Description of the validation stamp"
     description: String
+    "If set, the status is set to failure if there is are no test at all."
+    failWhenNoResults: Boolean
     "Name of the project"
     project: String!
     "Name of the validation stamp"

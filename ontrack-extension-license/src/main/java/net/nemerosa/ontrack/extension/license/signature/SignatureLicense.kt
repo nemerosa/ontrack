@@ -10,6 +10,10 @@ data class SignatureLicense(
     val validUntil: LocalDate?,
     val maxProjects: Int,
     val features: List<LicenseFeatureData>,
+    /**
+     * Forward compatibility with V5
+     */
+    val message: String? = null,
 ) {
     fun toLicense(type: String) =
         License(
