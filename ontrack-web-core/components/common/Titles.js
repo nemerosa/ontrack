@@ -29,7 +29,7 @@ export function subBuildTitle(build, what) {
 }
 
 export function buildKnownName(build) {
-    return build?.releaseProperty?.value?.name ?? build?.name
+    return build?.displayName ?? build?.releaseProperty?.value?.name ?? build?.name
 }
 
 export function buildLinkName({qualifier, build}) {

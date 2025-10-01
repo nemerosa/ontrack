@@ -86,6 +86,7 @@ export default function ProjectView({id}) {
                                 latestBuild: builds(count: 1) {
                                     id
                                     name
+                                    displayName
                                 }
                                 promotionLevels {
                                     id
@@ -95,6 +96,7 @@ export default function ProjectView({id}) {
                                         build {
                                             id
                                             name
+                                            displayName
                                         }
                                     }
                                 }

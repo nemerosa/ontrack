@@ -2,6 +2,7 @@ import TransitionBox from "@components/common/TransitionBox";
 import {buildLink} from "@components/common/Links";
 import {FaBan} from "react-icons/fa";
 import PromotionLevelLink from "@components/promotionLevels/PromotionLevelLink";
+import BuildLink from "@components/builds/BuildLink";
 
 export default function PromotionRunBox({promotionLevel}) {
     const run = promotionLevel.promotionRuns ? promotionLevel.promotionRuns[0] : undefined
@@ -13,7 +14,7 @@ export default function PromotionRunBox({promotionLevel}) {
                     <PromotionLevelLink promotionLevel={promotionLevel}/>
                 }
                 after={
-                    build ? buildLink(build) : <FaBan/>
+                    build ? <BuildLink build={build}/> : <FaBan/>
                 }
             />
         </>
