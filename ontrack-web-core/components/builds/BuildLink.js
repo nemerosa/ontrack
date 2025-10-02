@@ -3,7 +3,7 @@ import {buildKnownName} from "@components/common/Titles";
 import Link from "next/link";
 import {Popover, Space, Typography} from "antd";
 
-export default function BuildLink({build, text, displayTooltip, tooltipText = "Link to the build"}) {
+export default function BuildLink({build, buildNameOnly, text, displayTooltip, tooltipText = "Link to the build"}) {
     return (
         <>
             {
@@ -21,14 +21,14 @@ export default function BuildLink({build, text, displayTooltip, tooltipText = "L
                 }>
                     <Link
                         href={buildUri(build)}
-                    >{text ?? buildKnownName(build)}</Link>
+                    >{text ?? buildKnownName(build, buildNameOnly)}</Link>
                 </Popover>
             }
             {
                 !displayTooltip && <Link
                     href={buildUri(build)}
                     title="Link to build page"
-                >{text ?? buildKnownName(build)}</Link>
+                >{text ?? buildKnownName(build, buildNameOnly)}</Link>
             }
         </>
     )

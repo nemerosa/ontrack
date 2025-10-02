@@ -28,8 +28,12 @@ export function subBuildTitle(build, what) {
     return title(build ? `${what} | ${buildKnownName(build)} / ${build.branch.project.name}` : '')
 }
 
-export function buildKnownName(build) {
-    return build?.displayName ?? build?.releaseProperty?.value?.name ?? build?.name
+export function buildKnownName(build, nameOnly = false) {
+    if (nameOnly) {
+        return build.name
+    } else {
+        return build?.displayName ?? build?.releaseProperty?.value?.name ?? build?.name
+    }
 }
 
 export function buildLinkName({qualifier, build}) {
