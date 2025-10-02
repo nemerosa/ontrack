@@ -24,7 +24,9 @@ class JIRASessionFactoryImpl(
 
         // Creates an HTTP client
         val template = restTemplateProvider.createRestTemplate(
-            rootUri = configuration.url
+            rootUri = configuration.apiUrl
+                ?.takeIf { it.isNotBlank() }
+                ?: configuration.url
         ) {
             if (configuration.user.isNullOrBlank()) {
                 if (configuration.password.isNullOrBlank()) {
