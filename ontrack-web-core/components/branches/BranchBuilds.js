@@ -150,12 +150,14 @@ export default function BranchBuilds({
                                 </Col>
                             </Row> : undefined
                     }}
+                    scroll={{ x: 'max-content' }}
                 >
                     <Column
                         width="2em"
                         key="header"
                         colSpan={3}
                         align="left"
+                        fixed="left"
                         title={
                             <Space>
                                 {/* Build filter */}
@@ -210,6 +212,7 @@ export default function BranchBuilds({
                     />
                     <Column
                         key="build"
+                        fixed="left"
                         colSpan={0} // Header managed by the "header" column
                         render={(_, build) =>
                             <BuildBox build={build} displayDecorations={true}>
@@ -223,6 +226,7 @@ export default function BranchBuilds({
                     />
                     <Column
                         key="promotions"
+                        fixed="left"
                         colSpan={0} // Header managed by the "header" column
                         render={(_, build) =>
                             <Space size={8}>
