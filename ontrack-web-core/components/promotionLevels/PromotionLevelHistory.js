@@ -89,6 +89,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
                                     build {
                                         id
                                         name
+                                        displayName
                                         releaseProperty {
                                             value
                                         }
@@ -225,6 +226,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
                             <Space>
                                 <BuildLink
                                     build={run.build}
+                                    buildNameOnly={true}
                                 />
                                 <Decorations entity={run.build}/>
                                 <PromotionRunLink
