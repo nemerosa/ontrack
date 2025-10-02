@@ -4,6 +4,7 @@ const {test} = require("../../fixtures/connection");
 const {waitUntilCondition} = require("../../support/timing");
 const {generate} = require("@ontrack/utils");
 const {ProjectPage} = require("../projects/project");
+const {expect} = require("@playwright/test");
 
 test('branch creation', async ({page, ontrack}) => {
     const project = await ontrack.createProject()
@@ -91,9 +92,9 @@ test('deleting a branch', async ({page, ontrack}) => {
     await projectPage.expectOnPage()
 })
 
-test('many validations for a branch', async ({page}) => {
+test('many validations for a branch', async ({page, ontrack}) => {
     // Provisioning
-    const project = await ontrack().createProject()
+    const project = await ontrack.createProject()
     const branch = await project.createBranch()
     const build = await branch.createBuild("1.0.0")
     const numberVs = 30
@@ -102,7 +103,7 @@ test('many validations for a branch', async ({page}) => {
         await build.validate(vs, {})
     }
     // Login
-    await login(page)
+    await login(page, ontrack)
     // Navigating to the branch
     const branchPage = new BranchPage(page, branch)
     await branchPage.goTo()
