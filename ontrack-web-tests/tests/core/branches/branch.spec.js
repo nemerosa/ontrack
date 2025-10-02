@@ -58,3 +58,22 @@ test('deleting a branch', async ({page}) => {
     const projectPage = new ProjectPage(page, project)
     await projectPage.checkOnPage()
 })
+
+test('many validations for a branch', async ({page}) => {
+    // Provisioning
+    const project = await ontrack().createProject()
+    const branch = await project.createBranch()
+    const build = await branch.createBuild("1.0.0")
+    const numberVs = 30
+    for (let i = 1; i <= numberVs; i++) {
+        const vs = await branch.createValidationStamp(`VS${i}`)
+        await build.validate(vs, {})
+    }
+    // Login
+    await login(page)
+    // Navigating to the branch
+    const branchPage = new BranchPage(page, branch)
+    await branchPage.goTo()
+    // Waiting for the VS1 to be visible
+    await expect(page.getByText("1.0.0")).toBeVisible()
+})
