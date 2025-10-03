@@ -346,7 +346,7 @@ class GitServiceImpl(
                 buildCommitLink = branchConfigurationProperty.buildCommitLink?.let {
                     toConfiguredBuildGitCommitLink<Any>(it)
                 }
-                override = branchConfigurationProperty.isOverride
+                override = branchConfigurationProperty.override
                 buildTagInterval = branchConfigurationProperty.buildTagInterval
                 // OK
                 return GitBranchConfiguration(
@@ -458,7 +458,7 @@ class GitServiceImpl(
         }
         // Configuration for the sync
         val confProperty = propertyService.getProperty(branch, GitBranchConfigurationPropertyType::class.java)
-        val override = !confProperty.isEmpty && confProperty.value.isOverride
+        val override = !confProperty.isEmpty && confProperty.value.override
         // Makes sure of synchronization
         listener.message("Synchronizing before importing")
         syncAndWait(configuration)

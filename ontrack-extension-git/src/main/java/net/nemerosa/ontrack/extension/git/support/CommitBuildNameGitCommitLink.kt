@@ -42,7 +42,7 @@ class CommitBuildNameGitCommitLink(
         }
 
     override fun toJson(data: CommitLinkConfig): JsonNode =
-        mapOf("abbreviated" to data.isAbbreviated).asJson()
+        mapOf("abbreviated" to data.abbreviated).asJson()
 
     override fun getEarliestBuildAfterCommit(
         branch: Branch,
@@ -58,7 +58,7 @@ class CommitBuildNameGitCommitLink(
             ).asSequence()
                 .sorted()
                 .map { gitCommit ->
-                    if (data.isAbbreviated)
+                    if (data.abbreviated)
                         gitCommit.shortId
                     else
                         gitCommit.id
@@ -75,7 +75,7 @@ class CommitBuildNameGitCommitLink(
     }
 
     override fun isBuildNameValid(name: String, data: CommitLinkConfig): Boolean {
-        return if (data.isAbbreviated) {
+        return if (data.abbreviated) {
             abbreviatedPattern.matcher(name).matches()
         } else {
             fullPattern.matcher(name).matches()

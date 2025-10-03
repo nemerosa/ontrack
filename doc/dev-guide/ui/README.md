@@ -16,3 +16,5 @@ with the API to its pure client aspects.
 * [UI reference data](ui-ref-data.md)
 * [UI user preferences](ui-user-preferences.md)
 * [User menu](user-menu.md)
+* Framework
+  * [Properties](framework-properties.md)

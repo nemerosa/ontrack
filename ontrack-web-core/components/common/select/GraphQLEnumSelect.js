@@ -8,14 +8,17 @@ export default function GraphQLEnumSelect({
                                               mode,
                                               query,
                                               queryNode,
+                                              entryValue,
+                                              entryLabel,
+                                              width = '12em',
                                           }) {
     const {data: options, loading} = useQuery(
         query,
         {
             initialData: [],
             dataFn: data => data[queryNode].map(it => ({
-                value: it,
-                label: it,
+                value: entryValue ? entryValue(it) : it,
+                label: entryLabel ? entryLabel(it) : it,
             }))
         }
     )
@@ -27,7 +30,7 @@ export default function GraphQLEnumSelect({
                 value={value}
                 onChange={onChange}
                 allowClear
-                style={{width: '12em'}}
+                style={{width: width}}
                 options={options}
                 loading={loading}
                 mode={mode}

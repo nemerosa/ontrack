@@ -24,7 +24,7 @@ class GitBranchConfigurationProperty(
      * Build overriding policy when synchronizing
      */
     @APIDescription("Build overriding policy when synchronizing")
-    val isOverride: Boolean,
+    val override: Boolean,
 
     /**
      * Interval in minutes for build/tag synchronization

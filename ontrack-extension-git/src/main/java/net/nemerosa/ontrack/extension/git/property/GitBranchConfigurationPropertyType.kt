@@ -58,7 +58,7 @@ class GitBranchConfigurationPropertyType(
         return GitBranchConfigurationProperty(
             branch = node.getTextField("branch") ?: "main",
             buildCommitLink = configuredBuildGitCommitLink?.toServiceConfiguration(),
-            isOverride = indexationAvailable && (node.getBooleanField("override") ?: false),
+            override = indexationAvailable && (node.getBooleanField("override") ?: false),
             buildTagInterval = if (indexationAvailable) (node.getIntField("buildTagInterval") ?: 0) else 0
         )
     }
@@ -92,7 +92,7 @@ class GitBranchConfigurationPropertyType(
                 value.buildCommitLink,
                 replacementFunction
             ) else null,
-            value.isOverride,
+            value.override,
             value.buildTagInterval
         )
     }

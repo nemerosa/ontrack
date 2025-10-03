@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.model
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.git.GitRepositoryClient
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 
@@ -13,14 +14,10 @@ import net.nemerosa.ontrack.model.structure.Build
  */
 interface BuildGitCommitLink<T> {
 
-    /**
-     * ID of the link
-     */
+    @APIDescription("ID of the link")
     val id: String
 
-    /**
-     * Display name for the link
-     */
+    @APIDescription("Display name for the link")
     val name: String
 
     /**

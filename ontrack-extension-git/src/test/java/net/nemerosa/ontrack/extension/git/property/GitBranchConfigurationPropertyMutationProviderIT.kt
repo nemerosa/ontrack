@@ -40,7 +40,7 @@ class GitBranchConfigurationPropertyMutationProviderIT : AbstractGitTestSupport(
                                 assertEquals("git-commit-property", link.id)
                             }
                             assertEquals(0, it.buildTagInterval)
-                            assertEquals(false, it.isOverride)
+                            assertEquals(false, it.override)
                         }
                     }
                 }
@@ -81,7 +81,7 @@ class GitBranchConfigurationPropertyMutationProviderIT : AbstractGitTestSupport(
                                 assertEquals("git-commit-property", link.id)
                             }
                             assertEquals(0, it.buildTagInterval)
-                            assertEquals(false, it.isOverride)
+                            assertEquals(false, it.override)
                         }
                     }
                 }

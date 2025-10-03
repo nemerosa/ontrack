@@ -692,6 +692,14 @@ type BuildFilterValidation {
   error: String
 }
 
+"Link between a build and a Git commit"
+type BuildGitCommitLink {
+  "ID of the link"
+  id: String!
+  "Display name for the link"
+  name: String!
+}
+
 "Qualified link to a build"
 type BuildLink {
   "Linked build"
@@ -2010,7 +2018,7 @@ type GitHubIngestionFilterConfig {
 "Payload received by the GitHub Ingestion Hook"
 type GitHubIngestionHookPayload {
   "Identity of the user"
-  accountName: String!
+  accountName: String
   "Timestamp for the end of the processing"
   completion: LocalDateTime
   "Mapped to the `X-GitHub-Delivery` header"
@@ -5089,6 +5097,8 @@ type Query {
     "Generic filter based on a configured filter"
     filter: GenericBuildFilter!
   ): BuildFilterValidation
+  "List of build/commit links"
+  buildGitCommitLinks: [BuildGitCommitLink!]!
   builds(
     "Name of a branch - requires 'project' to be filled as well"
     branch: String,
@@ -5580,7 +5590,10 @@ type Query {
     triggerId: String
   ): WorkflowInstancePaginated
   "List of all workflow node executors"
-  workflowNodeExecutors: [WorkflowNodeExecutor!]!
+  workflowNodeExecutors(
+    "Gets only the matching executors"
+    enabled: Boolean
+  ): [WorkflowNodeExecutor!]!
 }
 
 "QueueDispatchResult"
@@ -7810,6 +7823,8 @@ type WorkflowNode {
 type WorkflowNodeExecutor {
   "displayName field"
   displayName: String!
+  "Checks if this node executor is enabled."
+  enabled: Boolean
   "id field"
   id: String!
 }
