@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component
 class TFCClientFactoryImpl : TFCClientFactory {
     override fun createClient(config: TFCConfiguration) = TFCClientImpl(
         url = config.url,
-        token = config.token,
+        token = config.token?.takeIf { it.isNotBlank() } ?: throw TFCConfigurationNoTokenException(),
     )
 }

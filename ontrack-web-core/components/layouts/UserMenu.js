@@ -35,6 +35,7 @@ import {useRefData} from "@components/providers/RefDataProvider";
 import SonarqubeIcon from "@components/extension/sonarqube/SonarqubeIcon";
 import {signOut} from "next-auth/react";
 import Link from "next/link";
+import TFCIcon from "@components/extension/tfc/TFCIcon";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -90,6 +91,7 @@ export default function UserMenu({userMenu}) {
         'extension/gitlab/configurations': <FaGitlab/>,
         'extension/notifications/webhooks': <FaPaperPlane/>,
         'extension/hook/hook-records': <FaReceipt/>,
+        'extension/tfc/configurations': <TFCIcon/>,
     }
 
     useEffect(() => {

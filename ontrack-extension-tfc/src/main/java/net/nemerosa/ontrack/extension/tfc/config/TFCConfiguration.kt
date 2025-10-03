@@ -13,7 +13,7 @@ class TFCConfiguration(
     val url: String,
     @APIDescription("User token to access the API")
     @APILabel("Token")
-    val token: String,
+    val token: String? = null,
 ) : CredentialsConfiguration<TFCConfiguration> {
 
     override fun obfuscate() = TFCConfiguration(
@@ -25,7 +25,7 @@ class TFCConfiguration(
     override fun injectCredentials(oldConfig: TFCConfiguration) = TFCConfiguration(
         name = name,
         url = url,
-        token = if (token.isBlank()) {
+        token = if (token.isNullOrBlank()) {
             oldConfig.token
         } else {
             token
