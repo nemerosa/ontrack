@@ -1,10 +1,24 @@
 import {Button, Form, Space} from "antd";
 import {FaBan, FaFilter} from "react-icons/fa";
 import TableFormSection from "@components/common/table/TableFormSection";
+import {useEffect} from "react";
 
-export default function FilterForm({setFilterFormData, onFilterFormValuesChanged, filterForm, filterExtraButtons}) {
+export default function FilterForm({
+                                       initialFilter,
+                                       setFilterFormData,
+                                       onFilterFormValuesChanged,
+                                       filterForm,
+                                       filterExtraButtons
+                                   }) {
 
     const [filterFormInstance] = Form.useForm()
+
+    useEffect(() => {
+        if (initialFilter) {
+            filterFormInstance.setFieldsValue(initialFilter)
+            setFilterFormData(initialFilter)
+        }
+    }, [])
 
     const onFilterFormFinish = (values) => {
         setFilterFormData(values)

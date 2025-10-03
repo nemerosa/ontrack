@@ -32,6 +32,7 @@ export default function StandardTable({
                                           columns = [],
                                           expandable = false,
                                           size = 10,
+                                          initialFilter = {},
                                           filter = {},
                                           onFilterChange = (_) => {
                                           },
@@ -45,7 +46,7 @@ export default function StandardTable({
 
     const client = useGraphQLClient()
 
-    const [filterFormData, setFilterFormData] = useState({})
+    const [filterFormData, setFilterFormData] = useState(initialFilter ?? {})
 
     const [loading, setLoading] = useState(true)
     const [items, setItems] = useState([])
@@ -96,6 +97,7 @@ export default function StandardTable({
                 {
                     filterForm.length > 0 &&
                     <FilterForm
+                        initialFilter={initialFilter}
                         filterForm={filterForm}
                         setFilterFormData={setFilterFormData}
                         onFilterFormValuesChanged={onFilterFormValuesChanged}

@@ -20,6 +20,7 @@ import {
     FaMedal,
     FaPaperPlane,
     FaProjectDiagram,
+    FaReceipt,
     FaServer,
     FaSignOutAlt,
     FaStamp,
@@ -88,6 +89,7 @@ export default function UserMenu({userMenu}) {
         'extension/bitbucket-cloud/configurations': <FaBitbucket/>,
         'extension/gitlab/configurations': <FaGitlab/>,
         'extension/notifications/webhooks': <FaPaperPlane/>,
+        'extension/hook/hook-records': <FaReceipt/>,
     }
 
     useEffect(() => {
