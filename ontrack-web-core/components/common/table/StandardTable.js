@@ -3,6 +3,8 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {useEffect, useState} from "react";
 import TablePaginationFooter from "@components/common/table/TablePaginationFooter";
 import FilterForm from "@components/common/table/FilterForm";
+import {useRefresh} from "@components/common/RefreshUtils";
+import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
 
 /**
  * Table whose content is fetched using a GraphQL query.
@@ -22,6 +24,7 @@ import FilterForm from "@components/common/table/FilterForm";
  * @param rowKey Computing each row key (needed for expandable content)
  * @param filterForm List of Antd Form items to put in a form on top of the table (not displayed if empty)
  * @param filterExtraButtons List of extra buttons to put in the form on top of the table
+ * @param autoRefresh Whether the table should contain an option for auto-refresh
  */
 export default function StandardTable({
                                           id,
@@ -31,6 +34,7 @@ export default function StandardTable({
                                           reloadCount = 0,
                                           columns = [],
                                           expandable = false,
+                                          tableSize,
                                           size = 10,
                                           initialFilter = {},
                                           filter = {},
@@ -42,7 +46,10 @@ export default function StandardTable({
                                           rowKey,
                                           filterForm = [],
                                           filterExtraButtons = [],
+                                          autoRefresh = false,
                                       }) {
+
+    const [localReloadCount, localReload] = useRefresh()
 
     const client = useGraphQLClient()
 
@@ -83,7 +90,7 @@ export default function StandardTable({
                 setLoading(false)
             })
         }
-    }, [client, query, pagination, filter, filterFormData, reloadCount]);
+    }, [client, query, pagination, filter, filterFormData, reloadCount, localReloadCount]);
 
     const onTableChange = (_, filters) => {
         if (onFilterChange) {
@@ -93,38 +100,48 @@ export default function StandardTable({
 
     return (
         <>
-            <Space direction="vertical" className="ot-line">
-                {
-                    filterForm.length > 0 &&
-                    <FilterForm
-                        initialFilter={initialFilter}
-                        filterForm={filterForm}
-                        setFilterFormData={setFilterFormData}
-                        onFilterFormValuesChanged={onFilterFormValuesChanged}
-                        filterExtraButtons={filterExtraButtons}
-                    />
-                }
-                <Table
-                    id={id}
-                    data-testid={id}
-                    loading={loading}
-                    dataSource={items}
-                    pagination={false}
-                    columns={columns}
-                    expandable={expandable}
-                    onChange={onTableChange}
-                    rowKey={rowKey}
-                    footer={() =>
-                        <Space>
-                            <TablePaginationFooter
-                                pageInfo={pageInfo}
-                                setPagination={setPagination}
-                            />
-                            {footerExtra}
-                        </Space>
+            <AutoRefreshContextProvider onRefresh={localReload}>
+                <Space direction="vertical" className="ot-line">
+                    {
+                        (filterForm.length > 0 || autoRefresh) &&
+                        <FilterForm
+                            initialFilter={initialFilter}
+                            filterForm={filterForm}
+                            setFilterFormData={setFilterFormData}
+                            onFilterFormValuesChanged={onFilterFormValuesChanged}
+                            filterExtraButtons={filterExtraButtons}
+                            extraComponents={
+                                <>
+                                {
+                                    autoRefresh && <AutoRefreshButton/>
+                                }
+                                </>
+                            }
+                        />
                     }
-                />
-            </Space>
+                    <Table
+                        id={id}
+                        data-testid={id}
+                        loading={loading}
+                        dataSource={items}
+                        pagination={false}
+                        columns={columns}
+                        expandable={expandable}
+                        onChange={onTableChange}
+                        rowKey={rowKey}
+                        size={tableSize}
+                        footer={() =>
+                            <Space>
+                                <TablePaginationFooter
+                                    pageInfo={pageInfo}
+                                    setPagination={setPagination}
+                                />
+                                {footerExtra}
+                            </Space>
+                        }
+                    />
+                </Space>
+            </AutoRefreshContextProvider>
         </>
     )
 }

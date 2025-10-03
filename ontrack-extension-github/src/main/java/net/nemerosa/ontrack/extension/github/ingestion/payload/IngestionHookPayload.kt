@@ -70,5 +70,5 @@ data class IngestionHookPayload(
     @APIDescription("Queue information")
     val queue: String? = null,
     @APIDescription("Identity of the user")
-    val accountName: String,
+    val accountName: String? = null,
 )

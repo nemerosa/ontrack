@@ -98,7 +98,10 @@ class AsyncIngestionHookQueueListener(
 
             // Gets the account to use from the queue payload
             val account = securityService.asAdmin {
-                accountService.findAccountByName(payload.accountName)
+                payload.accountName?.takeIf { it.isNotBlank() }
+                    ?.let {
+                        accountService.findAccountByName(it)
+                    }
                     ?: error("Account not found: ${payload.accountName}")
             }
 

@@ -92,6 +92,7 @@ export default function UserMenu({userMenu}) {
         'extension/notifications/webhooks': <FaPaperPlane/>,
         'extension/hook/hook-records': <FaReceipt/>,
         'extension/tfc/configurations': <TFCIcon/>,
+        'extension/github/ingestion/hook-payloads': <FaGithub/>,
     }
 
     useEffect(() => {

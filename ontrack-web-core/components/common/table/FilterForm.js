@@ -8,7 +8,8 @@ export default function FilterForm({
                                        setFilterFormData,
                                        onFilterFormValuesChanged,
                                        filterForm,
-                                       filterExtraButtons
+                                       filterExtraButtons,
+                                       extraComponents,
                                    }) {
 
     const [filterFormInstance] = Form.useForm()
@@ -42,29 +43,39 @@ export default function FilterForm({
                         columnGap: 8,
                     }}
                 >
-                    {filterForm}
-                    {/* Filter */}
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                    >
-                        <Space>
-                            <FaFilter/>
-                            Filter
-                        </Space>
-                    </Button>
-                    {/* Clear */}
-                    <Button
-                        type="link"
-                        onClick={onFilterFormClear}
-                    >
-                        <Space>
-                            <FaBan/>
-                            Clear filter
-                        </Space>
-                    </Button>
-                    {/* Extra buttons */}
-                    {filterExtraButtons}
+                    {
+                        filterForm.length > 0 && <>
+                            {filterForm}
+                            {/* Filter */}
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                            >
+                                <Space>
+                                    <FaFilter/>
+                                    Filter
+                                </Space>
+                            </Button>
+                            {/* Clear */}
+                            <Button
+                                type="link"
+                                onClick={onFilterFormClear}
+                            >
+                                <Space>
+                                    <FaBan/>
+                                    Clear filter
+                                </Space>
+                            </Button>
+                            {/* Extra buttons */}
+                            {filterExtraButtons}
+                        </>
+                    }
+                    {
+                        extraComponents &&
+                        <Form.Item>
+                            {extraComponents}
+                        </Form.Item>
+                    }
                 </Form>
             </TableFormSection>
         </>
