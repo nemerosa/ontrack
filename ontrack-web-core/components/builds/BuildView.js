@@ -106,7 +106,7 @@ export default function BuildView({id}) {
                         title="Displays downstream and upstream dependencies"
                     />,
                 ]
-                if (isAuthorized(build, "build", "edit")) {
+                if (isAuthorized(data.build, "build", "edit")) {
                     commands.push(
                         <EditBuildCommand
                             build={data.build}

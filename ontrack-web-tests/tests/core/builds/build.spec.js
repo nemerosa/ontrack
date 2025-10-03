@@ -1,5 +1,5 @@
 const {login} = require("../login");
-const {BuildPage} = require("../builds/build");
+const {BuildPage} = require("../builds/BuildPage");
 const {BranchPage} = require("../branches/branch");
 const {test} = require("../../fixtures/connection");
 
@@ -106,4 +106,27 @@ test('deleting a build', async ({page, ontrack}) => {
     // Checking we are on the branch page
     const branchPage = new BranchPage(page, branch)
     await branchPage.checkOnPage()
+})
+
+test('updating a build', async ({page, ontrack}) => {
+    // Provisioning
+    const project = await ontrack.createProject()
+    const branch = await project.createBranch()
+    const build = await branch.createBuild('initial-name')
+
+    // Login
+    await login(page, ontrack)
+    // Navigating to the build
+    const buildPage = new BuildPage(page, build)
+    await buildPage.goTo()
+
+    // Editing the build
+    await buildPage.update({
+        name: 'new-name',
+        description: 'Some new description',
+    })
+
+    // Checking that the page has been updated
+    await buildPage.assertName('new-name')
+    await buildPage.assertDescription('Some new description')
 })

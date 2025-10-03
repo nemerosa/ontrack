@@ -2,7 +2,6 @@ import {BuildLinksPage} from "./buildLinks";
 import {PromotionInfoSection} from "./PromotionInfoSection";
 import {confirmBox} from "../../support/confirm";
 
-const {ui} = require("@ontrack/connection");
 const {expect} = require("@playwright/test");
 
 export class BuildPage {
@@ -14,7 +13,7 @@ export class BuildPage {
 
     async goTo() {
         await this.page.goto(`${this.build.ontrack.connection.ui}/build/${this.build.id}`)
-        await expect(this.page.getByText(this.build.name)).toBeVisible()
+        await this.assertName(this.build.name)
         // Widgets must be visible
         await expect(this.page.getByText("Promotions")).toBeVisible()
         await expect(this.page.getByText("Validations")).toBeVisible()
@@ -40,4 +39,23 @@ export class BuildPage {
         await confirmBox(this.page, "Delete build", {okText: "Delete"})
     }
 
+    async update({name, description}) {
+        const button = this.page.getByRole('button', {name: 'Edit'})
+        await expect(button).toBeVisible()
+        await button.click()
+
+        const buildNameField = this.page.getByPlaceholder('Build name');
+        await expect(buildNameField).toBeVisible()
+        await buildNameField.fill(name)
+        if (description) await this.page.getByPlaceholder('Build description').fill(description)
+        await this.page.getByRole('button', {name: 'OK'}).click()
+    }
+
+    async assertName(name) {
+        await expect(this.page.getByText(name)).toBeVisible()
+    }
+
+    async assertDescription(description) {
+        await expect(this.page.getByText(description)).toBeVisible()
+    }
 }

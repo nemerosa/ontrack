@@ -11,7 +11,7 @@ export const useEditBuildDialog = ({onSuccess}) => {
         prepareValues: (values, {build}) => {
             return {
                 ...values,
-                buildId: build.id,
+                buildId: Number(build.id),
             }
         },
         query: gql`
