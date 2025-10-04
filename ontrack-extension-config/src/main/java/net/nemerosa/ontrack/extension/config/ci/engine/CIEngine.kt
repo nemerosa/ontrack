@@ -13,6 +13,11 @@ interface CIEngine {
     fun getBranchName(env: Map<String, String>): String? = env["BRANCH_NAME"]
 
     /**
+     * Gets a suffix to apply to the default build name.
+     */
+    fun getBuildSuffix(env: Map<String, String>): String? = null
+
+    /**
      * ID of the engine
      */
     val name: String

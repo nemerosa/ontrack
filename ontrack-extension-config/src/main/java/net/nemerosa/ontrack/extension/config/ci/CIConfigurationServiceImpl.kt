@@ -51,7 +51,14 @@ class CIConfigurationServiceImpl(
             scmEngine = scmEngine,
             env = env,
         )
-        TODO("Launching the build configuration")
+        // Launching the build configuration
+        return coreConfigurationService.configureBuild(
+            branch = branch,
+            configuration = configuration,
+            ciEngine = ciEngine,
+            scmEngine = scmEngine,
+            env = env,
+        )
     }
 
     private fun findSCMEngine(

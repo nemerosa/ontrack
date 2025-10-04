@@ -8,4 +8,5 @@ class GenericCIEngine : CIEngine {
 
     override fun getProjectName(env: Map<String, String>): String? = env["PROJECT_NAME"]
 
+    override fun getBuildSuffix(env: Map<String, String>): String? = env["BUILD_NUMBER"]
 }

@@ -8,6 +8,9 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.isProjectFunctionGranted
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import kotlin.jvm.optionals.getOrNull
 
 @Service
@@ -83,6 +86,57 @@ class CoreConfigurationServiceImpl(
         return branch
     }
 
+    override fun configureBuild(
+        branch: Branch,
+        configuration: ConfigurationInput,
+        ciEngine: CIEngine,
+        scmEngine: SCMEngine,
+        env: Map<String, String>
+    ): Build {
+        configurationLicense.checkConfigurationFeatureEnabled()
+
+        val buildName = getBuildName(configuration, ciEngine, env)
+
+        val build = structureService.findBuildByName(branch.project.name, branch.name, buildName).getOrNull()
+            ?: structureService.newBuild(
+                Build.of(
+                    branch,
+                    NameDescription(name = buildName, description = null),
+                    securityService.currentSignature,
+                )
+            )
+
+        configureProperties(
+            entity = branch,
+            defaults = configuration.configuration.defaults.build.properties,
+            // TODO Custom properties
+        )
+
+        // TODO Configuration of the build SCM (using the SCM engine)
+
+        return build
+    }
+
+    private fun getBuildName(
+        configuration: ConfigurationInput,
+        ciEngine: CIEngine,
+        env: Map<String, String>
+    ): String {
+        // TODO Configuration of the build name (template for example)
+        val timestampUtc = Instant.now()
+            .atZone(ZoneOffset.UTC)
+            .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+
+        // Suffix
+        val suffix = ciEngine.getBuildSuffix(env) // TODO Consolidated configuration for the build
+
+        return if (suffix.isNullOrBlank()) {
+            timestampUtc
+        } else {
+            "$timestampUtc-$suffix"
+        }
+    }
+
     private fun configureProperties(
         entity: ProjectEntity,
         defaults: List<PropertyConfiguration>,
@@ -94,10 +148,6 @@ class CoreConfigurationServiceImpl(
                 config.data
             )
         }
-    }
-
-    fun configureBuild() {
-        configurationLicense.checkConfigurationFeatureEnabled()
     }
 
 }
