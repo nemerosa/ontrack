@@ -1,12 +1,13 @@
 package net.nemerosa.ontrack.boot.docs
 
+import net.nemerosa.ontrack.it.AbstractITTestSupport.AbstractIntegrationTestConfiguration
 import net.nemerosa.ontrack.model.annotations.getAPITypeDescription
-import net.nemerosa.ontrack.model.docs.getFieldsDocumentation
 import net.nemerosa.ontrack.model.docs.getFieldsForDocumentationClass
 import net.nemerosa.ontrack.model.structure.PropertyType
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.findAnnotations
@@ -16,6 +17,12 @@ import kotlin.test.fail
  * Generation of the documentation
  */
 @Disabled("To be launched manually when need be")
+@SpringBootTest(
+    classes = [
+        AbstractIntegrationTestConfiguration::class
+    ],
+    webEnvironment = SpringBootTest.WebEnvironment.MOCK
+)
 class PropertiesDocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
 
     @Autowired

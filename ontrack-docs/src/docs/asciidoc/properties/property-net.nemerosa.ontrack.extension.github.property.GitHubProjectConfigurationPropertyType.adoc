@@ -19,3 +19,5 @@ Configuration:
 
 * **repository** - String - required - GitHub repository, ie. org/name
 
+* **url** - String - required - url field
+
