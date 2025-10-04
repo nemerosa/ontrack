@@ -26,7 +26,6 @@ class CoreConfigurationServiceImpl(
     ): Project {
         configurationLicense.checkConfigurationFeatureEnabled()
         val projectName = ciEngine.getProjectName(env)
-            ?: scmEngine.getProjectName(env)
             ?: throw CoreConfigurationException("Could not get the project name from the environment")
 
         val existingProject = securityService.asAdmin { structureService.findProjectByName(projectName) }.getOrNull()
@@ -47,9 +46,41 @@ class CoreConfigurationServiceImpl(
             // TODO Custom properties
         )
 
-        // TODO Configuration of the project SCM
+        // TODO Configuration of the project SCM (using the SCM engine)
 
         return project
+    }
+
+    override fun configureBranch(
+        project: Project,
+        configuration: ConfigurationInput,
+        ciEngine: CIEngine,
+        scmEngine: SCMEngine,
+        env: Map<String, String>
+    ): Branch {
+        configurationLicense.checkConfigurationFeatureEnabled()
+        val rawBranchName = ciEngine.getBranchName(env)
+            ?: throw CoreConfigurationException("Could not get the branch name from the environment")
+
+        val branchName = scmEngine.normalizeBranchName(rawBranchName)
+
+        val branch = structureService.findBranchByName(project.name, branchName).getOrNull()
+            ?: structureService.newBranch(
+                Branch.of(
+                    project,
+                    NameDescription(name = branchName, description = null)
+                )
+            )
+
+        configureProperties(
+            entity = branch,
+            defaults = configuration.configuration.defaults.branch.properties,
+            // TODO Custom properties
+        )
+
+        // TODO Configuration of the branch SCM (using the SCM engine)
+
+        return branch
     }
 
     private fun configureProperties(

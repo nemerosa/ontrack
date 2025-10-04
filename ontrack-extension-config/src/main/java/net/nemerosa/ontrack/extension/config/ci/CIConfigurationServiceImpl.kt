@@ -35,6 +35,7 @@ class CIConfigurationServiceImpl(
         val scmEngine = findSCMEngine(scm, configuration)
         // Converting the environment into a map
         val env = env.associate { it.name to it.value }
+
         // Launching the project configuration
         val project = coreConfigurationService.configureProject(
             configuration = configuration,
@@ -42,7 +43,14 @@ class CIConfigurationServiceImpl(
             scmEngine = scmEngine,
             env = env,
         )
-        TODO("Launching the branch configuration")
+        // Launching the branch configuration
+        val branch = coreConfigurationService.configureBranch(
+            project = project,
+            configuration = configuration,
+            ciEngine = ciEngine,
+            scmEngine = scmEngine,
+            env = env,
+        )
         TODO("Launching the build configuration")
     }
 

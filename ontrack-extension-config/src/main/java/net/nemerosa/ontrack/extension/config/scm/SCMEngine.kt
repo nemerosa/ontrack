@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.extension.config.scm
 
-interface SCMEngine {
-    val name: String
+import net.nemerosa.ontrack.model.structure.NameDescription
 
-    /**
-     * Given a CI environment, returns the project name.
-     */
-    fun getProjectName(env: Map<String, String>): String? = null
+interface SCMEngine {
+    fun normalizeBranchName(rawBranchName: String): String = NameDescription.escapeName(rawBranchName)
+
+    val name: String
 }

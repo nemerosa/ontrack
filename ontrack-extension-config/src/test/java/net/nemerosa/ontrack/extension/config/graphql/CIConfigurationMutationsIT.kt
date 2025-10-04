@@ -33,7 +33,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                         ci: "generic",
                         scm: "mock",
                         env: [{
-                            name: "MOCK_SCM_NAME"
+                            name: "PROJECT_NAME"
                             value: "yontrack"
                         }, {
                             name: "BRANCH_NAME"
