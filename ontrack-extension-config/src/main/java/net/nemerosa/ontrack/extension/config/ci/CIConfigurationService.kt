@@ -1,5 +1,6 @@
-package net.nemerosa.ontrack.extension.config.model
+package net.nemerosa.ontrack.extension.config.ci
 
+import net.nemerosa.ontrack.extension.config.model.CIEnv
 import net.nemerosa.ontrack.model.structure.Build
 
 /**

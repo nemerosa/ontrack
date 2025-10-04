@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.config.graphql
 
-import net.nemerosa.ontrack.extension.config.model.CIConfigurationService
+import net.nemerosa.ontrack.extension.config.ci.CIConfigurationService
 import net.nemerosa.ontrack.extension.config.model.ConfigureBuildInput
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
