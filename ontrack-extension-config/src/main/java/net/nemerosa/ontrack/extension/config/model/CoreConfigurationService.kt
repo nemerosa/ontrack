@@ -8,7 +8,8 @@ import net.nemerosa.ontrack.model.structure.Project
 
 interface CoreConfigurationService {
     fun configureProject(
-        configuration: ConfigurationInput,
+        input: ConfigurationInput,
+        configuration: ProjectConfiguration,
         ciEngine: CIEngine,
         scmEngine: SCMEngine,
         env: Map<String, String>
@@ -16,7 +17,8 @@ interface CoreConfigurationService {
 
     fun configureBranch(
         project: Project,
-        configuration: ConfigurationInput,
+        input: ConfigurationInput,
+        configuration: BranchConfiguration,
         ciEngine: CIEngine,
         scmEngine: SCMEngine,
         env: Map<String, String>
@@ -24,7 +26,8 @@ interface CoreConfigurationService {
 
     fun configureBuild(
         branch: Branch,
-        configuration: ConfigurationInput,
+        input: ConfigurationInput,
+        configuration: BuildConfiguration,
         ciEngine: CIEngine,
         scmEngine: SCMEngine,
         env: Map<String, String>

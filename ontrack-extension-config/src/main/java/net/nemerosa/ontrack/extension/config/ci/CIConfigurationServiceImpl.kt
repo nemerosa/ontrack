@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.extension.config.ci
 
+import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineNotFoundException
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineRegistry
-import net.nemerosa.ontrack.extension.config.model.CIEnv
-import net.nemerosa.ontrack.extension.config.model.ConfigurationInput
-import net.nemerosa.ontrack.extension.config.model.CoreConfigurationService
+import net.nemerosa.ontrack.extension.config.model.*
 import net.nemerosa.ontrack.extension.config.scm.SCMEngine
 import net.nemerosa.ontrack.extension.config.scm.SCMEngineNotFoundException
 import net.nemerosa.ontrack.extension.config.scm.SCMEngineRegistry
@@ -36,9 +35,30 @@ class CIConfigurationServiceImpl(
         // Converting the environment into a map
         val env = env.associate { it.name to it.value }
 
+        // Consolidation of the configurations
+        val projectConfiguration = consolidateProjectConfiguration(
+            input = configuration,
+            ciEngine = ciEngine,
+            scmEngine = scmEngine,
+            env = env,
+        )
+        val branchConfiguration = consolidateBranchConfiguration(
+            input = configuration,
+            ciEngine = ciEngine,
+            scmEngine = scmEngine,
+            env = env,
+        )
+        val buildConfiguration = consolidateBuildConfiguration(
+            input = configuration,
+            ciEngine = ciEngine,
+            scmEngine = scmEngine,
+            env = env,
+        )
+
         // Launching the project configuration
         val project = coreConfigurationService.configureProject(
-            configuration = configuration,
+            input = configuration,
+            configuration = projectConfiguration,
             ciEngine = ciEngine,
             scmEngine = scmEngine,
             env = env,
@@ -46,7 +66,8 @@ class CIConfigurationServiceImpl(
         // Launching the branch configuration
         val branch = coreConfigurationService.configureBranch(
             project = project,
-            configuration = configuration,
+            input = configuration,
+            configuration = branchConfiguration,
             ciEngine = ciEngine,
             scmEngine = scmEngine,
             env = env,
@@ -54,11 +75,42 @@ class CIConfigurationServiceImpl(
         // Launching the build configuration
         return coreConfigurationService.configureBuild(
             branch = branch,
-            configuration = configuration,
+            input = configuration,
+            configuration = buildConfiguration,
             ciEngine = ciEngine,
             scmEngine = scmEngine,
             env = env,
         )
+    }
+
+    private fun consolidateProjectConfiguration(
+        input: ConfigurationInput,
+        ciEngine: CIEngine,
+        scmEngine: SCMEngine,
+        env: Map<String, String>
+    ): ProjectConfiguration {
+        // TODO Use the conditions
+        return input.configuration.defaults.project
+    }
+
+    private fun consolidateBranchConfiguration(
+        input: ConfigurationInput,
+        ciEngine: CIEngine,
+        scmEngine: SCMEngine,
+        env: Map<String, String>
+    ): BranchConfiguration {
+        // TODO Use the conditions
+        return input.configuration.defaults.branch
+    }
+
+    private fun consolidateBuildConfiguration(
+        input: ConfigurationInput,
+        ciEngine: CIEngine,
+        scmEngine: SCMEngine,
+        env: Map<String, String>
+    ): BuildConfiguration {
+        // TODO Use the conditions
+        return input.configuration.defaults.build
     }
 
     private fun findSCMEngine(

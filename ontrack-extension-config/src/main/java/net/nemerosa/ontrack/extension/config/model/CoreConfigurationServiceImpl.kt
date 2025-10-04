@@ -23,7 +23,8 @@ class CoreConfigurationServiceImpl(
 ) : CoreConfigurationService {
 
     override fun configureProject(
-        configuration: ConfigurationInput,
+        input: ConfigurationInput,
+        configuration: ProjectConfiguration,
         ciEngine: CIEngine,
         scmEngine: SCMEngine,
         env: Map<String, String>
@@ -46,8 +47,7 @@ class CoreConfigurationServiceImpl(
         // Configuration of properties
         configureProperties(
             entity = project,
-            defaults = configuration.configuration.defaults.project.properties,
-            // TODO Custom properties
+            defaults = configuration.properties,
         )
 
         // TODO Configuration of the project SCM (using the SCM engine)
@@ -57,7 +57,8 @@ class CoreConfigurationServiceImpl(
 
     override fun configureBranch(
         project: Project,
-        configuration: ConfigurationInput,
+        input: ConfigurationInput,
+        configuration: BranchConfiguration,
         ciEngine: CIEngine,
         scmEngine: SCMEngine,
         env: Map<String, String>
@@ -78,7 +79,7 @@ class CoreConfigurationServiceImpl(
 
         configureProperties(
             entity = branch,
-            defaults = configuration.configuration.defaults.branch.properties,
+            defaults = configuration.properties,
             // TODO Custom properties
         )
 
@@ -89,7 +90,8 @@ class CoreConfigurationServiceImpl(
 
     override fun configureBuild(
         branch: Branch,
-        configuration: ConfigurationInput,
+        input: ConfigurationInput,
+        configuration: BuildConfiguration,
         ciEngine: CIEngine,
         scmEngine: SCMEngine,
         env: Map<String, String>
@@ -109,7 +111,7 @@ class CoreConfigurationServiceImpl(
 
         configureProperties(
             entity = branch,
-            defaults = configuration.configuration.defaults.build.properties,
+            defaults = configuration.properties,
             // TODO Custom properties
         )
 
@@ -123,7 +125,7 @@ class CoreConfigurationServiceImpl(
 
     private fun configureBuildDisplayName(
         build: Build,
-        configuration: ConfigurationInput,
+        configuration: BuildConfiguration,
         ciEngine: CIEngine,
         env: Map<String, String>
     ) {
@@ -134,7 +136,7 @@ class CoreConfigurationServiceImpl(
     }
 
     private fun getBuildName(
-        configuration: ConfigurationInput,
+        configuration: BuildConfiguration,
         ciEngine: CIEngine,
         env: Map<String, String>
     ): String {
