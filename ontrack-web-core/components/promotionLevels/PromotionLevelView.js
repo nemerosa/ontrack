@@ -188,6 +188,7 @@ export default function PromotionLevelView({id}) {
                             defaultLayout={defaultLayout}
                             items={items}
                             rowHeight={30}
+                            isDraggable={true}
                         />
                         {
                             promotionLevel &&

@@ -13,8 +13,7 @@ export default function BuildContent({build}) {
 
     const user = useContext(UserContext)
 
-    let defaultLayout = []
-    let layoutName = ''
+    let defaultLayout
     if (user.authorizations.environment?.view) {
         defaultLayout = [
             {i: "promotions", x: 0, y: 0, w: 5, h: 6},
@@ -78,12 +77,11 @@ export default function BuildContent({build}) {
 
     return (
         <>
-            <GridTableContextProvider>
+            <GridTableContextProvider isDraggable={false}>
                 <GridTable
                     rowHeight={30}
                     layout={defaultLayout}
                     items={items}
-                    isDraggable={false}
                     isResizable={false}
                 />
             </GridTableContextProvider>

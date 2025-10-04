@@ -198,6 +198,7 @@ export default function ValidationStampView({id}) {
                             defaultLayout={defaultLayout}
                             items={items}
                             rowHeight={30}
+                            isDraggable={true}
                         />
                         {
                             validationStamp &&
