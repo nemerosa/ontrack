@@ -18,7 +18,7 @@ class GitTestSupport(
             GitBranchConfigurationProperty(
                 branch = scmBranch,
                 buildCommitLink = null,
-                isOverride = false,
+                override = false,
                 buildTagInterval = 0,
             )
         )

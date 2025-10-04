@@ -96,7 +96,7 @@ abstract class AbstractGitHubTestSupport : AbstractQLKTITSupport() {
                     gitCommitPropertyCommitLink,
                     NoConfig.INSTANCE
                 ).toServiceConfiguration(),
-                isOverride = false,
+                override = false,
                 buildTagInterval = 0,
             )
         )

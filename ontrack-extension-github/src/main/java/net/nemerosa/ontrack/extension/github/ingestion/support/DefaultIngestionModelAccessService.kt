@@ -204,7 +204,7 @@ class DefaultIngestionModelAccessService(
                         gitCommitPropertyCommitLink,
                         NoConfig.INSTANCE
                     ).toServiceConfiguration(),
-                    isOverride = false,
+                    override = false,
                     buildTagInterval = 0,
                 )
             )

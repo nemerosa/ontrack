@@ -33,7 +33,7 @@ class GitBranchConfigurationPropertyMutationProvider(
     override fun readInput(entity: ProjectEntity, input: MutationInput) = GitBranchConfigurationProperty(
         branch = input.getRequiredInput(INPUT_BRANCH),
         buildCommitLink = ConfiguredBuildGitCommitLink(link, NoConfig.INSTANCE).toServiceConfiguration(),
-        isOverride = false,
+        override = false,
         buildTagInterval = 0
     )
 

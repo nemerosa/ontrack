@@ -190,7 +190,7 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
                         GitBranchConfigurationProperty(
                             branch = "main",
                             buildCommitLink = null, // Not used
-                            isOverride = false,
+                            override = false,
                             buildTagInterval = 0,
                         )
                     )
@@ -401,7 +401,7 @@ class WorkflowJobProcessingServiceIT : AbstractIngestionTestSupport() {
                 GitBranchConfigurationProperty(
                     branch = "main",
                     buildCommitLink = null, // Not used
-                    isOverride = false,
+                    override = false,
                     buildTagInterval = 0,
                 )
             )
