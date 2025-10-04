@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export function homeUri() {
     return `/`
 }
@@ -41,14 +39,6 @@ export function scmChangeLogUri(from, to) {
 
 export function autoVersioningAuditEntryUri(uuid) {
     return `/extension/auto-versioning/audit/detail/${uuid}`
-}
-
-// TODO As a component
-export function buildLink(build, text) {
-    return <Link
-        href={buildUri(build)}
-        title="Link to build page"
-    >{text ? text : build.name}</Link>
 }
 
 export function promotionLevelUri(promotionLevel) {
