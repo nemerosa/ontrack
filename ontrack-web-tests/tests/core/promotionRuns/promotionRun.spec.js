@@ -1,5 +1,5 @@
 import {login} from "../login";
-import {BuildPage} from "../builds/build";
+import {BuildPage} from "../builds/BuildPage";
 import {test} from "../../fixtures/connection";
 
 test('repromoting a promotion run', async ({page, ontrack}) => {
