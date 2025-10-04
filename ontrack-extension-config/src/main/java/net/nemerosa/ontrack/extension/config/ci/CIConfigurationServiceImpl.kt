@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineNotFoundException
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineRegistry
 import net.nemerosa.ontrack.extension.config.model.CIEnv
 import net.nemerosa.ontrack.extension.config.model.ConfigurationInput
+import net.nemerosa.ontrack.extension.config.model.CoreConfigurationService
 import net.nemerosa.ontrack.extension.config.scm.SCMEngine
 import net.nemerosa.ontrack.extension.config.scm.SCMEngineNotFoundException
 import net.nemerosa.ontrack.extension.config.scm.SCMEngineRegistry
@@ -17,6 +18,7 @@ class CIConfigurationServiceImpl(
     private val ciConfigurationParser: CIConfigurationParser,
     private val ciEngineRegistry: CIEngineRegistry,
     private val scmEngineRegistry: SCMEngineRegistry,
+    private val coreConfigurationService: CoreConfigurationService,
 ) : CIConfigurationService {
 
     override fun configureBuild(
@@ -31,8 +33,15 @@ class CIConfigurationServiceImpl(
         val ciEngine = findCIEngine(ci, configuration)
         // Getting the SCM engine from the configuration
         val scmEngine = findSCMEngine(scm, configuration)
-        TODO("Converting the environment into a map")
-        TODO("Launching the project configuration")
+        // Converting the environment into a map
+        val env = env.associate { it.name to it.value }
+        // Launching the project configuration
+        val project = coreConfigurationService.configureProject(
+            configuration = configuration,
+            ciEngine = ciEngine,
+            scmEngine = scmEngine,
+            env = env,
+        )
         TODO("Launching the branch configuration")
         TODO("Launching the build configuration")
     }
