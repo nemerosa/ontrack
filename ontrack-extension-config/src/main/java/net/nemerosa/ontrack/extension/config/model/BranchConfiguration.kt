@@ -6,4 +6,5 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 data class BranchConfiguration(
     override val properties: List<PropertyConfiguration> = emptyList(),
     val validations: List<ValidationStampConfiguration> = emptyList(),
+    val promotions: List<PromotionLevelConfiguration> = emptyList(),
 ) : PropertiesConfiguration
