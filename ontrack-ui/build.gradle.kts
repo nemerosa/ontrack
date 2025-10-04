@@ -84,6 +84,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-queue"))
     runtimeOnly(project(":ontrack-extension-workflows"))
     runtimeOnly(project(":ontrack-extension-environments"))
+    runtimeOnly(project(":ontrack-extension-config"))
 }
 
 configure<SpringBootExtension> {
