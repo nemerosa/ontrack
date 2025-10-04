@@ -1,0 +1,15 @@
+[[property-net.nemerosa.ontrack.extension.scm.branching.BranchingModelPropertyType]]
+==== Branching Model
+
+ID: `net.nemerosa.ontrack.extension.scm.branching.BranchingModelPropertyType`
+
+Defines the branching model used by a project
+
+Scope:
+
+* project
+
+Configuration:
+
+* **patterns** - List - required - List of branch patterns (name & value). The name is the category of branch and the value is a regular expression on the SCM branch.
+
