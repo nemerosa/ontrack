@@ -92,7 +92,11 @@ export default function PropertiesSection({entityType, entityId}) {
                         return {
                             title: <PropertyTitle entityType={entityType} entityId={entityId} property={property}/>,
                             icon: <PropertyIcon property={property}/>,
-                            content: <PropertyComponent property={property}/>,
+                            content: <PropertyComponent
+                                property={property}
+                                entityType={entityType}
+                                entityId={entityId}
+                            />,
                         }
                     })
             }
