@@ -19,6 +19,7 @@ class CoreConfigurationServiceImpl(
     private val securityService: SecurityService,
     private val structureService: StructureService,
     private val propertyService: PropertyService,
+    private val buildDisplayNameService: BuildDisplayNameService,
 ) : CoreConfigurationService {
 
     override fun configureProject(
@@ -114,7 +115,22 @@ class CoreConfigurationServiceImpl(
 
         // TODO Configuration of the build SCM (using the SCM engine)
 
+        // Build display name
+        configureBuildDisplayName(build, configuration, ciEngine, env)
+
         return build
+    }
+
+    private fun configureBuildDisplayName(
+        build: Build,
+        configuration: ConfigurationInput,
+        ciEngine: CIEngine,
+        env: Map<String, String>
+    ) {
+        val version = ciEngine.getBuildVersion(env)
+        if (!version.isNullOrBlank()) {
+            buildDisplayNameService.setDisplayName(build = build, displayName = version, override = false)
+        }
     }
 
     private fun getBuildName(

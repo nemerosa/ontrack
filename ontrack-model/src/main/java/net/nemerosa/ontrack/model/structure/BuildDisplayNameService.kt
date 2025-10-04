@@ -23,4 +23,11 @@ interface BuildDisplayNameService {
         onlyDisplayName: Boolean,
     ): Build?
 
+    /**
+     * Sets a display name for a build.
+     *
+     * If [override] is `false`, the display name will be set only if not already set.
+     */
+    fun setDisplayName(build: Build, displayName: String, override: Boolean)
+
 }

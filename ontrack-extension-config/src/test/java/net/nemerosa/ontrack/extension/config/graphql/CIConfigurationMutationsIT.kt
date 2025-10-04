@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.config.graphql
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.BuildDisplayNameService
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.jvm.optionals.getOrNull
@@ -11,7 +10,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-@Disabled("WIP")
 class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
 
     @Autowired

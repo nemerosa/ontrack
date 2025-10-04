@@ -25,6 +25,25 @@ class LabelBuildDisplayNameExtension(
         return displayProperty?.useLabel ?: false
     }
 
+    override fun setDisplayName(
+        build: Build,
+        displayName: String,
+        override: Boolean
+    ): Boolean {
+        val release = propertyService.getPropertyValue(build, ReleasePropertyType::class.java)
+        if (release == null || override) {
+            propertyService.editProperty(
+                build,
+                ReleasePropertyType::class.java,
+                ReleaseProperty(
+                    name = displayName
+                )
+            )
+            return true
+        }
+        return false
+    }
+
     override fun findBuildByDisplayName(project: Project, name: String, onlyDisplayName: Boolean): Build? =
         // Looking first with release property
         structureService.buildSearch(
