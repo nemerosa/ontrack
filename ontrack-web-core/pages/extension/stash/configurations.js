@@ -83,7 +83,7 @@ export default function BitbucketServerConfigurationsPage() {
         <>
             <ConfigurationPage
                 pageTitle="Bitbucket Server configurations"
-                configurationType="stash"
+                configurationType="bitbucket-server"
                 columns={columns}
                 dialogItems={dialogItems}
             >

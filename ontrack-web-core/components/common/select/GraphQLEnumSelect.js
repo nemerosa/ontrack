@@ -7,6 +7,7 @@ export default function GraphQLEnumSelect({
                                               onChange,
                                               mode,
                                               query,
+                                              queryVariables = {},
                                               queryNode,
                                               entryValue,
                                               entryLabel,
@@ -15,6 +16,7 @@ export default function GraphQLEnumSelect({
     const {data: options, loading} = useQuery(
         query,
         {
+            variables: queryVariables,
             initialData: [],
             dataFn: data => data[queryNode].map(it => ({
                 value: entryValue ? entryValue(it) : it,
