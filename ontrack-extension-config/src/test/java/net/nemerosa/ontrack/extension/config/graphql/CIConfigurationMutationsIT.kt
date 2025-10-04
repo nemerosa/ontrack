@@ -30,8 +30,8 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                 ) {
                     configureBuild(input: {
                         config: ${'$'}config,
-                        ci: "jenkins",
-                        scm: "github",
+                        ci: "generic",
+                        scm: "mock",
                         env: [{
                             name: "GIT_URL"
                             value: "https://github.com/yontrack/yontrack.git"
@@ -48,6 +48,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                     }) {
                         errors {
                             message
+                            exception
                         }
                         build {
                             id
