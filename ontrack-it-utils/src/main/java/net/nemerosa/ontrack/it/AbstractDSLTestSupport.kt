@@ -636,30 +636,6 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         }
     }
 
-    /**
-     * Saving current "main build links" settings, runs some code and restores the format settings
-     */
-    protected fun withMainBuildLinksSettings(code: () -> Unit) = withSettings<MainBuildLinksConfig>(code)
-
-    /**
-     * Settings "main build links" settings
-     */
-    protected fun setMainBuildLinksSettings(vararg labels: String) {
-        asAdmin().execute {
-            settingsManagerService.saveSettings(
-                MainBuildLinksConfig(
-                    labels.toList()
-                )
-            )
-        }
-    }
-
-    /**
-     * Getting "main build links" settings
-     */
-    protected val mainBuildLinksSettings: List<String>
-        get() = settingsService.getCachedSettings(MainBuildLinksConfig::class.java).labels
-
     protected fun Branch.assertBuildSearch(filterBuilder: (StandardFilterProviderDataBuilder) -> Unit): BuildSearchAssertion {
         val data = buildFilterService.standardFilterProviderData(10)
         filterBuilder(data)
