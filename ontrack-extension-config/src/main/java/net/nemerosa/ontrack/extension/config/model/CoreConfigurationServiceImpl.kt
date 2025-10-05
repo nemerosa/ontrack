@@ -20,6 +20,7 @@ class CoreConfigurationServiceImpl(
     private val structureService: StructureService,
     private val propertyService: PropertyService,
     private val buildDisplayNameService: BuildDisplayNameService,
+    private val validationDataTypeService: ValidationDataTypeService,
 ) : CoreConfigurationService {
 
     override fun configureProject(
@@ -77,10 +78,11 @@ class CoreConfigurationServiceImpl(
                 )
             )
 
+        configureValidations(branch, configuration.validations)
+
         configureProperties(
             entity = branch,
             defaults = configuration.properties,
-            // TODO Custom properties
         )
 
         // TODO Configuration of the branch SCM (using the SCM engine)
@@ -112,7 +114,6 @@ class CoreConfigurationServiceImpl(
         configureProperties(
             entity = branch,
             defaults = configuration.properties,
-            // TODO Custom properties
         )
 
         // TODO Configuration of the build SCM (using the SCM engine)
@@ -121,6 +122,33 @@ class CoreConfigurationServiceImpl(
         configureBuildDisplayName(build, configuration, ciEngine, env)
 
         return build
+    }
+
+    private fun configureValidations(
+        branch: Branch,
+        validations: List<ValidationStampConfiguration>,
+    ) {
+        validations.forEach { config ->
+            val vs = structureService.setupValidationStamp(
+                branch = branch,
+                validationStampName = config.name,
+                validationStampDescription = config.description,
+            )
+            if (config.validationStampDataConfiguration != null) {
+                structureService.saveValidationStamp(
+                    vs.withDataType(
+                        validationDataTypeService.validateValidationDataTypeConfig<Any>(
+                            config.validationStampDataConfiguration.type,
+                            config.validationStampDataConfiguration.data
+                        )
+                    )
+                )
+            } else {
+                structureService.saveValidationStamp(
+                    vs.withDataType(null)
+                )
+            }
+        }
     }
 
     private fun configureBuildDisplayName(
