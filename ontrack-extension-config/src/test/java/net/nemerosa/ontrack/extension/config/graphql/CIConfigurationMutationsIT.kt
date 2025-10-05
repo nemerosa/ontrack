@@ -3,6 +3,9 @@ package net.nemerosa.ontrack.extension.config.graphql
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
+import net.nemerosa.ontrack.extension.scm.mock.MockSCMBranchPropertyType
+import net.nemerosa.ontrack.extension.scm.mock.MockSCMBuildCommitPropertyType
+import net.nemerosa.ontrack.extension.scm.mock.MockSCMProjectPropertyType
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
@@ -42,6 +45,9 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                             name: "BRANCH_NAME"
                             value: "release/5.1"
                         }, {
+                            name: "BUILD_REVISION"
+                            value: "abcd123"
+                        }, {
                             name: "BUILD_NUMBER"
                             value: "23"
                         }, {
@@ -67,19 +73,37 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                     structureService.findProjectByName("yontrack").getOrNull(),
                     "Project has been created"
                 ) { project ->
-                    // TODO Project SCM config
+                    // Project SCM config
+                    assertNotNull(
+                        propertyService.getPropertyValue(project, MockSCMProjectPropertyType::class.java),
+                        "Project SCM config has been set"
+                    ) {
+                        assertEquals("yontrack", it.name)
+                    }
                     // Branch
                     assertNotNull(
                         structureService.findBranchByName(project.name, "release-5.1").getOrNull(),
                         "Branch has been created"
                     ) { branch ->
-                        // TODO Branch SCM config
+                        // Branch SCM config
+                        assertNotNull(
+                            propertyService.getPropertyValue(branch, MockSCMBranchPropertyType::class.java),
+                            "Branch SCM config has been set"
+                        ) {
+                            assertEquals("release/5.1", it.name)
+                        }
                         // Build
                         assertNotNull(
                             structureService.getLastBuild(branch.id).getOrNull(),
                             "Build has been created"
                         ) { build ->
-                            // TODO Build SCM config
+                            // Build SCM config
+                            assertNotNull(
+                                propertyService.getPropertyValue(build, MockSCMBuildCommitPropertyType::class.java),
+                                "Build SCM config has been set"
+                            ) {
+                                assertEquals("abcd123", it.id)
+                            }
                             // Build ID
                             assertEquals(buildId, build.id())
                             // Build name
@@ -147,7 +171,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
             """,
             mapOf("config" to config)
         ) { data ->
-            checkGraphQLUserErrors(data, "configureBuild") { payload ->
+            checkGraphQLUserErrors(data, "configureBuild") { _ ->
                 assertNotNull(
                     structureService.findProjectByName("yontrack").getOrNull(),
                     "Project has been created"
@@ -234,7 +258,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
             """,
             mapOf("config" to config)
         ) { data ->
-            checkGraphQLUserErrors(data, "configureBuild") { payload ->
+            checkGraphQLUserErrors(data, "configureBuild") { _ ->
                 assertNotNull(
                     structureService.findProjectByName("yontrack").getOrNull(),
                     "Project has been created"
@@ -344,7 +368,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
             """,
             mapOf("config" to config)
         ) { data ->
-            checkGraphQLUserErrors(data, "configureBuild") { payload ->
+            checkGraphQLUserErrors(data, "configureBuild") { _ ->
                 assertNotNull(
                     structureService.findProjectByName("yontrack").getOrNull(),
                     "Project has been created"

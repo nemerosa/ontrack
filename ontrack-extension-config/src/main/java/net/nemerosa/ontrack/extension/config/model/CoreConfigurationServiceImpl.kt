@@ -46,13 +46,14 @@ class CoreConfigurationServiceImpl(
             structureService.newProject(Project.of(NameDescription(name = projectName, description = null)))
         }
 
+        // Configuration of the project SCM (using the SCM engine)
+        scmEngine.configureProject(project, configuration, env)
+
         // Configuration of properties
         configureProperties(
             entity = project,
             defaults = configuration.properties,
         )
-
-        // TODO Configuration of the project SCM (using the SCM engine)
 
         return project
     }
@@ -82,12 +83,13 @@ class CoreConfigurationServiceImpl(
         configureValidations(branch, configuration.validations)
         configurePromotions(branch, configuration.promotions)
 
+        // Configuration of the branch SCM (using the SCM engine)
+        scmEngine.configureBranch(branch, configuration, env, rawBranchName)
+
         configureProperties(
             entity = branch,
             defaults = configuration.properties,
         )
-
-        // TODO Configuration of the branch SCM (using the SCM engine)
 
         return branch
     }
@@ -113,12 +115,13 @@ class CoreConfigurationServiceImpl(
                 )
             )
 
+        // Configuration of the build SCM (using the SCM engine)
+        scmEngine.configureBuild(build, configuration, env)
+
         configureProperties(
             entity = branch,
             defaults = configuration.properties,
         )
-
-        // TODO Configuration of the build SCM (using the SCM engine)
 
         // Build display name
         configureBuildDisplayName(build, configuration, ciEngine, env)
