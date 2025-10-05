@@ -21,6 +21,7 @@ class CoreConfigurationServiceImpl(
     private val propertyService: PropertyService,
     private val buildDisplayNameService: BuildDisplayNameService,
     private val validationDataTypeService: ValidationDataTypeService,
+    private val promotionLevelConfigurators: List<PromotionLevelConfigurator>,
 ) : CoreConfigurationService {
 
     override fun configureProject(
@@ -79,6 +80,7 @@ class CoreConfigurationServiceImpl(
             )
 
         configureValidations(branch, configuration.validations)
+        configurePromotions(branch, configuration.promotions)
 
         configureProperties(
             entity = branch,
@@ -147,6 +149,28 @@ class CoreConfigurationServiceImpl(
                 structureService.saveValidationStamp(
                     vs.withDataType(null)
                 )
+            }
+        }
+    }
+
+    private fun configurePromotions(
+        branch: Branch,
+        promotions: List<PromotionLevelConfiguration>,
+    ) {
+        promotions.forEach { config ->
+            val pl = structureService.findPromotionLevelByName(
+                project = branch.project.name,
+                branch = branch.name,
+                promotionLevel = config.name
+            ).getOrNull() ?: structureService.newPromotionLevel(
+                PromotionLevel.of(
+                    branch,
+                    NameDescription(name = config.name, description = config.description)
+                )
+            )
+            // Auto promotion property is not accessible through the API (general extension not visible)
+            promotionLevelConfigurators.forEach { configurator ->
+                configurator.configure(pl, config)
             }
         }
     }

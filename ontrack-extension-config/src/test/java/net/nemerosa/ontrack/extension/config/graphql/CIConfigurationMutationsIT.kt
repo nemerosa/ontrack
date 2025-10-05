@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.config.graphql
 
+import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
@@ -145,7 +146,6 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
             mapOf("config" to config)
         ) { data ->
             checkGraphQLUserErrors(data, "configureBuild") { payload ->
-                val buildId = payload.path("build").path("id").asInt()
                 assertNotNull(
                     structureService.findProjectByName("yontrack").getOrNull(),
                     "Project has been created"
@@ -169,6 +169,116 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                                 mapOf("warningIfSkipped" to false, "failWhenNoResults" to false).asJson(),
                                 it.config.asJson()
                             )
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Branch promotions`() {
+        val config = """
+            configuration:
+              defaults:
+                  branch:
+                    validations:
+                      build:
+                        tests: {}
+                    promotions:
+                      BRONZE:
+                        validations:
+                          - build
+                      SILVER:
+                        promotions:
+                          - BRONZE
+                        validations:
+                          - scan
+        """.trimIndent()
+        run(
+            """
+                mutation ConfigureBuild(
+                    ${'$'}config: String!
+                ) {
+                    configureBuild(input: {
+                        config: ${'$'}config,
+                        ci: "generic",
+                        scm: "mock",
+                        env: [{
+                            name: "PROJECT_NAME"
+                            value: "yontrack"
+                        }, {
+                            name: "BRANCH_NAME"
+                            value: "release/5.1"
+                        }, {
+                            name: "BUILD_NUMBER"
+                            value: "23"
+                        }, {
+                            name: "VERSION"
+                            value: "5.1.12"
+                        }]
+                    }) {
+                        errors {
+                            message
+                            exception
+                        }
+                        build {
+                            id
+                        }
+                    }
+                }
+            """,
+            mapOf("config" to config)
+        ) { data ->
+            checkGraphQLUserErrors(data, "configureBuild") { payload ->
+                assertNotNull(
+                    structureService.findProjectByName("yontrack").getOrNull(),
+                    "Project has been created"
+                ) { project ->
+                    // Branch
+                    assertNotNull(
+                        structureService.findBranchByName(project.name, "release-5.1").getOrNull(),
+                        "Branch has been created"
+                    ) { branch ->
+                        // Checks the promotions
+                        val promotions = structureService.getPromotionLevelListForBranch(branch.id)
+                        assertEquals(2, promotions.size, "Two promotions created")
+
+                        assertNotNull(
+                            promotions.first { it.name == "BRONZE" },
+                            "BRONZE promotion has been created"
+                        ) { pl ->
+                            assertNotNull(
+                                propertyService.getPropertyValue(pl, AutoPromotionPropertyType::class.java),
+                                "Auto promotion property has been set"
+                            ) { p ->
+                                assertEquals(
+                                    listOf("build"),
+                                    p.validationStamps.map { it.name }
+                                )
+                                assertEquals(0, p.promotionLevels.size)
+                            }
+                        }
+
+                        assertNotNull(
+                            promotions.first { it.name == "SILVER" },
+                            "SILVER promotion has been created"
+                        ) { pl ->
+                            assertNotNull(
+                                propertyService.getPropertyValue(pl, AutoPromotionPropertyType::class.java),
+                                "Auto promotion property has been set"
+                            ) { p ->
+                                assertEquals(
+                                    listOf("scan"),
+                                    p.validationStamps.map { it.name }
+                                )
+                                assertEquals(
+                                    listOf("BRONZE"),
+                                    p.promotionLevels.map { it.name }
+                                )
+                            }
                         }
                     }
                 }
