@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.config.ci
 
+import net.nemerosa.ontrack.extension.config.ci.conditions.ConditionRegistry
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineNotFoundException
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineRegistry
@@ -17,6 +18,7 @@ class CIConfigurationServiceImpl(
     private val ciConfigurationParser: CIConfigurationParser,
     private val ciEngineRegistry: CIEngineRegistry,
     private val scmEngineRegistry: SCMEngineRegistry,
+    private val conditionRegistry: ConditionRegistry,
     private val coreConfigurationService: CoreConfigurationService,
 ) : CIConfigurationService {
 
@@ -35,24 +37,21 @@ class CIConfigurationServiceImpl(
         // Converting the environment into a map
         val env = env.associate { it.name to it.value }
 
+        // Getting the custom configurations which match the current environment
+        val customConfigs = matchingConfigs(configuration, ciEngine, env)
+
         // Consolidation of the configurations
         val projectConfiguration = consolidateProjectConfiguration(
             input = configuration,
-            ciEngine = ciEngine,
-            scmEngine = scmEngine,
-            env = env,
+            customConfigs = customConfigs,
         )
         val branchConfiguration = consolidateBranchConfiguration(
             input = configuration,
-            ciEngine = ciEngine,
-            scmEngine = scmEngine,
-            env = env,
+            customConfigs = customConfigs,
         )
         val buildConfiguration = consolidateBuildConfiguration(
             input = configuration,
-            ciEngine = ciEngine,
-            scmEngine = scmEngine,
-            env = env,
+            customConfigs = customConfigs,
         )
 
         // Launching the project configuration
@@ -85,32 +84,56 @@ class CIConfigurationServiceImpl(
 
     private fun consolidateProjectConfiguration(
         input: ConfigurationInput,
-        ciEngine: CIEngine,
-        scmEngine: SCMEngine,
-        env: Map<String, String>
+        customConfigs: List<CustomConfig>,
     ): ProjectConfiguration {
-        // TODO Use the conditions
-        return input.configuration.defaults.project
+        return customConfigs
+            .filter { it.project.isNotEmpty() }
+            .fold(input.configuration.defaults.project) { acc, config ->
+                acc.merge(config.project)
+            }
     }
 
     private fun consolidateBranchConfiguration(
         input: ConfigurationInput,
-        ciEngine: CIEngine,
-        scmEngine: SCMEngine,
-        env: Map<String, String>
+        customConfigs: List<CustomConfig>,
     ): BranchConfiguration {
-        // TODO Use the conditions
-        return input.configuration.defaults.branch
+        return customConfigs
+            .filter { it.branch.isNotEmpty() }
+            .fold(input.configuration.defaults.branch) { acc, config ->
+                acc.merge(config.branch)
+            }
     }
 
     private fun consolidateBuildConfiguration(
         input: ConfigurationInput,
-        ciEngine: CIEngine,
-        scmEngine: SCMEngine,
-        env: Map<String, String>
+        customConfigs: List<CustomConfig>,
     ): BuildConfiguration {
-        // TODO Use the conditions
-        return input.configuration.defaults.build
+        return customConfigs
+            .filter { it.build.isNotEmpty() }
+            .fold(input.configuration.defaults.build) { acc, config ->
+                acc.merge(config.build)
+            }
+    }
+
+    private fun matchingConfigs(
+        input: ConfigurationInput,
+        ciEngine: CIEngine,
+        env: Map<String, String>
+    ): List<CustomConfig> = input.configuration.custom.configs.filter { customConfig ->
+        customConfig.conditions.all {
+            matchesCondition(ciEngine, it, env)
+        }
+    }
+
+    private fun matchesCondition(
+        ciEngine: CIEngine,
+        conditionConfig: ConditionConfig,
+        env: Map<String, String>
+    ): Boolean {
+        // Gets the condition interface
+        val condition = conditionRegistry.getCondition(conditionConfig.name)
+        // Checks the condition
+        return condition.matches(ciEngine, conditionConfig.config, env)
     }
 
     private fun findSCMEngine(

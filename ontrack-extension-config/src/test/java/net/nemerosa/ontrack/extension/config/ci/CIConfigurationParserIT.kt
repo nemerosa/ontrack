@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.config.ci
 
+import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.extension.config.model.*
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
@@ -132,6 +133,73 @@ class CIConfigurationParserIT : AbstractDSLTestSupport() {
                                     data = mapOf(
                                         "name" to "${'$'}{env.VERSION}"
                                     ).asJson()
+                                ),
+                            )
+                        )
+                    )
+                )
+            ),
+            config
+        )
+    }
+
+    @Test
+    fun `Parsing of configuration with custom conditions`() {
+        val config = parser.parseConfig(
+            """
+                configuration:
+                  defaults:
+                    branch:
+                      validations:
+                        acceptance:
+                          tests:
+                            warningIfSkipped: true
+                  custom:
+                    configs:
+                      - conditions:
+                          branch: "release.*"
+                        branch:
+                          validations:
+                            deployment: {}
+            """.trimIndent()
+        )
+        assertEquals(
+            ConfigurationInput(
+                configuration = RootConfiguration(
+                    defaults = Configuration(
+                        branch = BranchConfiguration(
+                            validations = listOf(
+                                ValidationStampConfiguration(
+                                    name = "acceptance",
+                                    description = "",
+                                    validationStampDataConfiguration = ValidationStampDataConfiguration(
+                                        type = "net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType",
+                                        data = mapOf(
+                                            "warningIfSkipped" to true,
+                                            "failWhenNoResults" to false,
+                                        ).asJson()
+                                    )
+                                )
+                            ),
+                        ),
+                    ),
+                    custom = Custom(
+                        configs = listOf(
+                            CustomConfig(
+                                conditions = listOf(
+                                    ConditionConfig(
+                                        name = "branch",
+                                        config = TextNode("release.*")
+                                    )
+                                ),
+                                branch = BranchConfiguration(
+                                    validations = listOf(
+                                        ValidationStampConfiguration(
+                                            name = "deployment",
+                                            description = "",
+                                            validationStampDataConfiguration = null,
+                                        )
+                                    ),
                                 ),
                             )
                         )

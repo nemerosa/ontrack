@@ -47,6 +47,26 @@ class CIConfigurationParserImpl(
     private fun convertRootConfiguration(ciConfigRoot: CIConfigRoot): RootConfiguration {
         return RootConfiguration(
             defaults = convertConfiguration(ciConfigRoot.defaults),
+            custom = convertCustom(ciConfigRoot.custom),
+        )
+    }
+
+    private fun convertCustom(custom: CICustom): Custom {
+        return Custom(
+            configs = custom.configs.map {
+                convertCustomConfig(it)
+            }
+        )
+    }
+
+    private fun convertCustomConfig(customConfig: CICustomConfig): CustomConfig {
+        return CustomConfig(
+            conditions = customConfig.conditions.map { (name, data) ->
+                ConditionConfig(name, data)
+            },
+            project = convertProject(customConfig.project),
+            branch = convertBranch(customConfig.branch),
+            build = convertBuild(customConfig.build),
         )
     }
 

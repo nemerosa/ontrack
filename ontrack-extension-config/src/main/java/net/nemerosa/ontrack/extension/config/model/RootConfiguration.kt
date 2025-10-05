@@ -6,5 +6,6 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 data class RootConfiguration(
     @APIDescription("Default configuration to use, outside of any customization.")
     val defaults: Configuration = Configuration(),
-    // TODO Custom configurations
+    @APIDescription("Customization")
+    val custom: Custom = Custom()
 )

@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.config.graphql
 
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
+import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
+import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
@@ -279,6 +281,114 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                                     p.promotionLevels.map { it.name }
                                 )
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Branch validations with positive condition`() {
+        val config = """
+            configuration:
+              defaults:
+                  branch:
+                    validations:
+                      build:
+                        tests: {}
+              custom:
+                configs:
+                  - conditions:
+                      branch: release.*
+                    branch:
+                      validations:
+                        deploy-tests:
+                          tests:
+                            warningIfSkipped: true
+        """.trimIndent()
+        run(
+            """
+                mutation ConfigureBuild(
+                    ${'$'}config: String!
+                ) {
+                    configureBuild(input: {
+                        config: ${'$'}config,
+                        ci: "generic",
+                        scm: "mock",
+                        env: [{
+                            name: "PROJECT_NAME"
+                            value: "yontrack"
+                        }, {
+                            name: "BRANCH_NAME"
+                            value: "release/5.1"
+                        }, {
+                            name: "BUILD_NUMBER"
+                            value: "23"
+                        }, {
+                            name: "VERSION"
+                            value: "5.1.12"
+                        }]
+                    }) {
+                        errors {
+                            message
+                            exception
+                        }
+                        build {
+                            id
+                        }
+                    }
+                }
+            """,
+            mapOf("config" to config)
+        ) { data ->
+            checkGraphQLUserErrors(data, "configureBuild") { payload ->
+                assertNotNull(
+                    structureService.findProjectByName("yontrack").getOrNull(),
+                    "Project has been created"
+                ) { project ->
+                    // Branch
+                    assertNotNull(
+                        structureService.findBranchByName(project.name, "release-5.1").getOrNull(),
+                        "Branch has been created"
+                    ) { branch ->
+                        val vss = structureService.getValidationStampListForBranch(branch.id)
+                        assertEquals(2, vss.size, "Two validation stamps created")
+
+                        assertNotNull(
+                            vss.first { it.name == "build" },
+                            "Build validation stamp has been created"
+                        ) {
+                            assertEquals(
+                                TestSummaryValidationDataType::class.qualifiedName,
+                                it.dataType?.descriptor?.id
+                            )
+                            assertEquals(
+                                TestSummaryValidationConfig(
+                                    warningIfSkipped = false,
+                                    failWhenNoResults = false,
+                                ),
+                                it.dataType?.config
+                            )
+                        }
+
+                        assertNotNull(
+                            vss.first { it.name == "deploy-tests" },
+                            "Deployment tests validation stamp has been created"
+                        ) {
+                            assertEquals(
+                                TestSummaryValidationDataType::class.qualifiedName,
+                                it.dataType?.descriptor?.id
+                            )
+                            assertEquals(
+                                TestSummaryValidationConfig(
+                                    warningIfSkipped = true,
+                                    failWhenNoResults = false,
+                                ),
+                                it.dataType?.config
+                            )
                         }
                     }
                 }
