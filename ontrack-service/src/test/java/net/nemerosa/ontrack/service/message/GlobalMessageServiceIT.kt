@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.message
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.message.GlobalMessage
 import net.nemerosa.ontrack.model.message.GlobalMessageService
 import net.nemerosa.ontrack.model.message.Message
 import net.nemerosa.ontrack.model.message.MessageType
@@ -31,10 +32,11 @@ class GlobalMessageServiceIT : AbstractDSLTestSupport() {
             "Some message",
             MessageType.ERROR
         )
-        val messages = globalMessageService.globalMessages
+        val messages = globalMessageService.globalMessages.filter { it.featureId == "test" }
         assertEquals(
             listOf(
-                Message(
+                GlobalMessage(
+                    "test",
                     "Some message",
                     MessageType.ERROR
                 )
@@ -54,14 +56,16 @@ class GlobalMessageServiceIT : AbstractDSLTestSupport() {
             "License has expired.",
             MessageType.ERROR
         )
-        val messages = globalMessageService.globalMessages
+        val messages = globalMessageService.globalMessages.filter { it.featureId == "test" }
         assertEquals(
             listOf(
-                Message(
+                GlobalMessage(
+                    "test",
                     "License has expired.",
                     MessageType.ERROR
                 ),
-                Message(
+                GlobalMessage(
+                    "test",
                     "License is about expire.",
                     MessageType.WARNING
                 ),

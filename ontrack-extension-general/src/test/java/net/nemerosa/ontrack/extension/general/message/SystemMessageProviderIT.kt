@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.general.message
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.message.GlobalMessage
 import net.nemerosa.ontrack.model.message.GlobalMessageService
-import net.nemerosa.ontrack.model.message.Message
 import net.nemerosa.ontrack.model.message.MessageType
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,7 +19,10 @@ internal class SystemMessageProviderIT : AbstractDSLTestSupport() {
         asAdmin {
             withCleanSettings<SystemMessageSettings> {
                 val messages = globalMessageService.globalMessages
-                assertTrue(messages.isEmpty(), "No global message")
+                assertTrue(
+                    messages.none { it.featureId == "general" },
+                    "No global message: $messages"
+                )
             }
         }
     }
@@ -37,12 +40,13 @@ internal class SystemMessageProviderIT : AbstractDSLTestSupport() {
                 val messages = globalMessageService.globalMessages
                 assertEquals(
                     listOf(
-                        Message(
+                        GlobalMessage(
+                            featureId = "general",
                             content = "License has expired.",
                             type = MessageType.ERROR
                         )
                     ),
-                    messages
+                    messages.filter { it.featureId == "general" }
                 )
             }
         }

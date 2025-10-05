@@ -5,6 +5,6 @@ interface GlobalMessageService {
     /**
      * Gets the list of global messages
      */
-    val globalMessages: List<Message>
+    val globalMessages: List<GlobalMessage>
 
 }
