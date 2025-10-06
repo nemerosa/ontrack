@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-license"))
     implementation(project(":ontrack-extension-casc"))
+    implementation(project(":ontrack-extension-auto-versioning"))
     implementation(project(":ontrack-repository"))
     implementation(project(":ontrack-repository-support"))
 

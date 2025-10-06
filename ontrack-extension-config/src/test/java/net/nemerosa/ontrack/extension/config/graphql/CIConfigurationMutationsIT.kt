@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.config.graphql
 
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.extension.scm.mock.MockSCMProjectPropertyType
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BuildDisplayNameService
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,6 +24,9 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var buildDisplayNameService: BuildDisplayNameService
+
+    @Autowired
+    private lateinit var autoVersioningConfigurationService: AutoVersioningConfigurationService
 
     @Test
     @AsAdminTest
@@ -489,6 +494,99 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                 }
             }
         }
+    }
 
+    @Test
+    @AsAdminTest
+    fun `Auto-versioning setup`() {
+        withConfigAndBranch(
+            """
+                version: v1
+                configuration:
+                  defaults:
+                    branch:
+                      autoVersioning:
+                        configurations:
+                          - sourceProject: my-project
+                            sourceBranch: main
+                            sourcePromotion: GOLD
+                            targetPath: versions.properties
+                            targetProperty: yontrackVersion
+                            validationStamp: my-chart-validator
+            """.trimIndent()
+        ) { branch ->
+            assertNotNull(
+                autoVersioningConfigurationService.getAutoVersioning(branch),
+                "Auto-versioning config has been set"
+            ) { av ->
+                val avConfig = av.configurations.single()
+                avConfig.apply {
+                    assertEquals("my-project", sourceProject)
+                    assertEquals("main", sourceBranch)
+                    assertEquals("GOLD", sourcePromotion)
+                    assertEquals("versions.properties", targetPath)
+                    assertEquals("yontrackVersion", targetProperty)
+                    assertEquals("my-chart-validator", validationStamp)
+                }
+            }
+        }
+    }
+
+    private fun withConfigAndBranch(yaml: String, code: (branch: Branch) -> Unit) =
+        withConfig(yaml) {
+            assertNotNull(
+                structureService.findProjectByName("yontrack").getOrNull(),
+                "Project has been created"
+            ) { project ->
+                // Branch
+                assertNotNull(
+                    structureService.findBranchByName(project.name, "release-5.1").getOrNull(),
+                    "Branch has been created"
+                ) { branch ->
+                    code(branch)
+                }
+            }
+        }
+
+    private fun withConfig(yaml: String, code: () -> Unit) {
+        run(
+            """
+                mutation ConfigureBuild(
+                    ${'$'}config: String!
+                ) {
+                    configureBuild(input: {
+                        config: ${'$'}config,
+                        ci: "generic",
+                        scm: "mock",
+                        env: [{
+                            name: "PROJECT_NAME"
+                            value: "yontrack"
+                        }, {
+                            name: "BRANCH_NAME"
+                            value: "release/5.1"
+                        }, {
+                            name: "BUILD_NUMBER"
+                            value: "23"
+                        }, {
+                            name: "VERSION"
+                            value: "5.1.12"
+                        }]
+                    }) {
+                        errors {
+                            message
+                            exception
+                        }
+                        build {
+                            id
+                        }
+                    }
+                }
+            """,
+            mapOf("config" to yaml)
+        ) { data ->
+            checkGraphQLUserErrors(data, "configureBuild") { _ ->
+                code()
+            }
+        }
     }
 }

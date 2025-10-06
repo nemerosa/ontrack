@@ -96,6 +96,7 @@ class CIConfigurationParserImpl(
             properties = convertProperties(branch),
             validations = convertValidations(branch.validations),
             promotions = convertPromotions(branch.promotions),
+            autoVersioning = branch.autoVersioning,
         )
     }
 

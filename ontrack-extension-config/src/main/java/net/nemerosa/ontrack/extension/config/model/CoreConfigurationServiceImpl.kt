@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.config.model
 
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.license.ConfigurationLicense
 import net.nemerosa.ontrack.extension.config.scm.SCMEngine
@@ -22,6 +24,7 @@ class CoreConfigurationServiceImpl(
     private val buildDisplayNameService: BuildDisplayNameService,
     private val validationDataTypeService: ValidationDataTypeService,
     private val promotionLevelConfigurators: List<PromotionLevelConfigurator>,
+    private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
 ) : CoreConfigurationService {
 
     override fun configureProject(
@@ -82,6 +85,7 @@ class CoreConfigurationServiceImpl(
 
         configureValidations(branch, configuration.validations)
         configurePromotions(branch, configuration.promotions)
+        configureAutoVersioning(branch, configuration.autoVersioning)
 
         // Configuration of the branch SCM (using the SCM engine)
         scmEngine.configureBranch(branch, configuration, env, rawBranchName)
@@ -92,6 +96,13 @@ class CoreConfigurationServiceImpl(
         )
 
         return branch
+    }
+
+    private fun configureAutoVersioning(
+        branch: Branch,
+        autoVersioning: AutoVersioningConfig?
+    ) {
+        autoVersioningConfigurationService.setupAutoVersioning(branch, autoVersioning)
     }
 
     override fun configureBuild(
@@ -139,12 +150,13 @@ class CoreConfigurationServiceImpl(
                 validationStampName = config.name,
                 validationStampDescription = config.description,
             )
-            if (config.validationStampDataConfiguration != null) {
+            val validationStampDataConfiguration = config.validationStampDataConfiguration
+            if (validationStampDataConfiguration != null) {
                 structureService.saveValidationStamp(
                     vs.withDataType(
                         validationDataTypeService.validateValidationDataTypeConfig<Any>(
-                            config.validationStampDataConfiguration.type,
-                            config.validationStampDataConfiguration.data
+                            validationStampDataConfiguration.type,
+                            validationStampDataConfiguration.data
                         )
                     )
                 )
