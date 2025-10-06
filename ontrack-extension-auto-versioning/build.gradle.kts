@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     api(project(":ontrack-extension-support"))
+    api(project(":ontrack-extension-auto-versioning-config"))
 
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-scm"))

@@ -11,7 +11,7 @@ dependencies {
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-license"))
     implementation(project(":ontrack-extension-casc"))
-    implementation(project(":ontrack-extension-auto-versioning"))
+    implementation(project(":ontrack-extension-auto-versioning-config"))
     implementation(project(":ontrack-repository"))
     implementation(project(":ontrack-repository-support"))
 
@@ -25,6 +25,7 @@ dependencies {
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
+    testRuntimeOnly(project(":ontrack-extension-auto-versioning"))
 
     testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
