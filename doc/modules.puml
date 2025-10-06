@@ -1,0 +1,51 @@
+@startuml
+
+[common]
+
+[database] --> [model]
+
+[extension-api] --> [model]
+
+[extension-artifactory] --> [extension-support]
+
+[extension-auto-versioning] --> [extension-support] #blue;line.bold
+[extension-auto-versioning] --> [extension-auto-versioning-config] #blue;line.bold
+[extension-auto-versioning] --> [ui-graphql]
+[extension-auto-versioning] --> [extension-scm]
+[extension-auto-versioning] --> [extension-general]
+[extension-auto-versioning] --> [extension-casc]
+[extension-auto-versioning] --> [repository-support]
+[extension-auto-versioning] --> [extension-queue]
+[extension-auto-versioning] --> [extension-recordings]
+[extension-auto-versioning] --> [rabbitmq]
+[extension-auto-versioning] --> [extension-notifications]
+[extension-auto-versioning] --> [extension-workflows]
+
+[extension-auto-versioning-config] --> [extension-support]
+
+[extension-bitbucket-cloud] --> [extension-git] #blue;line.bold
+[extension-bitbucket-cloud] --> [extension-stash]
+[extension-bitbucket-cloud] --> [ui-graphql]
+[extension-bitbucket-cloud] --> [extension-casc]
+
+[extension-casc] --> [extension-support] #blue;line.bold
+[extension-casc] --> [extension-scm]
+[extension-casc] --> [ui-graphql]
+
+[extension-chart] --> [extension-support] #blue;line.bold
+[extension-chart] --> [ui-graphql]
+
+[extension-config] --> [ui-graphql]
+[extension-config] --> [extension-license]
+[extension-config] --> [extension-casc]
+[extension-config] --> [extension-auto-versioning-config]
+[extension-config] --> [repository]
+[extension-config] --> [repository-support]
+
+[extension-general] --> [extension-support] #blue;line.bold
+[extension-general] --> [ui-graphql]
+[extension-general] --> [extension-casc]
+[extension-general] --> [extension-indicators]
+[extension-general] --> [extension-config]
+
+@enduml
