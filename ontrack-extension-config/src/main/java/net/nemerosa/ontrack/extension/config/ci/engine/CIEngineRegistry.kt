@@ -11,4 +11,6 @@ class CIEngineRegistry(
 
     fun findCIEngine(name: String): CIEngine? = index[name]
 
+    val engines = index.values.toList()
+
 }

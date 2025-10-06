@@ -6,9 +6,8 @@ import org.springframework.stereotype.Component
 class GenericCIEngine : CIEngine {
     override val name: String = "generic"
 
-    override fun getProjectName(env: Map<String, String>): String? = env["PROJECT_NAME"]
-
-    override fun getBuildSuffix(env: Map<String, String>): String? = env["BUILD_NUMBER"]
-
-    override fun getBuildVersion(env: Map<String, String>): String? = env["VERSION"]
+    /**
+     * Never matching, it must be declared explicitly.
+     */
+    override fun matchesEnv(env: Map<String, String>): Boolean = false
 }

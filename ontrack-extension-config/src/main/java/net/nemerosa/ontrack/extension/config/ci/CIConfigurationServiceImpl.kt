@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.config.ci
 
 import net.nemerosa.ontrack.extension.config.ci.conditions.ConditionRegistry
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
+import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineNotDetectedException
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineNotFoundException
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineRegistry
 import net.nemerosa.ontrack.extension.config.model.*
@@ -30,12 +31,12 @@ class CIConfigurationServiceImpl(
     ): Build {
         // Parsing of the configuration YAML
         val configuration = ciConfigurationParser.parseConfig(yaml = config)
-        // Getting the CI engine from the configuration
-        val ciEngine = findCIEngine(ci, configuration)
-        // Getting the SCM engine from the configuration
-        val scmEngine = findSCMEngine(scm, configuration)
         // Converting the environment into a map
         val env = env.associate { it.name to it.value }
+        // Getting the CI engine from the configuration
+        val ciEngine = findCIEngine(ci, configuration, env)
+        // Getting the SCM engine from the configuration
+        val scmEngine = findSCMEngine(scm, configuration)
 
         // Getting the custom configurations which match the current environment
         val customConfigs = matchingConfigs(configuration, ciEngine, env)
@@ -149,10 +150,13 @@ class CIConfigurationServiceImpl(
 
     private fun findCIEngine(
         ci: String?,
-        configuration: ConfigurationInput
+        configuration: ConfigurationInput,
+        env: Map<String, String>,
     ) =
         if (ci.isNullOrBlank()) {
-            TODO("Getting the CI engine from the configuration")
+            ciEngineRegistry.engines.find {
+                it.matchesEnv(env)
+            } ?: throw CIEngineNotDetectedException()
         } else {
             ciEngineRegistry.findCIEngine(ci)
                 ?: throw CIEngineNotFoundException(ci)
