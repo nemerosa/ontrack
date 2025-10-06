@@ -5,7 +5,7 @@ on:
     branches:
       # - main
       # - release/*
-      - feature/*github*
+      - release/5.0-alpha
 
 concurrency: ci-${{ github.ref }}
 
