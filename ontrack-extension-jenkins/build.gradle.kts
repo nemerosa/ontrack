@@ -22,6 +22,7 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-casc")))
     testImplementation(testFixtures(project(":ontrack-extension-git")))
     testImplementation(testFixtures(project(":ontrack-extension-issues")))
+    testImplementation(testFixtures(project(":ontrack-extension-config")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

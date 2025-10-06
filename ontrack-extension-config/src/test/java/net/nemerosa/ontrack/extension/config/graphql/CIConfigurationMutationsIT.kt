@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.config.graphql
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationData
+import net.nemerosa.ontrack.extension.config.ConfigTestSupport
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
@@ -12,7 +12,7 @@ import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.BuildDisplayNameService
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,6 +23,9 @@ import kotlin.test.assertTrue
 import kotlin.test.fail
 
 class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
+
+    @Autowired
+    private lateinit var configTestSupport: ConfigTestSupport
 
     @Autowired
     private lateinit var buildDisplayNameService: BuildDisplayNameService
@@ -36,7 +39,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
     @Test
     @AsAdminTest
     fun `Default configuration`() {
-        withConfigAndBuild(
+        configTestSupport.withConfigAndBuild(
             """
                 version: v1
                 configuration: {}
@@ -69,7 +72,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
     @Test
     @AsAdminTest
     fun `Branch validations`() {
-        withConfigAndBranch(
+        configTestSupport.withConfigAndBranch(
             """
                 version: v1
                 configuration:
@@ -101,7 +104,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
     @Test
     @AsAdminTest
     fun `Branch promotions`() {
-        withConfigAndBranch(
+        configTestSupport.withConfigAndBranch(
             """
                 version: v1
                 configuration:
@@ -165,7 +168,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
     @Test
     @AsAdminTest
     fun `Branch validations with positive condition`() {
-        withConfigAndBranch(
+        configTestSupport.withConfigAndBranch(
             """
                 version: v1
                 configuration:
@@ -227,7 +230,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
     @Test
     @AsAdminTest
     fun `Project issue service identifier`() {
-        withConfigAndProject(
+        configTestSupport.withConfigAndProject(
             """
                 version: v1
                 configuration:
@@ -253,7 +256,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
     @Test
     @AsAdminTest
     fun `Auto-versioning setup`() {
-        withConfigAndBranch(
+        configTestSupport.withConfigAndBranch(
             """
                 version: v1
                 configuration:
@@ -307,7 +310,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                     """.trimIndent()
                 )
 
-                withConfigAndBuild(
+                configTestSupport.withConfigAndBuild(
                     """
                         version: v1
                         configuration:
@@ -347,95 +350,6 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                     }
 
                 }
-            }
-        }
-    }
-
-    private fun withConfigAndProject(
-        yaml: String,
-        scmBranch: String = "release/5.1",
-        code: (project: Project, payload: JsonNode) -> Unit,
-    ) =
-        withConfig(yaml, scmBranch = scmBranch) { payload ->
-            assertNotNull(
-                structureService.findProjectByName("yontrack").getOrNull(),
-                "Project has been created"
-            ) { project ->
-                code(project, payload)
-            }
-        }
-
-    private fun withConfigAndBranch(
-        yaml: String,
-        scmBranch: String = "release/5.1",
-        branch: String = NameDescription.escapeName(scmBranch),
-        code: (branch: Branch, payload: JsonNode) -> Unit,
-    ) =
-        withConfigAndProject(yaml, scmBranch = scmBranch) { project, payload ->
-            // Branch
-            assertNotNull(
-                structureService.findBranchByName(project.name, branch).getOrNull(),
-                "Branch has been created"
-            ) { branch ->
-                code(branch, payload)
-            }
-        }
-
-    private fun withConfigAndBuild(
-        yaml: String,
-        scmBranch: String = "release/5.1",
-        code: (build: Build, payload: JsonNode) -> Unit,
-    ) =
-        withConfigAndBranch(yaml, scmBranch = scmBranch) { branch, payload ->
-            assertNotNull(
-                structureService.getLastBuild(branch.id).getOrNull(),
-                "Build has been created"
-            ) { build ->
-                code(build, payload)
-            }
-        }
-
-    private fun withConfig(
-        yaml: String,
-        scmBranch: String = "release/5.1",
-        env: Map<String, String> = mapOf(
-            "PROJECT_NAME" to "yontrack",
-            "BRANCH_NAME" to scmBranch,
-            "BUILD_NUMBER" to "23",
-            "BUILD_REVISION" to "abcd123",
-            "VERSION" to "5.1.12",
-        ),
-        code: (payload: JsonNode) -> Unit,
-    ) {
-        run(
-            """
-                mutation ConfigureBuild(
-                    ${'$'}config: String!,
-                    ${'$'}env: [CIEnv!]!,
-                ) {
-                    configureBuild(input: {
-                        config: ${'$'}config,
-                        ci: "generic",
-                        scm: "mock",
-                        env: ${'$'}env,
-                    }) {
-                        errors {
-                            message
-                            exception
-                        }
-                        build {
-                            id
-                        }
-                    }
-                }
-            """,
-            mapOf(
-                "config" to yaml,
-                "env" to env.map { mapOf("name" to it.key, "value" to it.value) },
-            )
-        ) { data ->
-            checkGraphQLUserErrors(data, "configureBuild") { payload ->
-                code(payload)
             }
         }
     }
