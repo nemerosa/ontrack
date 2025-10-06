@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-indicators"))
     implementation(project(":ontrack-extension-auto-versioning"))
+    implementation(project(":ontrack-extension-config"))
     implementation("io.jsonwebtoken:jjwt-api")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("io.micrometer:micrometer-core")
