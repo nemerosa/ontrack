@@ -6,9 +6,7 @@ import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationServ
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.license.ConfigurationLicense
 import net.nemerosa.ontrack.extension.config.scm.SCMEngine
-import net.nemerosa.ontrack.model.security.ProjectConfig
-import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.security.isProjectFunctionGranted
+import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -52,6 +50,9 @@ class CoreConfigurationServiceImpl(
             structureService.newProject(Project.of(NameDescription(name = projectName, description = null)))
         }
 
+        // Check for configuration
+        securityService.checkProjectFunction(project, ProjectConfig::class.java)
+
         // Configuration of the project SCM (using the SCM engine)
         scmEngine.configureProject(project, configuration, env, projectName)
 
@@ -73,6 +74,9 @@ class CoreConfigurationServiceImpl(
         env: Map<String, String>
     ): Branch {
         configurationLicense.checkConfigurationFeatureEnabled()
+        securityService.checkProjectFunction(project, BranchCreate::class.java)
+        securityService.checkProjectFunction(project, BranchEdit::class.java)
+
         val rawBranchName = ciEngine.getBranchName(env)
             ?: throw CoreConfigurationException("Could not get the branch name from the environment")
 
@@ -117,6 +121,8 @@ class CoreConfigurationServiceImpl(
         env: Map<String, String>
     ): Build {
         configurationLicense.checkConfigurationFeatureEnabled()
+        securityService.checkProjectFunction(branch, BuildCreate::class.java)
+        securityService.checkProjectFunction(branch, BuildConfig::class.java)
 
         val buildName = getBuildName(configuration, ciEngine, env)
 
