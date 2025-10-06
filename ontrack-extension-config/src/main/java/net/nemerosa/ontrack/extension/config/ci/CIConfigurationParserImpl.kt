@@ -88,6 +88,7 @@ class CIConfigurationParserImpl(
     private fun convertBuild(build: CIBuildConfig): BuildConfiguration {
         return BuildConfiguration(
             properties = convertProperties(build),
+            autoVersioningCheck = build.autoVersioningCheck,
         )
     }
 

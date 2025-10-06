@@ -1,17 +1,22 @@
 package net.nemerosa.ontrack.extension.config.graphql
 
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
+import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationData
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMBranchPropertyType
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMBuildCommitPropertyType
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMProjectPropertyType
+import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.BuildDisplayNameService
+import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.jvm.optionals.getOrNull
@@ -27,6 +32,9 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var autoVersioningConfigurationService: AutoVersioningConfigurationService
+
+    @Autowired
+    private lateinit var mockSCMTester: MockSCMTester
 
     @Test
     @AsAdminTest
@@ -532,45 +540,136 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
         }
     }
 
-    private fun withConfigAndBranch(yaml: String, code: (branch: Branch) -> Unit) =
-        withConfig(yaml) {
+    @Test
+    @AsAdminTest
+    fun `Auto-versioning check`() {
+        project {
+            val dependency = this
+            branch("main") {
+                val pl = promotionLevel("GOLD")
+                build("5.0.0") {
+                    promote(pl)
+                }
+            }
+            mockSCMTester.withMockSCMRepository(name = "yontrack") {
+
+                repositoryFile(
+                    branch = "main",
+                    path = "versions.properties",
+                    content = """
+                        yontrackVersion = 5.0.0
+                    """.trimIndent()
+                )
+
+                withConfigAndBuild(
+                    """
+                        version: v1
+                        configuration:
+                          defaults:
+                            branch:
+                              autoVersioning:
+                                configurations:
+                                  - sourceProject: ${dependency.name}
+                                    sourceBranch: main
+                                    sourcePromotion: GOLD
+                                    targetPath: versions.properties
+                                    targetProperty: yontrackVersion
+                                    validationStamp: av-check
+                            build:
+                              autoVersioningCheck: true
+                    """.trimIndent(),
+                    scmBranch = "main", // Must match the branch where the versions.properties file is created
+                ) { build ->
+
+                    val vs = structureService.findValidationStampByName(
+                        project = build.project.name,
+                        branch = build.branch.name,
+                        validationStamp = "av-check"
+                    ).getOrNull() ?: fail("Validation stamp has not been created")
+
+                    val run = structureService.getValidationRunsForBuildAndValidationStamp(
+                        build, vs, offset = 0, count = 1
+                    ).single()
+
+                    assertNotNull(run.data) { data ->
+                        assertIs<AutoVersioningValidationData>(data.data) { avData ->
+                            assertEquals(dependency.name, avData.project)
+                            assertEquals("5.0.0", avData.version, "Current version OK")
+                            assertEquals("5.0.0", avData.latestVersion)
+                            assertEquals("versions.properties", avData.path)
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    private fun withConfigAndProject(
+        yaml: String,
+        scmBranch: String = "release/5.1",
+        code: (project: Project) -> Unit,
+    ) =
+        withConfig(yaml, scmBranch = scmBranch) {
             assertNotNull(
                 structureService.findProjectByName("yontrack").getOrNull(),
                 "Project has been created"
             ) { project ->
-                // Branch
-                assertNotNull(
-                    structureService.findBranchByName(project.name, "release-5.1").getOrNull(),
-                    "Branch has been created"
-                ) { branch ->
-                    code(branch)
-                }
+                code(project)
             }
         }
 
-    private fun withConfig(yaml: String, code: () -> Unit) {
+    private fun withConfigAndBranch(
+        yaml: String,
+        scmBranch: String = "release/5.1",
+        code: (branch: Branch) -> Unit,
+    ) =
+        withConfigAndProject(yaml, scmBranch = scmBranch) { project ->
+            // Branch
+            assertNotNull(
+                structureService.findBranchByName(project.name, scmBranch).getOrNull(),
+                "Branch has been created"
+            ) { branch ->
+                code(branch)
+            }
+        }
+
+    private fun withConfigAndBuild(
+        yaml: String,
+        scmBranch: String = "release/5.1",
+        code: (build: Build) -> Unit,
+    ) =
+        withConfigAndBranch(yaml, scmBranch = scmBranch) { branch ->
+            assertNotNull(
+                structureService.getLastBuild(branch.id).getOrNull(),
+                "Build has been created"
+            ) { build ->
+                code(build)
+            }
+        }
+
+    private fun withConfig(
+        yaml: String,
+        scmBranch: String = "release/5.1",
+        env: Map<String, String> = mapOf(
+            "PROJECT_NAME" to "yontrack",
+            "BRANCH_NAME" to scmBranch,
+            "BUILD_NUMBER" to "23",
+            "VERSION" to "5.1.12",
+        ),
+        code: () -> Unit,
+    ) {
         run(
             """
                 mutation ConfigureBuild(
-                    ${'$'}config: String!
+                    ${'$'}config: String!,
+                    ${'$'}env: [CIEnv!]!,
                 ) {
                     configureBuild(input: {
                         config: ${'$'}config,
                         ci: "generic",
                         scm: "mock",
-                        env: [{
-                            name: "PROJECT_NAME"
-                            value: "yontrack"
-                        }, {
-                            name: "BRANCH_NAME"
-                            value: "release/5.1"
-                        }, {
-                            name: "BUILD_NUMBER"
-                            value: "23"
-                        }, {
-                            name: "VERSION"
-                            value: "5.1.12"
-                        }]
+                        env: ${'$'}env,
                     }) {
                         errors {
                             message
@@ -582,7 +681,10 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                     }
                 }
             """,
-            mapOf("config" to yaml)
+            mapOf(
+                "config" to yaml,
+                "env" to env.map { mapOf("name" to it.key, "value" to it.value) },
+            )
         ) { data ->
             checkGraphQLUserErrors(data, "configureBuild") { _ ->
                 code()

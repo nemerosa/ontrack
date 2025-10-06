@@ -67,6 +67,14 @@ class MockSCMTester(
                 )
         }
 
+        fun repositoryFile(branch: String = "main", path: String, content: String) {
+            mockSCMExtension.repository(repositoryName).registerFile(
+                scmBranch = branch,
+                path = path,
+                content = content
+            )
+        }
+
         fun Build.withRepositoryCommit(message: String, property: Boolean = true): String {
             val branchProperty = propertyService.getPropertyValue(branch, MockSCMBranchPropertyType::class.java)
             return if (branchProperty != null) {

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.config.model
 
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
+import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationService
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.license.ConfigurationLicense
 import net.nemerosa.ontrack.extension.config.scm.SCMEngine
@@ -25,6 +26,7 @@ class CoreConfigurationServiceImpl(
     private val validationDataTypeService: ValidationDataTypeService,
     private val promotionLevelConfigurators: List<PromotionLevelConfigurator>,
     private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
+    private val autoVersioningValidationService: AutoVersioningValidationService,
 ) : CoreConfigurationService {
 
     override fun configureProject(
@@ -137,6 +139,13 @@ class CoreConfigurationServiceImpl(
         // Build display name
         configureBuildDisplayName(build, configuration, ciEngine, env)
 
+        // Auto-versioning check
+        val autoVersioningCheck = configuration.autoVersioningCheck
+        if (autoVersioningCheck != null && autoVersioningCheck) {
+            autoVersioningValidationService.checkAndValidate(build)
+        }
+
+        // OK
         return build
     }
 

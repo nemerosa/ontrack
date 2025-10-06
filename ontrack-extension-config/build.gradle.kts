@@ -20,6 +20,7 @@ dependencies {
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(":ontrack-extension-git"))
     testImplementation(project(":ontrack-extension-scm"))
+    testImplementation(testFixtures(project(":ontrack-extension-scm")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
