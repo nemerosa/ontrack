@@ -178,6 +178,7 @@ class CIConfigurationParserImpl(
     private fun convertProject(project: CIProjectConfig): ProjectConfiguration {
         return ProjectConfiguration(
             properties = convertProperties(project),
+            issueServiceIdentifier = project.issueServiceIdentifier,
         )
     }
 

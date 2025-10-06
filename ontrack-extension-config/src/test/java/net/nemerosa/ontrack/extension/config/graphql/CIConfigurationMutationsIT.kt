@@ -424,4 +424,71 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
         }
 
     }
+
+    @Test
+    @AsAdminTest
+    fun `Project issue service identifier`() {
+        val config = """
+            version: v1
+            configuration:
+              defaults:
+                project:
+                  issueServiceIdentifier:
+                    serviceId: jira
+                    serviceName: JIRA
+        """.trimIndent()
+        run(
+            """
+                mutation ConfigureBuild(
+                    ${'$'}config: String!
+                ) {
+                    configureBuild(input: {
+                        config: ${'$'}config,
+                        ci: "generic",
+                        scm: "mock",
+                        env: [{
+                            name: "PROJECT_NAME"
+                            value: "yontrack"
+                        }, {
+                            name: "BRANCH_NAME"
+                            value: "release/5.1"
+                        }, {
+                            name: "BUILD_NUMBER"
+                            value: "23"
+                        }, {
+                            name: "VERSION"
+                            value: "5.1.12"
+                        }]
+                    }) {
+                        errors {
+                            message
+                            exception
+                        }
+                        build {
+                            id
+                        }
+                    }
+                }
+            """,
+            mapOf("config" to config)
+        ) { data ->
+            checkGraphQLUserErrors(data, "configureBuild") { _ ->
+                assertNotNull(
+                    structureService.findProjectByName("yontrack").getOrNull(),
+                    "Project has been created"
+                ) { project ->
+                    assertNotNull(
+                        propertyService.getPropertyValue(project, MockSCMProjectPropertyType::class.java),
+                        "Project SCM config has been set"
+                    ) { property ->
+                        assertEquals(
+                            "jira//JIRA",
+                            property.issueServiceIdentifier
+                        )
+                    }
+                }
+            }
+        }
+
+    }
 }

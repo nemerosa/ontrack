@@ -28,7 +28,10 @@ class MockSCMEngine(
         propertyService.editProperty(
             entity = project,
             propertyType = MockSCMProjectPropertyType::class.java,
-            data = MockSCMProjectProperty(name),
+            data = MockSCMProjectProperty(
+                name = name,
+                issueServiceIdentifier = configuration.issueServiceIdentifier?.toRepresentation(),
+            ),
         )
     }
 
