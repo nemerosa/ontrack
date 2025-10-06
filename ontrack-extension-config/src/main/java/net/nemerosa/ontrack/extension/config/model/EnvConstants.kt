@@ -23,7 +23,7 @@ object EnvConstants {
     /**
      * Build version
      */
-    const val GENERIC_BUILD_VERSION = "BUILD_VERSION"
+    const val GENERIC_BUILD_VERSION = "VERSION"
 
     /**
      * Build revision
