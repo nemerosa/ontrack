@@ -27,6 +27,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
     @AsAdminTest
     fun `Default configuration`() {
         val config = """
+            version: v1
             configuration: {}
         """.trimIndent()
         run(
@@ -129,6 +130,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
     @AsAdminTest
     fun `Branch validations`() {
         val config = """
+            version: v1
             configuration:
               defaults:
                   branch:
@@ -207,6 +209,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
     @AsAdminTest
     fun `Branch promotions`() {
         val config = """
+            version: v1
             configuration:
               defaults:
                   branch:
@@ -317,6 +320,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
     @AsAdminTest
     fun `Branch validations with positive condition`() {
         val config = """
+            version: v1
             configuration:
               defaults:
                   branch:

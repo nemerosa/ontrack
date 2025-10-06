@@ -17,6 +17,7 @@ class CIConfigurationParserIT : AbstractDSLTestSupport() {
     fun `Parsing of the default configuration`() {
         val config = parser.parseConfig(
             """
+                version: v1
                 configuration: {}
             """.trimIndent()
         )
@@ -30,6 +31,7 @@ class CIConfigurationParserIT : AbstractDSLTestSupport() {
     fun `Parsing of configuration with properties and other attributes`() {
         val config = parser.parseConfig(
             """
+                version: v1
                 configuration:
                   defaults:
                     project:
@@ -147,6 +149,7 @@ class CIConfigurationParserIT : AbstractDSLTestSupport() {
     fun `Parsing of configuration with custom conditions`() {
         val config = parser.parseConfig(
             """
+                version: v1
                 configuration:
                   defaults:
                     branch:

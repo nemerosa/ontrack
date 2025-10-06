@@ -29,8 +29,15 @@ class CIConfigurationParserImpl(
         val documents = Yaml().read(yaml)
         return if (documents.size == 1) {
             val document = documents.first()
-            val ciConfigInput = document.parse<CIConfigInput>()
-            convert(ciConfigInput)
+            val version = document.getTextField("version")
+            if (version.isNullOrBlank()) {
+                throw CIConfigVersionMissingException()
+            } else if (version == "v1") {
+                val ciConfigInput = document.parse<CIConfigInput>()
+                convert(ciConfigInput)
+            } else {
+                throw CIConfigVersionUnsupportedException(version)
+            }
         } else if (documents.size > 1) {
             throw CIConfigurationSeveralDocumentsException()
         } else {
