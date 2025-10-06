@@ -15,26 +15,25 @@ class ConfigTestSupport(
 
     fun withConfig(
         yaml: String,
+        ci: String? = DEFAULT_CI,
+        scm: String? = DEFAULT_SCM,
         scmBranch: String = "release/5.1",
-        env: Map<String, String> = mapOf(
-            "PROJECT_NAME" to "yontrack",
-            "BRANCH_NAME" to scmBranch,
-            "BUILD_NUMBER" to "23",
-            "BUILD_REVISION" to "abcd123",
-            "VERSION" to "5.1.12",
-        ),
+        extraEnv: Map<String, String> = emptyMap(),
+        env: Map<String, String> = EnvFixtures.generic(scmBranch, extraEnv),
         code: (payload: JsonNode) -> Unit,
     ) {
         graphQLTestSupport.run(
             """
                 mutation ConfigureBuild(
                     ${'$'}config: String!,
+                    ${'$'}ci: String,
+                    ${'$'}scm: String,
                     ${'$'}env: [CIEnv!]!,
                 ) {
                     configureBuild(input: {
                         config: ${'$'}config,
-                        ci: "generic",
-                        scm: "mock",
+                        ci: ${'$'}ci,
+                        scm: ${'$'}scm,
                         env: ${'$'}env,
                     }) {
                         errors {
@@ -49,6 +48,8 @@ class ConfigTestSupport(
             """,
             mapOf(
                 "config" to yaml,
+                "ci" to ci,
+                "scm" to scm,
                 "env" to env.map { mapOf("name" to it.key, "value" to it.value) },
             )
         ) { data ->
@@ -60,12 +61,17 @@ class ConfigTestSupport(
 
     fun withConfigAndProject(
         yaml: String,
+        ci: String? = DEFAULT_CI,
+        scm: String? = DEFAULT_SCM,
+        projectName: String = "yontrack",
         scmBranch: String = "release/5.1",
+        extraEnv: Map<String, String> = emptyMap(),
+        env: Map<String, String> = EnvFixtures.generic(scmBranch, extraEnv),
         code: (project: Project, payload: JsonNode) -> Unit,
     ) =
-        withConfig(yaml, scmBranch = scmBranch) { payload ->
+        withConfig(yaml, ci=ci, scm=scm, scmBranch = scmBranch, env = env, extraEnv = extraEnv) { payload ->
             assertNotNull(
-                structureService.findProjectByName("yontrack").getOrNull(),
+                structureService.findProjectByName(projectName).getOrNull(),
                 "Project has been created"
             ) { project ->
                 code(project, payload)
@@ -101,5 +107,10 @@ class ConfigTestSupport(
                 code(build, payload)
             }
         }
+
+    companion object {
+        const val DEFAULT_CI = "generic"
+        const val DEFAULT_SCM = "mock"
+    }
 
 }

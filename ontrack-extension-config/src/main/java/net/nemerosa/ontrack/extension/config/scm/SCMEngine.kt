@@ -14,7 +14,7 @@ interface SCMEngine {
     /**
      * Configures a project with this SCM engine.
      */
-    fun configureProject(project: Project, configuration: ProjectConfiguration, env: Map<String, String>)
+    fun configureProject(project: Project, configuration: ProjectConfiguration, env: Map<String, String>, projectName: String)
 
     /**
      * Configures a branch with this SCM engine.

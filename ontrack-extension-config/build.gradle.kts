@@ -30,4 +30,6 @@ dependencies {
     testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
     testFixturesImplementation(testFixtures(project(":ontrack-ui-graphql")))
+    testFixturesImplementation(project(":ontrack-extension-scm"))
+    testFixturesImplementation(testFixtures(project(":ontrack-extension-scm")))
 }

@@ -48,4 +48,11 @@
 [extension-general] --> [extension-indicators]
 [extension-general] --> [extension-config]
 
+[extension-jenkins] --> [extension-indicators]
+[extension-jenkins] --> [extension-scm]
+[extension-jenkins] --> [extension-auto-versioning]
+[extension-jenkins] --> [extension-casc]
+[extension-jenkins] --> [extension-notifications]
+[extension-jenkins] --> [extension-config]
+
 @enduml

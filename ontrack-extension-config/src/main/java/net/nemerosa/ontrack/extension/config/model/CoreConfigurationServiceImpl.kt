@@ -37,7 +37,8 @@ class CoreConfigurationServiceImpl(
         env: Map<String, String>
     ): Project {
         configurationLicense.checkConfigurationFeatureEnabled()
-        val projectName = ciEngine.getProjectName(env)
+        val projectName = configuration.projectName
+            ?: ciEngine.getProjectName(env)
             ?: throw CoreConfigurationException("Could not get the project name from the environment")
 
         val existingProject = securityService.asAdmin { structureService.findProjectByName(projectName) }.getOrNull()
@@ -52,7 +53,7 @@ class CoreConfigurationServiceImpl(
         }
 
         // Configuration of the project SCM (using the SCM engine)
-        scmEngine.configureProject(project, configuration, env)
+        scmEngine.configureProject(project, configuration, env, projectName)
 
         // Configuration of properties
         configureProperties(

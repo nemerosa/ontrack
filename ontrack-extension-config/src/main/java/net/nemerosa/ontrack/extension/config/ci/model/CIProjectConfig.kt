@@ -5,5 +5,6 @@ import net.nemerosa.ontrack.extension.config.model.ProjectIssueServiceIdentifier
 
 data class CIProjectConfig(
     override val properties: Map<String, JsonNode> = emptyMap(),
+    val name: String? = null,
     val issueServiceIdentifier: ProjectIssueServiceIdentifier? = null,
 ) : CIPropertiesConfig

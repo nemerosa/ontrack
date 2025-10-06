@@ -21,15 +21,14 @@ class MockSCMEngine(
     override fun configureProject(
         project: Project,
         configuration: ProjectConfiguration,
-        env: Map<String, String>
+        env: Map<String, String>,
+        projectName: String,
     ) {
-        val name = env[EnvConstants.GENERIC_PROJECT_NAME]
-            ?: error("[scm][mock] `${EnvConstants.GENERIC_PROJECT_NAME}` env variable is required")
         propertyService.editProperty(
             entity = project,
             propertyType = MockSCMProjectPropertyType::class.java,
             data = MockSCMProjectProperty(
-                name = name,
+                name = projectName,
                 issueServiceIdentifier = configuration.issueServiceIdentifier?.toRepresentation(),
             ),
         )
