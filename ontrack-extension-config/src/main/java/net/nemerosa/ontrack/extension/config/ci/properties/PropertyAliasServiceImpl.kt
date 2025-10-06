@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.config.ci.properties
 
+import net.nemerosa.ontrack.model.structure.PropertyAlias
 import org.springframework.stereotype.Component
 
 @Component

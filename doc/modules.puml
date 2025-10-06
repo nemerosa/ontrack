@@ -46,7 +46,6 @@
 [extension-general] --> [ui-graphql]
 [extension-general] --> [extension-casc]
 [extension-general] --> [extension-indicators]
-[extension-general] --> [extension-config]
 
 [extension-jenkins] --> [extension-indicators]
 [extension-jenkins] --> [extension-scm]

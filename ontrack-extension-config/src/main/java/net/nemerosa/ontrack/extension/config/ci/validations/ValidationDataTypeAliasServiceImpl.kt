@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.config.ci.validations
 
+import net.nemerosa.ontrack.model.structure.ValidationDataTypeAlias
 import org.springframework.stereotype.Component
 
 @Component

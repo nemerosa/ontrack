@@ -12,7 +12,6 @@ dependencies {
 
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-repository-support"))
-    implementation(project(":ontrack-extension-config"))
     implementation("org.springframework:spring-tx")
     implementation("commons-io:commons-io")
     implementation("org.apache.commons:commons-lang3")

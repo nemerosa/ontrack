@@ -1,11 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.extension.config.model.PromotionLevelConfiguration
-import net.nemerosa.ontrack.extension.config.model.PromotionLevelConfigurator
-import net.nemerosa.ontrack.model.structure.PromotionLevel
-import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.model.structure.setupValidationStamp
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import kotlin.jvm.optionals.getOrNull
 

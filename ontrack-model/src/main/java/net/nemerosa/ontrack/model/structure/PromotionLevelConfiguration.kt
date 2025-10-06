@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.config.model
+package net.nemerosa.ontrack.model.structure
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
 

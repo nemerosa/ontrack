@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.general.validation
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.extension.config.ci.validations.ValidationDataTypeAlias
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.structure.ValidationDataTypeAlias
 import org.springframework.stereotype.Component
 
 @Component

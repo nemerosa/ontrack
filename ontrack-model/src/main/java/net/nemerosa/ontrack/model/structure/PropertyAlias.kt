@@ -1,8 +1,8 @@
-package net.nemerosa.ontrack.extension.config.ci.validations
+package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.databind.JsonNode
 
-interface ValidationDataTypeAlias {
+interface PropertyAlias {
     val alias: String
     val type: String
     fun parseConfig(data: JsonNode): JsonNode

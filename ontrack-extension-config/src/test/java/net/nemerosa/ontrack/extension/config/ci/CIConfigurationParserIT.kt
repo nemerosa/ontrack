@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.extension.config.model.*
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.structure.PromotionLevelConfiguration
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals

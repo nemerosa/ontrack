@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.config.model
 
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.structure.PromotionLevelConfiguration
 
 @APIDescription("Branch configuration")
 data class BranchConfiguration(

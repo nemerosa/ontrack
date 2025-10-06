@@ -10,7 +10,6 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-indicators"))
-    implementation(project(":ontrack-extension-config"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
     testImplementation(testFixtures(project(":ontrack-model")))
@@ -23,5 +22,4 @@ dependencies {
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
-    testRuntimeOnly(project(":ontrack-extension-auto-versioning"))
 }

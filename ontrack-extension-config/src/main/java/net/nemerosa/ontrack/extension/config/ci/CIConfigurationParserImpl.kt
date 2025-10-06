@@ -9,10 +9,7 @@ import net.nemerosa.ontrack.extension.config.model.*
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.model.structure.PropertyType
-import net.nemerosa.ontrack.model.structure.ValidationDataTypeService
-import net.nemerosa.ontrack.model.structure.validateValidationDataTypeConfig
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.yaml.Yaml
 import org.springframework.stereotype.Component
 

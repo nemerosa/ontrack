@@ -1,6 +1,4 @@
-package net.nemerosa.ontrack.extension.config.model
-
-import net.nemerosa.ontrack.model.structure.PromotionLevel
+package net.nemerosa.ontrack.model.structure
 
 /**
  * Configuration for a promotion level.
