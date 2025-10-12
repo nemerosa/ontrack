@@ -18,6 +18,9 @@ class MockSCMEngine(
     propertyService = propertyService,
     name = "mock"
 ) {
+
+    override fun matchesUrl(scmUrl: String): Boolean = false
+
     override fun configureProject(
         project: Project,
         configuration: ProjectConfiguration,

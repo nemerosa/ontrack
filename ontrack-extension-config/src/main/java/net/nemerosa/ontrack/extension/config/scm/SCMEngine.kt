@@ -18,12 +18,14 @@ interface SCMEngine {
      * @param configuration Configuration for the project
      * @param env Environment variables to use for the configuration
      * @param projectName Name of the project as defined by the CI engine.
+     * @param scmUrl URL of the SCM repository as detected by the CI engine.
      */
     fun configureProject(
         project: Project,
         configuration: ProjectConfiguration,
         env: Map<String, String>,
-        projectName: String
+        projectName: String,
+        scmUrl: String,
     )
 
     /**

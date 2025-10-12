@@ -12,7 +12,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationProperty
  * @property issueServiceConfigurationIdentifier ID to the [net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration] associated
  * with this repository.
  */
-class GitHubProjectConfigurationProperty(
+data class GitHubProjectConfigurationProperty(
     @DocumentationType("String", description = "Name of the configuration")
     override val configuration: GitHubEngineConfiguration,
     @APIDescription("GitHub repository, ie. org/name")

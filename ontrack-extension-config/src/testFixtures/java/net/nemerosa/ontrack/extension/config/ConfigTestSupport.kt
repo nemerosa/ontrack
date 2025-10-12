@@ -60,7 +60,10 @@ class ConfigTestSupport(
     }
 
     fun withConfigAndProject(
-        yaml: String,
+        yaml: String = """
+            version: v1
+            configuration: {}
+        """.trimIndent(),
         ci: String? = DEFAULT_CI,
         scm: String? = DEFAULT_SCM,
         expectedProjectName: String = "yontrack",

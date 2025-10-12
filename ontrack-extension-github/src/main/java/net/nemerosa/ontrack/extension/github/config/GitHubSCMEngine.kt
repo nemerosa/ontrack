@@ -4,6 +4,10 @@ import net.nemerosa.ontrack.extension.config.model.BranchConfiguration
 import net.nemerosa.ontrack.extension.config.model.BuildConfiguration
 import net.nemerosa.ontrack.extension.config.model.ProjectConfiguration
 import net.nemerosa.ontrack.extension.config.scm.AbstractSCMEngine
+import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
+import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
+import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
+import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
@@ -13,18 +17,60 @@ import org.springframework.stereotype.Component
 @Component
 class GitHubSCMEngine(
     propertyService: PropertyService,
+    private val gitHubConfigurationService: GitHubConfigurationService,
 ) : AbstractSCMEngine(
     propertyService = propertyService,
     name = "github",
 ) {
+
     override fun configureProject(
         project: Project,
         configuration: ProjectConfiguration,
         env: Map<String, String>,
-        projectName: String
+        projectName: String,
+        scmUrl: String,
     ) {
-        TODO("Not yet implemented")
+        val githubConfig = getGitHubConfig(configuration, scmUrl)
+        val githubRepository = getGitHubRepository(scmUrl)
+        val projectConfig = GitHubProjectConfigurationProperty(
+            configuration = githubConfig,
+            repository = githubRepository,
+            indexationInterval = 0, // TODO
+            issueServiceConfigurationIdentifier = configuration.issueServiceIdentifier?.toRepresentation(),
+        )
+        val existingConfig =
+            propertyService.getPropertyValue(project, GitHubProjectConfigurationPropertyType::class.java)
+        if (existingConfig != projectConfig) {
+            propertyService.editProperty(
+                project,
+                GitHubProjectConfigurationPropertyType::class.java,
+                projectConfig
+            )
+        }
     }
+
+    internal fun getGitHubRepository(scmUrl: String): String =
+        if (matchesUrl(scmUrl)) {
+            val m = scmUrlRepoRegex.find(scmUrl)
+            if (m != null) {
+                val owner = m.groupValues[1]
+                val repo = m.groupValues[2]
+                "$owner/$repo"
+            } else {
+                throw GitHubSCMRepositoryNotDetectedException(scmUrl)
+            }
+        } else {
+            throw GitHubSCMRepositoryNotDetectedException(scmUrl)
+        }
+
+    private fun getGitHubConfig(
+        configuration: ProjectConfiguration,
+        scmUrl: String
+    ): GitHubEngineConfiguration =
+        // TODO Using a specific configuration
+        gitHubConfigurationService.configurations.find {
+            scmUrl.startsWith(it.url)
+        } ?: throw GitHubSCMUnexistingConfigException()
 
     override fun configureBranch(
         branch: Branch,
@@ -44,6 +90,13 @@ class GitHubSCMEngine(
     }
 
     override fun matchesUrl(scmUrl: String): Boolean =
-        scmUrl.startsWith("https://github.com/") ||
-                scmUrl.startsWith("git@github.com:")
+        scmUrl.startsWith(SCM_URL_HTTPS) ||
+                scmUrl.startsWith(SCM_URL_SSH)
+
+    companion object {
+        const val SCM_URL_HTTPS = "https://github.com/"
+        const val SCM_URL_SSH = "git@github.com:"
+
+        private val scmUrlRepoRegex = "([^/:]*)/([^/]*)\\.git$".toRegex()
+    }
 }
