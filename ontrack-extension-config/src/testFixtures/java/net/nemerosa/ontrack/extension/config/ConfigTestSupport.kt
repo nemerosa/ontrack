@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.config
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.config.ci.CIConfigurationService
+import net.nemerosa.ontrack.extension.config.model.CIEnv
 import net.nemerosa.ontrack.graphql.GraphQLTestSupport
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
@@ -11,7 +13,44 @@ import kotlin.test.assertNotNull
 class ConfigTestSupport(
     private val structureService: StructureService,
     private val graphQLTestSupport: GraphQLTestSupport,
+    private val ciConfigurationService: CIConfigurationService,
 ) {
+
+    fun withConfigServiceProject(
+        yaml: String = DEFAULT_CONFIG,
+        ci: String? = null,
+        scm: String? = null,
+        env: Map<String, String> = emptyMap(),
+    ) = ciConfigurationService.configureProject(
+        config = yaml,
+        ci = ci,
+        scm = scm,
+        env = env.map { (name, value) -> CIEnv(name, value) },
+    )
+
+    fun withConfigServiceBranch(
+        yaml: String = DEFAULT_CONFIG,
+        ci: String? = null,
+        scm: String? = null,
+        env: Map<String, String> = emptyMap(),
+    ) = ciConfigurationService.configureBranch(
+        config = yaml,
+        ci = ci,
+        scm = scm,
+        env = env.map { (name, value) -> CIEnv(name, value) },
+    )
+
+    fun withConfigServiceBuild(
+        yaml: String = DEFAULT_CONFIG,
+        ci: String? = null,
+        scm: String? = null,
+        env: Map<String, String> = emptyMap(),
+    ) = ciConfigurationService.configureBuild(
+        config = yaml,
+        ci = ci,
+        scm = scm,
+        env = env.map { (name, value) -> CIEnv(name, value) },
+    )
 
     fun withConfig(
         yaml: String,
@@ -140,6 +179,10 @@ class ConfigTestSupport(
     companion object {
         const val DEFAULT_CI = "generic"
         const val DEFAULT_SCM = "mock"
+        val DEFAULT_CONFIG = """
+            version: v1
+            configuration: {}
+        """.trimIndent()
     }
 
 }

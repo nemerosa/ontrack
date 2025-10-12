@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.extension.github.config
 
+import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.model.BranchConfiguration
 import net.nemerosa.ontrack.extension.config.model.BuildConfiguration
 import net.nemerosa.ontrack.extension.config.model.ProjectConfiguration
 import net.nemerosa.ontrack.extension.config.scm.AbstractSCMEngine
+import net.nemerosa.ontrack.extension.config.scm.SCMEngineNoURLException
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
@@ -28,8 +30,9 @@ class GitHubSCMEngine(
         configuration: ProjectConfiguration,
         env: Map<String, String>,
         projectName: String,
-        scmUrl: String,
+        ciEngine: CIEngine,
     ) {
+        val scmUrl = ciEngine.getScmUrl(env) ?: throw SCMEngineNoURLException()
         val githubConfig = getGitHubConfig(configuration, scmUrl)
         val githubRepository = getGitHubRepository(scmUrl)
         val projectConfig = GitHubProjectConfigurationProperty(
@@ -66,11 +69,16 @@ class GitHubSCMEngine(
     private fun getGitHubConfig(
         configuration: ProjectConfiguration,
         scmUrl: String
-    ): GitHubEngineConfiguration =
-        // TODO Using a specific configuration
-        gitHubConfigurationService.configurations.find {
-            scmUrl.startsWith(it.url)
-        } ?: throw GitHubSCMUnexistingConfigException()
+    ): GitHubEngineConfiguration {
+        val scmConfig = configuration.scmConfig
+        return if (scmConfig.isNullOrBlank()) {
+            gitHubConfigurationService.configurations.find {
+                scmUrl.startsWith(it.url)
+            } ?: throw GitHubSCMUnexistingConfigException()
+        } else {
+            gitHubConfigurationService.getConfiguration(scmConfig)
+        }
+    }
 
     override fun configureBranch(
         branch: Branch,

@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationServ
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.license.ConfigurationLicense
 import net.nemerosa.ontrack.extension.config.scm.SCMEngine
-import net.nemerosa.ontrack.extension.config.scm.SCMEngineNoURLException
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
@@ -54,11 +53,8 @@ class CoreConfigurationServiceImpl(
         // Check for configuration
         securityService.checkProjectFunction(project, ProjectConfig::class.java)
 
-        // SCM URL
-        val scmUrl = ciEngine.getScmUrl(env) ?: throw SCMEngineNoURLException()
-
         // Configuration of the project SCM (using the SCM engine)
-        scmEngine.configureProject(project, configuration, env, projectName, scmUrl)
+        scmEngine.configureProject(project, configuration, env, projectName, ciEngine)
 
         // Configuration of properties
         configureProperties(

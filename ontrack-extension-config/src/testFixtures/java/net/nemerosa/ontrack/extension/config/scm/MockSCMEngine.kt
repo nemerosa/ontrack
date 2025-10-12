@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.config.scm
 
+import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.model.BranchConfiguration
 import net.nemerosa.ontrack.extension.config.model.BuildConfiguration
 import net.nemerosa.ontrack.extension.config.model.EnvConstants
@@ -26,6 +27,7 @@ class MockSCMEngine(
         configuration: ProjectConfiguration,
         env: Map<String, String>,
         projectName: String,
+        ciEngine: CIEngine,
     ) {
         propertyService.editProperty(
             entity = project,

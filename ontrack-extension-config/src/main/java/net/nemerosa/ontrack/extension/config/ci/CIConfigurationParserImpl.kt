@@ -178,6 +178,7 @@ class CIConfigurationParserImpl(
         return ProjectConfiguration(
             properties = convertProperties(project),
             projectName = project.name,
+            scmConfig = project.scmConfig,
             issueServiceIdentifier = project.issueServiceIdentifier,
         )
     }

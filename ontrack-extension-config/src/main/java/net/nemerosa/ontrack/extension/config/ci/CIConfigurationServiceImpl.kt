@@ -7,7 +7,9 @@ import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineNotFoundException
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineRegistry
 import net.nemerosa.ontrack.extension.config.model.*
 import net.nemerosa.ontrack.extension.config.scm.*
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,63 +23,99 @@ class CIConfigurationServiceImpl(
     private val coreConfigurationService: CoreConfigurationService,
 ) : CIConfigurationService {
 
+    override fun configureProject(
+        config: String,
+        ci: String?,
+        scm: String?,
+        env: List<CIEnv>
+    ): Project {
+        val context = getConfigContext(
+            yaml = config,
+            ci = ci,
+            scm = scm,
+            env = env,
+        )
+        return configureProjectWithContext(context)
+    }
+
+    private fun configureProjectWithContext(context: ConfigContext): Project {
+        // Consolidation of the configurations
+        val projectConfiguration = consolidateProjectConfiguration(
+            input = context.configurationInput,
+            customConfigs = context.customConfigs,
+        )
+
+        // Launching the project configuration
+        return coreConfigurationService.configureProject(
+            input = context.configurationInput,
+            configuration = projectConfiguration,
+            ciEngine = context.ciEngine,
+            scmEngine = context.scmEngine,
+            env = context.env,
+        )
+    }
+
+    override fun configureBranch(
+        config: String,
+        ci: String?,
+        scm: String?,
+        env: List<CIEnv>
+    ): Branch {
+        val context = getConfigContext(
+            yaml = config,
+            ci = ci,
+            scm = scm,
+            env = env,
+        )
+        return configureBranchWithContext(context)
+    }
+
+    private fun configureBranchWithContext(context: ConfigContext): Branch {
+        val project = configureProjectWithContext(context)
+
+        val branchConfiguration = consolidateBranchConfiguration(
+            input = context.configurationInput,
+            customConfigs = context.customConfigs,
+        )
+
+        return coreConfigurationService.configureBranch(
+            project = project,
+            input = context.configurationInput,
+            configuration = branchConfiguration,
+            ciEngine = context.ciEngine,
+            scmEngine = context.scmEngine,
+            env = context.env,
+        )
+    }
+
     override fun configureBuild(
         config: String,
         ci: String?,
         scm: String?,
         env: List<CIEnv>
     ): Build {
-        // Parsing of the configuration YAML
-        val configuration = ciConfigurationParser.parseConfig(yaml = config)
-        // Converting the environment into a map
-        val env = env.associate { it.name to it.value }
-        // Getting the CI engine from the configuration
-        val ciEngine = findCIEngine(ci, env)
-        // Getting the SCM engine from the configuration
-        val scmEngine = findSCMEngine(scm, ciEngine, env)
-
-        // Getting the custom configurations which match the current environment
-        val customConfigs = matchingConfigs(configuration, ciEngine, env)
-
-        // Consolidation of the configurations
-        val projectConfiguration = consolidateProjectConfiguration(
-            input = configuration,
-            customConfigs = customConfigs,
+        val context = getConfigContext(
+            yaml = config,
+            ci = ci,
+            scm = scm,
+            env = env,
         )
-        val branchConfiguration = consolidateBranchConfiguration(
-            input = configuration,
-            customConfigs = customConfigs,
-        )
+        return configureBuildWithContext(context)
+    }
+
+    private fun configureBuildWithContext(context: ConfigContext): Build {
+        val branch = configureBranchWithContext(context)
         val buildConfiguration = consolidateBuildConfiguration(
-            input = configuration,
-            customConfigs = customConfigs,
+            input = context.configurationInput,
+            customConfigs = context.customConfigs,
         )
-
-        // Launching the project configuration
-        val project = coreConfigurationService.configureProject(
-            input = configuration,
-            configuration = projectConfiguration,
-            ciEngine = ciEngine,
-            scmEngine = scmEngine,
-            env = env,
-        )
-        // Launching the branch configuration
-        val branch = coreConfigurationService.configureBranch(
-            project = project,
-            input = configuration,
-            configuration = branchConfiguration,
-            ciEngine = ciEngine,
-            scmEngine = scmEngine,
-            env = env,
-        )
-        // Launching the build configuration
         return coreConfigurationService.configureBuild(
             branch = branch,
-            input = configuration,
+            input = context.configurationInput,
             configuration = buildConfiguration,
-            ciEngine = ciEngine,
-            scmEngine = scmEngine,
-            env = env,
+            ciEngine = context.ciEngine,
+            scmEngine = context.scmEngine,
+            env = context.env,
         )
     }
 
@@ -163,5 +201,41 @@ class CIConfigurationServiceImpl(
             ciEngineRegistry.findCIEngine(ci)
                 ?: throw CIEngineNotFoundException(ci)
         }
+
+    private data class ConfigContext(
+        val configurationInput: ConfigurationInput,
+        val env: Map<String, String>,
+        val ciEngine: CIEngine,
+        val scmEngine: SCMEngine,
+        val customConfigs: List<CustomConfig>,
+    )
+
+    private fun getConfigContext(
+        yaml: String,
+        ci: String?,
+        scm: String?,
+        env: List<CIEnv>,
+    ): ConfigContext {
+        // Parsing of the configuration YAML
+        val configurationInput = ciConfigurationParser.parseConfig(yaml = yaml)
+        // Converting the environment into a map
+        val env = env.associate { it.name to it.value }
+        // Getting the CI engine from the configuration
+        val ciEngine = findCIEngine(ci, env)
+        // Getting the SCM engine from the configuration
+        val scmEngine = findSCMEngine(scm, ciEngine, env)
+
+        // Getting the custom configurations which match the current environment
+        val customConfigs = matchingConfigs(configurationInput, ciEngine, env)
+
+        // OK
+        return ConfigContext(
+            configurationInput = configurationInput,
+            env = env,
+            ciEngine = ciEngine,
+            scmEngine = scmEngine,
+            customConfigs = customConfigs,
+        )
+    }
 
 }

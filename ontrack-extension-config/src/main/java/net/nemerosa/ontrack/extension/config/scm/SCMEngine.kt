@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.config.scm
 
+import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.model.BranchConfiguration
 import net.nemerosa.ontrack.extension.config.model.BuildConfiguration
 import net.nemerosa.ontrack.extension.config.model.ProjectConfiguration
@@ -18,14 +19,14 @@ interface SCMEngine {
      * @param configuration Configuration for the project
      * @param env Environment variables to use for the configuration
      * @param projectName Name of the project as defined by the CI engine.
-     * @param scmUrl URL of the SCM repository as detected by the CI engine.
+     * @param ciEngine CI engine used for this configuration
      */
     fun configureProject(
         project: Project,
         configuration: ProjectConfiguration,
         env: Map<String, String>,
         projectName: String,
-        scmUrl: String,
+        ciEngine: CIEngine,
     )
 
     /**

@@ -33,9 +33,9 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     @AsAdminTest
     fun `Configuration of the project with unexisting configuration`() {
         assertFailsWith<GitHubSCMUnexistingConfigException> {
-            configTestSupport.withConfigAndProject(
+            configTestSupport.withConfigServiceBuild(
                 env = EnvFixtures.gitHub(),
-            ) { _, _ -> }
+            )
         }
     }
 
@@ -43,24 +43,23 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     @AsAdminTest
     fun `Configuration of the project with existing configuration being detected`() {
         val config = gitHubConfiguration()
-        configTestSupport.withConfigAndProject(
+        val project = configTestSupport.withConfigServiceProject(
             ci = null,
             scm = null,
             env = EnvFixtures.gitHub(),
-        ) { project, _ ->
-            assertNotNull(
-                propertyService.getPropertyValue(project, GitHubProjectConfigurationPropertyType::class.java),
-                "GitHub project configuration has been set"
-            ) {
-                assertEquals(
-                    config.name,
-                    it.configuration.name,
-                )
-                assertEquals(
-                    "nemerosa/yontrack",
-                    it.repository,
-                )
-            }
+        )
+        assertNotNull(
+            propertyService.getPropertyValue(project, GitHubProjectConfigurationPropertyType::class.java),
+            "GitHub project configuration has been set"
+        ) {
+            assertEquals(
+                config.name,
+                it.configuration.name,
+            )
+            assertEquals(
+                "yontrack/yontrack",
+                it.repository,
+            )
         }
     }
 
@@ -69,7 +68,7 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     fun `Configuration of the project with explicit configuration`() {
         val configName = uid("cfg-")
         val config = gitHubConfiguration(gitConfigurationName = configName)
-        configTestSupport.withConfigAndProject(
+        val project = configTestSupport.withConfigServiceProject(
             yaml = """
                 version: v1
                 configuration:
@@ -80,20 +79,19 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
             ci = null,
             scm = null,
             env = EnvFixtures.gitHub(),
-        ) { project, _ ->
-            assertNotNull(
-                propertyService.getPropertyValue(project, GitHubProjectConfigurationPropertyType::class.java),
-                "GitHub project configuration has been set"
-            ) {
-                assertEquals(
-                    config.name,
-                    it.configuration.name,
-                )
-                assertEquals(
-                    "nemerosa/yontrack",
-                    it.repository,
-                )
-            }
+        )
+        assertNotNull(
+            propertyService.getPropertyValue(project, GitHubProjectConfigurationPropertyType::class.java),
+            "GitHub project configuration has been set"
+        ) {
+            assertEquals(
+                config.name,
+                it.configuration.name,
+            )
+            assertEquals(
+                "yontrack/yontrack",
+                it.repository,
+            )
         }
     }
 
