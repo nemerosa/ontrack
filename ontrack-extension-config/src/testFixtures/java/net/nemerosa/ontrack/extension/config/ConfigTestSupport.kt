@@ -63,15 +63,15 @@ class ConfigTestSupport(
         yaml: String,
         ci: String? = DEFAULT_CI,
         scm: String? = DEFAULT_SCM,
-        projectName: String = "yontrack",
+        expectedProjectName: String = "yontrack",
         scmBranch: String = "release/5.1",
         extraEnv: Map<String, String> = emptyMap(),
         env: Map<String, String> = EnvFixtures.generic(scmBranch, extraEnv),
         code: (project: Project, payload: JsonNode) -> Unit,
     ) =
-        withConfig(yaml, ci=ci, scm=scm, scmBranch = scmBranch, env = env, extraEnv = extraEnv) { payload ->
+        withConfig(yaml, ci = ci, scm = scm, scmBranch = scmBranch, env = env, extraEnv = extraEnv) { payload ->
             assertNotNull(
-                structureService.findProjectByName(projectName).getOrNull(),
+                structureService.findProjectByName(expectedProjectName).getOrNull(),
                 "Project has been created"
             ) { project ->
                 code(project, payload)
@@ -80,11 +80,24 @@ class ConfigTestSupport(
 
     fun withConfigAndBranch(
         yaml: String,
+        ci: String? = DEFAULT_CI,
+        scm: String? = DEFAULT_SCM,
         scmBranch: String = "release/5.1",
+        extraEnv: Map<String, String> = emptyMap(),
+        env: Map<String, String> = EnvFixtures.generic(scmBranch, extraEnv),
         branch: String = NameDescription.escapeName(scmBranch),
+        expectedProjectName: String = "yontrack",
         code: (branch: Branch, payload: JsonNode) -> Unit,
     ) =
-        withConfigAndProject(yaml, scmBranch = scmBranch) { project, payload ->
+        withConfigAndProject(
+            yaml,
+            ci = ci,
+            scm = scm,
+            scmBranch = scmBranch,
+            extraEnv = extraEnv,
+            env = env,
+            expectedProjectName = expectedProjectName,
+        ) { project, payload ->
             // Branch
             assertNotNull(
                 structureService.findBranchByName(project.name, branch).getOrNull(),
@@ -96,10 +109,23 @@ class ConfigTestSupport(
 
     fun withConfigAndBuild(
         yaml: String,
+        ci: String? = DEFAULT_CI,
+        scm: String? = DEFAULT_SCM,
         scmBranch: String = "release/5.1",
+        extraEnv: Map<String, String> = emptyMap(),
+        env: Map<String, String> = EnvFixtures.generic(scmBranch, extraEnv),
+        expectedProjectName: String = "yontrack",
         code: (build: Build, payload: JsonNode) -> Unit,
     ) =
-        withConfigAndBranch(yaml, scmBranch = scmBranch) { branch, payload ->
+        withConfigAndBranch(
+            yaml,
+            ci = ci,
+            scm = scm,
+            scmBranch = scmBranch,
+            extraEnv = extraEnv,
+            env = env,
+            expectedProjectName = expectedProjectName,
+        ) { branch, payload ->
             assertNotNull(
                 structureService.getLastBuild(branch.id).getOrNull(),
                 "Build has been created"

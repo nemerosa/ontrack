@@ -37,6 +37,8 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-general")))
     testImplementation(testFixtures(project(":ontrack-extension-issues")))
     testImplementation(testFixtures(project(":ontrack-extension-git")))
+    testImplementation(testFixtures(project(":ontrack-extension-config")))
+    testImplementation(testFixtures(project(":ontrack-extension-scm")))
 
     testFixturesImplementation("org.junit.jupiter:junit-jupiter-api")
     testFixturesImplementation(project(":ontrack-test-utils"))
