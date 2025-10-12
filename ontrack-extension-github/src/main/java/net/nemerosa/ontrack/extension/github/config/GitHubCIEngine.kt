@@ -10,6 +10,16 @@ class GitHubCIEngine : CIEngine {
 
     override fun matchesEnv(env: Map<String, String>): Boolean = env[GITHUB_ACTIONS] == "true"
 
+    override fun getScmUrl(env: Map<String, String>): String? {
+        val serverUrl = env[GITHUB_SERVER_URL]
+        val repository = env[GITHUB_REPOSITORY]
+        return if (serverUrl != null && repository != null) {
+            "$serverUrl/$repository.git"
+        } else {
+            null
+        }
+    }
+
     override fun getProjectName(env: Map<String, String>): String? =
         super.getProjectName(env) ?: detectProjectName(env)
 
@@ -24,7 +34,7 @@ class GitHubCIEngine : CIEngine {
     }
 
     companion object {
-        // const val GITHUB_SERVER_URL = "GITHUB_SERVER_URL"
+        const val GITHUB_SERVER_URL = "GITHUB_SERVER_URL"
         const val GITHUB_REPOSITORY = "GITHUB_REPOSITORY"
         const val GITHUB_REF_NAME = "GITHUB_REF_NAME"
         const val GITHUB_RUN_NUMBER = "GITHUB_RUN_NUMBER"

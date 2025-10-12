@@ -16,6 +16,8 @@ class JenkinsCIEngine : CIEngine {
         super.getProjectName(env)
             ?: detectProjectName(env)
 
+    override fun getScmUrl(env: Map<String, String>): String? = env[EnvConstants.GIT_URL]
+
     private fun detectProjectName(env: Map<String, String>): String? {
         val gitUrl = env[EnvConstants.GIT_URL] ?: return null
         return gitUrlRegex.matchEntire(gitUrl)?.groupValues?.getOrNull(1)

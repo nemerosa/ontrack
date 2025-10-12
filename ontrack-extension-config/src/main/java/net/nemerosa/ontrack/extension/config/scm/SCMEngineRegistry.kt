@@ -8,5 +8,7 @@ class SCMEngineRegistry(
 ) {
     private val index = scmEngines.associateBy { it.name }
 
+    val engines: List<SCMEngine> = index.values.toList()
+
     fun findSCMEngine(name: String): SCMEngine? = index[name]
 }

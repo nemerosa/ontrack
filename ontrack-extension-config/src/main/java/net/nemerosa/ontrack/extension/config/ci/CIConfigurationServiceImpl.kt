@@ -6,9 +6,7 @@ import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineNotDetectedExcept
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineNotFoundException
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineRegistry
 import net.nemerosa.ontrack.extension.config.model.*
-import net.nemerosa.ontrack.extension.config.scm.SCMEngine
-import net.nemerosa.ontrack.extension.config.scm.SCMEngineNotFoundException
-import net.nemerosa.ontrack.extension.config.scm.SCMEngineRegistry
+import net.nemerosa.ontrack.extension.config.scm.*
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -34,9 +32,9 @@ class CIConfigurationServiceImpl(
         // Converting the environment into a map
         val env = env.associate { it.name to it.value }
         // Getting the CI engine from the configuration
-        val ciEngine = findCIEngine(ci, configuration, env)
+        val ciEngine = findCIEngine(ci, env)
         // Getting the SCM engine from the configuration
-        val scmEngine = findSCMEngine(scm, configuration)
+        val scmEngine = findSCMEngine(scm, ciEngine, env)
 
         // Getting the custom configurations which match the current environment
         val customConfigs = matchingConfigs(configuration, ciEngine, env)
@@ -139,18 +137,22 @@ class CIConfigurationServiceImpl(
 
     private fun findSCMEngine(
         scm: String?,
-        configuration: ConfigurationInput
-    ): SCMEngine =
+        ciEngine: CIEngine,
+        env: Map<String, String>,
+    ): SCMEngine {
         if (scm.isNullOrBlank()) {
-            TODO("Getting the SCM engine from the configuration")
+            val scmUrl = ciEngine.getScmUrl(env) ?: throw SCMEngineNoURLException()
+            return scmEngineRegistry.engines.find {
+                it.matchesUrl(scmUrl)
+            } ?: throw SCMEngineNotDetectedException()
         } else {
-            scmEngineRegistry.findSCMEngine(scm)
+            return scmEngineRegistry.findSCMEngine(scm)
                 ?: throw SCMEngineNotFoundException(scm)
         }
+    }
 
     private fun findCIEngine(
         ci: String?,
-        configuration: ConfigurationInput,
         env: Map<String, String>,
     ) =
         if (ci.isNullOrBlank()) {

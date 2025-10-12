@@ -32,6 +32,14 @@ interface CIEngine {
     fun matchesEnv(env: Map<String, String>): Boolean
 
     /**
+     * Gets the SCM URL associated with this CI engine and this environment.
+     *
+     * @param env Environment to check
+     * @return SCM URL or null if cannot be determined from the environment
+     */
+    fun getScmUrl(env: Map<String, String>): String? = null
+
+    /**
      * ID of the engine
      */
     val name: String

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.jenkins.config
 
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNull
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -13,6 +14,16 @@ class JenkinsCIEngineTest {
         assertTrue(engine.matchesEnv(mapOf("JENKINS_URL" to "uri:jenkins")))
         assertFalse(engine.matchesEnv(mapOf("JENKINS_URL" to "")))
         assertFalse(engine.matchesEnv(emptyMap()))
+    }
+
+    @Test
+    fun `Jenkins SCM URL`() {
+        val engine = JenkinsCIEngine()
+        assertNull(engine.getScmUrl(emptyMap()))
+        assertEquals(
+            "https://github.com/nemerosa/ontrack.git",
+            engine.getScmUrl(mapOf("GIT_URL" to "https://github.com/nemerosa/ontrack.git"))
+        )
     }
 
     @Test

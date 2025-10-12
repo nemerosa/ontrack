@@ -46,6 +46,14 @@ interface SCMEngine {
     fun configureBuild(build: Build, configuration: BuildConfiguration, env: Map<String, String>)
 
     /**
+     * Checks if the given SCM URL matches this SCM engine.
+     *
+     * @param scmUrl URL to check
+     * @return `true` if the URL matches this SCM engine
+     */
+    fun matchesUrl(scmUrl: String): Boolean
+
+    /**
      * Identifier for the SCM engine.
      */
     val name: String
