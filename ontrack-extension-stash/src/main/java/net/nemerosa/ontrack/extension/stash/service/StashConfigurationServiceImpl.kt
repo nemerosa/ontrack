@@ -1,11 +1,8 @@
 package net.nemerosa.ontrack.extension.stash.service
 
-import net.nemerosa.ontrack.client.OTHttpClient
-import net.nemerosa.ontrack.client.ResponseParser
+import net.nemerosa.ontrack.extension.stash.client.BitbucketClientFactory
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.extension.support.AbstractConfigurationService
-import net.nemerosa.ontrack.extension.support.client.ClientConnection
-import net.nemerosa.ontrack.extension.support.client.ClientFactory
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.security.EncryptionService
@@ -24,7 +21,7 @@ class StashConfigurationServiceImpl(
         encryptionService: EncryptionService,
         eventPostService: EventPostService,
         eventFactory: EventFactory,
-        private val clientFactory: ClientFactory,
+        private val bitbucketClientFactory: BitbucketClientFactory,
         ontrackConfigProperties: OntrackConfigProperties
 ) : AbstractConfigurationService<StashConfiguration>(
         StashConfiguration::class.java,
@@ -40,23 +37,12 @@ class StashConfigurationServiceImpl(
 
     override fun validate(configuration: StashConfiguration): ConnectionResult {
         return try {
-            val client = getHttpClient(configuration)
-            if (client.get(ResponseParser { _: String? -> true }, "projects")) {
-                ConnectionResult.ok()
-            } else {
-                ConnectionResult.error("Cannot get the content of the Stash home page")
-            }
+            val client = bitbucketClientFactory.getBitbucketClient(configuration)
+            client.projects
+            ConnectionResult.ok()
         } catch (ex: Exception) {
             ConnectionResult.error(ex)
         }
     }
-
-    private fun getHttpClient(configuration: StashConfiguration): OTHttpClient = clientFactory.getHttpClient(
-            ClientConnection(
-                    configuration.url,
-                    configuration.user,
-                    configuration.password
-            )
-    )
 
 }
