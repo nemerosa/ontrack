@@ -10,4 +10,5 @@ data class CIProjectConfig(
     @APIDescription("Name of the SCM configuration to use for this project")
     val scmConfig: String? = null,
     val issueServiceIdentifier: ProjectIssueServiceIdentifier? = null,
+    val scmIndexationInterval: Int? = null,
 ) : CIPropertiesConfig

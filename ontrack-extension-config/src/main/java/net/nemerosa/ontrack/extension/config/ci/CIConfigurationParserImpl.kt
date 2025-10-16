@@ -180,6 +180,7 @@ class CIConfigurationParserImpl(
             projectName = project.name,
             scmConfig = project.scmConfig,
             issueServiceIdentifier = project.issueServiceIdentifier,
+            scmIndexationInterval = project.scmIndexationInterval,
         )
     }
 

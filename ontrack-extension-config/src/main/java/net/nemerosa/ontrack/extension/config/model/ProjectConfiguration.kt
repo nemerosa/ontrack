@@ -8,11 +8,13 @@ data class ProjectConfiguration(
     val projectName: String? = null,
     val scmConfig: String? = null,
     val issueServiceIdentifier: ProjectIssueServiceIdentifier? = null,
+    val scmIndexationInterval: Int? = null,
 ) : PropertiesConfiguration {
     fun isNotEmpty(): Boolean = properties.isNotEmpty()
     fun merge(project: ProjectConfiguration) = ProjectConfiguration(
         properties = this.properties + project.properties,
         projectName = project.projectName ?: this.projectName,
         issueServiceIdentifier = project.issueServiceIdentifier ?: this.issueServiceIdentifier,
+        scmIndexationInterval = project.scmIndexationInterval ?: this.scmIndexationInterval,
     )
 }

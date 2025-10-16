@@ -6,6 +6,7 @@ plugins {
 dependencies {
     api(project(":ontrack-extension-scm"))
     api(project(":ontrack-extension-stale"))
+    api(project(":ontrack-extension-config"))
     api(project(":ontrack-git"))
     api(project(":ontrack-tx"))
     api(project(":ontrack-json"))

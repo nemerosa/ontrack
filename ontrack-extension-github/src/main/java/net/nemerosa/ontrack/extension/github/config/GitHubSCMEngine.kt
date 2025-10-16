@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.config.model.BuildConfiguration
 import net.nemerosa.ontrack.extension.config.model.ProjectConfiguration
 import net.nemerosa.ontrack.extension.config.scm.AbstractSCMEngine
 import net.nemerosa.ontrack.extension.config.scm.SCMEngineNoURLException
+import net.nemerosa.ontrack.extension.git.config.GitSCMEngineHelper
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component
 class GitHubSCMEngine(
     propertyService: PropertyService,
     private val gitHubConfigurationService: GitHubConfigurationService,
+    private val gitSCMEngineHelper: GitSCMEngineHelper,
 ) : AbstractSCMEngine(
     propertyService = propertyService,
     name = "github",
@@ -38,7 +40,7 @@ class GitHubSCMEngine(
         val projectConfig = GitHubProjectConfigurationProperty(
             configuration = githubConfig,
             repository = githubRepository,
-            indexationInterval = 0, // TODO
+            indexationInterval = configuration.scmIndexationInterval ?: 0,
             issueServiceConfigurationIdentifier = configuration.issueServiceIdentifier?.toRepresentation(),
         )
         val existingConfig =
@@ -86,7 +88,10 @@ class GitHubSCMEngine(
         env: Map<String, String>,
         scmBranch: String
     ) {
-        TODO("Not yet implemented")
+        gitSCMEngineHelper.configureBranch(
+            branch = branch,
+            scmBranch = scmBranch,
+        )
     }
 
     override fun configureBuild(
@@ -94,7 +99,13 @@ class GitHubSCMEngine(
         configuration: BuildConfiguration,
         env: Map<String, String>
     ) {
-        TODO("Not yet implemented")
+        val commit = env[GITHUB_SHA]
+        if (!commit.isNullOrBlank()) {
+            gitSCMEngineHelper.configureBuild(
+                build = build,
+                commit = commit,
+            )
+        }
     }
 
     override fun matchesUrl(scmUrl: String): Boolean =
@@ -106,5 +117,7 @@ class GitHubSCMEngine(
         const val SCM_URL_SSH = "git@github.com:"
 
         private val scmUrlRepoRegex = "([^/:]*)/([^/]*)\\.git$".toRegex()
+
+        const val GITHUB_SHA = "GITHUB_SHA"
     }
 }

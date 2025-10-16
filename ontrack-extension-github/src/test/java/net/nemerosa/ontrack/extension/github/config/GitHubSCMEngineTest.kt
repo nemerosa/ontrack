@@ -12,6 +12,7 @@ class GitHubSCMEngineTest {
     private val engine = GitHubSCMEngine(
         propertyService = mockk(),
         gitHubConfigurationService = mockk(),
+        gitSCMEngineHelper = mockk(),
     )
 
     @Test

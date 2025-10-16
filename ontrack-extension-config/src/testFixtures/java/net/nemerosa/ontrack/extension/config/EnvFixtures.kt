@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.config
 object EnvFixtures {
 
     fun generic(
-        scmBranch: String = "release/1.51",
+        scmBranch: String = TEST_BRANCH,
         extraEnv: Map<String, String> = emptyMap(),
     ) = mapOf(
         "PROJECT_NAME" to "yontrack",
@@ -14,7 +14,7 @@ object EnvFixtures {
     ) + extraEnv
 
     fun jenkins(
-        scmBranch: String = "release/1.51",
+        scmBranch: String = TEST_BRANCH,
         extraEnv: Map<String, String> = emptyMap(),
     ) = mapOf(
         "JENKINS_URL" to "https://jenkins.dev.yontrack.com",
@@ -24,7 +24,7 @@ object EnvFixtures {
 
     fun gitHub(
         projectName: String = "yontrack",
-        scmBranch: String = "release/5.1",
+        scmBranch: String = TEST_BRANCH,
         runNumber: Long = 96L,
         extraEnv: Map<String, String> = emptyMap(),
     ) = mapOf(
@@ -33,6 +33,10 @@ object EnvFixtures {
         "GITHUB_REF_NAME" to scmBranch,
         "GITHUB_ACTIONS" to "true",
         "GITHUB_RUN_NUMBER" to runNumber.toString(),
+        "GITHUB_SHA" to TEST_COMMIT,
     ) + extraEnv
+
+    const val TEST_BRANCH = "release/1.51"
+    const val TEST_COMMIT = "7c0b1745f513b9162791651582c0044d7b6d2a83"
 
 }

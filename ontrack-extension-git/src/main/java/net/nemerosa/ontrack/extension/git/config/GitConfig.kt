@@ -7,6 +7,9 @@ import net.nemerosa.ontrack.model.support.EnvService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
+/**
+ * TODO Move to another package.
+ */
 @Configuration
 class GitConfig(
     private val envService: EnvService,

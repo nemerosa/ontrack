@@ -22,7 +22,11 @@ class GitCommitPropertyCommitLink(
     private val propertyService: PropertyService
 ) : BuildGitCommitLink<NoConfig> {
 
-    override val id: String = "git-commit-property"
+    companion object {
+        const val ID = "git-commit-property"
+    }
+
+    override val id: String = ID
     override val name: String = "Git Commit Property"
 
     override fun clone(data: NoConfig, replacementFunction: (String) -> String): NoConfig {
