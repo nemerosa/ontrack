@@ -3,16 +3,18 @@ plugins {
     `java-test-fixtures`
 }
 
+configurations.create("testRuntimeExport")
+
 dependencies {
     api(project(":ontrack-extension-scm"))
     api(project(":ontrack-extension-stale"))
-    api(project(":ontrack-extension-config"))
     api(project(":ontrack-git"))
     api(project(":ontrack-tx"))
     api(project(":ontrack-json"))
 
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-repository-support"))
+    implementation(project(":ontrack-extension-config"))
     implementation("org.springframework:spring-tx")
     implementation("commons-io:commons-io")
     implementation("org.apache.commons:commons-lang3")
@@ -33,4 +35,6 @@ dependencies {
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
     testRuntimeOnly("org.springframework.boot:spring-boot-starter-web")
+
+    "testRuntimeExport"(project(":ontrack-extension-auto-versioning"))
 }
