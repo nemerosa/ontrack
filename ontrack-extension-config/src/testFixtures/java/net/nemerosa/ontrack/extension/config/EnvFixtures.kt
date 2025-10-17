@@ -17,9 +17,12 @@ object EnvFixtures {
         scmBranch: String = TEST_BRANCH,
         extraEnv: Map<String, String> = emptyMap(),
     ) = mapOf(
-        "JENKINS_URL" to "https://jenkins.dev.yontrack.com",
+        "JENKINS_URL" to JENKINS_URL,
         "GIT_URL" to "https://github.com/nemerosa/ontrack.git",
         "BRANCH_NAME" to scmBranch,
+        "BUILD_NUMBER" to "23",
+        "BUILD_URL" to "$JENKINS_URL/job/nemerosa/job/ontrack/job/main/23/",
+        "JOB_NAME" to "nemerosa/ontrack/main",
     ) + extraEnv
 
     fun gitHub(
@@ -38,5 +41,7 @@ object EnvFixtures {
 
     const val TEST_BRANCH = "release/1.51"
     const val TEST_COMMIT = "7c0b1745f513b9162791651582c0044d7b6d2a83"
+
+    const val JENKINS_URL = "https://jenkins.dev.yontrack.com"
 
 }

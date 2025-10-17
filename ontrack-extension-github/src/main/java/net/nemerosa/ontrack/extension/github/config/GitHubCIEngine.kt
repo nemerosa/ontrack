@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.github.config
 
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
+import net.nemerosa.ontrack.extension.config.model.BuildConfiguration
+import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Component
 
 @Component
@@ -31,6 +33,14 @@ class GitHubCIEngine : CIEngine {
     private fun detectProjectName(env: Map<String, String>): String? {
         val fullName = env[GITHUB_REPOSITORY] ?: return null
         return fullName.substringAfter("/")
+    }
+
+    override fun configureBuild(
+        build: Build,
+        configuration: BuildConfiguration,
+        env: Map<String, String>
+    ) {
+        TODO("Not yet implemented")
     }
 
     companion object {

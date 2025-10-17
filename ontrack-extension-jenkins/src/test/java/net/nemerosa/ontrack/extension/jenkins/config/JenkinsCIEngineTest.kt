@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.jenkins.config
 
+import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNull
 import kotlin.test.assertEquals
@@ -10,7 +11,7 @@ class JenkinsCIEngineTest {
 
     @Test
     fun `Jenkins detection`() {
-        val engine = JenkinsCIEngine()
+        val engine = mockJenkinsCIEngine()
         assertTrue(engine.matchesEnv(mapOf("JENKINS_URL" to "uri:jenkins")))
         assertFalse(engine.matchesEnv(mapOf("JENKINS_URL" to "")))
         assertFalse(engine.matchesEnv(emptyMap()))
@@ -18,7 +19,7 @@ class JenkinsCIEngineTest {
 
     @Test
     fun `Jenkins SCM URL`() {
-        val engine = JenkinsCIEngine()
+        val engine = mockJenkinsCIEngine()
         assertNull(engine.getScmUrl(emptyMap()))
         assertEquals(
             "https://github.com/nemerosa/ontrack.git",
@@ -28,7 +29,7 @@ class JenkinsCIEngineTest {
 
     @Test
     fun `Jenkins project name`() {
-        val engine = JenkinsCIEngine()
+        val engine = mockJenkinsCIEngine()
         assertEquals(
             "yontrack", engine.getProjectName(
                 mapOf(
@@ -48,16 +49,21 @@ class JenkinsCIEngineTest {
 
     @Test
     fun `Jenkins branch name`() {
-        val engine = JenkinsCIEngine()
+        val engine = mockJenkinsCIEngine()
         assertEquals("main", engine.getBranchName(mapOf("BRANCH_NAME" to "main")))
         assertEquals(null, engine.getBranchName(emptyMap()))
     }
 
     @Test
     fun `Jenkins build suffix is the build number`() {
-        val engine = JenkinsCIEngine()
+        val engine = mockJenkinsCIEngine()
         assertEquals("23", engine.getBuildSuffix(mapOf("BUILD_NUMBER" to "23")))
         assertEquals(null, engine.getBuildSuffix(mapOf("NO_BUILD_NUMBER" to "23")))
     }
+
+    private fun mockJenkinsCIEngine(): JenkinsCIEngine = JenkinsCIEngine(
+        propertyService = mockk(),
+        jenkinsConfigurationService = mockk(),
+    )
 
 }

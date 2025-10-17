@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.config.ci.engine
 
+import net.nemerosa.ontrack.extension.config.model.BuildConfiguration
 import net.nemerosa.ontrack.extension.config.model.EnvConstants
+import net.nemerosa.ontrack.model.structure.Build
 
 interface CIEngine {
 
@@ -38,6 +40,15 @@ interface CIEngine {
      * @return SCM URL or null if cannot be determined from the environment
      */
     fun getScmUrl(env: Map<String, String>): String? = null
+
+    /**
+     * Configures a build with this CI engine.
+     *
+     * @param build Build to configure
+     * @param configuration Configuration for the build
+     * @param env Environment variables to use for the configuration
+     */
+    fun configureBuild(build: Build, configuration: BuildConfiguration, env: Map<String, String>)
 
     /**
      * ID of the engine

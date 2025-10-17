@@ -2,16 +2,24 @@ package net.nemerosa.ontrack.extension.jenkins.config
 
 import net.nemerosa.ontrack.extension.config.ConfigTestSupport
 import net.nemerosa.ontrack.extension.config.EnvFixtures
+import net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType
+import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
+import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class JenkinsCIEngineIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var configTestSupport: ConfigTestSupport
+
+    @Autowired
+    private lateinit var jenkinsConfigurationService: JenkinsConfigurationService
 
     @Test
     @AsAdminTest
@@ -67,6 +75,40 @@ class JenkinsCIEngineIT : AbstractDSLTestSupport() {
             expectedProjectName = "nemerosa"
         ) { project, _ ->
             assertEquals("nemerosa", project.name)
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Link to the Jenkins job at build level`() {
+        jenkinsConfiguration()
+        val build = configTestSupport.withConfigServiceBuild(
+            scm = "mock",
+            env = EnvFixtures.jenkins()
+        )
+        // Checking the Jenkins link
+        assertNotNull(
+            propertyService.getPropertyValue(build, JenkinsBuildPropertyType::class.java),
+            "Jenkins build property is set"
+        ) {
+            assertEquals("https://jenkins.dev.yontrack.com/job/nemerosa/job/ontrack/job/main/23", it.url)
+            assertEquals("nemerosa/ontrack/main", it.job)
+            assertEquals(23, it.build)
+        }
+    }
+
+    private fun jenkinsConfiguration(
+        name: String = uid("jenkins-"),
+        url: String = EnvFixtures.JENKINS_URL,
+    ) {
+        withDisabledConfigurationTest {
+            val configuration = JenkinsConfiguration(
+                name = name,
+                url = url,
+                user = "user",
+                password = "password",
+            )
+            jenkinsConfigurationService.newConfiguration(configuration)
         }
     }
 
