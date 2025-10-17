@@ -28,16 +28,26 @@ object EnvFixtures {
     fun gitHub(
         projectName: String = "yontrack",
         scmBranch: String = TEST_BRANCH,
+        workflowName: String = GITHUB_WORKFLOW,
+        runId: Long = GITHUB_RUN_ID,
         runNumber: Long = 96L,
+        eventName: String = GITHUB_EVENT_NAME,
         extraEnv: Map<String, String> = emptyMap(),
     ) = mapOf(
         "GITHUB_SERVER_URL" to "https://github.com",
         "GITHUB_REPOSITORY" to "yontrack/$projectName",
+        "GITHUB_WORKFLOW" to workflowName,
         "GITHUB_REF_NAME" to scmBranch,
         "GITHUB_ACTIONS" to "true",
+        "GITHUB_RUN_ID" to runId.toString(),
         "GITHUB_RUN_NUMBER" to runNumber.toString(),
         "GITHUB_SHA" to TEST_COMMIT,
+        "GITHUB_EVENT_NAME" to eventName,
     ) + extraEnv
+
+    const val GITHUB_RUN_ID = 18289595913L
+    const val GITHUB_WORKFLOW = "Workflow name"
+    const val GITHUB_EVENT_NAME = "push"
 
     const val TEST_BRANCH = "release/1.51"
     const val TEST_COMMIT = "7c0b1745f513b9162791651582c0044d7b6d2a83"

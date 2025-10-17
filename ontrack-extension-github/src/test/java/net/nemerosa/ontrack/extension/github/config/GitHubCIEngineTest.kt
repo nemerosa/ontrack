@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.config
 
+import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNull
 import kotlin.test.assertEquals
@@ -10,7 +11,7 @@ class GitHubCIEngineTest {
 
     @Test
     fun `GitHub CI engine`() {
-        val engine = GitHubCIEngine()
+        val engine = GitHubCIEngine(mockk())
         assertTrue(engine.matchesEnv(mapOf("GITHUB_ACTIONS" to "true")))
         assertFalse(engine.matchesEnv(mapOf("GITHUB_ACTIONS" to "false")))
         assertFalse(engine.matchesEnv(emptyMap()))
@@ -18,7 +19,7 @@ class GitHubCIEngineTest {
 
     @Test
     fun `GitHub SCM URL`() {
-        val engine = GitHubCIEngine()
+        val engine = GitHubCIEngine(mockk())
         assertNull(engine.getScmUrl(emptyMap()))
         assertEquals(
             "https://github.com/nemerosa/ontrack.git",
