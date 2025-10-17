@@ -34,7 +34,7 @@ dependencies {
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
-    testRuntimeOnly("org.springframework.boot:spring-boot-starter-web")
+    testRuntimeOnly(project(":ontrack-extension-auto-versioning"))
 
-    "testRuntimeExport"(project(":ontrack-extension-auto-versioning"))
+    testRuntimeOnly("org.springframework.boot:spring-boot-starter-web")
 }

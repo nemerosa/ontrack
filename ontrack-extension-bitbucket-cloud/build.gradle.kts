@@ -22,6 +22,5 @@ dependencies {
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
-
-    testRuntimeOnly(project(path = ":ontrack-extension-git", configuration = "testRuntimeExport"))
+    testRuntimeOnly(project(":ontrack-extension-auto-versioning"))
 }

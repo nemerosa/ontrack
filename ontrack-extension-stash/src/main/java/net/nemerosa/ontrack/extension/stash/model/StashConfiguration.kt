@@ -44,4 +44,18 @@ class StashConfiguration(
         )
     }
 
+    /**
+     * Checks if a given "git clone" URL is associated with this configuration.
+     *
+     * @param url URL to test (like `https://bitbucket.dev.yontrack.com/scm/nemerosa/ontrack.git`
+     * or `ssh://git@bitbucket.dev.yontrack.com:7999/nemerosa/ontrack.git`)
+     * @return `true` if the URL is associated with this configuration
+     */
+    fun matchesUrl(url: String): Boolean {
+        // Extract the host from the configuration URL
+        val configHost = this.url.removePrefix("https://").removePrefix("http://").removeSuffix("/")
+        // Check if the provided URL contains the configuration host
+        return url.contains(configHost)
+    }
+
 }

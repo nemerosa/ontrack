@@ -1,13 +1,15 @@
-package net.nemerosa.ontrack.extension.github.config
+package net.nemerosa.ontrack.extension.stash.config
 
 import net.nemerosa.ontrack.extension.config.ConfigTestSupport
 import net.nemerosa.ontrack.extension.config.EnvFixtures
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
-import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
-import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
-import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
+import net.nemerosa.ontrack.extension.stash.BitbucketServerFixtures
+import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
+import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType
+import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.BeforeEach
@@ -17,27 +19,29 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
-class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
+class BitbucketServerSCMEngineIT : AbstractDSLTestSupport() {
 
     @Autowired
-    private lateinit var gitHubConfigurationService: GitHubConfigurationService
+    private lateinit var stashConfigurationService: StashConfigurationService
 
     @Autowired
     private lateinit var configTestSupport: ConfigTestSupport
 
     @BeforeEach
     fun cleanup() {
-        gitHubConfigurationService.configurations.forEach {
-            gitHubConfigurationService.deleteConfiguration(it.name)
+        stashConfigurationService.configurations.forEach {
+            stashConfigurationService.deleteConfiguration(it.name)
         }
     }
 
     @Test
     @AsAdminTest
     fun `Configuration of the project with unexisting configuration`() {
-        assertFailsWith<GitHubSCMUnexistingConfigException> {
+        assertFailsWith<BitbucketServerSCMUnexistingConfigException> {
             configTestSupport.withConfigServiceBuild(
-                env = EnvFixtures.gitHub(),
+                ci = "generic",
+                scm = "bitbucket-server",
+                env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(),
             )
         }
     }
@@ -45,22 +49,25 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     @Test
     @AsAdminTest
     fun `Configuration of the project with existing configuration being detected`() {
-        val config = gitHubConfiguration()
+        val config = bitbucketServerConfig()
         val project = configTestSupport.withConfigServiceProject(
-            ci = null,
-            scm = null,
-            env = EnvFixtures.gitHub(),
+            ci = "generic",
+            env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(),
         )
         assertNotNull(
-            propertyService.getPropertyValue(project, GitHubProjectConfigurationPropertyType::class.java),
-            "GitHub project configuration has been set"
+            propertyService.getPropertyValue(project, StashProjectConfigurationPropertyType::class.java),
+            "Bitbucket Server project configuration has been set"
         ) {
             assertEquals(
                 config.name,
                 it.configuration.name,
             )
             assertEquals(
-                "yontrack/yontrack",
+                "nemerosa",
+                it.project,
+            )
+            assertEquals(
+                "yontrack",
                 it.repository,
             )
             assertEquals(
@@ -73,7 +80,7 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     @Test
     @AsAdminTest
     fun `Configuration of the project with indexation interval`() {
-        val config = gitHubConfiguration()
+        val config = bitbucketServerConfig()
         val project = configTestSupport.withConfigServiceProject(
             yaml = """
                 version: v1
@@ -82,20 +89,24 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
                     project:
                       scmIndexationInterval: 30
             """.trimIndent(),
-            ci = null,
+            ci = "generic",
             scm = null,
-            env = EnvFixtures.gitHub(),
+            env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(),
         )
         assertNotNull(
-            propertyService.getPropertyValue(project, GitHubProjectConfigurationPropertyType::class.java),
-            "GitHub project configuration has been set"
+            propertyService.getPropertyValue(project, StashProjectConfigurationPropertyType::class.java),
+            "Bitbucket Server project configuration has been set"
         ) {
             assertEquals(
                 config.name,
                 it.configuration.name,
             )
             assertEquals(
-                "yontrack/yontrack",
+                "nemerosa",
+                it.project,
+            )
+            assertEquals(
+                "yontrack",
                 it.repository,
             )
             assertEquals(
@@ -109,7 +120,7 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     @AsAdminTest
     fun `Configuration of the project with explicit configuration`() {
         val configName = uid("cfg-")
-        val config = gitHubConfiguration(gitConfigurationName = configName)
+        val config = bitbucketServerConfig(name = configName)
         val project = configTestSupport.withConfigServiceProject(
             yaml = """
                 version: v1
@@ -118,20 +129,24 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
                     project:
                       scmConfig: $configName
             """.trimIndent(),
-            ci = null,
+            ci = "generic",
             scm = null,
-            env = EnvFixtures.gitHub(),
+            env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(),
         )
         assertNotNull(
-            propertyService.getPropertyValue(project, GitHubProjectConfigurationPropertyType::class.java),
-            "GitHub project configuration has been set"
+            propertyService.getPropertyValue(project, StashProjectConfigurationPropertyType::class.java),
+            "Bitbucket Server project configuration has been set"
         ) {
             assertEquals(
                 config.name,
                 it.configuration.name,
             )
             assertEquals(
-                "yontrack/yontrack",
+                "nemerosa",
+                it.project,
+            )
+            assertEquals(
+                "yontrack",
                 it.repository,
             )
         }
@@ -140,11 +155,11 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     @Test
     @AsAdminTest
     fun `Configuration of the branch with the Git branch`() {
-        gitHubConfiguration()
+        bitbucketServerConfig()
         val branch = configTestSupport.withConfigServiceBranch(
-            ci = null,
+            ci = "generic",
             scm = null,
-            env = EnvFixtures.gitHub(),
+            env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(),
         )
         assertNotNull(
             propertyService.getPropertyValue(branch, GitBranchConfigurationPropertyType::class.java),
@@ -172,12 +187,12 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     @Test
     @AsAdminTest
     fun `Configuration of the build with the Git commit`() {
-        gitHubConfiguration()
+        bitbucketServerConfig()
         withDisabledConfigurationTest {
             val build = configTestSupport.withConfigServiceBuild(
-                ci = null,
+                ci = "generic",
                 scm = null,
-                env = EnvFixtures.gitHub(),
+                env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(),
             )
             assertNotNull(
                 propertyService.getPropertyValue(build, GitCommitPropertyType::class.java),
@@ -189,6 +204,22 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
                 )
             }
         }
+    }
+
+    private fun bitbucketServerConfig(
+        name: String = uid("stash-"),
+        url: String = BitbucketServerFixtures.BITBUCKET_SERVER_URL,
+    ): StashConfiguration {
+        val configuration = BitbucketServerFixtures.bitbucketServerConfig(
+            name = name,
+            url = url,
+        )
+        withDisabledConfigurationTest {
+            stashConfigurationService.newConfiguration(
+                configuration,
+            )
+        }
+        return configuration
     }
 
 }

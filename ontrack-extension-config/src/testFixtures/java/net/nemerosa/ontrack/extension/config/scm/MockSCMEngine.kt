@@ -55,7 +55,8 @@ class MockSCMEngine(
     override fun configureBuild(
         build: Build,
         configuration: BuildConfiguration,
-        env: Map<String, String>
+        env: Map<String, String>,
+        ciEngine: CIEngine,
     ) {
         val id = env[EnvConstants.GENERIC_BUILD_REVISION]
         if (!id.isNullOrBlank()) {

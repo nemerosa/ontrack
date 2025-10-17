@@ -136,7 +136,7 @@ class CoreConfigurationServiceImpl(
             )
 
         // Configuration of the build SCM (using the SCM engine)
-        scmEngine.configureBuild(build, configuration, env)
+        scmEngine.configureBuild(build, configuration, env, ciEngine)
         // Configuration of the build using the CI engine
         ciEngine.configureBuild(build, configuration, env)
 

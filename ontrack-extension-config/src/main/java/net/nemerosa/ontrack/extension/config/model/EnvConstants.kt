@@ -31,7 +31,17 @@ object EnvConstants {
     const val GENERIC_BUILD_REVISION = "BUILD_REVISION"
 
     /**
+     * SCM URL
+     */
+    const val GENERIC_SCM_URL = "SCM_URL"
+
+    /**
      * Git URL
      */
     const val GIT_URL = "GIT_URL"
+
+    /**
+     * Git commit
+     */
+    const val GIT_COMMIT = "GIT_COMMIT"
 }

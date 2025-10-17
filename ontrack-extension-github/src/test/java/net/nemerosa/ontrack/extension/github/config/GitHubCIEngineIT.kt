@@ -78,33 +78,21 @@ class GitHubCIEngineIT : AbstractGitHubTestSupport() {
     @Test
     @AsAdminTest
     fun `GitHub CI engine getting the branch name from the native environment`() {
-        configTestSupport.withConfigAndBranch(
-            """
-                version: v1
-                configuration: {}
-            """.trimIndent(),
-            ci = null,
-            env = EnvFixtures.gitHub(),
-            expectedProjectName = "yontrack"
-        ) { branch, _ ->
-            assertEquals("release-5.1", branch.name)
-        }
+        gitHubConfiguration()
+        val branch = configTestSupport.withConfigServiceBranch(
+            env = EnvFixtures.gitHub()
+        )
+        assertEquals("release-1.51", branch.name)
     }
 
     @Test
     @AsAdminTest
     fun `GitHub CI engine getting the build suffix from the native environment`() {
-        configTestSupport.withConfigAndBuild(
-            """
-                version: v1
-                configuration: {}
-            """.trimIndent(),
-            ci = null,
+        gitHubConfiguration()
+        val build = configTestSupport.withConfigServiceBuild(
             env = EnvFixtures.gitHub(),
-            expectedProjectName = "yontrack"
-        ) { build, _ ->
-            assertTrue(build.name.endsWith("-96"), "Build name contains the run number: ${build.name}")
-        }
+        )
+        assertTrue(build.name.endsWith("-96"), "Build name contains the run number: ${build.name}")
     }
 
     @Test

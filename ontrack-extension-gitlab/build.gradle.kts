@@ -17,4 +17,5 @@ dependencies {
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
+    testRuntimeOnly(project(":ontrack-extension-auto-versioning"))
 }

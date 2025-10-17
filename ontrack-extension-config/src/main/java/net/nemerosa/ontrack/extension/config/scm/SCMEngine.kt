@@ -45,8 +45,9 @@ interface SCMEngine {
      * @param build Build to configure
      * @param configuration Configuration for the build
      * @param env Environment variables to use for the configuration
+     * @param ciEngine CI engine used for this configuration
      */
-    fun configureBuild(build: Build, configuration: BuildConfiguration, env: Map<String, String>)
+    fun configureBuild(build: Build, configuration: BuildConfiguration, env: Map<String, String>, ciEngine: CIEngine)
 
     /**
      * Checks if the given SCM URL matches this SCM engine.

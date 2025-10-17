@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":ontrack-extension-casc"))
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":ontrack-ui-graphql"))
+    implementation(project(":ontrack-extension-config"))
 
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))
@@ -17,7 +18,9 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-casc")))
     testImplementation(testFixtures(project(":ontrack-extension-git")))
     testImplementation(testFixtures(project(":ontrack-extension-issues")))
+    testImplementation(testFixtures(project(":ontrack-extension-config")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
+    testRuntimeOnly(project(":ontrack-extension-auto-versioning"))
 }

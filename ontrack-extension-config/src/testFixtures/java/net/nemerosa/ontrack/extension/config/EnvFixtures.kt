@@ -9,7 +9,7 @@ object EnvFixtures {
         "PROJECT_NAME" to "yontrack",
         "BRANCH_NAME" to scmBranch,
         "BUILD_NUMBER" to "23",
-        "BUILD_REVISION" to "abcd123",
+        "BUILD_REVISION" to TEST_COMMIT,
         "VERSION" to "5.1.12",
     ) + extraEnv
 

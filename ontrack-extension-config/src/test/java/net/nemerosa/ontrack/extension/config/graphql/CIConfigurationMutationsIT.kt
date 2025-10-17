@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.config.graphql
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationData
 import net.nemerosa.ontrack.extension.config.ConfigTestSupport
+import net.nemerosa.ontrack.extension.config.EnvFixtures
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
@@ -51,7 +52,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                 propertyService.getPropertyValue(build, MockSCMBuildCommitPropertyType::class.java),
                 "Build SCM config has been set"
             ) {
-                assertEquals("abcd123", it.id)
+                assertEquals(EnvFixtures.TEST_COMMIT, it.id)
             }
             // Build ID
             assertEquals(buildId, build.id())

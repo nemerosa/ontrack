@@ -28,6 +28,8 @@ class GitHubCIEngine(
         }
     }
 
+    override fun getScmRevision(env: Map<String, String>): String? = env[GITHUB_SHA]
+
     override fun getProjectName(env: Map<String, String>): String? =
         super.getProjectName(env) ?: detectProjectName(env)
 
@@ -80,5 +82,6 @@ class GitHubCIEngine(
         const val GITHUB_WORKFLOW = "GITHUB_WORKFLOW"
         const val GITHUB_EVENT_NAME = "GITHUB_EVENT_NAME"
         const val GITHUB_ACTIONS = "GITHUB_ACTIONS"
+        const val GITHUB_SHA = "GITHUB_SHA"
     }
 }

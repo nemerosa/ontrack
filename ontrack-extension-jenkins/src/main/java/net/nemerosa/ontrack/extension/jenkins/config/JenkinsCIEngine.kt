@@ -28,6 +28,8 @@ class JenkinsCIEngine(
 
     override fun getScmUrl(env: Map<String, String>): String? = env[EnvConstants.GIT_URL]
 
+    override fun getScmRevision(env: Map<String, String>): String? = env[EnvConstants.GIT_COMMIT]
+
     override fun configureBuild(
         build: Build,
         configuration: BuildConfiguration,

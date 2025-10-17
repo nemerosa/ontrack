@@ -42,6 +42,11 @@ interface CIEngine {
     fun getScmUrl(env: Map<String, String>): String? = null
 
     /**
+     * Gets the SCM revision associated with this CI engine and this environment.
+     */
+    fun getScmRevision(env: Map<String, String>): String?
+
+    /**
      * Configures a build with this CI engine.
      *
      * @param build Build to configure
