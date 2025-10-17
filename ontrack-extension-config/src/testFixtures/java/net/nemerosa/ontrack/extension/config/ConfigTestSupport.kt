@@ -3,7 +3,9 @@ package net.nemerosa.ontrack.extension.config
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.config.ci.CIConfigurationService
 import net.nemerosa.ontrack.extension.config.model.CIEnv
+import net.nemerosa.ontrack.extension.config.model.EffectiveConfiguration
 import net.nemerosa.ontrack.graphql.GraphQLTestSupport
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import kotlin.jvm.optionals.getOrNull
@@ -175,6 +177,41 @@ class ConfigTestSupport(
                 code(build, payload)
             }
         }
+
+    fun graphQLEffectiveConfiguration(
+        yaml: String = DEFAULT_CONFIG,
+        ci: String? = null,
+        scm: String? = null,
+        env: Map<String, String> = emptyMap(),
+        code: (EffectiveConfiguration) -> Unit,
+    ) {
+        graphQLTestSupport.run(
+            """
+                query EffectiveCIConfiguration(
+                    ${'$'}config: String!,
+                    ${'$'}ci: String,
+                    ${'$'}scm: String,
+                    ${'$'}env: [CIEnv!]!,
+                ) {
+                    effectiveCIConfiguration(input: {
+                        config: ${'$'}config,
+                        ci: ${'$'}ci,
+                        scm: ${'$'}scm,
+                        env: ${'$'}env,
+                    })
+                }
+            """,
+            mapOf(
+                "config" to yaml,
+                "ci" to ci,
+                "scm" to scm,
+                "env" to env.map { mapOf("name" to it.key, "value" to it.value) },
+            )
+        ) { data ->
+            val json = data.path("effectiveCIConfiguration")
+            code(json.parse())
+        }
+    }
 
     companion object {
         const val DEFAULT_CI = "generic"

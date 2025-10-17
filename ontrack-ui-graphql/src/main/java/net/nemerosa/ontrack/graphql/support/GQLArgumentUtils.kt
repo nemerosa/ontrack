@@ -51,7 +51,7 @@ fun stringArgument(
  * Creates a typed (input) GraphQL argument.
  *
  * @param name Name of the argument
- * @param typeName Name of the input
+ * @param typeName Type of the input
  * @param description Description of the argument
  * @param nullable If the argument is nullable or not
  */

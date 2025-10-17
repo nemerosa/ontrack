@@ -23,6 +23,41 @@ class CIConfigurationServiceImpl(
     private val coreConfigurationService: CoreConfigurationService,
 ) : CIConfigurationService {
 
+    override fun effectiveCIConfiguration(
+        config: String,
+        ci: String?,
+        scm: String?,
+        env: List<CIEnv>
+    ): EffectiveConfiguration {
+        val context = getConfigContext(
+            yaml = config,
+            ci = ci,
+            scm = scm,
+            env = env,
+        )
+        val projectConfiguration = consolidateProjectConfiguration(
+            input = context.configurationInput,
+            customConfigs = context.customConfigs,
+        )
+        val branchConfiguration = consolidateBranchConfiguration(
+            input = context.configurationInput,
+            customConfigs = context.customConfigs,
+        )
+        val buildConfiguration = consolidateBuildConfiguration(
+            input = context.configurationInput,
+            customConfigs = context.customConfigs,
+        )
+        return EffectiveConfiguration(
+            configuration = Configuration(
+                project = projectConfiguration,
+                branch = branchConfiguration,
+                build = buildConfiguration,
+            ),
+            ciEngine = context.ciEngine.name,
+            scmEngine = context.scmEngine.name,
+        )
+    }
+
     override fun configureProject(
         config: String,
         ci: String?,

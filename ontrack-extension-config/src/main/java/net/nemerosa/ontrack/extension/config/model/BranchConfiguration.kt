@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.config.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.PromotionLevelConfiguration
@@ -11,7 +12,10 @@ data class BranchConfiguration(
     val promotions: List<PromotionLevelConfiguration> = emptyList(),
     val autoVersioning: AutoVersioningConfig? = null,
 ) : PropertiesConfiguration {
-    fun isNotEmpty(): Boolean = properties.isNotEmpty() || validations.isNotEmpty() || promotions.isNotEmpty()
+    @JsonIgnore
+    fun isNotEmpty(): Boolean =
+        properties.isNotEmpty() || validations.isNotEmpty() || promotions.isNotEmpty() || autoVersioning != null
+
     fun merge(branch: BranchConfiguration) = BranchConfiguration(
         properties = this.properties + branch.properties,
         validations = this.validations + branch.validations,

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.config.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.model.annotations.APIDescription
 
 @APIDescription("Project configuration")
@@ -10,7 +11,15 @@ data class ProjectConfiguration(
     val issueServiceIdentifier: ProjectIssueServiceIdentifier? = null,
     val scmIndexationInterval: Int? = null,
 ) : PropertiesConfiguration {
-    fun isNotEmpty(): Boolean = properties.isNotEmpty()
+
+    @JsonIgnore
+    fun isNotEmpty(): Boolean = properties.isNotEmpty() ||
+            !projectName.isNullOrBlank() ||
+            !scmConfig.isNullOrBlank() ||
+            issueServiceIdentifier != null ||
+            scmIndexationInterval != null
+
+
     fun merge(project: ProjectConfiguration) = ProjectConfiguration(
         properties = this.properties + project.properties,
         projectName = project.projectName ?: this.projectName,

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.config.ci
 
 import net.nemerosa.ontrack.extension.config.model.CIEnv
+import net.nemerosa.ontrack.extension.config.model.EffectiveConfiguration
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
@@ -57,5 +58,22 @@ interface CIConfigurationService {
         scm: String?,
         env: List<CIEnv>,
     ): Build
+
+
+    /**
+     * Given a CI configuration and a context, returns an effective configuration.
+     *
+     * @param config YAML configuration
+     * @param ci Name of the CI provider (like "jenkins")
+     * @param scm Name of the SCM provider (like "github")
+     * @param env Environment variables
+     * @return Final configuration
+     */
+    fun effectiveCIConfiguration(
+        config: String,
+        ci: String?,
+        scm: String?,
+        env: List<CIEnv>,
+    ): EffectiveConfiguration
 
 }
