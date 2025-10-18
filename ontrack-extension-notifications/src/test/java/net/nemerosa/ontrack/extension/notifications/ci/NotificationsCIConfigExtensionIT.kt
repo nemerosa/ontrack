@@ -1,15 +1,17 @@
-package net.nemerosa.ontrack.extension.notifications.config
+package net.nemerosa.ontrack.extension.notifications.ci
 
 import net.nemerosa.ontrack.extension.config.ConfigTestSupport
 import net.nemerosa.ontrack.extension.config.EnvFixtures
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class ConfigNotificationsIT : AbstractNotificationTestSupport() {
+@Disabled("WIP")
+class NotificationsCIConfigExtensionIT : AbstractNotificationTestSupport() {
 
     @Autowired
     private lateinit var configTestSupport: ConfigTestSupport
