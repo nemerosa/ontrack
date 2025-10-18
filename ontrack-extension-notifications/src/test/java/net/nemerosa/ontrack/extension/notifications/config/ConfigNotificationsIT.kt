@@ -17,7 +17,7 @@ class ConfigNotificationsIT : AbstractNotificationTestSupport() {
     @Test
     @AsAdminTest
     fun `Setup of notifications with some conditions`() {
-        val branch = configTestSupport.withConfigServiceBranch(
+        val branch = configTestSupport.configureBranch(
             yaml = """
                 version: v1
                 configuration:

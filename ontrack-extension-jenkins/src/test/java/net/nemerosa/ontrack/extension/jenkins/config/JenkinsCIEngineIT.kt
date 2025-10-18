@@ -82,7 +82,7 @@ class JenkinsCIEngineIT : AbstractDSLTestSupport() {
     @AsAdminTest
     fun `Link to the Jenkins job at build level`() {
         jenkinsConfiguration()
-        val build = configTestSupport.withConfigServiceBuild(
+        val build = configTestSupport.configureBuild(
             scm = "mock",
             env = EnvFixtures.jenkins()
         )

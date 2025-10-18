@@ -5,7 +5,6 @@ plugins {
 
 dependencies {
     api(project(":ontrack-extension-support"))
-    api(project(":ontrack-extension-auto-versioning-config"))
 
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-scm"))
@@ -23,6 +22,7 @@ dependencies {
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation(project(":ontrack-extension-notifications"))
     implementation(project(":ontrack-extension-workflows"))
+    implementation(project(":ontrack-extension-config"))
 
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(testFixtures(project(":ontrack-model")))
@@ -31,6 +31,7 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-general")))
     testImplementation(testFixtures(project(":ontrack-extension-notifications")))
     testImplementation(testFixtures(project(":ontrack-extension-scm")))
+    testImplementation(testFixtures(project(":ontrack-extension-config")))
     // testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     // testImplementation(project(path = ":ontrack-extension-workflows", configuration = "tests"))
     // testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))

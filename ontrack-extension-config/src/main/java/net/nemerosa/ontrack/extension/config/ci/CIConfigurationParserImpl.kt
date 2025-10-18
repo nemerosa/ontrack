@@ -2,9 +2,13 @@ package net.nemerosa.ontrack.extension.config.ci
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
+import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.config.ci.model.*
 import net.nemerosa.ontrack.extension.config.ci.properties.PropertyAliasService
 import net.nemerosa.ontrack.extension.config.ci.validations.ValidationDataTypeAliasService
+import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtension
+import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtensionNotFoundException
+import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtensionTypeNotSupportedException
 import net.nemerosa.ontrack.extension.config.model.*
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
@@ -19,7 +23,12 @@ class CIConfigurationParserImpl(
     private val validationDataTypeService: ValidationDataTypeService,
     private val propertyAliasService: PropertyAliasService,
     private val validationDataTypeAliasService: ValidationDataTypeAliasService,
+    private val extensionManager: ExtensionManager,
 ) : CIConfigurationParser {
+
+    private val ciExtensions: Map<String, CIConfigExtension<*>> by lazy {
+        extensionManager.getExtensions(CIConfigExtension::class.java).associateBy { it.id }
+    }
 
     override fun parseConfig(yaml: String): ConfigurationInput {
         // JSON parsing
@@ -85,16 +94,16 @@ class CIConfigurationParserImpl(
     private fun convertBuild(build: CIBuildConfig): BuildConfiguration {
         return BuildConfiguration(
             properties = convertProperties(build),
-            autoVersioningCheck = build.autoVersioningCheck,
+            extensions = convertExtensions(ProjectEntityType.BUILD, build),
         )
     }
 
     private fun convertBranch(branch: CIBranchConfig): BranchConfiguration {
         return BranchConfiguration(
             properties = convertProperties(branch),
+            extensions = convertExtensions(ProjectEntityType.BRANCH, branch),
             validations = convertValidations(branch.validations),
             promotions = convertPromotions(branch.promotions),
-            autoVersioning = branch.autoVersioning,
         )
     }
 
@@ -177,6 +186,7 @@ class CIConfigurationParserImpl(
     private fun convertProject(project: CIProjectConfig): ProjectConfiguration {
         return ProjectConfiguration(
             properties = convertProperties(project),
+            extensions = convertExtensions(ProjectEntityType.PROJECT, project),
             projectName = project.name,
             scmConfig = project.scmConfig,
             issueServiceIdentifier = project.issueServiceIdentifier,
@@ -187,6 +197,33 @@ class CIConfigurationParserImpl(
     private fun convertProperties(ciPropertiesConfig: CIPropertiesConfig): List<PropertyConfiguration> {
         return ciPropertiesConfig.properties.map { (type, data) ->
             convertProperty(type, data)
+        }
+    }
+
+    private fun convertExtensions(
+        projectEntityType: ProjectEntityType,
+        ciExtensionsConfig: CIExtensionsConfig,
+    ): List<ExtensionConfiguration> {
+        return ciExtensionsConfig.extensions.map { (id, data) ->
+            convertExtension(projectEntityType, id, data)
+        }
+    }
+
+    private fun convertExtension(
+        projectEntityType: ProjectEntityType,
+        id: String,
+        data: JsonNode
+    ): ExtensionConfiguration {
+        val extension = ciExtensions[id]
+            ?: throw CIConfigExtensionNotFoundException(id)
+        if (projectEntityType in extension.projectEntityTypes) {
+            val extensionData = extension.parseData(data).asJson()
+            return ExtensionConfiguration(
+                id = id,
+                data = extensionData,
+            )
+        } else {
+            throw CIConfigExtensionTypeNotSupportedException(projectEntityType, id)
         }
     }
 

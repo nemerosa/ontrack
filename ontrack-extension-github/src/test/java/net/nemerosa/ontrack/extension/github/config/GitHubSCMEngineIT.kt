@@ -36,7 +36,7 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     @AsAdminTest
     fun `Configuration of the project with unexisting configuration`() {
         assertFailsWith<GitHubSCMUnexistingConfigException> {
-            configTestSupport.withConfigServiceBuild(
+            configTestSupport.configureBuild(
                 env = EnvFixtures.gitHub(),
             )
         }
@@ -46,7 +46,7 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     @AsAdminTest
     fun `Configuration of the project with existing configuration being detected`() {
         val config = gitHubConfiguration()
-        val project = configTestSupport.withConfigServiceProject(
+        val project = configTestSupport.configureProject(
             ci = null,
             scm = null,
             env = EnvFixtures.gitHub(),
@@ -74,7 +74,7 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     @AsAdminTest
     fun `Configuration of the project with indexation interval`() {
         val config = gitHubConfiguration()
-        val project = configTestSupport.withConfigServiceProject(
+        val project = configTestSupport.configureProject(
             yaml = """
                 version: v1
                 configuration:
@@ -110,7 +110,7 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     fun `Configuration of the project with explicit configuration`() {
         val configName = uid("cfg-")
         val config = gitHubConfiguration(gitConfigurationName = configName)
-        val project = configTestSupport.withConfigServiceProject(
+        val project = configTestSupport.configureProject(
             yaml = """
                 version: v1
                 configuration:
@@ -141,7 +141,7 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     @AsAdminTest
     fun `Configuration of the branch with the Git branch`() {
         gitHubConfiguration()
-        val branch = configTestSupport.withConfigServiceBranch(
+        val branch = configTestSupport.configureBranch(
             ci = null,
             scm = null,
             env = EnvFixtures.gitHub(),
@@ -174,7 +174,7 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     fun `Configuration of the build with the Git commit`() {
         gitHubConfiguration()
         withDisabledConfigurationTest {
-            val build = configTestSupport.withConfigServiceBuild(
+            val build = configTestSupport.configureBuild(
                 ci = null,
                 scm = null,
                 env = EnvFixtures.gitHub(),

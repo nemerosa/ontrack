@@ -38,7 +38,7 @@ class BitbucketServerSCMEngineIT : AbstractDSLTestSupport() {
     @AsAdminTest
     fun `Configuration of the project with unexisting configuration`() {
         assertFailsWith<BitbucketServerSCMUnexistingConfigException> {
-            configTestSupport.withConfigServiceBuild(
+            configTestSupport.configureBuild(
                 ci = "generic",
                 scm = "bitbucket-server",
                 env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(),
@@ -50,7 +50,7 @@ class BitbucketServerSCMEngineIT : AbstractDSLTestSupport() {
     @AsAdminTest
     fun `Configuration of the project with existing configuration being detected`() {
         val config = bitbucketServerConfig()
-        val project = configTestSupport.withConfigServiceProject(
+        val project = configTestSupport.configureProject(
             ci = "generic",
             env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(),
         )
@@ -81,7 +81,7 @@ class BitbucketServerSCMEngineIT : AbstractDSLTestSupport() {
     @AsAdminTest
     fun `Configuration of the project with indexation interval`() {
         val config = bitbucketServerConfig()
-        val project = configTestSupport.withConfigServiceProject(
+        val project = configTestSupport.configureProject(
             yaml = """
                 version: v1
                 configuration:
@@ -121,7 +121,7 @@ class BitbucketServerSCMEngineIT : AbstractDSLTestSupport() {
     fun `Configuration of the project with explicit configuration`() {
         val configName = uid("cfg-")
         val config = bitbucketServerConfig(name = configName)
-        val project = configTestSupport.withConfigServiceProject(
+        val project = configTestSupport.configureProject(
             yaml = """
                 version: v1
                 configuration:
@@ -156,7 +156,7 @@ class BitbucketServerSCMEngineIT : AbstractDSLTestSupport() {
     @AsAdminTest
     fun `Configuration of the branch with the Git branch`() {
         bitbucketServerConfig()
-        val branch = configTestSupport.withConfigServiceBranch(
+        val branch = configTestSupport.configureBranch(
             ci = "generic",
             scm = null,
             env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(),
@@ -189,7 +189,7 @@ class BitbucketServerSCMEngineIT : AbstractDSLTestSupport() {
     fun `Configuration of the build with the Git commit`() {
         bitbucketServerConfig()
         withDisabledConfigurationTest {
-            val build = configTestSupport.withConfigServiceBuild(
+            val build = configTestSupport.configureBuild(
                 ci = "generic",
                 scm = null,
                 env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(),

@@ -6,11 +6,12 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 @APIDescription("Project configuration")
 data class ProjectConfiguration(
     override val properties: List<PropertyConfiguration> = emptyList(),
+    override val extensions: List<ExtensionConfiguration> = emptyList(),
     val projectName: String? = null,
     val scmConfig: String? = null,
     val issueServiceIdentifier: ProjectIssueServiceIdentifier? = null,
     val scmIndexationInterval: Int? = null,
-) : PropertiesConfiguration {
+) : PropertiesConfiguration, ExtensionsConfiguration {
 
     @JsonIgnore
     fun isNotEmpty(): Boolean = properties.isNotEmpty() ||

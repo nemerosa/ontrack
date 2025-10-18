@@ -18,7 +18,7 @@ class ConfigTestSupport(
     private val ciConfigurationService: CIConfigurationService,
 ) {
 
-    fun withConfigServiceProject(
+    fun configureProject(
         yaml: String = DEFAULT_CONFIG,
         ci: String? = null,
         scm: String? = null,
@@ -30,7 +30,7 @@ class ConfigTestSupport(
         env = env.map { (name, value) -> CIEnv(name, value) },
     )
 
-    fun withConfigServiceBranch(
+    fun configureBranch(
         yaml: String = DEFAULT_CONFIG,
         ci: String? = null,
         scm: String? = null,
@@ -42,7 +42,7 @@ class ConfigTestSupport(
         env = env.map { (name, value) -> CIEnv(name, value) },
     )
 
-    fun withConfigServiceBuild(
+    fun configureBuild(
         yaml: String = DEFAULT_CONFIG,
         ci: String? = null,
         scm: String? = null,

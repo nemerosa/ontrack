@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.av.config
 
-import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscription
-import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionFilter
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService

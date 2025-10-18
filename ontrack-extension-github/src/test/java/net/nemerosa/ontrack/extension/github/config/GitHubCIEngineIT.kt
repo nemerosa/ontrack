@@ -79,7 +79,7 @@ class GitHubCIEngineIT : AbstractGitHubTestSupport() {
     @AsAdminTest
     fun `GitHub CI engine getting the branch name from the native environment`() {
         gitHubConfiguration()
-        val branch = configTestSupport.withConfigServiceBranch(
+        val branch = configTestSupport.configureBranch(
             env = EnvFixtures.gitHub()
         )
         assertEquals("release-1.51", branch.name)
@@ -89,7 +89,7 @@ class GitHubCIEngineIT : AbstractGitHubTestSupport() {
     @AsAdminTest
     fun `GitHub CI engine getting the build suffix from the native environment`() {
         gitHubConfiguration()
-        val build = configTestSupport.withConfigServiceBuild(
+        val build = configTestSupport.configureBuild(
             env = EnvFixtures.gitHub(),
         )
         assertTrue(build.name.endsWith("-96"), "Build name contains the run number: ${build.name}")
@@ -99,7 +99,7 @@ class GitHubCIEngineIT : AbstractGitHubTestSupport() {
     @AsAdminTest
     fun `GitHub CI engine setting the workflow link on the build`() {
         gitHubConfiguration()
-        val build = configTestSupport.withConfigServiceBuild(
+        val build = configTestSupport.configureBuild(
             env = EnvFixtures.gitHub(),
         )
         assertNotNull(

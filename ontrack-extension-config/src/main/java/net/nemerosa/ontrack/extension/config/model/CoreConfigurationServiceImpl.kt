@@ -1,10 +1,11 @@
 package net.nemerosa.ontrack.extension.config.model
 
-import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
-import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
-import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationService
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.config.ci.CIConfigPRNotSupportedException
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
+import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtension
+import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtensionNotFoundException
 import net.nemerosa.ontrack.extension.config.license.ConfigurationLicense
 import net.nemerosa.ontrack.extension.config.scm.SCMEngine
 import net.nemerosa.ontrack.model.security.*
@@ -24,9 +25,12 @@ class CoreConfigurationServiceImpl(
     private val buildDisplayNameService: BuildDisplayNameService,
     private val validationDataTypeService: ValidationDataTypeService,
     private val promotionLevelConfigurators: List<PromotionLevelConfigurator>,
-    private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
-    private val autoVersioningValidationService: AutoVersioningValidationService,
+    private val extensionManager: ExtensionManager,
 ) : CoreConfigurationService {
+
+    private val ciExtensions: Map<String, CIConfigExtension<*>> by lazy {
+        extensionManager.getExtensions(CIConfigExtension::class.java).associateBy { it.id }
+    }
 
     override fun configureProject(
         input: ConfigurationInput,
@@ -63,6 +67,11 @@ class CoreConfigurationServiceImpl(
             defaults = configuration.properties,
         )
 
+        configureExtensions(
+            entity = project,
+            defaults = configuration.extensions,
+        )
+
         return project
     }
 
@@ -97,7 +106,6 @@ class CoreConfigurationServiceImpl(
 
         configureValidations(branch, configuration.validations)
         configurePromotions(branch, configuration.promotions)
-        configureAutoVersioning(branch, configuration.autoVersioning)
 
         // Configuration of the branch SCM (using the SCM engine)
         scmEngine.configureBranch(branch, configuration, env, rawBranchName)
@@ -107,14 +115,12 @@ class CoreConfigurationServiceImpl(
             defaults = configuration.properties,
         )
 
-        return branch
-    }
+        configureExtensions(
+            entity = branch,
+            defaults = configuration.extensions,
+        )
 
-    private fun configureAutoVersioning(
-        branch: Branch,
-        autoVersioning: AutoVersioningConfig?
-    ) {
-        autoVersioningConfigurationService.setupAutoVersioning(branch, autoVersioning)
+        return branch
     }
 
     override fun configureBuild(
@@ -146,18 +152,17 @@ class CoreConfigurationServiceImpl(
         ciEngine.configureBuild(build, configuration, env)
 
         configureProperties(
-            entity = branch,
+            entity = build,
             defaults = configuration.properties,
+        )
+
+        configureExtensions(
+            entity = build,
+            defaults = configuration.extensions,
         )
 
         // Build display name
         configureBuildDisplayName(build, configuration, ciEngine, env)
-
-        // Auto-versioning check
-        val autoVersioningCheck = configuration.autoVersioningCheck
-        if (autoVersioningCheck != null && autoVersioningCheck) {
-            autoVersioningValidationService.checkAndValidate(build)
-        }
 
         // OK
         return build
@@ -256,6 +261,29 @@ class CoreConfigurationServiceImpl(
                 config.data
             )
         }
+    }
+
+    private fun configureExtensions(
+        entity: ProjectEntity,
+        defaults: List<ExtensionConfiguration>,
+    ) {
+        defaults.forEach { config ->
+            val extension = ciExtensions[config.id]
+                ?: throw CIConfigExtensionNotFoundException(id = config.id)
+            configureExtension(entity, extension, config.data)
+        }
+    }
+
+    private fun <T> configureExtension(
+        entity: ProjectEntity,
+        extension: CIConfigExtension<T>,
+        data: JsonNode
+    ) {
+        val parsedData = extension.parseData(data)
+        extension.configure(
+            entity = entity,
+            data = parsedData,
+        )
     }
 
 }
