@@ -104,7 +104,9 @@ class AutoVersioningBranchCIConfigExtensionIT : AbstractQLKTITSupport() {
                     """.trimIndent(),
                     ci = "generic",
                     scm = "mock",
-                    env = EnvFixtures.generic()
+                    env = EnvFixtures.generic(
+                        scmBranch = "main",
+                    )
                 )
 
                 val vs = structureService.findValidationStampByName(
