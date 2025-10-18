@@ -58,6 +58,14 @@ interface SCMEngine {
     fun matchesUrl(scmUrl: String): Boolean
 
     /**
+     * Given the SCM branch name, checks if this is PR or not.
+     *
+     * By default, only checks if the name matches `PR-\d+`.
+     */
+    fun isBranchPR(scmBranchName: String, env: Map<String, String>): Boolean =
+        Regex("^PR-\\d+$").matchEntire(scmBranchName) != null
+
+    /**
      * Identifier for the SCM engine.
      */
     val name: String

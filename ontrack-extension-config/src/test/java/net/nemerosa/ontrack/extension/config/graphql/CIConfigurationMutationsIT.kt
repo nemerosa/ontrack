@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationServi
 import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationData
 import net.nemerosa.ontrack.extension.config.ConfigTestSupport
 import net.nemerosa.ontrack.extension.config.EnvFixtures
+import net.nemerosa.ontrack.extension.config.ci.CIConfigPRNotSupportedException
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
@@ -18,10 +19,7 @@ import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.jvm.optionals.getOrNull
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
-import kotlin.test.fail
+import kotlin.test.*
 
 class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
 
@@ -352,6 +350,18 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
 
                 }
             }
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `PR are not ingested`() {
+        assertFailsWith<CIConfigPRNotSupportedException> {
+            configTestSupport.withConfigServiceBranch(
+                ci = "generic",
+                scm = "mock",
+                env = EnvFixtures.generic(scmBranch = "PR-2")
+            )
         }
     }
 }

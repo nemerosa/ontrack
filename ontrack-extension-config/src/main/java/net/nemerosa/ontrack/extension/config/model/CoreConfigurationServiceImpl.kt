@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.config.model
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationService
+import net.nemerosa.ontrack.extension.config.ci.CIConfigPRNotSupportedException
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.license.ConfigurationLicense
 import net.nemerosa.ontrack.extension.config.scm.SCMEngine
@@ -79,6 +80,10 @@ class CoreConfigurationServiceImpl(
 
         val rawBranchName = ciEngine.getBranchName(env)
             ?: throw CoreConfigurationException("Could not get the branch name from the environment")
+
+        if (scmEngine.isBranchPR(rawBranchName, env)) {
+            throw CIConfigPRNotSupportedException()
+        }
 
         val branchName = scmEngine.normalizeBranchName(rawBranchName)
 
