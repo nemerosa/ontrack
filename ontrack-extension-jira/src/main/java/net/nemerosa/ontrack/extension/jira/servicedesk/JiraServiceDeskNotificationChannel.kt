@@ -11,12 +11,13 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
-import net.nemerosa.ontrack.json.transform
+import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
+import net.nemerosa.ontrack.model.utils.patchList
 import org.springframework.stereotype.Component
 
 @Component
@@ -40,6 +41,19 @@ class JiraServiceDeskNotificationChannel(
                 ?: throw EventSubscriptionConfigException("Jira config configuration ${config.configName} does not exist")
         }
     }
+
+    override fun mergeConfig(
+        a: JiraServiceDeskNotificationChannelConfig,
+        changes: JsonNode
+    ) = JiraServiceDeskNotificationChannelConfig(
+        configName = patchString(changes, a::configName),
+        useExisting = patchBoolean(changes, a::useExisting),
+        requestStatus = patchNullableEnum(changes, a::requestStatus),
+        serviceDeskId = patchInt(changes, a::serviceDeskId),
+        requestTypeId = patchInt(changes, a::requestTypeId),
+        fields = patchList(changes, a::fields) { it.name },
+        searchTerm = patchNullableString(changes, a::searchTerm),
+    )
 
     override val type: String = "jira-service-desk"
 

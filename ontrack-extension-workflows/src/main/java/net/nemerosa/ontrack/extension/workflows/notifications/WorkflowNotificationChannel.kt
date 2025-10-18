@@ -17,6 +17,7 @@ import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
@@ -49,6 +50,11 @@ class WorkflowNotificationChannel(
             validationWorkflowNode(config.workflow, node)
         }
     }
+
+    override fun mergeConfig(
+        a: WorkflowNotificationChannelConfig,
+        changes: JsonNode
+    ): WorkflowNotificationChannelConfig = changes.parse()
 
     private fun validationWorkflowNode(workflow: Workflow, node: WorkflowNode) {
         val executor = workflowNodeExecutorService.findExecutor(node.executorId)

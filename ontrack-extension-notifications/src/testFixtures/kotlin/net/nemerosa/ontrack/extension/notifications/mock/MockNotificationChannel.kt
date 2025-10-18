@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.it.waitUntil
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.patchNullableString
+import net.nemerosa.ontrack.json.patchString
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventRendererRegistry
@@ -36,15 +38,9 @@ class MockNotificationChannel(
         a: MockNotificationChannelConfig,
         changes: JsonNode
     ) = MockNotificationChannelConfig(
-        target = changes.path(MockNotificationChannelConfig::target.name).asText()
-            .takeIf { it.isNotBlank() }
-            ?: a.target,
-        data = changes.path(MockNotificationChannelConfig::data.name).asText()
-            .takeIf { it.isNotBlank() }
-            ?: a.data,
-        rendererType = changes.path(MockNotificationChannelConfig::rendererType.name).asText()
-            .takeIf { it.isNotBlank() }
-            ?: a.rendererType,
+        target = patchString(changes, a::target),
+        data = patchNullableString(changes, a::data),
+        rendererType = patchNullableString(changes, a::rendererType),
     )
 
     /**

@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.patchNullableString
+import net.nemerosa.ontrack.json.patchString
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
@@ -34,6 +36,19 @@ class OntrackValidationNotificationChannel(
         if (config.validation.isBlank()) {
             throw EventSubscriptionConfigException("Validation stamp name cannot be blank.")
         }
+    }
+
+    override fun mergeConfig(
+        a: OntrackValidationNotificationChannelConfig,
+        changes: JsonNode
+    ): OntrackValidationNotificationChannelConfig {
+        return OntrackValidationNotificationChannelConfig(
+            project = patchNullableString(changes, a::project),
+            branch = patchNullableString(changes, a::branch),
+            build = patchNullableString(changes, a::build),
+            validation = patchString(changes, a::validation),
+            runTime = patchNullableString(changes, a::runTime),
+        )
     }
 
     override fun publish(

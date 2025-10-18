@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.patchString
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
@@ -30,6 +31,13 @@ class WebhookNotificationChannel(
             throw EventSubscriptionConfigException("Webhook with name ${config.name} not found")
         }
     }
+
+    override fun mergeConfig(
+        a: WebhookNotificationChannelConfig,
+        changes: JsonNode
+    ) = WebhookNotificationChannelConfig(
+        name = patchString(changes, a::name),
+    )
 
     override fun publish(
         recordId: String,

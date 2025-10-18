@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.patchNullableString
+import net.nemerosa.ontrack.json.patchString
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
@@ -34,6 +36,14 @@ class InMemoryNotificationChannel(
             throw EventSubscriptionConfigException("Group cannot be blank")
         }
     }
+
+    override fun mergeConfig(
+        a: InMemoryNotificationChannelConfig,
+        changes: JsonNode
+    ) = InMemoryNotificationChannelConfig(
+        group = patchString(changes, a::group),
+        data = patchNullableString(changes, a::data),
+    )
 
     private val messages = mutableMapOf<String, MutableList<String>>()
 

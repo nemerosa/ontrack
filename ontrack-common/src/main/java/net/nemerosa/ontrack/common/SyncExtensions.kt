@@ -4,9 +4,9 @@ package net.nemerosa.ontrack.common
  * Forward synchronization from/to a given collection
  */
 fun <A, B> syncForward(
-        from: Collection<A>,
-        to: Collection<B>,
-        code: SyncForwardBuilder<A, B>.() -> Unit
+    from: Collection<A>,
+    to: Collection<B>,
+    code: SyncForwardBuilder<A, B>.() -> Unit
 ) {
     val builder = SyncForwardBuilder(from, to)
     builder.code()
@@ -15,11 +15,38 @@ fun <A, B> syncForward(
 }
 
 /**
+ * Forward synchronization from a list of another, using a simple ID property check
+ *
+ * @param E Type of items
+ */
+fun <E> mergeList(
+    target: List<E>,
+    changes: List<E>,
+    idFn: (E) -> Any,
+    mergeFn: (e: E, existing: E) -> E,
+): List<E> {
+    val result = target.toMutableList()
+    syncForward(
+        from = changes,
+        to = target,
+    ) {
+        equality { a, b -> idFn(a) == idFn(b) }
+        onCreation { item -> result += item }
+        onDeletion { }
+        onModification { e, existing ->
+            val index = result.indexOfFirst { idFn(it) == idFn(existing) }
+            result[index] = mergeFn(e, existing)
+        }
+    }
+    return result.toList()
+}
+
+/**
  * Forward synchronization builder
  */
 class SyncForwardBuilder<A, B>(
-        private val from: Collection<A>,
-        private val to: Collection<B>
+    private val from: Collection<A>,
+    private val to: Collection<B>
 ) {
 
     private var equality: (a: A, b: B) -> Boolean = { a, b -> a == b }
@@ -44,12 +71,12 @@ class SyncForwardBuilder<A, B>(
     }
 
     fun build() = SyncForward(
-            source = from,
-            target = to,
-            equality = equality,
-            onCreation = onCreation,
-            onModification = onModification,
-            onDeletion = onDeletion
+        source = from,
+        target = to,
+        equality = equality,
+        onCreation = onCreation,
+        onModification = onModification,
+        onDeletion = onDeletion
     )
 
 }

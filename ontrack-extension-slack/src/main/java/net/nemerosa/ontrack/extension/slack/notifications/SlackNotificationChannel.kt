@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscript
 import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.patchEnum
+import net.nemerosa.ontrack.json.patchString
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationLink
@@ -34,6 +36,14 @@ class SlackNotificationChannel(
             throw EventSubscriptionConfigException("Slack channel cannot be blank")
         }
     }
+
+    override fun mergeConfig(
+        a: SlackNotificationChannelConfig,
+        changes: JsonNode
+    ) = SlackNotificationChannelConfig(
+        channel = patchString(changes, a::channel),
+        type = patchEnum(changes, a::type),
+    )
 
     override fun publish(
         recordId: String,

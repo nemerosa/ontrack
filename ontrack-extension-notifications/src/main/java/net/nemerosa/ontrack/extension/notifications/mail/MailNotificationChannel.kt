@@ -7,6 +7,8 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.patchNullableString
+import net.nemerosa.ontrack.json.patchString
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
@@ -52,6 +54,15 @@ class MailNotificationChannel(
             throw EventSubscriptionConfigException("Subject cannot be blank")
         }
     }
+
+    override fun mergeConfig(
+        a: MailNotificationChannelConfig,
+        changes: JsonNode
+    ) = MailNotificationChannelConfig(
+        to = patchString(changes, a::to),
+        cc = patchNullableString(changes, a::cc),
+        subject = patchString(changes, a::subject),
+    )
 
     override fun toSearchCriteria(text: String): JsonNode =
         mapOf(

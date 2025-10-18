@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.patchString
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
@@ -44,6 +45,16 @@ class JiraLinkNotificationChannel(
             throw EventSubscriptionConfigException("Jira link name is required")
         }
     }
+
+    override fun mergeConfig(
+        a: JiraLinkNotificationChannelConfig,
+        changes: JsonNode
+    ) = JiraLinkNotificationChannelConfig(
+        configName = patchString(changes, a::configName),
+        sourceQuery = patchString(changes, a::sourceQuery),
+        targetQuery = patchString(changes, a::targetQuery),
+        linkName = patchString(changes, a::linkName),
+    )
 
     override fun publish(
         recordId: String,

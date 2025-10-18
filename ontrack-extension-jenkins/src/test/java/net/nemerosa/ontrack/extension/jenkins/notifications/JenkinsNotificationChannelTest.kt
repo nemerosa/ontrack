@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsJob
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactoryImpl
 import net.nemerosa.ontrack.model.events.EventTemplatingService
@@ -158,6 +159,41 @@ class JenkinsNotificationChannelTest {
             assertEquals("https://jenkins/folder/job", output.jobUrl)
             assertEquals("uri:build", output.buildUrl)
         }
+    }
+
+    @Test
+    fun `Merge configuration`() {
+        val config = newJenkinsNotificationConfig(
+            callMode = JenkinsNotificationChannelConfigCallMode.ASYNC,
+            parameters = mapOf(
+                "TEST" to "1",
+                "PROMOTION" to "GOLD"
+            )
+        )
+        val changes = mapOf(
+            "parameters" to listOf(
+                mapOf(
+                    "name" to "PROMOTION",
+                    "value" to "PLATINUM",
+                ),
+                mapOf(
+                    "name" to "RELEASE",
+                    "value" to "true",
+                ),
+            )
+        ).asJson()
+        val merged = jenkinsNotificationChannel.mergeConfig(config, changes)
+        assertEquals(
+            newJenkinsNotificationConfig(
+                callMode = JenkinsNotificationChannelConfigCallMode.ASYNC,
+                parameters = mapOf(
+                    "TEST" to "1",
+                    "PROMOTION" to "PLATINUM",
+                    "RELEASE" to "true"
+                )
+            ),
+            merged
+        )
     }
 
     private fun newJenkinsNotificationConfig(

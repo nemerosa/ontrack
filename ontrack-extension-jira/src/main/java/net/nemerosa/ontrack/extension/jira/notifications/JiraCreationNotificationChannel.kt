@@ -1,14 +1,14 @@
 package net.nemerosa.ontrack.extension.jira.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.mergeList
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
-import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.transform
+import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
@@ -37,6 +37,27 @@ class JiraCreationNotificationChannel(
                 ?: throw EventSubscriptionConfigException("Jira config configuration ${config.configName} does not exist")
         }
     }
+
+    override fun mergeConfig(
+        a: JiraCreationNotificationChannelConfig,
+        changes: JsonNode
+    ) = JiraCreationNotificationChannelConfig(
+        configName = patchString(changes, a::configName),
+        useExisting = patchBoolean(changes, a::useExisting),
+        projectName = patchString(changes, a::projectName),
+        issueType = patchString(changes, a::issueType),
+        labels = patchStringList(changes, a::labels),
+        fixVersion = patchNullableString(changes, a::fixVersion),
+        assignee = patchNullableString(changes, a::assignee),
+        titleTemplate = patchString(changes, a::titleTemplate),
+        customFields = if (changes.has(JiraCreationNotificationChannelConfig::customFields.name)) {
+            val customChanges = changes.path(JiraCreationNotificationChannelConfig::customFields.name)
+                .map { it.parse<JiraCustomField>() }
+            mergeList(a.customFields, customChanges, JiraCustomField::name) { e, _ -> e }
+        } else {
+            a.customFields
+        }
+    )
 
     override fun publish(
         recordId: String,

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.patchNullableString
+import net.nemerosa.ontrack.json.patchString
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
@@ -21,6 +23,15 @@ class OtherMockNotificationChannel(
 
     override fun validateParsedConfig(config: MockNotificationChannelConfig) {
     }
+
+    override fun mergeConfig(
+        a: MockNotificationChannelConfig,
+        changes: JsonNode
+    ) = MockNotificationChannelConfig(
+        target = patchString(changes, a::target),
+        data = patchNullableString(changes, a::data),
+        rendererType = patchNullableString(changes, a::rendererType),
+    )
 
     /**
      * List of messages received, indexed by target.
