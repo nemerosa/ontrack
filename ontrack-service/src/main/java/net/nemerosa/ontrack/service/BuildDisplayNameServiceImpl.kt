@@ -31,6 +31,6 @@ class BuildDisplayNameServiceImpl(
         displayName: String,
         override: Boolean
     ) {
-        extensions.first { it.setDisplayName(build, displayName, override) }
+        extensions.firstOrNull { it.setDisplayName(build, displayName, override) }
     }
 }
