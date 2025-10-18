@@ -32,6 +32,15 @@ class MockNotificationChannel(
         }
     }
 
+    override fun mergeConfig(
+        a: MockNotificationChannelConfig,
+        b: MockNotificationChannelConfig
+    ) = MockNotificationChannelConfig(
+        target = b.target.takeIf { it.isNotBlank() } ?: a.target,
+        data = b.data ?: a.data,
+        rendererType = b.rendererType ?: a.rendererType,
+    )
+
     /**
      * List of messages received, indexed by target.
      */

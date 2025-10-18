@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineNotDetectedException
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineNotFoundException
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineRegistry
+import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtensionService
 import net.nemerosa.ontrack.extension.config.model.*
 import net.nemerosa.ontrack.extension.config.scm.*
 import net.nemerosa.ontrack.model.structure.Branch
@@ -21,6 +22,7 @@ class CIConfigurationServiceImpl(
     private val scmEngineRegistry: SCMEngineRegistry,
     private val conditionRegistry: ConditionRegistry,
     private val coreConfigurationService: CoreConfigurationService,
+    private val ciConfigExtensionService: CIConfigExtensionService,
 ) : CIConfigurationService {
 
     override fun effectiveCIConfiguration(
@@ -161,7 +163,7 @@ class CIConfigurationServiceImpl(
         return customConfigs
             .filter { it.project.isNotEmpty() }
             .fold(input.configuration.defaults.project) { acc, config ->
-                acc.merge(config.project)
+                acc.merge(config.project, ciConfigExtensionService)
             }
     }
 
@@ -172,7 +174,7 @@ class CIConfigurationServiceImpl(
         return customConfigs
             .filter { it.branch.isNotEmpty() }
             .fold(input.configuration.defaults.branch) { acc, config ->
-                acc.merge(config.branch)
+                acc.merge(config.branch, ciConfigExtensionService)
             }
     }
 
@@ -183,7 +185,7 @@ class CIConfigurationServiceImpl(
         return customConfigs
             .filter { it.build.isNotEmpty() }
             .fold(input.configuration.defaults.build) { acc, config ->
-                acc.merge(config.build)
+                acc.merge(config.build, ciConfigExtensionService)
             }
     }
 

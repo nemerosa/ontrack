@@ -53,6 +53,11 @@ interface NotificationChannel<C, R> {
     fun toSearchCriteria(text: String): JsonNode
 
     /**
+     * Merges two configurations.
+     */
+    fun mergeConfig(a: C, b: C): C = TODO("Not yet implemented")
+
+    /**
      * Type of the channel, used as an identifier for the serialization of the subscriptions.
      */
     val type: String

@@ -32,4 +32,9 @@ interface CIConfigExtension<T> : Extension {
      */
     fun configure(entity: ProjectEntity, data: T)
 
+    /**
+     * Merging data together
+     */
+    fun mergeData(defaults: T, custom: T): T
+
 }

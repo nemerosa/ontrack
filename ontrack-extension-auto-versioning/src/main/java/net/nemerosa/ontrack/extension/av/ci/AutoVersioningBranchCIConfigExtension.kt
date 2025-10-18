@@ -22,6 +22,11 @@ class AutoVersioningBranchCIConfigExtension(
 
     override fun parseData(data: JsonNode): AutoVersioningConfig = data.parse()
 
+    override fun mergeData(
+        defaults: AutoVersioningConfig,
+        custom: AutoVersioningConfig
+    ): AutoVersioningConfig = custom
+
     override val projectEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.BRANCH)
 
     override fun configure(

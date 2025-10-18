@@ -20,6 +20,8 @@ class AutoVersioningCheckBuildCIConfigExtension(
 
     override fun parseData(data: JsonNode): Boolean = data.asBoolean()
 
+    override fun mergeData(defaults: Boolean, custom: Boolean): Boolean = custom
+
     override val projectEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.BUILD)
 
     override fun configure(

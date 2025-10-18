@@ -23,3 +23,11 @@ fun ValidatedNotificationChannelConfig<*>.throwException(): Nothing {
     }
     throw EventSubscriptionConfigException(message)
 }
+
+fun <C> ValidatedNotificationChannelConfig<C>.getConfigIfOk(): C {
+    if (isOk()) {
+        return config!!
+    } else {
+        throwException()
+    }
+}
