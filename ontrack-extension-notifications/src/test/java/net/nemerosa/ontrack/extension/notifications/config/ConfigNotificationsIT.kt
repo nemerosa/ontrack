@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.config
 import net.nemerosa.ontrack.extension.config.ConfigTestSupport
 import net.nemerosa.ontrack.extension.config.EnvFixtures
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -14,6 +15,7 @@ class ConfigNotificationsIT : AbstractNotificationTestSupport() {
     private lateinit var configTestSupport: ConfigTestSupport
 
     @Test
+    @AsAdminTest
     fun `Setup of notifications with some conditions`() {
         val branch = configTestSupport.withConfigServiceBranch(
             yaml = """
@@ -80,7 +82,10 @@ class ConfigNotificationsIT : AbstractNotificationTestSupport() {
         val release = structureService.findPromotionLevelByName(branch.project.name, branch.name, "RELEASE").get()
 
         // Notifications at the branch level
-        assertNotNull(eventSubscriptionService.findSubscriptionByName(branch, "On validation error")) {
+        assertNotNull(
+            eventSubscriptionService.findSubscriptionByName(branch, "On validation error"),
+            "On validation error subscription found"
+        ) {
             assertEquals("failed", it.keywords)
             assertEquals(setOf("new_validation_run"), it.events)
             assertEquals("mock", it.channel)
@@ -93,7 +98,10 @@ class ConfigNotificationsIT : AbstractNotificationTestSupport() {
         }
 
         // Notifications at the BRONZE promotion level
-        assertNotNull(eventSubscriptionService.findSubscriptionByName(bronze, "On BRONZE")) {
+        assertNotNull(
+            eventSubscriptionService.findSubscriptionByName(bronze, "On BRONZE"),
+            "On BRONZE subscription found"
+        ) {
             assertEquals(null, it.keywords)
             assertEquals(setOf("new_promotion_run"), it.events)
             assertEquals("mock", it.channel)
@@ -106,7 +114,10 @@ class ConfigNotificationsIT : AbstractNotificationTestSupport() {
         }
 
         // Notifications at the RELEASE promotion level
-        assertNotNull(eventSubscriptionService.findSubscriptionByName(release, "On RELEASE")) {
+        assertNotNull(
+            eventSubscriptionService.findSubscriptionByName(release, "On RELEASE"),
+            "On RELEASE subscription found"
+        ) {
             assertEquals(null, it.keywords)
             assertEquals(setOf("new_promotion_run"), it.events)
             assertEquals("mock", it.channel)
