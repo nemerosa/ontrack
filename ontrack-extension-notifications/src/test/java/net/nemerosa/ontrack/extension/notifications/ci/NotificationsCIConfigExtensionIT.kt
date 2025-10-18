@@ -4,13 +4,11 @@ import net.nemerosa.ontrack.extension.config.ConfigTestSupport
 import net.nemerosa.ontrack.extension.config.EnvFixtures
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-@Disabled("WIP")
 class NotificationsCIConfigExtensionIT : AbstractNotificationTestSupport() {
 
     @Autowired
@@ -36,8 +34,7 @@ class NotificationsCIConfigExtensionIT : AbstractNotificationTestSupport() {
                             keywords: failed
                             channel: mock
                             channelConfig:
-                              channel: "#notifications"
-                              type: ERROR
+                              target: "#notifications"
                             contentTemplate: "Build ${'$'}{build} has failed on ${'$'}{validationStamp}."
                           - name: On BRONZE
                             promotion: BRONZE
@@ -45,8 +42,7 @@ class NotificationsCIConfigExtensionIT : AbstractNotificationTestSupport() {
                               - new_promotion_run
                             channel: mock
                             channelConfig:
-                              channel: "#notifications"
-                              type: SUCCESS
+                              target: "#notifications"
                             contentTemplate: "Build ${'$'}{build} has been promoted to ${'$'}{promotionLevel}."
                           - name: On RELEASE
                             promotion: RELEASE
@@ -54,8 +50,7 @@ class NotificationsCIConfigExtensionIT : AbstractNotificationTestSupport() {
                               - new_promotion_run
                             channel: mock
                             channelConfig:
-                              channel: "#internal-releases"
-                              type: SUCCESS
+                              target: "#internal-releases"
                             contentTemplate: |
                               Yontrack ${'$'}{build} has been released.
                               
@@ -91,11 +86,10 @@ class NotificationsCIConfigExtensionIT : AbstractNotificationTestSupport() {
             assertEquals("failed", it.keywords)
             assertEquals(setOf("new_validation_run"), it.events)
             assertEquals("mock", it.channel)
-            assertEquals("ERROR", it.channelConfig["type"].asText())
-            assertEquals("#notifications", it.channelConfig["channel"].asText())
+            assertEquals("#notifications", it.channelConfig["target"].asText())
             assertEquals(
                 "Build ${'$'}{build} has failed on ${'$'}{validationStamp}.",
-                it.channelConfig["contentTemplate"].asText()
+                it.contentTemplate
             )
         }
 
@@ -107,11 +101,10 @@ class NotificationsCIConfigExtensionIT : AbstractNotificationTestSupport() {
             assertEquals(null, it.keywords)
             assertEquals(setOf("new_promotion_run"), it.events)
             assertEquals("mock", it.channel)
-            assertEquals("SUCCESS", it.channelConfig["type"].asText())
-            assertEquals("#notifications", it.channelConfig["channel"].asText())
+            assertEquals("#notifications", it.channelConfig["target"].asText())
             assertEquals(
                 "Build ${'$'}{build} has been promoted to ${'$'}{promotionLevel}.",
-                it.channelConfig["contentTemplate"].asText()
+                it.contentTemplate
             )
         }
 
@@ -123,8 +116,7 @@ class NotificationsCIConfigExtensionIT : AbstractNotificationTestSupport() {
             assertEquals(null, it.keywords)
             assertEquals(setOf("new_promotion_run"), it.events)
             assertEquals("mock", it.channel)
-            assertEquals("SUCCESS", it.channelConfig["type"].asText())
-            assertEquals("#releases", it.channelConfig["channel"].asText())
+            assertEquals("#releases", it.channelConfig["target"].asText())
         }
     }
 

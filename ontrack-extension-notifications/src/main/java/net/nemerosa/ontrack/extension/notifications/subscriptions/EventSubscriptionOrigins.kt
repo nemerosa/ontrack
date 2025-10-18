@@ -20,4 +20,9 @@ object EventSubscriptionOrigins {
      */
     const val API = "api"
 
+    /**
+     * Subscription added though the CI configuration.
+     */
+    const val CI = "ci"
+
 }
