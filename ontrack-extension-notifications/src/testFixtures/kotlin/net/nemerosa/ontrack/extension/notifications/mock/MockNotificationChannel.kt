@@ -34,11 +34,17 @@ class MockNotificationChannel(
 
     override fun mergeConfig(
         a: MockNotificationChannelConfig,
-        b: MockNotificationChannelConfig
+        changes: JsonNode
     ) = MockNotificationChannelConfig(
-        target = b.target.takeIf { it.isNotBlank() } ?: a.target,
-        data = b.data ?: a.data,
-        rendererType = b.rendererType ?: a.rendererType,
+        target = changes.path(MockNotificationChannelConfig::target.name).asText()
+            .takeIf { it.isNotBlank() }
+            ?: a.target,
+        data = changes.path(MockNotificationChannelConfig::data.name).asText()
+            .takeIf { it.isNotBlank() }
+            ?: a.data,
+        rendererType = changes.path(MockNotificationChannelConfig::rendererType.name).asText()
+            .takeIf { it.isNotBlank() }
+            ?: a.rendererType,
     )
 
     /**

@@ -98,9 +98,7 @@ class NotificationsCIConfigExtension(
     ): JsonNode {
         val parsedConfigA = notificationChannel.validate(configA)
             .getConfigIfOk()
-        val parsedConfigB = notificationChannel.validate(configB)
-            .getConfigIfOk()
-        val finalConfig = notificationChannel.mergeConfig(parsedConfigA, parsedConfigB)
+        val finalConfig = notificationChannel.mergeConfig(parsedConfigA, configB)
         return finalConfig.asJson()
     }
 

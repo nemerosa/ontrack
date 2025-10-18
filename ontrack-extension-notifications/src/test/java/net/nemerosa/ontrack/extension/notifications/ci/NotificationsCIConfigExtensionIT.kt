@@ -64,7 +64,7 @@ class NotificationsCIConfigExtensionIT : AbstractNotificationTestSupport() {
                             notifications:
                               - name: On RELEASE
                                 channelConfig:
-                                  channel: "#releases"
+                                  target: "#releases"
             """.trimIndent(),
             ci = "generic",
             scm = "mock",

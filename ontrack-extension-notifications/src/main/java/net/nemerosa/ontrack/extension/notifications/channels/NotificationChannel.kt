@@ -54,8 +54,12 @@ interface NotificationChannel<C, R> {
 
     /**
      * Merges two configurations.
+     *
+     * @param a First configuration, where to merge the [changes]
+     * @param changes JSON containing the changes to apply to the [a] configuration
+     * @return Merged configuration
      */
-    fun mergeConfig(a: C, b: C): C = TODO("Not yet implemented")
+    fun mergeConfig(a: C, changes: JsonNode): C = TODO("Not yet implemented")
 
     /**
      * Type of the channel, used as an identifier for the serialization of the subscriptions.
