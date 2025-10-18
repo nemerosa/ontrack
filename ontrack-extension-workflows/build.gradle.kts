@@ -16,6 +16,7 @@ dependencies {
     implementation("io.micrometer:micrometer-core")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation(project(":ontrack-extension-casc"))
+    implementation(project(":ontrack-extension-config"))
     implementation(project(":ontrack-repository-support"))
     implementation("org.springframework.boot:spring-boot-starter-web")
 
@@ -24,6 +25,7 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-casc")))
     testImplementation(testFixtures(project(":ontrack-extension-queue")))
     testImplementation(testFixtures(project(":ontrack-extension-notifications")))
+    testImplementation(testFixtures(project(":ontrack-extension-config")))
     testImplementation("com.networknt:json-schema-validator")
     testImplementation(project(":ontrack-it-utils"))
     testImplementation("com.networknt:json-schema-validator")

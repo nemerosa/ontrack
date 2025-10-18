@@ -34,9 +34,9 @@ class MergeListTest {
         )
     }
 
-}
+    data class Item(
+        val name: String,
+        val value: Int,
+    )
 
-data class Item(
-    val name: String,
-    val value: Int,
-)
+}

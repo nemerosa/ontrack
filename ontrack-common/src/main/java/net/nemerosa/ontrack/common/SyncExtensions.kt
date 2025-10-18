@@ -42,6 +42,32 @@ fun <E> mergeList(
 }
 
 /**
+ * Forward synchronization from a map of another, using keys.
+ *
+ * @param E Type of items
+ */
+fun <K, E> mergeMap(
+    target: Map<K, E>,
+    changes: Map<K, E>,
+    mergeFn: (e: E, existing: E) -> E,
+): Map<K, E> {
+    val result = target.toList().toMutableList()
+    syncForward(
+        from = changes.toList(),
+        to = target.toList(),
+    ) {
+        equality { a, b -> a.first == b.first }
+        onCreation { item -> result += item }
+        onDeletion { }
+        onModification { e, existing ->
+            val index = result.indexOfFirst { it.first == existing.first }
+            result[index] = existing.first to mergeFn(e.second, existing.second)
+        }
+    }
+    return result.toMap()
+}
+
+/**
  * Forward synchronization builder
  */
 class SyncForwardBuilder<A, B>(
