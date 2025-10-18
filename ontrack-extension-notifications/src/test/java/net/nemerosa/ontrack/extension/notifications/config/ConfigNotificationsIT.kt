@@ -1,0 +1,118 @@
+package net.nemerosa.ontrack.extension.notifications.config
+
+import net.nemerosa.ontrack.extension.config.ConfigTestSupport
+import net.nemerosa.ontrack.extension.config.EnvFixtures
+import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+
+class ConfigNotificationsIT : AbstractNotificationTestSupport() {
+
+    @Autowired
+    private lateinit var configTestSupport: ConfigTestSupport
+
+    @Test
+    fun `Setup of notifications with some conditions`() {
+        val branch = configTestSupport.withConfigServiceBranch(
+            yaml = """
+                version: v1
+                configuration:
+                  defaults:
+                    branch:
+                      promotions:
+                        BRONZE: {}
+                        RELEASE: {}
+                      notificationsConfig:
+                        notifications:
+                          - name: On validation error
+                            events:
+                              - new_validation_run
+                            keywords: failed
+                            channel: mock
+                            channelConfig:
+                              channel: "#notifications"
+                              type: ERROR
+                            contentTemplate: "Build ${'$'}{build} has failed on ${'$'}{validationStamp}."
+                          - name: On BRONZE
+                            promotion: BRONZE
+                            events:
+                              - new_promotion_run
+                            channel: mock
+                            channelConfig:
+                              channel: "#notifications"
+                              type: SUCCESS
+                            contentTemplate: "Build ${'$'}{build} has been promoted to ${'$'}{promotionLevel}."
+                          - name: On RELEASE
+                            promotion: RELEASE
+                            events:
+                              - new_promotion_run
+                            channel: mock
+                            channelConfig:
+                              channel: "#internal-releases"
+                              type: SUCCESS
+                            contentTemplate: |
+                              Yontrack ${'$'}{build} has been released.
+                              
+                              ${'$'}{promotionRun.changelog?title=true}
+                  custom:
+                    configs:
+                      - conditions:
+                          branch: '^release\/\d+\.\d+$'
+                        branch:
+                          notificationsConfig:
+                            notifications:
+                              - name: On RELEASE
+                                channelConfig:
+                                  channel: "#releases"
+            """.trimIndent(),
+            ci = "generic",
+            scm = "mock",
+            env = EnvFixtures.generic(scmBranch = "release/5.0"),
+        )
+
+        // Branch name
+        assertEquals("release-5.0", branch.name)
+
+        // Promotions
+        val bronze = structureService.findPromotionLevelByName(branch.project.name, branch.name, "BRONZE").get()
+        val release = structureService.findPromotionLevelByName(branch.project.name, branch.name, "RELEASE").get()
+
+        // Notifications at the branch level
+        assertNotNull(eventSubscriptionService.findSubscriptionByName(branch, "On validation error")) {
+            assertEquals("failed", it.keywords)
+            assertEquals(setOf("new_validation_run"), it.events)
+            assertEquals("mock", it.channel)
+            assertEquals("ERROR", it.channelConfig["type"].asText())
+            assertEquals("#notifications", it.channelConfig["channel"].asText())
+            assertEquals(
+                "Build ${'$'}{build} has failed on ${'$'}{validationStamp}.",
+                it.channelConfig["contentTemplate"].asText()
+            )
+        }
+
+        // Notifications at the BRONZE promotion level
+        assertNotNull(eventSubscriptionService.findSubscriptionByName(bronze, "On BRONZE")) {
+            assertEquals(null, it.keywords)
+            assertEquals(setOf("new_promotion_run"), it.events)
+            assertEquals("mock", it.channel)
+            assertEquals("SUCCESS", it.channelConfig["type"].asText())
+            assertEquals("#notifications", it.channelConfig["channel"].asText())
+            assertEquals(
+                "Build ${'$'}{build} has been promoted to ${'$'}{promotionLevel}.",
+                it.channelConfig["contentTemplate"].asText()
+            )
+        }
+
+        // Notifications at the RELEASE promotion level
+        assertNotNull(eventSubscriptionService.findSubscriptionByName(release, "On RELEASE")) {
+            assertEquals(null, it.keywords)
+            assertEquals(setOf("new_promotion_run"), it.events)
+            assertEquals("mock", it.channel)
+            assertEquals("SUCCESS", it.channelConfig["type"].asText())
+            assertEquals("#releases", it.channelConfig["channel"].asText())
+        }
+    }
+
+}

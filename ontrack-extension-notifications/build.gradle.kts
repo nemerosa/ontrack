@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":ontrack-rabbitmq"))
     implementation(project(":ontrack-extension-queue"))
     implementation(project(":ontrack-extension-recordings"))
+    implementation(project(":ontrack-extension-config"))
     implementation("org.springframework:spring-context")
     implementation("org.apache.commons:commons-lang3")
     implementation("commons-codec:commons-codec")
@@ -29,6 +30,7 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testImplementation(testFixtures(project(":ontrack-extension-casc")))
     testImplementation(testFixtures(project(":ontrack-model")))
+    testImplementation(testFixtures(project(":ontrack-extension-config")))
 
     testImplementation("com.icegreen:greenmail")
     testImplementation("com.icegreen:greenmail-spring")
@@ -40,4 +42,5 @@ dependencies {
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
+    testRuntimeOnly(project(":ontrack-extension-auto-versioning"))
 }
