@@ -11,6 +11,7 @@ class ConfigurationLicensedFeatureProvider : LicensedFeatureProvider {
         ProvidedLicensedFeature(
             id = FEATURE_CONFIGURATION,
             name = "Injection of configuration from the CI",
+            alwaysEnabled = true,
         )
     )
 
