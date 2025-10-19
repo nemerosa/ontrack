@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.config.ci
 
+import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.config.ci.conditions.ConditionRegistry
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineNotDetectedException
@@ -8,6 +9,8 @@ import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineRegistry
 import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtensionService
 import net.nemerosa.ontrack.extension.config.model.*
 import net.nemerosa.ontrack.extension.config.scm.*
+import net.nemerosa.ontrack.model.metrics.increment
+import net.nemerosa.ontrack.model.metrics.timeNotNull
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
@@ -23,6 +26,7 @@ class CIConfigurationServiceImpl(
     private val conditionRegistry: ConditionRegistry,
     private val coreConfigurationService: CoreConfigurationService,
     private val ciConfigExtensionService: CIConfigExtensionService,
+    private val meterRegistry: MeterRegistry,
 ) : CIConfigurationService {
 
     override fun effectiveCIConfiguration(
@@ -65,14 +69,17 @@ class CIConfigurationServiceImpl(
         ci: String?,
         scm: String?,
         env: List<CIEnv>
-    ): Project {
+    ): Project = meterRegistry.timeNotNull(
+        CIConfigMetrics.ciConfigProjectDuration,
+    ) {
+        meterRegistry.increment(CIConfigMetrics.ciConfigProjectCount)
         val context = getConfigContext(
             yaml = config,
             ci = ci,
             scm = scm,
             env = env,
         )
-        return configureProjectWithContext(context)
+        configureProjectWithContext(context)
     }
 
     private fun configureProjectWithContext(context: ConfigContext): Project {
@@ -97,14 +104,17 @@ class CIConfigurationServiceImpl(
         ci: String?,
         scm: String?,
         env: List<CIEnv>
-    ): Branch {
+    ): Branch = meterRegistry.timeNotNull(
+        CIConfigMetrics.ciConfigBranchDuration,
+    ) {
+        meterRegistry.increment(CIConfigMetrics.ciConfigBranchCount)
         val context = getConfigContext(
             yaml = config,
             ci = ci,
             scm = scm,
             env = env,
         )
-        return configureBranchWithContext(context)
+        configureBranchWithContext(context)
     }
 
     private fun configureBranchWithContext(context: ConfigContext): Branch {
@@ -130,14 +140,17 @@ class CIConfigurationServiceImpl(
         ci: String?,
         scm: String?,
         env: List<CIEnv>
-    ): Build {
+    ): Build = meterRegistry.timeNotNull(
+        CIConfigMetrics.ciConfigBuildDuration,
+    ) {
+        meterRegistry.increment(CIConfigMetrics.ciConfigBuildCount)
         val context = getConfigContext(
             yaml = config,
             ci = ci,
             scm = scm,
             env = env,
         )
-        return configureBuildWithContext(context)
+        configureBuildWithContext(context)
     }
 
     private fun configureBuildWithContext(context: ConfigContext): Build {

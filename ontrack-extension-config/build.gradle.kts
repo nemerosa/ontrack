@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-repository"))
     implementation(project(":ontrack-repository-support"))
+    implementation("io.micrometer:micrometer-core")
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
