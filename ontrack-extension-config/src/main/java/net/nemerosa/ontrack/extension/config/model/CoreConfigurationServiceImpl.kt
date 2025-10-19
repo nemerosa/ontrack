@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.config.ci.CIConfigPRNotSupportedException
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtension
 import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtensionNotFoundException
+import net.nemerosa.ontrack.extension.config.extensions.ProjectCIConfigExtension
 import net.nemerosa.ontrack.extension.config.license.ConfigurationLicense
 import net.nemerosa.ontrack.extension.config.scm.SCMEngine
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
@@ -36,6 +37,10 @@ class CoreConfigurationServiceImpl(
         extensionManager.getExtensions(CIConfigExtension::class.java).associateBy { it.id }
     }
 
+    private val projectCiExtensions: Collection<ProjectCIConfigExtension> by lazy {
+        extensionManager.getExtensions(ProjectCIConfigExtension::class.java)
+    }
+
     override fun configureProject(
         input: ConfigurationInput,
         configuration: ProjectConfiguration,
@@ -64,6 +69,11 @@ class CoreConfigurationServiceImpl(
 
         // Configuration of the project SCM (using the SCM engine)
         scmEngine.configureProject(project, configuration, env, projectName, ciEngine)
+
+        // Auto-validations & auto-promotions
+        projectCiExtensions.forEach { extension ->
+            extension.configureProject(project, configuration)
+        }
 
         // Configuration of properties
         configureProperties(
