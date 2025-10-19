@@ -8,8 +8,11 @@ import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtension
 import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtensionNotFoundException
 import net.nemerosa.ontrack.extension.config.license.ConfigurationLicense
 import net.nemerosa.ontrack.extension.config.scm.SCMEngine
+import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.templating.EnvTemplatingRenderable
+import net.nemerosa.ontrack.model.templating.TemplatingService
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.ZoneOffset
@@ -26,6 +29,7 @@ class CoreConfigurationServiceImpl(
     private val validationDataTypeService: ValidationDataTypeService,
     private val promotionLevelConfigurators: List<PromotionLevelConfigurator>,
     private val extensionManager: ExtensionManager,
+    private val templatingService: TemplatingService,
 ) : CoreConfigurationService {
 
     private val ciExtensions: Map<String, CIConfigExtension<*>> by lazy {
@@ -235,19 +239,34 @@ class CoreConfigurationServiceImpl(
         ciEngine: CIEngine,
         env: Map<String, String>
     ): String {
-        // TODO Configuration of the build name (template for example)
-        val timestampUtc = Instant.now()
-            .atZone(ZoneOffset.UTC)
-            .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
-
-        // Suffix
-        val suffix = ciEngine.getBuildSuffix(env)
-
-        return if (suffix.isNullOrBlank()) {
-            timestampUtc
+        val buildNameTemplate = configuration.buildName
+            ?.takeIf { it.isNotBlank() }
+        return if (!buildNameTemplate.isNullOrBlank()) {
+            renderBuildNameTemplate(
+                template = buildNameTemplate,
+                env = env,
+            )
         } else {
-            "$timestampUtc-$suffix"
+            val suffix = ciEngine.getBuildSuffix(env)
+            val timestampUtc = Instant.now()
+                .atZone(ZoneOffset.UTC)
+                .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+            if (suffix.isNullOrBlank()) {
+                timestampUtc
+            } else {
+                "$timestampUtc-$suffix"
+            }
         }
+    }
+
+    private fun renderBuildNameTemplate(template: String, env: Map<String, String>): String {
+        return templatingService.render(
+            template = template,
+            context = mapOf(
+                "env" to EnvTemplatingRenderable(env),
+            ),
+            renderer = PlainEventRenderer.INSTANCE,
+        )
     }
 
     private fun configureProperties(

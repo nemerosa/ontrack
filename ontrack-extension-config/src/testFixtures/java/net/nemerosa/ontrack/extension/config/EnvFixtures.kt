@@ -8,9 +8,9 @@ object EnvFixtures {
     ) = mapOf(
         "PROJECT_NAME" to "yontrack",
         "BRANCH_NAME" to scmBranch,
-        "BUILD_NUMBER" to "23",
+        "BUILD_NUMBER" to TEST_BUILD_NUMBER,
         "BUILD_REVISION" to TEST_COMMIT,
-        "VERSION" to "5.1.12",
+        "VERSION" to TEST_VERSION,
     ) + extraEnv
 
     fun jenkins(
@@ -20,7 +20,7 @@ object EnvFixtures {
         "JENKINS_URL" to JENKINS_URL,
         "GIT_URL" to "https://github.com/nemerosa/ontrack.git",
         "BRANCH_NAME" to scmBranch,
-        "BUILD_NUMBER" to "23",
+        "BUILD_NUMBER" to TEST_BUILD_NUMBER,
         "BUILD_URL" to "$JENKINS_URL/job/nemerosa/job/ontrack/job/main/23/",
         "JOB_NAME" to "nemerosa/ontrack/main",
     ) + extraEnv
@@ -51,6 +51,8 @@ object EnvFixtures {
 
     const val TEST_BRANCH = "release/1.51"
     const val TEST_COMMIT = "7c0b1745f513b9162791651582c0044d7b6d2a83"
+    const val TEST_VERSION = "5.1.2"
+    const val TEST_BUILD_NUMBER = "23"
 
     const val JENKINS_URL = "https://jenkins.dev.yontrack.com"
 

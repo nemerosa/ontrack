@@ -93,6 +93,7 @@ class CIConfigurationParserImpl(
 
     private fun convertBuild(build: CIBuildConfig): BuildConfiguration {
         return BuildConfiguration(
+            buildName = build.buildName,
             properties = convertProperties(build),
             extensions = convertExtensions(ProjectEntityType.BUILD, build),
         )
