@@ -115,6 +115,10 @@ class LicenseControlServiceImplTest {
         )
         every { licenseService.license } returns license
 
+        every { licensedFeatureProvider.providedFeatures } returns listOf(
+            ProvidedLicensedFeature(id = "someFeature", name = "Some feature", alwaysEnabled = false)
+        )
+
         val result = service.isFeatureEnabled("someFeature")
 
         assertTrue(result)
@@ -133,6 +137,10 @@ class LicenseControlServiceImplTest {
             )
         )
         every { licenseService.license } returns license
+
+        every { licensedFeatureProvider.providedFeatures } returns listOf(
+            ProvidedLicensedFeature(id = "someFeature", name = "Some feature", alwaysEnabled = false)
+        )
 
         val result = service.isFeatureEnabled("someFeature")
 

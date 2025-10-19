@@ -41,7 +41,8 @@ class LicenseControlServiceImpl(
 
     override fun isFeatureEnabled(featureID: String): Boolean {
         val license = licenseService.license
-        return license.active && license.isFeatureEnabled(featureID)
+        val feature = getLicensedFeatures(license).find { it.id == featureID }
+        return license.active && feature != null && feature.enabled
     }
 
     override fun <T : Any> parseLicenseDataInto(featureID: String, type: KClass<T>): T? {
