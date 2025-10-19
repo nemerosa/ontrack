@@ -50,7 +50,7 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
             )
             // Build display name
             assertEquals(
-                "5.1.12",
+                EnvFixtures.TEST_VERSION,
                 buildDisplayNameService.getFirstBuildDisplayName(build),
                 "Build has the expected version as display name"
             )
