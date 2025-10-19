@@ -241,7 +241,7 @@ class CoreConfigurationServiceImpl(
             .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
 
         // Suffix
-        val suffix = ciEngine.getBuildSuffix(env) // TODO Consolidated configuration for the build
+        val suffix = ciEngine.getBuildSuffix(env)
 
         return if (suffix.isNullOrBlank()) {
             timestampUtc
