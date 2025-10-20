@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.config
 
 import net.nemerosa.ontrack.extension.config.ConfigTestSupport
 import net.nemerosa.ontrack.extension.config.EnvFixtures
+import net.nemerosa.ontrack.extension.config.scm.SCMEngineNotDetectedException
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
@@ -35,7 +36,8 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
     @Test
     @AsAdminTest
     fun `Configuration of the project with unexisting configuration`() {
-        assertFailsWith<GitHubSCMUnexistingConfigException> {
+        gitHubConfiguration(url = "https://github.dev.yontrack.com")
+        assertFailsWith<SCMEngineNotDetectedException> {
             configTestSupport.configureBuild(
                 env = EnvFixtures.gitHub(),
             )
