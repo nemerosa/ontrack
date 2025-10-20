@@ -74,13 +74,16 @@ class GitHubSCMEngine(
     ): GitHubEngineConfiguration {
         val scmConfig = configuration.scmConfig
         return if (scmConfig.isNullOrBlank()) {
-            gitHubConfigurationService.configurations.find {
-                scmUrl.startsWith(it.url)
-            } ?: throw GitHubSCMUnexistingConfigException()
+            findConfigurationByURL(scmUrl) ?: throw GitHubSCMUnexistingConfigException()
         } else {
             gitHubConfigurationService.getConfiguration(scmConfig)
         }
     }
+
+    private fun findConfigurationByURL(scmUrl: String): GitHubEngineConfiguration? =
+        gitHubConfigurationService.configurations.find {
+            it.matchesUrl(scmUrl)
+        }
 
     override fun configureBranch(
         branch: Branch,
@@ -110,13 +113,9 @@ class GitHubSCMEngine(
     }
 
     override fun matchesUrl(scmUrl: String): Boolean =
-        scmUrl.startsWith(SCM_URL_HTTPS) ||
-                scmUrl.startsWith(SCM_URL_SSH)
+        findConfigurationByURL(scmUrl) != null
 
     companion object {
-        const val SCM_URL_HTTPS = "https://github.com/"
-        const val SCM_URL_SSH = "git@github.com:"
-
         private val scmUrlRepoRegex = "([^/:]*)/([^/]*)\\.git$".toRegex()
     }
 }

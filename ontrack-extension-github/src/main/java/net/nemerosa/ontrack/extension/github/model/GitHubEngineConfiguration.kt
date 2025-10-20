@@ -138,6 +138,24 @@ open class GitHubEngineConfiguration(
         autoMergeToken = decrypting(autoMergeToken?.takeIf { it.isNotBlank() }),
     )
 
+    /**
+     * Checks if a given "git clone" URL is associated with this configuration.
+     *
+     * @param url URL to test (like `https://github.dev.yontrack.com/scm/nemerosa/ontrack.git`
+     * or `https://github.com/scm/nemerosa/ontrack.git`
+     * or `git@github.com:nemerosa/ontrack.git`)
+     * @return `true` if the URL is associated with this configuration
+     */
+    fun matchesUrl(url: String): Boolean {
+        // Extract the host from the configuration URL
+        val configHost = this.url
+            .removePrefix("https://")
+            .removePrefix("http://")
+            .removeSuffix("/")
+        // Check if the provided URL contains the configuration host
+        return url.contains(configHost)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

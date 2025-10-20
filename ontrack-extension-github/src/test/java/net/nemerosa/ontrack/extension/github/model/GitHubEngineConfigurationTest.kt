@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class GitHubEngineConfigurationTest {
 
@@ -548,5 +550,19 @@ class GitHubEngineConfigurationTest {
                 appPrivateKey = "xxx",
             ).authenticationType
         )
+    }
+
+    @Test
+    fun `SCM URL matching the config URL`() {
+        val configUrl = "https://github.com"
+        val config = GitHubEngineConfiguration(
+            "Test",
+            configUrl,
+            oauth2Token = "xxx",
+        )
+        assertTrue(config.matchesUrl("https://github.com/nemerosa/yontrack.git"))
+        assertTrue(config.matchesUrl("git@github.com:nemerosa/ontrack.git"))
+        assertFalse(config.matchesUrl("https://github.dev.yontrack.com/nemerosa/yontrack.git"))
+        assertFalse(config.matchesUrl("git@github.dev.yontrack.com:nemerosa/ontrack.git"))
     }
 }
