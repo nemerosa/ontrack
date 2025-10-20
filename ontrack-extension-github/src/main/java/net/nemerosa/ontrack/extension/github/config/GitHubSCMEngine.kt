@@ -74,7 +74,7 @@ class GitHubSCMEngine(
     ): GitHubEngineConfiguration {
         val scmConfig = configuration.scmConfig
         return if (scmConfig.isNullOrBlank()) {
-            findConfigurationByURL(scmUrl) ?: throw GitHubSCMUnexistingConfigException()
+            findConfigurationByURL(scmUrl) ?: throw GitHubSCMUnexistingConfigException(scmUrl)
         } else {
             gitHubConfigurationService.getConfiguration(scmConfig)
         }
