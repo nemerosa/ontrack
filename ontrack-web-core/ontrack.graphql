@@ -858,6 +858,14 @@ type Configuration {
   name: String!
 }
 
+"Output type for the configureBuild mutation."
+type ConfigureBuildPayload implements Payload {
+  "Configured build"
+  build: Build
+  "List of errors"
+  errors: [UserError]
+}
+
 "Result of testing a configuration"
 type ConnectionResult {
   "Result message"
@@ -2833,6 +2841,18 @@ type JobType {
   name: String!
 }
 
+"Available JSON schema"
+type JsonSchemaDefinition {
+  "Description for the JSON schema"
+  description: String!
+  "URI ID for the JSON schema"
+  id: String!
+  "Internal key"
+  key: String!
+  "Title for the JSON schema"
+  title: String!
+}
+
 "Label"
 type Label {
   "category field"
@@ -2999,6 +3019,11 @@ type Mutation {
     "Input for the mutation"
     input: CheckAutoVersioningInput
   ): CheckAutoVersioningPayload
+  "Configuration of a Yontrack build based on some input"
+  configureBuild(
+    "Input for the mutation"
+    input: ConfigureBuildInput
+  ): ConfigureBuildPayload
   "Creates an account group"
   createAccountGroup(
     "Input for the mutation"
@@ -4626,11 +4651,6 @@ type Project implements Authorizable & ProjectEntity {
   ): [PromotionRun!]!
   "List of links."
   linkProperty: Property
-  """
-  List of project labels which describes the list of build links
-  to display in a build links decoration.
-  """
-  mainBuildLinksProjectProperty: Property
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
@@ -5136,6 +5156,11 @@ type Query {
   ): [Configuration!]!
   "List of available widgets"
   dashboardWidgets: [Widget!]!
+  "Getting the effective configuration for the current CI without actually configuring anything"
+  effectiveCIConfiguration(
+    "Input for the CI configuration"
+    input: ConfigureBuildInput!
+  ): JSON
   "Getting the eligible slots for a build"
   eligibleSlotsForBuild(
     "ID of the build"
@@ -5291,6 +5316,8 @@ type Query {
     "Type key"
     type: String
   ): JobStatusPaginated
+  "Gets the JSON schema definitions"
+  jsonSchemaDefinitions: [JsonSchemaDefinition!]!
   "List of all labels"
   labels(
     "Category to look for"
@@ -8244,6 +8271,13 @@ input CHMLLevel {
   value: Int!
 }
 
+input CIEnv {
+  "Name of the variable"
+  name: String!
+  "Value of the variable"
+  value: String!
+}
+
 "Input type for the cancelSlotPipeline mutation."
 input CancelSlotPipelineInput {
   "pipelineId field"
@@ -8278,6 +8312,18 @@ input CheckAutoVersioningInput {
   build: String!
   "Project name"
   project: String!
+}
+
+"Input type for the configureBuild mutation."
+input ConfigureBuildInput {
+  "Type of CI engine. Will be guessed from the environment if not specified."
+  ci: String
+  "YAML configuration"
+  config: String!
+  "List of environment variables"
+  env: [CIEnv!]!
+  "Type of SCM. Will be guessed from the environment if not specified."
+  scm: String
 }
 
 "Input type for the createAccountGroup mutation."

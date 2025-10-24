@@ -52,7 +52,7 @@ class CascController(
      */
     @GetMapping("download/schema/json")
     fun downloadJSONSchema(response: HttpServletResponse) {
-        val json = cascJsonSchemaService.createCascJsonSchema()
+        val json = cascJsonSchemaService.createJsonSchema()
             .toPrettyString()
             .toByteArray(Charsets.UTF_8)
 

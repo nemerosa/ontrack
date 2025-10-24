@@ -30,6 +30,13 @@ class CoreUserMenuItemExtension(
                 name = "User profile",
             )
 
+            items += UserMenuItem(
+                groupId = CoreUserMenuGroups.USER,
+                extension = "core/ref",
+                id = "resources",
+                name = "Resources",
+            )
+
             if (globalSettings) {
                 items += UserMenuItem(
                     groupId = CoreUserMenuGroups.CONFIGURATIONS,

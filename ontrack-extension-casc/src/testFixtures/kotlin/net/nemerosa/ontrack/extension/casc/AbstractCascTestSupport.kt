@@ -55,7 +55,7 @@ abstract class AbstractCascTestSupport : AbstractDSLTestSupport() {
 
     protected fun validateYaml(yamlSource: String): Set<ValidationMessage> {
         val schemaNode = asAdmin {
-            cascJsonSchemaService.createCascJsonSchema()
+            cascJsonSchemaService.createJsonSchema()
         }
         val yamlNode = Yaml().read(yamlSource).single()
         val schema: JsonSchema = jsonSchemaFactory.getSchema(schemaNode)

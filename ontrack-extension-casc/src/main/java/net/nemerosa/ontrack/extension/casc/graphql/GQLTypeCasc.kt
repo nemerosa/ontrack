@@ -34,7 +34,7 @@ class GQLTypeCasc(
                     .description("CasC JSON Schema")
                     .type(GQLScalarJSON.INSTANCE)
                     .dataFetcher { _ ->
-                        cascJsonSchemaService.createCascJsonSchema()
+                        cascJsonSchemaService.createJsonSchema()
                     }
             }
             .field {

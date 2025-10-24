@@ -8,7 +8,7 @@ class CascJsonSchemaServiceIT : AbstractCascTestSupport() {
     @Test
     fun `Creating the Casc JSON schema`() {
         val schema = asAdmin {
-            cascJsonSchemaService.createCascJsonSchema()
+            cascJsonSchemaService.createJsonSchema()
         }
         println(schema.toPrettyString())
     }

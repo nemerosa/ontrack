@@ -1,12 +1,5 @@
 package net.nemerosa.ontrack.extension.workflows.schema
 
-import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaProvider
 
-interface WorkflowSchemaService {
-
-    /**
-     * Creating the JSON Schema for a workflow
-     */
-    fun createJsonSchema(): JsonNode
-
-}
+interface WorkflowSchemaService : JsonSchemaProvider

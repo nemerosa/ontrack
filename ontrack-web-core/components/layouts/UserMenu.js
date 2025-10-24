@@ -9,6 +9,7 @@ import {
     FaCog,
     FaCogs,
     FaExpandArrowsAlt,
+    FaFileDownload,
     FaGithub,
     FaGitlab,
     FaInfo,
@@ -26,6 +27,7 @@ import {
     FaStamp,
     FaTag,
     FaUser,
+    FaUserCog,
     FaUsers,
     FaWrench
 } from "react-icons/fa";
@@ -74,6 +76,8 @@ export default function UserMenu({userMenu}) {
         'core/admin/account-management': <FaUsers/>,
         'core/admin/jobs': <FaCogs/>,
         'core/admin/settings': <FaWrench/>,
+        'core/admin/userProfile': <FaUserCog/>,
+        'core/ref/resources': <FaFileDownload/>,
         'extension/jenkins/configurations': <FaJenkins/>,
         'extension/github/configurations': <FaGithub/>,
         'extension/jira/configurations': <FaJira/>,
