@@ -2,10 +2,10 @@ name: Building a branch
 
 on:
   push:
-    branches:
+    branches: []
       # - main
       # - release/*
-      - release/5.0-alpha
+      # - release/5.0-alpha
 
 concurrency: ci-${{ github.ref }}
 
