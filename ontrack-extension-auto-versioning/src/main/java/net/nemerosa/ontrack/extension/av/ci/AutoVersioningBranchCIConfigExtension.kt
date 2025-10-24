@@ -7,6 +7,9 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationServi
 import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -16,9 +19,12 @@ import org.springframework.stereotype.Component
 class AutoVersioningBranchCIConfigExtension(
     autoVersioningExtensionFeature: AutoVersioningExtensionFeature,
     private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
+    jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractExtension(autoVersioningExtensionFeature), CIConfigExtension<AutoVersioningConfig> {
 
     override val id: String = "autoVersioning"
+
+    override val jsonType: JsonType = jsonTypeBuilder.toType(AutoVersioningConfig::class)
 
     override fun parseData(data: JsonNode): AutoVersioningConfig = data.parse()
 

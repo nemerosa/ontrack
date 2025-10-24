@@ -14,6 +14,9 @@ import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscript
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -27,11 +30,14 @@ class NotificationsCIConfigExtension(
     private val eventSubscriptionService: EventSubscriptionService,
     private val structureService: StructureService,
     private val notificationChannelRegistry: NotificationChannelRegistry,
+    jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractExtension(notificationsExtensionFeature), CIConfigExtension<NotificationsCIConfig> {
 
     override val id: String = "notificationsConfig"
 
     override val projectEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.BRANCH)
+
+    override val jsonType: JsonType = jsonTypeBuilder.toType(NotificationsCIConfig::class)
 
     override fun parseData(data: JsonNode): NotificationsCIConfig = data.parse()
 

@@ -15,6 +15,9 @@ import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificati
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.exceptions.PromotionLevelNotFoundException
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import kotlin.jvm.optionals.getOrNull
@@ -25,11 +28,14 @@ class WorkflowsBranchCIConfigExtension(
     private val structureService: StructureService,
     private val eventSubscriptionService: EventSubscriptionService,
     private val workflowNotificationChannel: WorkflowNotificationChannel,
+    jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractExtension(workflowsExtensionFeature), CIConfigExtension<WorkflowsBranchCIConfig> {
 
     override val id: String = "workflows"
 
     override val projectEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.BRANCH)
+
+    override val jsonType: JsonType = jsonTypeBuilder.toType(WorkflowsBranchCIConfig::class)
 
     override fun parseData(data: JsonNode): WorkflowsBranchCIConfig = data.parse()
 

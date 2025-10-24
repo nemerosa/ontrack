@@ -78,27 +78,52 @@ class JsonSchemaBuilderService(
         )
 }
 
+private data class JsonTypeContext(
+    val paths: List<String> = emptyList(),
+) {
+    fun addProperty(propertyName: String, propertyReturnType: KType): JsonTypeContext {
+        return JsonTypeContext(
+            paths = paths + propertyName + propertyReturnType.toString(),
+        )
+    }
+
+    override fun toString(): String = paths.joinToString(" > ")
+
+    companion object {
+        fun ofType(type: KType) = JsonTypeContext(
+            paths = listOf(type.toString())
+        )
+    }
+}
+
 private class JsonSchemaBuilder(
-    private val clsGetter: (cls: KClass<out DynamicJsonSchemaProvider>) -> DynamicJsonSchemaProvider,
+    private val clsGetter: (cls: KClass<out Any>) -> Any,
     private val defs: MutableMap<String, JsonType>,
 ) : JsonTypeBuilder {
 
     fun toRoot(type: KClass<*>, description: String? = null): JsonObjectType =
-        toObject(type.starProjectedType, description)
+        toObject(type.starProjectedType, description, JsonTypeContext.ofType(type.starProjectedType))
 
-    override fun toType(type: KType, description: String?): JsonType {
+    override fun toType(
+        type: KType,
+        description: String?
+    ): JsonType =
+        toType(type, description, JsonTypeContext.ofType(type))
+
+    private fun toType(type: KType, description: String?, context: JsonTypeContext): JsonType {
         val cls = type.classifier as KClass<*>
         return when {
             cls == String::class -> JsonStringType(description)
             cls == Int::class -> JsonIntType(description)
             cls == Long::class -> JsonLongType(description)
             cls == Boolean::class -> JsonBooleanType(description)
-            cls == List::class -> toList(type, description)
+            cls == List::class -> toList(type, description, context)
+            cls == Map::class -> toMap(type, description, context)
             cls == JsonNode::class -> JsonRawJsonType(description)
             cls == Duration::class -> JsonDurationType(description)
             cls.isSubclassOf(Enum::class) -> toEnumType(cls, description)
-            cls.jvmName.startsWith("net.nemerosa.ontrack.") -> toObject(type, description)
-            else -> error("$type is not supported")
+            cls.jvmName.startsWith("net.nemerosa.ontrack.") -> toObject(type, description, context)
+            else -> error("$type is not supported at $context")
         }
     }
 
@@ -107,14 +132,35 @@ private class JsonSchemaBuilder(
         description = description,
     )
 
-    private fun toList(type: KType, description: String? = null): JsonArrayType {
+    private fun toMap(type: KType, description: String? = null, context: JsonTypeContext): JsonMapObjectType {
+        val arguments = type.arguments
+        if (arguments.size != 2) {
+            error("Map must have exactly two type arguments: $context")
+        }
+
+        val keyType = arguments[0]
+        if (keyType.type?.classifier != String::class) {
+            error("Map key must be a string: $context")
+        }
+
+        val itemType = arguments[1].type
+            ?.run { toType(this, description, context) }
+            ?: error("Map must be typed")
+
+        return JsonMapObjectType(
+            itemType = itemType,
+            description = description,
+        )
+    }
+
+    private fun toList(type: KType, description: String? = null, context: JsonTypeContext): JsonArrayType {
         val itemType = type.arguments.firstOrNull()?.type
-            ?.run { toType(this, description) }
+            ?.run { toType(this, description, context) }
             ?: error("List must be typed")
         return JsonArrayType(itemType, description)
     }
 
-    private fun toObject(type: KType, description: String? = null): JsonObjectType {
+    private fun toObject(type: KType, description: String? = null, context: JsonTypeContext): JsonObjectType {
         val cls = type.classifier as KClass<*>
 
         val excludedProperties = mutableSetOf<String>()
@@ -132,13 +178,20 @@ private class JsonSchemaBuilder(
                 val propertyName = getPropertyName(property)
                 val propertyReturnType = property.returnType
                 val schemaRef = property.findAnnotation<JsonSchemaRef>()
+                val jsonSchemaPropertiesContributor = property.findAnnotation<JsonSchemaPropertiesContributor>()
                 if (schemaRef != null) {
                     oProperties[propertyName] = JsonRefType(
                         ref = schemaRef.value,
                         description = getPropertyDescription(property),
                     )
+                } else if (jsonSchemaPropertiesContributor != null) {
+                    contributeProperties(oProperties, jsonSchemaPropertiesContributor)
                 } else {
-                    val propertyType = toType(propertyReturnType, getPropertyDescription(property))
+                    val propertyType = toType(
+                        propertyReturnType,
+                        getPropertyDescription(property),
+                        context = context.addProperty(propertyName, propertyReturnType),
+                    )
                     oProperties[propertyName] = propertyType
                 }
                 if (!property.returnType.isMarkedNullable && !property.hasDefaultValue(cls) && !property.hasAnnotation<APIOptional>()) {
@@ -166,6 +219,16 @@ private class JsonSchemaBuilder(
         )
     }
 
+    private fun contributeProperties(
+        oProperties: MutableMap<String, JsonType>,
+        jsonSchemaPropertiesContributor: JsonSchemaPropertiesContributor
+    ) {
+        val provider = clsGetter(jsonSchemaPropertiesContributor.provider) as JsonSchemaPropertiesContributorProvider
+        oProperties += provider.contributeProperties(
+            configuration = jsonSchemaPropertiesContributor.configuration,
+        )
+    }
+
     private fun setupDynamicJsonSchema(
         cls: KClass<*>,
         dynamicJsonSchema: DynamicJsonSchema,
@@ -173,7 +236,7 @@ private class JsonSchemaBuilder(
         oRequired: MutableList<String>
     ): JsonOneOf {
         // Getting the provider
-        val provider = clsGetter(dynamicJsonSchema.provider)
+        val provider = clsGetter(dynamicJsonSchema.provider) as DynamicJsonSchemaProvider
 
         // Gets the corresponding properties in the holding class
         val clsProperties = cls.memberProperties.associateBy { it.name }

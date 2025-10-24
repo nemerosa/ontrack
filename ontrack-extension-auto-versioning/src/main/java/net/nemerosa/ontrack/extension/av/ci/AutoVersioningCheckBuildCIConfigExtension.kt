@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.extension.av.AutoVersioningExtensionFeature
 import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationService
 import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.json.schema.JsonBooleanType
+import net.nemerosa.ontrack.model.json.schema.JsonType
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -17,6 +19,8 @@ class AutoVersioningCheckBuildCIConfigExtension(
 ) : AbstractExtension(autoVersioningExtensionFeature), CIConfigExtension<Boolean> {
 
     override val id: String = "autoVersioningCheck"
+
+    override val jsonType: JsonType = JsonBooleanType(null)
 
     override fun parseData(data: JsonNode): Boolean = data.asBoolean()
 

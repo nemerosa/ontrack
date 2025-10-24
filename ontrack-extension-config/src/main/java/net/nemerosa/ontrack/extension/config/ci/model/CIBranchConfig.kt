@@ -2,11 +2,22 @@ package net.nemerosa.ontrack.extension.config.ci.model
 
 import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.config.schema.CIConfigExtensionJsonSchemaPropertiesContributorProvider
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaPropertiesContributor
 
+@APIDescription("Branch configuration")
 data class CIBranchConfig(
+    @APIDescription("List of properties for the branch.")
     override val properties: Map<String, JsonNode> = emptyMap(),
+    @APIDescription("List of validation stamps to define for the branch.")
     val validations: Map<String, JsonNode> = emptyMap(),
+    @APIDescription("List of promotion levels to define for the branch.")
     val promotions: Map<String, CIPromotionConfig> = emptyMap(),
+    @JsonSchemaPropertiesContributor(
+        provider = CIConfigExtensionJsonSchemaPropertiesContributorProvider::class,
+        configuration = "BRANCH",
+    )
     @field:JsonAnySetter
     override val extensions: Map<String, JsonNode> = mutableMapOf()
 ) : CIPropertiesConfig, CIExtensionsConfig
