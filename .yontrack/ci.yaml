@@ -1,0 +1,83 @@
+version: v1
+configuration:
+  defaults:
+    branch:
+      validations:
+        BUILD:
+          tests: {}
+        UI_UNIT:
+          tests: {}
+        KDSL.ACCEPTANCE:
+          tests: {}
+        PLAYWRIGHT:
+          tests: {}
+      promotions:
+        BRONZE:
+          validations:
+            - BUILD
+            - UI_UNIT
+            - KDSL.ACCEPTANCE
+            - PLAYWRIGHT
+        RELEASE:
+          promotions:
+            - BRONZE
+          validations:
+            - GITHUB.RELEASE
+      notificationsConfig:
+        notifications:
+          - name: On validation error
+            events:
+              - new_validation_run
+            keywords: failed
+            channel: slack
+            channelConfig:
+              channel: '#notifications'
+              type: 'ERROR'
+            contentTemplate: |
+              Build ${build} has failed on ${validationStamp}.
+          - name: On BRONZE
+            promotion: BRONZE
+            events:
+              - new_promotion_run
+            channel: slack
+            channelConfig:
+              channel: '#notifications'
+              type: 'SUCCESS'
+            contentTemplate: |
+              Build ${build} has been promoted to ${promotionLevel}.
+          - name: On RELEASE
+            promotion: RELEASE
+            events:
+              - new_promotion_run
+            channel: slack
+            channelConfig:
+              channel: '#internal-releases'
+              type: 'SUCCESS'
+            contentTemplate: |
+              Ontrack ${build} has been released.
+              
+              ${promotionRun.changelog?title=true}
+  custom:
+    configs:
+      - conditions:
+          branch: '^release/\d+\.\d+$'
+        branch:
+          notificationsConfig:
+            notifications:
+              - name: On RELEASE
+                channelConfig:
+                  channel: '#internal-releases'
+              - name: On RELEASE deploy the Demo Beta
+                promotion: RELEASE
+                events:
+                  - new_promotion_run
+                channel: workflow
+                channelConfig:
+                  workflow:
+                    name: Deploy Demo Beta
+                    nodes:
+                      - id: start
+                        description: Start deployment
+                        executorId: slot-pipeline-creation
+                        data:
+                          environment: demo-beta
