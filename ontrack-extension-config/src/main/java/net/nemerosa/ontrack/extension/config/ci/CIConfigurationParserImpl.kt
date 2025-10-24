@@ -176,11 +176,11 @@ class CIConfigurationParserImpl(
         type: String,
         data: JsonNode
     ): ValidationStampDataConfiguration {
-        val config = validationDataTypeService.validateValidationDataTypeConfig<Any>(type, data)
+        validationDataTypeService.validateValidationDataTypeConfig<Any>(type, data)
             ?: throw ValidationStampDataConfigurationTypeNotFoundException(type)
         return ValidationStampDataConfiguration(
-            type = config.descriptor.id,
-            data = config.config.asJson(),
+            type = type,
+            data = data,
         )
     }
 
