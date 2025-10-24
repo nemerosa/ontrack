@@ -4,21 +4,20 @@ import net.nemerosa.ontrack.extension.config.ConfigTestSupport
 import net.nemerosa.ontrack.extension.config.EnvFixtures
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
-import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-class ThresholdPercentageValidationDataTypeAliasIT : AbstractDSLTestSupport() {
+class MetricsValidationDataTypeAliasIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var configTestSupport: ConfigTestSupport
 
     @Test
     @AsAdminTest
-    fun `Percentage validation data type alias`() {
+    fun `Metrics validation data type alias`() {
         val branch = configTestSupport.configureBranch(
             yaml = """
                 version: v1
@@ -26,26 +25,18 @@ class ThresholdPercentageValidationDataTypeAliasIT : AbstractDSLTestSupport() {
                     defaults:
                         branch:
                             validations:
-                                PERCENTAGE:
-                                    percentage:
-                                        okIfGreater: false
-                                        warningThreshold: 50
-                                        failureThreshold: 80
+                                METRICS:
+                                    metrics:
             """.trimIndent(),
             ci = "generic",
             scm = "mock",
             env = EnvFixtures.generic()
         )
 
-        val vs = structureService.findValidationStampByName(branch.project.name, branch.name, "PERCENTAGE").getOrNull()
-            ?: fail("Cannot find PERCENTAGE validation stamp")
+        val vs = structureService.findValidationStampByName(branch.project.name, branch.name, "METRICS").getOrNull()
+            ?: fail("Cannot find METRICS validation stamp")
 
-        assertEquals(ThresholdPercentageValidationDataType::class.qualifiedName, vs.dataType?.descriptor?.id)
-        assertIs<ThresholdConfig>(vs.dataType?.config) {
-            assertEquals(50, it.warningThreshold)
-            assertEquals(80, it.failureThreshold)
-            assertEquals(false, it.okIfGreater)
-        }
+        assertEquals(MetricsValidationDataType::class.qualifiedName, vs.dataType?.descriptor?.id)
     }
 
 }
