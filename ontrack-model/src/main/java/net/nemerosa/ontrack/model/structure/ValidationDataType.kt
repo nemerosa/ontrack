@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.extension.Extension
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 
 /**
  * Definition and validation of some arbitrary data associated with [ValidationStamp]s
@@ -87,12 +89,19 @@ interface ValidationDataType<C, T> : Extension {
     fun getMetrics(data: T): Map<String, *>?
 
     /**
+     * Creates the JSON type for the configuration
+     *
+     * @param jsonTypeBuilder Builder for the JSON types
+     */
+    fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType
+
+    /**
      * Descriptor
      */
     val descriptor
         get() = ValidationDataTypeDescriptor(
-                feature.featureDescription,
-                this::class.qualifiedName!!,
-                displayName
+            feature.featureDescription,
+            this::class.qualifiedName!!,
+            displayName
         )
 }

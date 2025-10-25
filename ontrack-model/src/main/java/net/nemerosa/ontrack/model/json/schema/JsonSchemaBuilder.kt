@@ -179,6 +179,7 @@ private class JsonSchemaBuilder(
                 val propertyReturnType = property.returnType
                 val schemaRef = property.findAnnotation<JsonSchemaRef>()
                 val jsonSchemaPropertiesContributor = property.findAnnotation<JsonSchemaPropertiesContributor>()
+                val jsonSchemaMapValueType = property.findAnnotation<JsonSchemaMapValueType>()
                 if (schemaRef != null) {
                     oProperties[propertyName] = JsonRefType(
                         ref = schemaRef.value,
@@ -186,6 +187,14 @@ private class JsonSchemaBuilder(
                     )
                 } else if (jsonSchemaPropertiesContributor != null) {
                     contributeProperties(oProperties, jsonSchemaPropertiesContributor)
+                } else if (jsonSchemaMapValueType != null) {
+                    contributeTypedMap(
+                        oProperties = oProperties,
+                        propertyName = propertyName,
+                        propertyReturnType = propertyReturnType,
+                        jsonSchemaMapValueType = jsonSchemaMapValueType,
+                        context = context
+                    )
                 } else {
                     val propertyType = toType(
                         propertyReturnType,
@@ -216,6 +225,42 @@ private class JsonSchemaBuilder(
             required = oRequired,
             additionalProperties = false,
             oneOf = oneOf,
+        )
+    }
+
+    private fun contributeTypedMap(
+        oProperties: MutableMap<String, JsonType>,
+        propertyName: String,
+        propertyReturnType: KType,
+        jsonSchemaMapValueType: JsonSchemaMapValueType,
+        context: JsonTypeContext
+    ) {
+        val cls = propertyReturnType.classifier as KClass<*>
+        if (cls != Map::class) {
+            error("JsonSchemaMapValueType can only be used on maps: $context")
+        }
+
+        val arguments = propertyReturnType.arguments
+        if (arguments.size != 2) {
+            error("Map must have exactly two type arguments: $context")
+        }
+
+        val keyType = arguments[0]
+        if (keyType.type?.classifier != String::class) {
+            error("Map key must be a string: $context")
+        }
+
+        val itemType = arguments[1].type?.classifier as? KClass<*>?
+        if (itemType != JsonNode::class) {
+            error("JsonSchemaMapValueType can only be used on Map<String,JsonNode>: $context")
+        }
+
+        val typeProvider = clsGetter(jsonSchemaMapValueType.provider)
+                as JsonSchemaMapValueTypeProvider
+
+        oProperties += propertyName to JsonMapObjectType(
+            description = null,
+            itemType = typeProvider.createType()
         )
     }
 

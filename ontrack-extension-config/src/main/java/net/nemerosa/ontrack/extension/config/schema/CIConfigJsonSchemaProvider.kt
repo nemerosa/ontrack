@@ -20,7 +20,7 @@ class CIConfigJsonSchemaProvider(
 
     override fun createJsonSchema(): JsonNode =
         jsonSchemaBuilderService.createSchema(
-            ref = "workflow",
+            ref = "ci-config",
             id = id,
             title = title,
             description = description,

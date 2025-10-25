@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.av.AutoVersioningExtensionFeature
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.json.schema.JsonEmptyType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
@@ -29,6 +32,8 @@ class AutoVersioningValidationDataType(
     override fun configToFormJson(config: Any?): JsonNode? = null
 
     override fun configToJson(config: Any?): JsonNode = NullNode.instance
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType = JsonEmptyType.INSTANCE
 
     override fun fromConfigForm(node: JsonNode?) {}
 

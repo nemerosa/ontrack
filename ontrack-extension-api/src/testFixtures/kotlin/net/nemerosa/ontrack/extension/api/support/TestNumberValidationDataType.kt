@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.node.IntNode
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataFormatException
+import net.nemerosa.ontrack.model.json.schema.JsonIntType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
@@ -20,6 +23,9 @@ class TestNumberValidationDataType(
                 is IntNode -> node.asInt()
                 else -> null
             }
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        JsonIntType(description = "Threshold value")
 
     override fun configToJson(config: Int?): JsonNode =
             config?.let { IntNode(it) } ?: NullNode.instance

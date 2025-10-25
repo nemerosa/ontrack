@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.json.getIntField
 import net.nemerosa.ontrack.json.getRequiredEnum
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.toJson
+import net.nemerosa.ontrack.model.json.schema.*
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.MetricsColors
 import net.nemerosa.ontrack.model.structure.NumericValidationDataType
@@ -51,6 +52,29 @@ class CHMLValidationDataType(
             )
         }
 
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType = JsonObjectType(
+        title = "CHML",
+        description = "CHML thresholds for the validation data",
+        properties = mapOf(
+            "warningLevel" to JsonEnumType(
+                description = "Level for which to raise a warning",
+                values = CHML.entries.map { it.name },
+            ),
+            "warningValue" to JsonIntType("Value for which to raise a warning"),
+            "failedLevel" to JsonEnumType(
+                description = "Level for which to raise a failure",
+                values = CHML.entries.map { it.name },
+            ),
+            "failedValue" to JsonIntType("Value for which to raise a failure"),
+        ),
+        required = listOf(
+            "warningLevel",
+            "failedLevel"
+        ),
+        additionalProperties = false,
+        oneOf = null,
+    )
+
     override fun toJson(data: CHMLValidationDataTypeData) = data.toJson()!!
 
     override fun fromJson(node: JsonNode): CHMLValidationDataTypeData = node.parse()
@@ -58,7 +82,7 @@ class CHMLValidationDataType(
     override fun fromForm(node: JsonNode?): CHMLValidationDataTypeData? =
         node?.let {
             CHMLValidationDataTypeData(
-                CHML.values().associateWith { (node.getIntField(it.name) ?: 0) }
+                CHML.entries.associateWith { (node.getIntField(it.name) ?: 0) }
             )
         }
 
@@ -85,7 +109,7 @@ class CHMLValidationDataType(
 
     override fun validateData(config: CHMLValidationDataTypeConfig?, data: CHMLValidationDataTypeData?) =
         validateNotNull(data) {
-            CHML.values().forEach {
+            CHML.entries.forEach {
                 val value = levels[it]
                 if (value != null) {
                     validate(value >= 0, "Value for ${it} must be >= 0")
@@ -102,13 +126,13 @@ class CHMLValidationDataType(
         )
     }
 
-    override fun getMetricNames(): List<String> = CHML.values().map { it.name.lowercase() }
+    override fun getMetricNames(): List<String> = CHML.entries.map { it.name.lowercase() }
 
     override fun getMetricColors(): List<String> = listOf(
-            MetricsColors.FAILURE,
-            MetricsColors.WARNING,
-            MetricsColors.NEUTRAL,
-            MetricsColors.SUCCESS,
+        MetricsColors.FAILURE,
+        MetricsColors.WARNING,
+        MetricsColors.NEUTRAL,
+        MetricsColors.SUCCESS,
     )
 
     override fun getNumericMetrics(data: CHMLValidationDataTypeData): Map<String, Double> {

@@ -7,8 +7,6 @@ class JsonMapObjectType(
     type = "object",
     description = description,
 ) {
-    val additionalProperties = mapOf(
-        "type" to itemType,
-    )
+    val additionalProperties = itemType
 }
 

@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseOrNull
+import net.nemerosa.ontrack.model.json.schema.JsonEmptyType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
@@ -39,6 +42,8 @@ class TestValidationDataType(
             validate(high >= 0, "Number of high issues must be >= 0")
             validate(medium >= 0, "Number of medium issues must be >= 0")
         }
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType = JsonEmptyType.INSTANCE
 
     override fun configToJson(config: Any): JsonNode = NullNode.instance
 

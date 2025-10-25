@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.io.File
 
 class CIConfigJsonSchemaProviderIT : AbstractDSLTestSupport() {
 
@@ -14,7 +15,11 @@ class CIConfigJsonSchemaProviderIT : AbstractDSLTestSupport() {
     @AsAdminTest
     fun `Creating the Casc JSON schema`() {
         val schema = provider.createJsonSchema()
-        println(schema.toPrettyString())
+        val schemaJson = schema.toPrettyString()
+        println(schemaJson)
+
+        val file = File("yontrack-ci-config-schema.json")
+        file.writeText(schemaJson)
     }
 
 }
