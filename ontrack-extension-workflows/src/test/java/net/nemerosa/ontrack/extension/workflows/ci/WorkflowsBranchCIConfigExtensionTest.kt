@@ -19,7 +19,6 @@ class WorkflowsBranchCIConfigExtensionTest {
             structureService = mockk(),
             eventSubscriptionService = mockk(),
             workflowNotificationChannel = mockk(),
-            jsonTypeBuilder = mockk(),
         )
     }
 

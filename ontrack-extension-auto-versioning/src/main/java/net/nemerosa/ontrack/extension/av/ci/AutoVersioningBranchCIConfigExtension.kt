@@ -19,12 +19,12 @@ import org.springframework.stereotype.Component
 class AutoVersioningBranchCIConfigExtension(
     autoVersioningExtensionFeature: AutoVersioningExtensionFeature,
     private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
-    jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractExtension(autoVersioningExtensionFeature), CIConfigExtension<AutoVersioningConfig> {
 
     override val id: String = "autoVersioning"
 
-    override val jsonType: JsonType = jsonTypeBuilder.toType(AutoVersioningConfig::class)
+    override fun createJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(AutoVersioningConfig::class)
 
     override fun parseData(data: JsonNode): AutoVersioningConfig = data.parse()
 

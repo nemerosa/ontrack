@@ -13,12 +13,11 @@ import org.springframework.stereotype.Component
  */
 @Component
 class ValidationJsonSchemaMapValueTypeProvider(
-    private val jsonTypeBuilder: JsonTypeBuilder,
     private val validationDataTypes: List<ValidationDataType<*, *>>,
     private val validationDataTypeAliases: List<ValidationDataTypeAlias>,
 ) : JsonSchemaMapValueTypeProvider {
 
-    override fun createType(): JsonType {
+    override fun createType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
 
         // One property per type
         val properties = mutableMapOf<String, JsonType>()

@@ -10,5 +10,5 @@ interface JsonSchemaTypeProvider {
     /**
      * Creates a [JsonType] for a map value.
      */
-    fun createType(configuration: String): JsonType
+    fun createType(configuration: String, jsonTypeBuilder: JsonTypeBuilder): JsonType
 }

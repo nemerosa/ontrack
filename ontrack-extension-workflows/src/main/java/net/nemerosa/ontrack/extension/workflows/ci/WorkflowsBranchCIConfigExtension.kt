@@ -28,14 +28,14 @@ class WorkflowsBranchCIConfigExtension(
     private val structureService: StructureService,
     private val eventSubscriptionService: EventSubscriptionService,
     private val workflowNotificationChannel: WorkflowNotificationChannel,
-    jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractExtension(workflowsExtensionFeature), CIConfigExtension<WorkflowsBranchCIConfig> {
 
     override val id: String = "workflows"
 
     override val projectEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.BRANCH)
 
-    override val jsonType: JsonType = jsonTypeBuilder.toType(WorkflowsBranchCIConfig::class)
+    override fun createJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(WorkflowsBranchCIConfig::class)
 
     override fun parseData(data: JsonNode): WorkflowsBranchCIConfig = data.parse()
 

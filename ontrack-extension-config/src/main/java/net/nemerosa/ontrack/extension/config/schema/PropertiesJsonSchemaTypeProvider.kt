@@ -9,12 +9,11 @@ import kotlin.reflect.full.hasAnnotation
 
 @Component
 class PropertiesJsonSchemaTypeProvider(
-    private val jsonTypeBuilder: JsonTypeBuilder,
     private val propertyService: PropertyService,
     private val propertyAliases: List<PropertyAlias>,
 ) : JsonSchemaTypeProvider {
 
-    override fun createType(configuration: String): JsonType {
+    override fun createType(configuration: String, jsonTypeBuilder: JsonTypeBuilder): JsonType {
         val entityType = ProjectEntityType.valueOf(configuration)
 
         // One property per type

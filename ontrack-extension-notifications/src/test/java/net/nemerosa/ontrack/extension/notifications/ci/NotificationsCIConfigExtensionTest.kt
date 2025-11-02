@@ -30,7 +30,6 @@ class NotificationsCIConfigExtensionTest {
             eventSubscriptionService = mockk(),
             structureService = mockk(),
             notificationChannelRegistry = notificationChannelRegistry,
-            jsonTypeBuilder = mockk(),
         )
     }
 

@@ -198,7 +198,7 @@ private class JsonSchemaBuilder(
                     contributeProperties(oProperties, jsonSchemaPropertiesContributor)
                 } else if (jsonSchemaType != null) {
                     val provider = clsGetter(jsonSchemaType.provider) as JsonSchemaTypeProvider
-                    oProperties[propertyName] = provider.createType(jsonSchemaType.configuration)
+                    oProperties[propertyName] = provider.createType(jsonSchemaType.configuration, this)
                 } else if (jsonSchemaMapValueType != null) {
                     contributeTypedMap(
                         oProperties = oProperties,
@@ -272,7 +272,7 @@ private class JsonSchemaBuilder(
 
         oProperties += propertyName to JsonMapObjectType(
             description = null,
-            itemType = typeProvider.createType()
+            itemType = typeProvider.createType(this)
         )
     }
 
@@ -283,6 +283,7 @@ private class JsonSchemaBuilder(
         val provider = clsGetter(jsonSchemaPropertiesContributor.provider) as JsonSchemaPropertiesContributorProvider
         oProperties += provider.contributeProperties(
             configuration = jsonSchemaPropertiesContributor.configuration,
+            jsonTypeBuilder = this,
         )
     }
 
