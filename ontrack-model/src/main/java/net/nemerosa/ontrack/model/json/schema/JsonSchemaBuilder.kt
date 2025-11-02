@@ -179,14 +179,26 @@ private class JsonSchemaBuilder(
                 val propertyReturnType = property.returnType
                 val schemaRef = property.findAnnotation<JsonSchemaRef>()
                 val jsonSchemaPropertiesContributor = property.findAnnotation<JsonSchemaPropertiesContributor>()
+                val jsonSchemaType = property.findAnnotation<JsonSchemaType>()
                 val jsonSchemaMapValueType = property.findAnnotation<JsonSchemaMapValueType>()
-                if (schemaRef != null) {
+                val jsonSchemaString = property.findAnnotation<JsonSchemaString>()
+                val jsonSchemaIgnore = property.findAnnotation<JsonSchemaIgnore>()
+                if (jsonSchemaIgnore != null) {
+                    continue
+                } else if (jsonSchemaString != null) {
+                    oProperties[propertyName] = JsonStringType(
+                        description = getPropertyDescription(property),
+                    )
+                } else if (schemaRef != null) {
                     oProperties[propertyName] = JsonRefType(
                         ref = schemaRef.value,
                         description = getPropertyDescription(property),
                     )
                 } else if (jsonSchemaPropertiesContributor != null) {
                     contributeProperties(oProperties, jsonSchemaPropertiesContributor)
+                } else if (jsonSchemaType != null) {
+                    val provider = clsGetter(jsonSchemaType.provider) as JsonSchemaTypeProvider
+                    oProperties[propertyName] = provider.createType(jsonSchemaType.configuration)
                 } else if (jsonSchemaMapValueType != null) {
                     contributeTypedMap(
                         oProperties = oProperties,

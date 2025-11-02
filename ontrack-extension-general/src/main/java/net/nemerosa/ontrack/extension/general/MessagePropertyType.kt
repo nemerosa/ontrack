@@ -3,6 +3,9 @@ package net.nemerosa.ontrack.extension.general
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -20,6 +23,9 @@ class MessagePropertyType(extensionFeature: GeneralExtensionFeature) :
         "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
 
     override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.allOf(ProjectEntityType::class.java)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(MessageProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)

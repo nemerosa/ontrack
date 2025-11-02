@@ -6,6 +6,9 @@ import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.scm.index.SCMBuildCommitIndexService
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
@@ -27,6 +30,9 @@ class GitCommitPropertyType(
     override val description: String = "Git commit"
 
     override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.BUILD)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(GitCommitProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity, BuildCreate::class.java)

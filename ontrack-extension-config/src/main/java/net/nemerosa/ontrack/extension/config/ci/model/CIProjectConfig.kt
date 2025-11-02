@@ -4,12 +4,18 @@ import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.config.model.ProjectIssueServiceIdentifier
 import net.nemerosa.ontrack.extension.config.schema.CIConfigExtensionJsonSchemaPropertiesContributorProvider
+import net.nemerosa.ontrack.extension.config.schema.PropertiesJsonSchemaTypeProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.json.schema.JsonSchemaPropertiesContributor
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaType
 
 @APIDescription("Project configuration")
 data class CIProjectConfig(
     @APIDescription("List of properties for the build.")
+    @JsonSchemaType(
+        provider = PropertiesJsonSchemaTypeProvider::class,
+        configuration = "PROJECT",
+    )
     override val properties: Map<String, JsonNode> = emptyMap(),
     @APIDescription("Overriding the name of the project")
     val name: String? = null,

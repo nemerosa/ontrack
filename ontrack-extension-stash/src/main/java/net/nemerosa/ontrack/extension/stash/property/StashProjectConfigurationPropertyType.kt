@@ -7,6 +7,9 @@ import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -26,6 +29,9 @@ class StashProjectConfigurationPropertyType(
     override val description: String = "Associates the project with a Bitbucket Server repository"
 
     override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROJECT)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(StashProjectConfigurationProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig::class.java)

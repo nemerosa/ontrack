@@ -13,6 +13,9 @@ import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.getBooleanField
 import net.nemerosa.ontrack.json.getIntField
 import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
@@ -34,6 +37,9 @@ class GitBranchConfigurationPropertyType(
     override val description: String = "Git branch"
 
     override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.BRANCH)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(GitBranchConfigurationProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig::class.java)

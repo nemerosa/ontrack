@@ -9,6 +9,9 @@ import net.nemerosa.ontrack.extension.bitbucket.cloud.model.BitbucketCloudProjec
 import net.nemerosa.ontrack.extension.git.property.AbstractGitProjectConfigurationPropertyType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -30,6 +33,9 @@ class BitbucketCloudProjectConfigurationPropertyType(
     override val description: String = "Associates the project with a Bitbucket Cloud repository"
 
     override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROJECT)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(BitbucketCloudProjectConfigurationProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig::class.java)

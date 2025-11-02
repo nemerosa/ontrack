@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -19,6 +22,9 @@ class BuildLinkDisplayPropertyType(
     override val description: String = "Configuration of display options for the build links towards this project."
 
     override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROJECT)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(BuildLinkDisplayProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)

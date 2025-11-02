@@ -3,6 +3,9 @@ package net.nemerosa.ontrack.extension.jenkins
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.exceptions.PropertyUnsupportedEntityTypeException
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -26,6 +29,9 @@ class JenkinsBuildPropertyType(
         ProjectEntityType.PROMOTION_RUN,
         ProjectEntityType.VALIDATION_RUN
     )
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(JenkinsBuildProperty::class)
 
     /**
      * Depends on the nature of the entity. Allowed to the ones who can create the associated entity.

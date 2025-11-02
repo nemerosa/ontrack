@@ -4,6 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.model.json.schema.JsonEmptyType
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaIgnore
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
@@ -12,6 +16,7 @@ import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 @Component
+@JsonSchemaIgnore
 class AutoPromotionPropertyType(
     extensionFeature: GeneralExtensionFeature,
     private val structureService: StructureService
@@ -23,6 +28,8 @@ class AutoPromotionPropertyType(
         "Allows a promotion level to be granted on a build as soon as a list of validation stamps and/or other promotions has been passed"
 
     override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROMOTION_LEVEL)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType = JsonEmptyType.INSTANCE
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)

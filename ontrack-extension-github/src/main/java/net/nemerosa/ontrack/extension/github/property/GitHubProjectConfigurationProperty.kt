@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.property
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationType
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaString
 import net.nemerosa.ontrack.model.support.ConfigurationProperty
 
 /**
@@ -14,6 +15,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationProperty
  */
 data class GitHubProjectConfigurationProperty(
     @DocumentationType("String", description = "Name of the configuration")
+    @JsonSchemaString
     override val configuration: GitHubEngineConfiguration,
     @APIDescription("GitHub repository, ie. org/name")
     val repository: String,

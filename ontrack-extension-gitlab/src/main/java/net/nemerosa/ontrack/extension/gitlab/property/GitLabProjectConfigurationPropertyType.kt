@@ -7,6 +7,9 @@ import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration
 import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -29,6 +32,9 @@ class GitLabProjectConfigurationPropertyType(
 
     override val supportedEntityTypes: Set<ProjectEntityType>
         get() = EnumSet.of(ProjectEntityType.PROJECT)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(GitLabProjectConfigurationProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig::class.java)

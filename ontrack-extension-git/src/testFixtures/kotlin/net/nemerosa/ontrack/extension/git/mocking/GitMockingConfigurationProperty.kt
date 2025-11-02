@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.git.mocking
 
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaString
 
 class GitMockingConfigurationProperty(
-        val configuration: BasicGitConfiguration,
-        val issueServiceConfigurationIdentifier: String?
+    @JsonSchemaString
+    val configuration: BasicGitConfiguration,
+    val issueServiceConfigurationIdentifier: String?
 )

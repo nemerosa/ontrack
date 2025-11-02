@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.json.schema.JsonBooleanType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.structure.PropertyAlias
 import org.springframework.stereotype.Component
 
@@ -13,4 +16,6 @@ class BuildLinkDisplayPropertyAlias : PropertyAlias {
         BuildLinkDisplayProperty(
             useLabel = data.asBoolean()
         ).asJson()
+
+    override fun createJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType = JsonBooleanType("Use label")
 }

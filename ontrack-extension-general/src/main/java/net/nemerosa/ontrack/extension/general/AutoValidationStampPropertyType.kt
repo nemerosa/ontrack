@@ -4,6 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.extension.ValidationStampPropertyType
+import net.nemerosa.ontrack.model.json.schema.JsonEmptyType
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaIgnore
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
+@JsonSchemaIgnore
 class AutoValidationStampPropertyType(
     extensionFeature: GeneralExtensionFeature,
     private val predefinedValidationStampService: PredefinedValidationStampService,
@@ -61,6 +66,8 @@ class AutoValidationStampPropertyType(
         "If set, this property allows validation stamps to be created automatically from predefined validation stamps"
 
     override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROJECT)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType = JsonEmptyType.INSTANCE
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)

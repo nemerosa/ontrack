@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.api.support
 
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaString
 import net.nemerosa.ontrack.model.support.ConfigurationProperty
 
 class TestProperty(
+    @JsonSchemaString
     override val configuration: TestConfiguration,
     val value: String
 ) : ConfigurationProperty<TestConfiguration> {

@@ -6,6 +6,9 @@ import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfi
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfigurationService
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -25,6 +28,9 @@ class ArtifactoryPromotionSyncPropertyType(
     override val description: String = "Synchronisation of the promotions with Artifactory build statuses"
 
     override val supportedEntityTypes = setOf(ProjectEntityType.BRANCH)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(ArtifactoryPromotionSyncProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig::class.java)

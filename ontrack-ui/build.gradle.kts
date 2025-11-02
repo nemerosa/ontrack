@@ -38,7 +38,7 @@ dependencies {
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     // TODO runtimeOnly("io.micrometer:micrometer-registry-elastic")
 
-    // TODO Logging extensions
+    // Logging extensions
     runtimeOnly("net.logstash.logback:logstash-logback-encoder")
 
     testImplementation(project(":ontrack-it-utils"))
@@ -46,6 +46,9 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))
     testImplementation(testFixtures(project(":ontrack-extension-support")))
+
+    // List of extensions needed for some tests spanning all modules
+    testImplementation(project(":ontrack-extension-config"))
 
     // List of extensions needed for the documentation generation
     testImplementation(project(":ontrack-extension-notifications"))

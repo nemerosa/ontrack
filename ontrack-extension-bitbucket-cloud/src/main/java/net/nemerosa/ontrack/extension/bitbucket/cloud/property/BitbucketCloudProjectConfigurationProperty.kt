@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketClo
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationIgnore
 import net.nemerosa.ontrack.model.docs.DocumentationType
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaString
 import net.nemerosa.ontrack.model.support.ConfigurationProperty
 
 /**
@@ -17,6 +18,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationProperty
  */
 class BitbucketCloudProjectConfigurationProperty(
     @DocumentationType("String", "Name of the Bitbucket Cloud configuration")
+    @JsonSchemaString
     override val configuration: BitbucketCloudConfiguration,
     @APIDescription("Name of the repository")
     val repository: String,

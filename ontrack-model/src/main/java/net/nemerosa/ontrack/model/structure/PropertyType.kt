@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.extension.Extension
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.apache.commons.lang3.StringUtils
 
@@ -166,4 +168,9 @@ interface PropertyType<T> : Extension {
     fun getPropertyDecorations(@Suppress("unused") value: T): Map<String, *> {
         return emptyMap<String, Any>()
     }
+
+    /**
+     * JSON schema type for this property.
+     */
+    fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType
 }
