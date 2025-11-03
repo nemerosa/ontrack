@@ -1,11 +1,8 @@
 package net.nemerosa.ontrack.extension.scm.catalog.sync
 
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.SCMJobs
-import net.nemerosa.ontrack.job.Job
-import net.nemerosa.ontrack.job.JobKey
-import net.nemerosa.ontrack.job.JobRegistration
-import net.nemerosa.ontrack.job.JobRun
-import net.nemerosa.ontrack.job.Schedule
+import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.support.JobProvider
 import org.springframework.stereotype.Component
@@ -17,13 +14,19 @@ import org.springframework.stereotype.Component
 class SCMCatalogImportJob(
     private val cachedSettingsService: CachedSettingsService,
     private val scmCatalogImportService: SCMCatalogImportService,
+    private val scmExtensionConfigProperties: SCMExtensionConfigProperties,
 ) : JobProvider {
 
-    override fun getStartingJobs(): Collection<JobRegistration> = listOf(
-        JobRegistration.of(
-            createSCMCatalogImportJob()
-        ).withSchedule(Schedule.EVERY_DAY)
-    )
+    override fun getStartingJobs(): Collection<JobRegistration> =
+        if (scmExtensionConfigProperties.catalog.enabled) {
+            listOf(
+                JobRegistration.of(
+                    createSCMCatalogImportJob()
+                ).withSchedule(Schedule.EVERY_DAY)
+            )
+        } else {
+            emptyList()
+        }
 
     private fun createSCMCatalogImportJob() = object : Job {
 

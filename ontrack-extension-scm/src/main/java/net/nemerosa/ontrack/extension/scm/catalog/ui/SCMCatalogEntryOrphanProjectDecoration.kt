@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.catalog.ui
 
 import net.nemerosa.ontrack.extension.api.DecorationExtension
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -16,21 +17,22 @@ import java.util.*
  */
 @Component
 class SCMCatalogEntryOrphanProjectDecoration(
-        extensionFeature: SCMExtensionFeature,
-        private val catalogLinkService: CatalogLinkService
+    extensionFeature: SCMExtensionFeature,
+    private val catalogLinkService: CatalogLinkService,
+    private val scmExtensionConfigProperties: SCMExtensionConfigProperties,
 ) : AbstractExtension(extensionFeature), DecorationExtension<SCMCatalogEntryOrphanProjectDecorationData> {
 
     override fun getDecorations(entity: ProjectEntity): List<Decoration<SCMCatalogEntryOrphanProjectDecorationData>> =
-            if (entity is Project && catalogLinkService.isOrphan(entity)) {
-                listOf(
-                        Decoration.of(
-                                this,
-                                SCMCatalogEntryOrphanProjectDecorationData(entity.id())
-                        )
+        if (entity is Project && scmExtensionConfigProperties.catalog.enabled && catalogLinkService.isOrphan(entity)) {
+            listOf(
+                Decoration.of(
+                    this,
+                    SCMCatalogEntryOrphanProjectDecorationData(entity.id())
                 )
-            } else {
-                emptyList()
-            }
+            )
+        } else {
+            emptyList()
+        }
 
     override fun getScope(): EnumSet<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROJECT)
 }
@@ -39,5 +41,5 @@ class SCMCatalogEntryOrphanProjectDecoration(
  * @property id Project ID
  */
 data class SCMCatalogEntryOrphanProjectDecorationData(
-        val id: Int
+    val id: Int
 )

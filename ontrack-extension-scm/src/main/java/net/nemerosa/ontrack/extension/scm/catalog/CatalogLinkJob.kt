@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.catalog
 
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.SCMJobs
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.model.support.JobProvider
@@ -7,23 +8,29 @@ import org.springframework.stereotype.Component
 
 @Component
 class CatalogLinkJob(
-        private val catalogLinkService: CatalogLinkService
+    private val catalogLinkService: CatalogLinkService,
+    private val scmExtensionConfigProperties: SCMExtensionConfigProperties,
 ) : JobProvider {
 
-    override fun getStartingJobs(): Collection<JobRegistration> = listOf(
-            JobRegistration(
+    override fun getStartingJobs(): Collection<JobRegistration> =
+        if (scmExtensionConfigProperties.catalog.enabled) {
+            listOf(
+                JobRegistration(
                     createCatalogLinkJob(),
                     Schedule.EVERY_DAY
+                )
             )
-    )
+        } else {
+            emptyList()
+        }
 
     private fun createCatalogLinkJob() = object : Job {
 
         override fun isDisabled(): Boolean = false
 
         override fun getKey(): JobKey = SCMJobs.category
-                .getType("catalog-link").withName("Getting catalog links")
-                .getKey("catalog-link")
+            .getType("catalog-link").withName("Getting catalog links")
+            .getKey("catalog-link")
 
         override fun getDescription(): String = "Catalog links collection"
 
