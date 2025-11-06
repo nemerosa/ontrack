@@ -168,6 +168,23 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    fun `Branch by exact name`() {
+        project {
+            val b2 = branch("B2")
+            branch("B2Same")
+            run("""{projects(id: ${id}) { name branch(name: "B2") { id name } }}""") { data ->
+                assertEquals(
+                    b2.id(),
+                    data.path("projects").first()
+                        .path("branch")
+                        .path("id")
+                        .asInt()
+                )
+            }
+        }
+    }
+
+    @Test
     fun `Branch by regular expression`() {
         project {
             branch("11.8.3")
