@@ -1,4 +1,7 @@
-import {formatSeconds} from "@components/common/Duration";
+import Duration, {formatSeconds} from "@components/common/Duration";
+import {render, screen} from "@testing-library/react";
+import React from "react";
+import '@testing-library/jest-dom';
 
 describe('Duration', () => {
 
@@ -26,5 +29,42 @@ describe('Duration', () => {
         const text = formatSeconds(300)
         expect(text).toEqual('5 minutes')
     })
+
+    it('renders default text when `seconds` is null or undefined', () => {
+        const defaultText = 'No duration available';
+        render(<Duration defaultText={defaultText}/>);
+        expect(screen.getByText(defaultText)).toBeInTheDocument();
+    });
+
+    it('renders humanized duration for seconds less than 60', () => {
+        render(<Duration seconds={45}/>);
+        expect(screen.getByText('45 seconds')).toBeInTheDocument();
+    });
+
+    it('renders without a tooltip and includes seconds text when `displaySecondsInTooltip` is false', () => {
+        render(<Duration seconds={120} displaySecondsInTooltip={false}/>);
+        expect(screen.getByText('2 minutes (120 seconds)')).toBeInTheDocument();
+    });
+
+    it('renders only humanized text when `displaySeconds` is false', () => {
+        render(<Duration seconds={300} displaySeconds={false}/>);
+        expect(screen.getByText('5 minutes')).toBeInTheDocument();
+    });
+
+    it('renders 0 second for 0', () => {
+        render(<Duration
+            seconds={0}
+            displaySeconds={true}
+        />);
+        expect(screen.getByText('0 second')).toBeInTheDocument();
+    });
+
+    it('calls `formatSeconds` correctly', () => {
+        // Ensure that the formatSeconds helper works correctly independent of the component
+        expect(formatSeconds(30)).toBe('30 seconds');
+        expect(formatSeconds(3600)).toBe('an hour');
+        expect(formatSeconds(0, '-')).toBe('0 second'); // Handling invalid number
+        expect(formatSeconds(-1, '-')).toBe('-'); // Handling invalid number
+    });
 
 })
