@@ -11,15 +11,14 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
 import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
-import net.nemerosa.ontrack.graphql.support.booleanArgument
-import net.nemerosa.ontrack.graphql.support.disabledField
-import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class GQLTypeProject(
@@ -74,6 +73,18 @@ class GQLTypeProject(
                                 projectFavouriteService.isProjectFavourite(project)
                             }
                 }
+                // Branch by name
+                .field(
+                    newFieldDefinition()
+                        .name("branch")
+                        .argument(stringArgument("name", "Name of the branch to look for", nullable = false))
+                        .type(branch.typeRef.toNotNull())
+                        .dataFetcher { env ->
+                            val project: Project = env.getSource()!!
+                            val name: String = env.getArgument("name")!!
+                            structureService.findBranchByName(project.name, name).getOrNull()
+                        }
+                )
                 // Branches
                 .field(
                         newFieldDefinition()
