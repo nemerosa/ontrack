@@ -10,6 +10,16 @@ describe('Duration', () => {
         expect(text).toEqual('-')
     })
 
+    it('formatSeconds returns a - string by default when seconds is empty', () => {
+        const text = formatSeconds('')
+        expect(text).toEqual('-')
+    })
+
+    it('formatSeconds returns a - string by default when seconds is blank', () => {
+        const text = formatSeconds(' ')
+        expect(text).toEqual('-')
+    })
+
     it('formatSeconds returns a custom string when seconds is undefined', () => {
         const text = formatSeconds(undefined, "n/a")
         expect(text).toEqual('n/a')
