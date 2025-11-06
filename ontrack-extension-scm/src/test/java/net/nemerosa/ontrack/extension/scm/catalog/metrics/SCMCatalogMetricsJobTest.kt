@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.scm.catalog.metrics
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogFilterService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogProjectFilterLink
 import org.junit.jupiter.api.Test
@@ -16,7 +17,11 @@ class SCMCatalogMetricsJobTest {
     fun `Collection of catalog metrics`() {
         val cache: SCMCatalogMetricsCache = mockk(relaxed = true)
         val filterService: SCMCatalogFilterService = mockk(relaxed = true)
-        val provider = SCMCatalogMetricsJob(cache, filterService)
+        val provider = SCMCatalogMetricsJob(
+            scmCatalogMetricsCache = cache,
+            scmCatalogFilterService = filterService,
+            scmExtensionConfigProperties = SCMExtensionConfigProperties(),
+        )
 
         val counts = mapOf(
             SCMCatalogProjectFilterLink.ALL to 10,

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.scm.catalog.ui
 
 import io.mockk.every
 import io.mockk.mockk
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogFixtures
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.model.structure.ID
@@ -24,7 +25,10 @@ class SCMCatalogEntryLabelProviderTest {
     fun init() {
         project = Project.of(NameDescription.nd("PRJ", "")).withId(ID.of(1))
         catalogLinkService = mockk(relaxed = true)
-        provider = SCMCatalogEntryLabelProvider(catalogLinkService)
+        provider = SCMCatalogEntryLabelProvider(
+            catalogLinkService = catalogLinkService,
+            scmExtensionConfigProperties = SCMExtensionConfigProperties(),
+        )
     }
 
     @Test

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.scm.catalog
 
 import io.mockk.mockk
 import io.mockk.verify
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
@@ -13,7 +14,8 @@ class SCMCatalogJobTest {
     fun `SCM catalog collection job`() {
         val scmCatalog: SCMCatalog = mockk(relaxed = true)
         val collectorJob = SCMCatalogJob(
-            scmCatalog = scmCatalog
+            scmCatalog = scmCatalog,
+            scmExtensionConfigProperties = SCMExtensionConfigProperties(),
         )
         val jobs = collectorJob.startingJobs
         assertEquals(1, jobs.size)
