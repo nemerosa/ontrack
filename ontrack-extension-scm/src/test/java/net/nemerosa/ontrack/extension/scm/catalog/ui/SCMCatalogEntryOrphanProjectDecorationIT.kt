@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.catalog.ui
 
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogFixtures
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
@@ -8,6 +9,8 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.test.TestUtils
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -26,6 +29,19 @@ class SCMCatalogEntryOrphanProjectDecorationIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var scmCatalogProvider: MockSCMCatalogProvider
+
+    @Autowired
+    private lateinit var scmExtensionConfigProperties: SCMExtensionConfigProperties
+
+    @BeforeEach
+    fun before() {
+        scmExtensionConfigProperties.catalog.enabled = true
+    }
+
+    @AfterEach
+    fun after() {
+        scmExtensionConfigProperties.catalog.enabled = false
+    }
 
     @Test
     fun `Project without an associated SCM catalog entry is marked as orphan`() {

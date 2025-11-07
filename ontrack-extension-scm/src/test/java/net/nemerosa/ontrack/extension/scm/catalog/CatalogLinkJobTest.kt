@@ -13,7 +13,12 @@ class CatalogLinkJobTest {
     @Test
     fun `Collection of catalog links`() {
         val service: CatalogLinkService = mockk(relaxed = true)
-        val provider = CatalogLinkJob(service, SCMExtensionConfigProperties())
+        val provider = CatalogLinkJob(
+            catalogLinkService = service,
+            scmExtensionConfigProperties = SCMExtensionConfigProperties().apply {
+                catalog.enabled = true
+            }
+        )
 
         val jobs = provider.startingJobs.toList()
         assertEquals(1, jobs.size)

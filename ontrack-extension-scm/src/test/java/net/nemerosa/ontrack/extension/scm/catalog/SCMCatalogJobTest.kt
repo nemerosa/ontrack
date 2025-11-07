@@ -15,7 +15,9 @@ class SCMCatalogJobTest {
         val scmCatalog: SCMCatalog = mockk(relaxed = true)
         val collectorJob = SCMCatalogJob(
             scmCatalog = scmCatalog,
-            scmExtensionConfigProperties = SCMExtensionConfigProperties(),
+            scmExtensionConfigProperties = SCMExtensionConfigProperties().apply {
+                catalog.enabled = true
+            },
         )
         val jobs = collectorJob.startingJobs
         assertEquals(1, jobs.size)

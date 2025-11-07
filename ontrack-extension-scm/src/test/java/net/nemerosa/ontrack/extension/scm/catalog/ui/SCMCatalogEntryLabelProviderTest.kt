@@ -27,7 +27,9 @@ class SCMCatalogEntryLabelProviderTest {
         catalogLinkService = mockk(relaxed = true)
         provider = SCMCatalogEntryLabelProvider(
             catalogLinkService = catalogLinkService,
-            scmExtensionConfigProperties = SCMExtensionConfigProperties(),
+            scmExtensionConfigProperties = SCMExtensionConfigProperties().apply {
+                catalog.enabled = true
+            },
         )
     }
 

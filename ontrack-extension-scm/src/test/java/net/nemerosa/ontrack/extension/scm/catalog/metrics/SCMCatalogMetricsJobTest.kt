@@ -20,7 +20,9 @@ class SCMCatalogMetricsJobTest {
         val provider = SCMCatalogMetricsJob(
             scmCatalogMetricsCache = cache,
             scmCatalogFilterService = filterService,
-            scmExtensionConfigProperties = SCMExtensionConfigProperties(),
+            scmExtensionConfigProperties = SCMExtensionConfigProperties().apply {
+                catalog.enabled = true
+            },
         )
 
         val counts = mapOf(
