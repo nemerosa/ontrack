@@ -27,6 +27,8 @@ import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import {useRefresh} from "@components/common/RefreshUtils";
 import BuildDeleteCommand from "@components/builds/BuildDeleteCommand";
 import {isAuthorized} from "@components/common/authorizations";
+import PreviousBuildCommand from "@components/builds/PreviousBuildCommand";
+import NextBuildCommand from "@components/builds/NextBuildCommand";
 
 export default function BuildView({id}) {
 
@@ -81,6 +83,16 @@ export default function BuildView({id}) {
                                 action
                                 authorized
                             }
+                            previousBuild {
+                                id
+                                name
+                                displayName
+                            }
+                            nextBuild {
+                                id
+                                name
+                                displayName
+                            }
                         }
                     }
 
@@ -94,6 +106,14 @@ export default function BuildView({id}) {
                 setBuild(data.build)
                 setLoadingBuild(false)
                 const commands = [
+                    <PreviousBuildCommand
+                        key="previous"
+                        previousBuild={data.build.previousBuild}
+                    />,
+                    <NextBuildCommand
+                        key="previous"
+                        nextBuild={data.build.nextBuild}
+                    />,
                     <UserMenuActions
                         key="tools"
                         actions={data.build.userMenuActions}

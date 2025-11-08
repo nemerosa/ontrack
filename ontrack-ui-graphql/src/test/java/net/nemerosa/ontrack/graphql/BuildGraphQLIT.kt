@@ -1712,4 +1712,52 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Getting the next and previous build`() {
+        project {
+            branch {
+                val build1 = build()
+                val build2 = build()
+                val build3 = build()
+
+                run(
+                    """
+                        {
+                            build1: build(id: ${build1.id}) {
+                                previousBuild { id }
+                                nextBuild { id }
+                            }
+                            build2: build(id: ${build2.id}) {
+                                previousBuild { id }
+                                nextBuild { id }
+                            }
+                            build3: build(id: ${build3.id}) {
+                                previousBuild { id }
+                                nextBuild { id }
+                            }
+                        }
+                    """.trimIndent()
+                ) { data ->
+                    val build1Previous = data.path("build1").path("previousBuild").path("id").asInt()
+                    val build1Next = data.path("build1").path("nextBuild").path("id").asInt()
+
+                    val build2Previous = data.path("build2").path("previousBuild").path("id").asInt()
+                    val build2Next = data.path("build2").path("nextBuild").path("id").asInt()
+
+                    val build3Previous = data.path("build3").path("previousBuild").path("id").asInt()
+                    val build3Next = data.path("build3").path("nextBuild").path("id").asInt()
+
+                    assertEquals(0, build1Previous, "Previous build 1")
+                    assertEquals(build2.id(), build1Next, "Next build 1")
+
+                    assertEquals(build1.id(), build2Previous, "Previous build 2")
+                    assertEquals(build3.id(), build2Next, "Next build 2")
+
+                    assertEquals(build2.id(), build3Previous, "Previous build 3")
+                    assertEquals(0, build3Next, "Next build 3")
+                }
+            }
+        }
+    }
+
 }
