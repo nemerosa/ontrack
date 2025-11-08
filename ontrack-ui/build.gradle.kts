@@ -46,9 +46,12 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))
     testImplementation(testFixtures(project(":ontrack-extension-support")))
+    testImplementation(testFixtures(project(":ontrack-extension-casc")))
 
     // List of extensions needed for some tests spanning all modules
     testImplementation(project(":ontrack-extension-config"))
+    testImplementation(project(":ontrack-extension-casc"))
+    testImplementation(project(":ontrack-extension-general"))
 
     // List of extensions needed for the documentation generation
     testImplementation(project(":ontrack-extension-notifications"))

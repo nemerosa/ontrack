@@ -1,10 +1,11 @@
 package net.nemerosa.ontrack.boot.search
 
-//import net.nemerosa.ontrack.extension.general.ReleaseProperty
-//import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.boot.support.UITest
+import net.nemerosa.ontrack.extension.general.ReleaseProperty
+import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AsAdminTest
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchIndexer
 import net.nemerosa.ontrack.model.structure.SearchService
@@ -39,8 +40,8 @@ abstract class AbstractSearchTestSupport : AbstractQLKTITSupport() {
         }
     }
 
-//    protected fun Build.release(value: String) {
-//        setProperty(this, ReleasePropertyType::class.java, ReleaseProperty(value))
-//    }
+    protected fun Build.release(value: String) {
+        setProperty(this, ReleasePropertyType::class.java, ReleaseProperty(value))
+    }
 
 }
