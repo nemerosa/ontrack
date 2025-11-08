@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("io.micrometer:micrometer-core")
 
     implementation("org.springframework:spring-tx")
     implementation("org.springframework.boot:spring-boot")
