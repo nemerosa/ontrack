@@ -8,9 +8,7 @@ import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ConnectorGlobalStatusService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.actuate.health.HealthEndpoint
 import org.springframework.http.HttpEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -21,25 +19,9 @@ class AdminController
 @Autowired
 constructor(
     private val jobScheduler: JobScheduler,
-    private val healthEndpoint: HealthEndpoint,
-    private val connectorGlobalStatusService: ConnectorGlobalStatusService,
     private val securityService: SecurityService,
     private val encryptionService: EncryptionService
 ) {
-
-    /**
-     * Gets the health status
-     */
-    @GetMapping("status")
-    fun getStatus(): ResponseEntity<AdminStatus> {
-        securityService.checkGlobalFunction(ApplicationManagement::class.java)
-        return ResponseEntity.ok(
-            AdminStatus(
-                health = healthEndpoint.health(),
-                connectors = connectorGlobalStatusService.globalStatus
-            ),
-        )
-    }
 
     /**
      * Gets the job filters

@@ -802,6 +802,12 @@ type CheckAutoVersioningPayload implements Payload {
   errors: [UserError]
 }
 
+"Status for an individual connector"
+type CollectedConnectorStatus {
+  status: ConnectorStatus!
+  time: String!
+}
+
 "Definition of an attribute for a configurable indicator"
 type ConfigurableIndicatorAttribute {
   "Identifier for this attribute, used for storage"
@@ -872,6 +878,37 @@ type ConnectionResult {
   message: String!
   "Type of result"
   type: ConnectionResultType!
+}
+
+"Definition of a connector"
+type Connector {
+  "Name of the connector"
+  name: String
+  "Type of connector"
+  type: String
+}
+
+"Description for a connector"
+type ConnectorDescription {
+  connection: String
+  connector: Connector
+}
+
+"List of statuses for all connectors"
+type ConnectorGlobalStatus {
+  count: Int!
+  downCount: Int!
+  percent: Int!
+  status: ConnectorStatusType!
+  statuses: [CollectedConnectorStatus!]!
+  upCount: Int!
+}
+
+"Connector status"
+type ConnectorStatus {
+  description: ConnectorDescription!
+  error: String
+  type: ConnectorStatusType!
 }
 
 "Output type for the createAccountGroup mutation."
@@ -4599,6 +4636,10 @@ type Project implements Authorizable & ProjectEntity {
   autoVersioningProjectProperty: Property
   "Associates the project with a Bitbucket Cloud repository"
   bitbucketCloudProjectConfigurationProperty: Property
+  branch(
+    "Name of the branch to look for"
+    name: String!
+  ): Branch!
   branches(
     "Maximum number of branches to return. No limit if not specified."
     count: Int,
@@ -5542,6 +5583,8 @@ type Query {
     "Slot workflow instance if"
     id: String!
   ): SlotWorkflowInstance
+  "Application health status"
+  systemHealth: SystemHealth
   "Getting the list of template renderers"
   templatingRenderers: [TemplatingRenderer!]!
   "List of workflow instance statuses"
@@ -7146,6 +7189,14 @@ type SubscribeValidationStampToEventsPayload implements Payload {
   subscription: EventSubscriptionPayload
 }
 
+"Application health"
+type SystemHealth {
+  "Connectors"
+  connectors: ConnectorGlobalStatus
+  "Health endpoints"
+  health: JSON!
+}
+
 "Data to be rendered in a template"
 type TemplatingContextData {
   "Data associated with the context, used by the handler associated with the ID"
@@ -7929,6 +7980,12 @@ enum ConfigurableIndicatorAttributeType {
 enum ConnectionResultType {
   ERROR
   OK
+}
+
+"Status type for a connector"
+enum ConnectorStatusType {
+  DOWN
+  UP
 }
 
 enum DashboardContextUserScope {

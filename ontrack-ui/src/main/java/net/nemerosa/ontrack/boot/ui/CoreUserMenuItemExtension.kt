@@ -62,6 +62,12 @@ class CoreUserMenuItemExtension(
                     id = "jobs",
                     name = "Background jobs",
                 )
+                items += UserMenuItem(
+                    groupId = CoreUserMenuGroups.SYSTEM,
+                    extension = "core/admin",
+                    id = "health",
+                    name = "System health",
+                )
             }
 
             if (accountManagement) {
