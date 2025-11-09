@@ -172,7 +172,7 @@ class AutoVersioningAuditStoreJdbcHelper(
         // Final query
         var sql = "$select FROM ENTITY_DATA_STORE S $joins $query"
         if (limits) {
-            sql += " ORDER BY S.ID DESC LIMIT ${filter.count} OFFSET ${filter.offset}"
+            sql += " ORDER BY S.json::jsonb->'states'->0->'signature'->>'time' DESC LIMIT ${filter.count} OFFSET ${filter.offset}"
         }
         return sql
     }
