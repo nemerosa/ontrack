@@ -42,7 +42,6 @@ export default function SystemHealthView() {
             }
         `,
         {
-            initialData: {},
             dataFn: data => data.systemHealth,
         }
     )
