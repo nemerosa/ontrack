@@ -4,5 +4,6 @@
 /templating
 /workflow-node-executors
 /notifications
+/events
 *.png
 *.svg

@@ -28,29 +28,7 @@ package net.nemerosa.ontrack.docs
 class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
 //
 //    @Autowired
-//    private lateinit var templatingFilters: List<TemplatingFilter>
-//
-//    @Autowired
 //    private lateinit var eventFactory: EventFactory
-//
-//    @Test
-//    fun `Templating filters generation`() {
-//        withDirectory("templating/filters") {
-//
-//            writeIndex(
-//                fileId = "appendix-templating-filters-index",
-//                level = 4,
-//                title = "List of templating filters",
-//                items = templatingFilters.associate { templatingFilter ->
-//                    getTemplatingFilterFileId(templatingFilter) to templatingFilter.id
-//                }
-//            )
-//
-//            templatingFilters.forEach { templatingFilter ->
-//                generateTemplatingFilter(this, templatingFilter)
-//            }
-//        }
-//    }
 //
 //    @Test
 //    fun `Events generation`() {
@@ -109,24 +87,5 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
 //    private fun getEventTypeFileId(eventType: EventType) = "event-${eventType.id}"
 //
 //
-//    private fun generateTemplatingFilter(directoryContext: DirectoryContext, templatingFilter: TemplatingFilter) {
-//        val id = templatingFilter.id
-//        val description = getAPITypeDescription(templatingFilter::class)
-//        val example = getDocumentationExampleCode(templatingFilter::class)
-//
-//        val fileId = getTemplatingFilterFileId(templatingFilter)
-//
-//        directoryContext.writeFile(
-//            fileId = fileId,
-//            level = 5,
-//            title = id,
-//            header = description,
-//            fields = emptyList(),
-//            example = example,
-//        )
-//    }
-//
-//    private fun getTemplatingFilterFileId(templatingFilter: TemplatingFilter) =
-//        "templating-filter-${templatingFilter.id}"
 
 }
