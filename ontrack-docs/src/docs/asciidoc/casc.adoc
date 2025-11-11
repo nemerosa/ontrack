@@ -19,7 +19,7 @@ The list of locations can contain path to folders on a file system.
 In this case, Ontrack will use all the files in this folder.
 
 [[casc-secrets]]
-==== [experimental] Casc secrets
+==== Casc secrets
 
 Secrets can be injected into Casc file using this syntax:
 

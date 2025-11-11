@@ -116,10 +116,6 @@ public GraphQLObjectType getType() {
 }
 ----
 
-CAUTION: The `GraphQLBeanConverter.asObjectType` is still very
-*experimental* and its implementation is likely to change in the next versions
-of Ontrack. For example, `Map` and `Collection` types are not supported.
-
 [[extending-graphql-queries]]
 ===== Root queries
 
