@@ -226,14 +226,14 @@ export const useValidationStamp = (id) => {
     return validationStamp
 }
 
-export const useValidationStampById = ({id, refreshCount = 0}) => {
+export const useValidationStampById = ({id, refreshCount = 0, deps = []}) => {
     const {data: validationStamp, loading} = useQuery(
         gqlValidationStampByIdQuery,
         {
             variables: {
                 id: Number(id)
             },
-            deps: [refreshCount],
+            deps: [refreshCount, ...deps],
             dataFn: data => data.validationStamp,
         }
     )

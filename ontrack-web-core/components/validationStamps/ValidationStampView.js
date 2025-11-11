@@ -29,6 +29,7 @@ import ValidationStampViewDrawer from "@components/validationStamps/ValidationSt
 import UserMenuActions from "@components/entities/UserMenuActions";
 import ValidationStampViewTitle from "@components/validationStamps/ValidationStampViewTitle";
 import {useRefresh} from "@components/common/RefreshUtils";
+import {useEventForRefresh} from "@components/common/EventsContext";
 
 export default function ValidationStampView({id}) {
 
@@ -47,7 +48,8 @@ export default function ValidationStampView({id}) {
 
     const user = useContext(UserContext)
 
-    const {validationStamp, loading} = useValidationStampById({id, refreshCount})
+    const validationStampImageUpdated = useEventForRefresh("validationStamp.image")
+    const {validationStamp, loading} = useValidationStampById({id, refreshCount, deps: [validationStampImageUpdated]})
 
     useEffect(() => {
         if (validationStamp) {
