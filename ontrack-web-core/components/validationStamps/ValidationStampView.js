@@ -6,7 +6,6 @@ import MainPage from "@components/layouts/MainPage";
 import {Skeleton, Space} from "antd";
 import {validationStampBreadcrumbs} from "@components/common/Breadcrumbs";
 import StoredGridLayout from "@components/grid/StoredGridLayout";
-import {useEventsForRefresh} from "@components/common/EventsContext";
 import {UserContext} from "@components/providers/UserProvider";
 import {useValidationStampById} from "@components/services/fragments";
 import {CloseCommand} from "@components/common/Commands";
@@ -29,6 +28,7 @@ import ValidationStampMetricsChart from "@components/validationStamps/Validation
 import ValidationStampViewDrawer from "@components/validationStamps/ValidationStampViewDrawer";
 import UserMenuActions from "@components/entities/UserMenuActions";
 import ValidationStampViewTitle from "@components/validationStamps/ValidationStampViewTitle";
+import {useRefresh} from "@components/common/RefreshUtils";
 
 export default function ValidationStampView({id}) {
 
@@ -43,7 +43,7 @@ export default function ValidationStampView({id}) {
     const [defaultLayout, setDefaultLayout] = useState([])
     const [items, setItems] = useState([])
 
-    const refreshCount = useEventsForRefresh(["validationStamp.updated", "validationStamp.image"])
+    const [refreshCount, refresh] = useRefresh()
 
     const user = useContext(UserContext)
 
@@ -56,7 +56,7 @@ export default function ValidationStampView({id}) {
             ]
             if (isAuthorized(validationStamp, 'validation_stamp', 'edit')) {
                 commands.push(<ValidationStampChangeImageCommand key="change-image" id={id}/>)
-                commands.push(<ValidationStampUpdateCommand key="update" id={id}/>)
+                commands.push(<ValidationStampUpdateCommand key="update" validationStamp={validationStamp} refresh={refresh}/>)
             }
             if (isAuthorized(validationStamp, 'validation_stamp', 'delete')) {
                 commands.push(<ValidationStampDeleteCommand key="delete" id={id}/>)
