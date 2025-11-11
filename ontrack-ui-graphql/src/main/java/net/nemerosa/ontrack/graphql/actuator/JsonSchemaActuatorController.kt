@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 
 
 @Component
-@Endpoint(id = "graphql-json")
+@Endpoint(id = "graphqlJson")
 class JsonSchemaActuatorController(
     private val graphQlSource: GraphQlSource,
 ) {
