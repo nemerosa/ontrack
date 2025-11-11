@@ -30,6 +30,7 @@ class CacheConfig(
                                 Caffeine.newBuilder()
                                         .maximumSize(1)
                                         .expireAfterWrite(10, TimeUnit.HOURS)
+                                        .recordStats()
                                         .build()
                         )
                 ) + cacheConfigExtensions.flatMap {
