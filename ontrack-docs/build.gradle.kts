@@ -1,5 +1,4 @@
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
-import org.asciidoctor.gradle.jvm.pdf.AsciidoctorPdfTask
 
 plugins {
     `java-library`
@@ -29,6 +28,7 @@ asciidoctorj {
 
 // HTML specific settings
 tasks.named<AsciidoctorTask>("asciidoctor") {
+    dependsOn("integrationTest")
     description = "Generates HTML documentation."
     attributes = mapOf(
         "ontrack-version" to version,
@@ -44,23 +44,24 @@ tasks.named<AsciidoctorTask>("asciidoctor") {
 
 // PDF specific settings
 
-tasks.named<AsciidoctorPdfTask>("asciidoctorPdf") {
-    dependsOn("asciidoctor")
-    description = "Generates PDF documentation."
-    attributes = mapOf(
-        "ontrack-version" to version,
-        // "spring-boot-version" to Versions.springBootVersion,
-        "icons" to "font",
-        "imagesdir" to file("build/docs/asciidoc")
-    )
-    logDocuments = true
-    baseDirFollowsSourceDir()
-    sources {
-        include("index.adoc")
-    }
-}
+//tasks.named<AsciidoctorPdfTask>("asciidoctorPdf") {
+//    dependsOn("integrationTest")
+//    dependsOn("asciidoctor")
+//    description = "Generates PDF documentation."
+//    attributes = mapOf(
+//        "ontrack-version" to version,
+//        // "spring-boot-version" to Versions.springBootVersion,
+//        "icons" to "font",
+//        "imagesdir" to file("build/docs/asciidoc")
+//    )
+//    logDocuments = true
+//    baseDirFollowsSourceDir()
+//    sources {
+//        include("index.adoc")
+//    }
+//}
 
 tasks.named<Task>("build") {
     dependsOn("asciidoctor")
-    dependsOn("asciidoctorPdf")
+    // dependsOn("asciidoctorPdf")
 }
