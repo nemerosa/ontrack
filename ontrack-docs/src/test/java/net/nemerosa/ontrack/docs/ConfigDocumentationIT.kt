@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.docs
+package net.nemerosa.ontrack.docs
 
 import net.nemerosa.ontrack.common.camelCaseToEnvironmentName
 import net.nemerosa.ontrack.common.camelCaseToKebabCase
@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.annotations.getAPITypeDescription
 import net.nemerosa.ontrack.model.annotations.getAPITypeName
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.docs.DocumentationIgnore
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.convert.DurationUnit
@@ -21,20 +20,20 @@ import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.jvmName
 
-@Disabled("To be launched manually")
-class ConfigDocumentationIT : AbstractDocumentationGenerationTestSupport() {
+class ConfigDocumentationIT : AbstractDocGenIT() {
 
     @Test
     fun `Configuration properties`() {
         val configurations = findAllBeansAnnotatedWith(ConfigurationProperties::class)
             .filter {
-                it::class.jvmName.startsWith("net.nemerosa.ontrack")
+                it::class.jvmName.startsWith("net.nemerosa.ontrack") ||
+                        it::class.jvmName.startsWith("com.yontrack")
             }
             .filterNot {
                 it::class.hasAnnotation<DocumentationIgnore>()
             }
 
-        withDirectory("configurations") {
+        docGenSupport.inDirectory("configurations") {
 
             writeFile(
                 fileName = "index",
@@ -52,7 +51,7 @@ class ConfigDocumentationIT : AbstractDocumentationGenerationTestSupport() {
     }
 
     private fun generateConfiguration(
-        directoryContext: DirectoryContext,
+        directoryContext: DocGenDirectoryContext,
         configuration: Any
     ) {
         println("Generation docs for configuration $configuration")
@@ -83,7 +82,7 @@ class ConfigDocumentationIT : AbstractDocumentationGenerationTestSupport() {
 
     private fun writeProperties(
         s: StringBuilder,
-        directoryContext: DirectoryContext,
+        directoryContext: DocGenDirectoryContext,
         configuration: Any,
         current: Any,
         prefix: String = "",
