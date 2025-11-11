@@ -21,50 +21,46 @@ dependencies {
     testRuntimeOnly(project(":ontrack-extension-support"))
 }
 
-if (project.hasProperty("documentation")) {
-
-    asciidoctorj {
-        modules {
-            diagram.use()
-        }
+asciidoctorj {
+    modules {
+        diagram.use()
     }
+}
 
-    // HTML specific settings
-    tasks.named<AsciidoctorTask>("asciidoctor") {
-        description = "Generates HTML documentation."
-        attributes = mapOf(
-            "ontrack-version" to version,
-            // "spring-boot-version" to Versions.springBootVersion,
-            "icons" to "font"
-        )
-        logDocuments = true
-        baseDirFollowsSourceDir()
-        sources {
-            include("index.adoc")
-        }
+// HTML specific settings
+tasks.named<AsciidoctorTask>("asciidoctor") {
+    description = "Generates HTML documentation."
+    attributes = mapOf(
+        "ontrack-version" to version,
+        // "spring-boot-version" to Versions.springBootVersion,
+        "icons" to "font"
+    )
+    logDocuments = true
+    baseDirFollowsSourceDir()
+    sources {
+        include("index.adoc")
     }
+}
 
-    // PDF specific settings
+// PDF specific settings
 
-    tasks.named<AsciidoctorPdfTask>("asciidoctorPdf") {
-        dependsOn("asciidoctor")
-        description = "Generates PDF documentation."
-        attributes = mapOf(
-            "ontrack-version" to version,
-            // "spring-boot-version" to Versions.springBootVersion,
-            "icons" to "font",
-            "imagesdir" to file("build/docs/asciidoc")
-        )
-        logDocuments = true
-        baseDirFollowsSourceDir()
-        sources {
-            include("index.adoc")
-        }
+tasks.named<AsciidoctorPdfTask>("asciidoctorPdf") {
+    dependsOn("asciidoctor")
+    description = "Generates PDF documentation."
+    attributes = mapOf(
+        "ontrack-version" to version,
+        // "spring-boot-version" to Versions.springBootVersion,
+        "icons" to "font",
+        "imagesdir" to file("build/docs/asciidoc")
+    )
+    logDocuments = true
+    baseDirFollowsSourceDir()
+    sources {
+        include("index.adoc")
     }
+}
 
-    tasks.named<Task>("build") {
-        dependsOn("asciidoctor")
-        dependsOn("asciidoctorPdf")
-    }
-
+tasks.named<Task>("build") {
+    dependsOn("asciidoctor")
+    dependsOn("asciidoctorPdf")
 }

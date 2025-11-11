@@ -224,6 +224,7 @@ pipeline {
                         sh '''
                             ./gradlew \\
                                 dockerBuild \\
+                                jibDockerBuild \\
                                 -PversionSuffix=-${BUILD_NUMBER} \\
                                 -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
@@ -232,7 +233,6 @@ pipeline {
                                 --console plain
                         '''
                     } else {
-                        // TODO documentation
                         sh '''
                             ./gradlew \\
                                 check \\
