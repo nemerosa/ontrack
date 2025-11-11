@@ -59,4 +59,32 @@ export class ProjectPage {
         await button.click()
         await confirmBox(this.page, "Delete project", {okText: "Delete"})
     }
+
+    async editProject({name, description, disabled = null}) {
+        // Clicking on the command
+        const button = this.page.getByRole('button', {name: 'Edit project'})
+        await expect(button).toBeVisible()
+        await button.click()
+        // Dialog
+        await expect(this.page.getByPlaceholder('Project name')).toBeVisible()
+        await this.page.getByPlaceholder('Project name').fill(name)
+        if (description) await this.page.getByPlaceholder('Project description').fill(description)
+        if (disabled !== null) {
+            if (disabled) {
+                await this.page.getByLabel('Disabled').click()
+            } else {
+                await this.page.getByLabel('Disabled').uncheck()
+            }
+        }
+        // Validating the dialog
+        await this.page.getByRole('button', {name: 'OK'}).click()
+    }
+
+    async checkProjectName(name) {
+        await expect(this.page.getByText(name ?? this.project.name)).toBeVisible()
+    }
+
+    async checkProjectDescription(description) {
+        await expect(this.page.getByText(description ?? this.project.description)).toBeVisible()
+    }
 }

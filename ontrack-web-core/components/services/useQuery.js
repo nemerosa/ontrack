@@ -3,6 +3,9 @@ import {useEffect, useState} from "react";
 import {getGraphQLErrors} from "@components/services/graphql-utils";
 import {useReloadState} from "@components/common/StateUtils";
 
+/**
+ * @deprecated Use the `GraphQL/useQuery` hook instead.
+ */
 export const useQuery = (query, {
     variables,
     skipInitialFetch = false,

@@ -80,3 +80,27 @@ test('deleting a project', async ({page, ontrack}) => {
     await homePage.checkOnPage()
 })
 
+test('editing a project', async ({page, ontrack}) => {
+    // Provisioning
+    const project = await ontrack.createProject()
+    // Login
+    await login(page, ontrack)
+    // Navigating to the project
+    const projectPage = new ProjectPage(page, ontrack, project)
+    await projectPage.goTo()
+
+    // Editing the project
+    const newName = generate("p-")
+    const newDescription = 'New description of the project'
+    await projectPage.editProject({
+        name: newName,
+        description: newDescription,
+        disabled: true,
+    })
+
+    // Checking the elements on the page
+
+    await projectPage.checkDisabledBanner()
+    await projectPage.checkProjectName(newName)
+    await projectPage.checkProjectDescription(newDescription)
+})

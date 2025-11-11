@@ -8,5 +8,7 @@ export const gqlProjectContentFragment = gql`
         id
         name
         disabled
+        description
+        annotatedDescription
     }
 `
