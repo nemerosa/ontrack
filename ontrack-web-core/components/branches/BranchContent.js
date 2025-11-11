@@ -12,7 +12,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import DisabledBranchBanner from "@components/branches/DisabledBranchBanner";
 import {useEventForRefresh} from "@components/common/EventsContext";
 
-export default function ClassicBranchView({branch}) {
+export default function BranchContent({branch}) {
 
     // Router (used for permalinks)
     const router = useRouter()

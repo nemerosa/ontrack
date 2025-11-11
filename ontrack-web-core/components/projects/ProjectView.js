@@ -189,7 +189,7 @@ export default function ProjectView({id}) {
                     {
                         favouriteBranches && favouriteBranches.length > 0 &&
                         <PageSection
-                            loading={loadingProject}
+                            loading={loading}
                             title="Favourite branches"
                             height="250px"
                             padding={true}
