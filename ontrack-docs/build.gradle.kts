@@ -34,7 +34,13 @@ tasks.named<AsciidoctorTask>("asciidoctor") {
     description = "Generates HTML documentation."
     attributes = mapOf(
         "ontrack-version" to version,
-        // TODO "spring-boot-version" to Versions.springBootVersion,
+        "spring-boot-version" to (
+                org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+                    .split(":")
+                    .getOrNull(2)
+                    ?.removeSuffix(")")
+                    ?: "unknown"
+                ),
         "icons" to "font"
     )
     logDocuments = true
@@ -52,7 +58,13 @@ tasks.named<AsciidoctorPdfTask>("asciidoctorPdf") {
     description = "Generates PDF documentation."
     attributes = mapOf(
         "ontrack-version" to version,
-        // TODO "spring-boot-version" to Versions.springBootVersion,
+        "spring-boot-version" to (
+                org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+                    .split(":")
+                    .getOrNull(2)
+                    ?.removeSuffix(")")
+                    ?: "unknown"
+                ),
         "icons" to "font",
         "imagesdir" to file("build/docs/asciidoc")
     )
