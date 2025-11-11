@@ -3,5 +3,6 @@
 /configurations
 /templating
 /workflow-node-executors
+/notifications
 *.png
 *.svg
