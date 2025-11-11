@@ -2,8 +2,18 @@ import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.asciidoctor.gradle.jvm.pdf.AsciidoctorPdfTask
 
 plugins {
-    id("org.asciidoctor.jvm.convert") version "3.3.2"
-    id("org.asciidoctor.jvm.pdf") version "3.3.2"
+    `java-library`
+    id("org.asciidoctor.jvm.convert") version "4.0.5"
+    id("org.asciidoctor.jvm.pdf") version "4.0.5"
+}
+
+description = "Generation of the Yontrack documentation."
+
+dependencies {
+    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(project(":ontrack-ui"))
+
+    testRuntimeOnly(project(":ontrack-extension-support"))
 }
 
 if (project.hasProperty("documentation")) {
@@ -18,9 +28,9 @@ if (project.hasProperty("documentation")) {
     tasks.named<AsciidoctorTask>("asciidoctor") {
         description = "Generates HTML documentation."
         attributes = mapOf(
-                "ontrack-version" to version,
-                "spring-boot-version" to Versions.springBootVersion,
-                "icons" to "font"
+            "ontrack-version" to version,
+            // "spring-boot-version" to Versions.springBootVersion,
+            "icons" to "font"
         )
         logDocuments = true
         baseDirFollowsSourceDir()
@@ -35,10 +45,10 @@ if (project.hasProperty("documentation")) {
         dependsOn("asciidoctor")
         description = "Generates PDF documentation."
         attributes = mapOf(
-                "ontrack-version" to version,
-                "spring-boot-version" to Versions.springBootVersion,
-                "icons" to "font",
-                "imagesdir" to file("build/docs/asciidoc")
+            "ontrack-version" to version,
+            // "spring-boot-version" to Versions.springBootVersion,
+            "icons" to "font",
+            "imagesdir" to file("build/docs/asciidoc")
         )
         logDocuments = true
         baseDirFollowsSourceDir()

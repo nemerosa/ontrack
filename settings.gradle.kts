@@ -21,19 +21,16 @@ include(":ontrack-ui-graphql")
 include(":ontrack-ui-support")
 include(":ontrack-web-core")
 include(":ontrack-web-tests")
-// TODO include(":ontrack-docs")
+include(":ontrack-docs")
 
 // KDSL
 include(":ontrack-kdsl")
 include(":ontrack-kdsl-acceptance")
 
 // Core extensions
-// TODO include(":ontrack-extension-ldap")
-// TODO include(":ontrack-extension-oidc")
 include(":ontrack-extension-artifactory")
 include(":ontrack-extension-general")
 include(":ontrack-extension-issues")
-// TODO include(":ontrack-extension-combined")
 include(":ontrack-extension-jenkins")
 include(":ontrack-extension-jira")
 include(":ontrack-extension-scm")
