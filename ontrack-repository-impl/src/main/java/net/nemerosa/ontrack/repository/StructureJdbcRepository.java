@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
 
 @Repository
 public class StructureJdbcRepository extends AbstractJdbcRepository implements StructureRepository {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ValidationDataTypeService validationDataTypeService;
     private final ValidationDataTypeConfigRepository validationDataTypeConfigRepository;
