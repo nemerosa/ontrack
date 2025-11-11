@@ -31,9 +31,6 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
 //    private lateinit var templatingFilters: List<TemplatingFilter>
 //
 //    @Autowired
-//    private lateinit var templatingSources: List<TemplatingSource>
-//
-//    @Autowired
 //    private lateinit var eventFactory: EventFactory
 //
 //    @Test
@@ -51,25 +48,6 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
 //
 //            templatingFilters.forEach { templatingFilter ->
 //                generateTemplatingFilter(this, templatingFilter)
-//            }
-//        }
-//    }
-//
-//    @Test
-//    fun `Templating sources generation`() {
-//        withDirectory("templating/sources") {
-//
-//            writeIndex(
-//                fileId = "appendix-templating-sources-index",
-//                level = 4,
-//                title = "List of templating sources",
-//                items = templatingSources.associate { templatingSource ->
-//                    getTemplatingSourceFileId(templatingSource) to getTemplatingSourceTitle(templatingSource)
-//                }
-//            )
-//
-//            templatingSources.forEach { templatingSource ->
-//                generateTemplatingSource(this, templatingSource)
 //            }
 //        }
 //    }
@@ -150,59 +128,5 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
 //
 //    private fun getTemplatingFilterFileId(templatingFilter: TemplatingFilter) =
 //        "templating-filter-${templatingFilter.id}"
-//
-//    private fun generateTemplatingSource(directoryContext: DirectoryContext, templatingSource: TemplatingSource) {
-//        val description = getAPITypeDescription(templatingSource::class)
-//        val parameters = if (templatingSource::class.hasAnnotation<DocumentationIgnore>()) {
-//            emptyList()
-//        } else {
-//            try {
-//                getFieldsDocumentation(templatingSource::class)
-//            } catch (any: Exception) {
-//                fail(
-//                    message = "Error getting parameters for templating source: ${templatingSource::class.java.name}",
-//                    cause = any,
-//                )
-//            }
-//        }
-//        val example = getDocumentationExampleCode(templatingSource::class)
-//        val types = templatingSource.types
-//
-//        val fileId = getTemplatingSourceFileId(templatingSource)
-//
-//        directoryContext.writeFile(
-//            fileId = fileId,
-//            level = 5,
-//            title = getTemplatingSourceTitle(templatingSource),
-//            header = description,
-//            fields = parameters,
-//            example = example,
-//            extendedHeader = { s ->
-//                s.append("Applicable for:\n\n")
-//                types.forEach { type ->
-//                    s.append("* ").append(type.displayName).append("\n")
-//                }
-//                s.append("\n")
-//            }
-//        )
-//    }
-//
-//    private fun getTemplatingSourceFileId(templatingSource: TemplatingSource): String {
-//        val qualifier = templatingSource::class.findAnnotation<DocumentationQualifier>()?.value
-//        if (qualifier.isNullOrBlank()) {
-//            return "templating-source-${templatingSource.field}"
-//        } else {
-//            return "templating-source-${qualifier}-${templatingSource.field}"
-//        }
-//    }
-//
-//    private fun getTemplatingSourceTitle(templatingSource: TemplatingSource): String {
-//        val qualifier = templatingSource::class.findAnnotation<DocumentationQualifier>()
-//        if (qualifier == null) {
-//            return templatingSource.field
-//        } else {
-//            return "${qualifier.name}.${templatingSource.field}"
-//        }
-//    }
 
 }
