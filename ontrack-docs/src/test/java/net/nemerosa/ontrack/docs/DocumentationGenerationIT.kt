@@ -26,9 +26,6 @@ package net.nemerosa.ontrack.docs
  */
 //@Disabled("To be launched manually when need be")
 class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
-
-//    @Autowired
-//    private lateinit var templatingFunctions: List<TemplatingFunction>
 //
 //    @Autowired
 //    private lateinit var templatingFilters: List<TemplatingFilter>
@@ -38,25 +35,6 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
 //
 //    @Autowired
 //    private lateinit var eventFactory: EventFactory
-//
-//    @Test
-//    fun `Templating functions generation`() {
-//        withDirectory("templating/functions") {
-//
-//            writeIndex(
-//                fileId = "appendix-templating-functions-index",
-//                level = 4,
-//                title = "List of templating functions",
-//                items = templatingFunctions.associate { templatingFunction ->
-//                    getTemplatingFunctionFileId(templatingFunction) to templatingFunction.id
-//                }
-//            )
-//
-//            templatingFunctions.forEach { templatingFunction ->
-//                generateTemplatingFunction(this, templatingFunction)
-//            }
-//        }
-//    }
 //
 //    @Test
 //    fun `Templating filters generation`() {
@@ -152,26 +130,6 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
 //
 //    private fun getEventTypeFileId(eventType: EventType) = "event-${eventType.id}"
 //
-//    private fun generateTemplatingFunction(directoryContext: DirectoryContext, templatingFunction: TemplatingFunction) {
-//        val id = templatingFunction.id
-//        val description = getAPITypeDescription(templatingFunction::class)
-//        val parameters = getFieldsDocumentation(templatingFunction::class)
-//        val example = getDocumentationExampleCode(templatingFunction::class)
-//
-//        val fileId = getTemplatingFunctionFileId(templatingFunction)
-//
-//        directoryContext.writeFile(
-//            fileId = fileId,
-//            level = 5,
-//            title = id,
-//            header = description,
-//            fields = parameters,
-//            example = example,
-//        )
-//    }
-//
-//    private fun getTemplatingFunctionFileId(templatingFunction: TemplatingFunction) =
-//        "templating-function-${templatingFunction.id}"
 //
 //    private fun generateTemplatingFilter(directoryContext: DirectoryContext, templatingFilter: TemplatingFilter) {
 //        val id = templatingFilter.id
