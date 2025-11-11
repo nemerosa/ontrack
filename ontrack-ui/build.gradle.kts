@@ -53,12 +53,6 @@ dependencies {
     testImplementation(project(":ontrack-extension-casc"))
     testImplementation(project(":ontrack-extension-general"))
 
-    // List of extensions needed for the documentation generation
-    testImplementation(project(":ontrack-extension-notifications"))
-    testImplementation(project(":ontrack-extension-workflows"))
-    testImplementation("org.junit.platform:junit-platform-suite-api")
-    testImplementation("org.junit.platform:junit-platform-suite-engine")
-
     // List of extensions to include in core
     runtimeOnly(project(":ontrack-extension-general"))
     runtimeOnly(project(":ontrack-extension-jenkins"))

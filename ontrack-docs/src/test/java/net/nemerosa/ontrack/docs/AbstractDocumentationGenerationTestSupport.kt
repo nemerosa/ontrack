@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.docs
+package net.nemerosa.ontrack.docs
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.docs.DocumentationLink

@@ -1,5 +1,6 @@
 /generated
 /properties
 /configurations
+/templating
 *.png
 *.svg
