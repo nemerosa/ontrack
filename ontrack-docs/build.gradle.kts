@@ -14,6 +14,9 @@ dependencies {
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(":ontrack-ui"))
 
+    // Extensions needed for the docs
+    testImplementation(project(":ontrack-extension-workflows"))
+
     testRuntimeOnly(project(":ontrack-extension-support"))
 }
 
