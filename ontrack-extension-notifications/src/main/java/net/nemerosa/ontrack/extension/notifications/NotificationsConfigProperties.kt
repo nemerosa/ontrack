@@ -45,24 +45,18 @@ class NotificationsConfigProperties {
     /**
      * Configuration for queuing
      */
-    abstract class AbstractQueuingProperties {
+    class ProcessingQueuingProperties {
         /**
-         * Async processing enabled?
+         * Default number of queues for the event listener
          */
-        @APIDescription("Is asynchronous processing of notifications enabled?")
-        var async: Boolean = true
+        @APIDescription("Default number of queues for the event listener")
+        var listenerQueues: Int = 5
+        /**
+         * Default number of queues for the processing
+         */
+        @APIDescription("Default number of queues for the processing")
+        var processingQueues: Int = 5
     }
-
-    /**
-     * Configuration for processing queuing
-     */
-    class ProcessingQueuingProperties(
-        /**
-         * Maximum parallel processing of queues
-         */
-        @APIDescription("Maximum parallel processing of queues")
-        var concurrency: Int = 10
-    ) : AbstractQueuingProperties()
 
     companion object {
         /**
