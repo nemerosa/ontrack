@@ -10,6 +10,7 @@ plugins {
 description = "Generation of the Yontrack documentation."
 
 dependencies {
+    testImplementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(":ontrack-ui"))
 
