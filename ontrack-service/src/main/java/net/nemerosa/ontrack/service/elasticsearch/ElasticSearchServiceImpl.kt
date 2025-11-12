@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.service.elasticsearch
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient
+import co.elastic.clients.elasticsearch._types.ElasticsearchException
 import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,6 +20,8 @@ class ElasticSearchServiceImpl(
     private val searchIndexers: List<SearchIndexer<*>>,
     private val searchIndexService: SearchIndexService
 ) : SearchService {
+
+    private val logger: Logger = LoggerFactory.getLogger(ElasticSearchServiceImpl::class.java)
 
     val indexers: Map<String, SearchIndexer<*>> by lazy {
         searchIndexers.associateBy { it.indexName }
@@ -65,21 +70,48 @@ class ElasticSearchServiceImpl(
                 }
             } ?: emptyList()
 
+        // If no field mappings are available, return empty results early
+        // This prevents multi_match queries on empty indices from failing
+        if (fieldBoosts.isEmpty()) {
+            logger.debug("No field mappings available for index '${searchIndexer.indexName}', returning empty results")
+            return SearchNodeResults(
+                items = emptyList(),
+                offset = 0,
+                total = 0,
+                message = "Search index '${searchIndexer.indexName}' has no searchable fields configured."
+            )
+        }
+
         val searchRequest = ESSearchRequestBuilder().apply {
             index(searchIndexer.indexName)
             from(offset)
             size(size)
+            // Allow partial search results even if some shards fail
+            allowPartialSearchResults(true)
             query { q ->
                 q.multiMatch { m ->
                     m.query(token)
                         .type(TextQueryType.BestFields)
                         .fields(fieldBoosts)
+                        // Lenient mode prevents failures when fields don't exist
+                        .lenient(true)
                 }
             }
         }.build()
 
         // Getting the result of the search
-        val response = client.search(searchRequest, Map::class.java)
+        val response = try {
+            client.search(searchRequest, Map::class.java)
+        } catch (ex: ElasticsearchException) {
+            // If search fails (e.g., all shards failed on empty index), return empty results
+            logger.warn("Search failed for index '${searchIndexer.indexName}': ${ex.message}")
+            return SearchNodeResults(
+                items = emptyList(),
+                offset = 0,
+                total = 0,
+                message = "Search temporarily unavailable for this result type: ${searchIndexer.indexerId}"
+            )
+        }
 
         // Pagination information
         val responseHits = response.hits()
