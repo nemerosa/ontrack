@@ -31,6 +31,7 @@ class MetaInfoSearchExtension(
         +MetaInfoSearchItem::entityType to keyword { index = false }
         +MetaInfoSearchItem::items to nested()
         +MetaInfoSearchItem::keys to keyword { scoreBoost = 3.0 } to text()
+        +MetaInfoSearchItem::names to keyword { scoreBoost = 2.0 }
     }
 
     override fun indexAll(processor: (MetaInfoSearchItem) -> Unit) {
@@ -109,11 +110,14 @@ class MetaInfoSearchItem(
     )
 
     val keys = items.map { (name, value) -> "$name$META_INFO_SEPARATOR$value" }
+    
+    val names = items.keys.toList()
 
     override val id: String = "$entityType::$entityId"
 
     override val fields: Map<String, Any?> = mapOf(
         "keys" to items.map { (name, value) -> "$name$META_INFO_SEPARATOR$value" },
+        "names" to items.keys.toList(),
         "items" to items,
         "entityType" to entityType,
         "entityId" to entityId

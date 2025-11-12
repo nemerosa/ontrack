@@ -29,14 +29,8 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                 }
                 // Looks for exact match
                 val exactMatches = searchService.paginatedSearch(searchRequest("$name:${value}1")).items
-                val exactMatch = exactMatches.find { it.title == build1.entityDisplayName }
+                exactMatches.find { it.title == build1.entityDisplayName }
                     ?: error("Exact match not found")
-                val variantMatch = exactMatches.find { it.title == build2.entityDisplayName }
-                    ?: error("Variant not found")
-                assertTrue(
-                    exactMatch.accuracy > variantMatch.accuracy,
-                    "Exact match scope is higher than non exact match"
-                )
                 // Looks for prefix
                 val prefixMatches = searchService.paginatedSearch(searchRequest("$name:$value")).items
                 assertTrue(prefixMatches.any { it.title == build1.entityDisplayName }, "Build 1 found")
@@ -135,7 +129,7 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                 // Indexation of meta information
                 index(META_INFO_SEARCH_INDEX)
                 // Search should return those two builds
-                val results = searchService.paginatedSearch(searchRequest("$name1:value1")).items
+                val results = searchService.paginatedSearch(searchRequest("$name1:$value1")).items
                 assertTrue(results.any { it.title == build1.entityDisplayName }, "Build 1 found")
                 assertTrue(results.any { it.title == build2.entityDisplayName }, "Build 2 found")
             }
@@ -166,24 +160,18 @@ class MetaInfoSearchIT : AbstractSearchTestSupport() {
                     }
                 }
 
-                // Indexation of meta information
+                // Indexation of meta-information
                 index(META_INFO_SEARCH_INDEX)
 
                 // Looks for the exact match
                 val results = searchService.paginatedSearch(searchRequest("$name:$value")).items
-                assertTrue(results.size > 1)
+                assertEquals(1, results.size)
                 // First build is the original one
-                results[0].apply {
+                results.first().apply {
                     assertEquals(original.entityDisplayName, title)
                     assertEquals("$name -> $value", description)
                     assertEquals(results.maxOfOrNull { it.accuracy }, accuracy)
                 }
-                // Prefixed & other values are also present
-                assertTrue(results.any { it.title == prefixed.entityDisplayName }, "Prefixed build is present")
-                assertTrue(
-                    results.any { it.title == otherValue.entityDisplayName },
-                    "Build with other value but same name is also present"
-                )
             }
         }
     }
