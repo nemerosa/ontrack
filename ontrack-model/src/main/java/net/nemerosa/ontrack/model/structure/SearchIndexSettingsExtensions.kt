@@ -16,7 +16,7 @@ fun autoCompleteSearchIndexSettings() = SearchIndexSettings(
             type = "edge_ngram",
             minGram = 3,
             maxGram = 10,
-            tokenChars = listOf("letter", "digit", "punctuation")
+            tokenChars = listOf("letter", "digit", "punctuation", "whitespace")
         )
     )
 )

@@ -27,10 +27,14 @@ class ReleaseSearchExtension(
 
     override val indexName: String = RELEASE_SEARCH_INDEX
 
-    override val indexMapping: SearchIndexMapping = indexMappings<ReleaseSearchItem> {
+    override val indexSettings: SearchIndexSettings = autoCompleteSearchIndexSettings()
+
+    override val indexMapping: SearchIndexMapping = indexMappings {
         +ReleaseSearchItem::entityId to id { index = false }
         +ReleaseSearchItem::entityType to keyword { index = false }
-        +ReleaseSearchItem::release to keyword { scoreBoost = 5.0 } to text()
+        +ReleaseSearchItem::release to autoCompleteText {
+            scoreBoost = 5.0
+        }
     }
 
     override fun indexAll(processor: (ReleaseSearchItem) -> Unit) {

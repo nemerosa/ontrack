@@ -28,7 +28,7 @@ class BranchSearchProvider(
 
     override val indexSettings = autoCompleteSearchIndexSettings()
 
-    override val indexMapping: SearchIndexMapping = indexMappings<BranchSearchItem> {
+    override val indexMapping: SearchIndexMapping = indexMappings {
         +BranchSearchItem::name to autoCompleteText {
             scoreBoost = 2.5
         }

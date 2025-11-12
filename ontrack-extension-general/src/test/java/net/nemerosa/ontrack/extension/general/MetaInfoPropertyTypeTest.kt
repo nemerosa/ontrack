@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.general
 
-import io.mockk.mockk
 import net.nemerosa.ontrack.extension.general.MetaInfoPropertyItem.Companion.of
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -10,11 +9,6 @@ class MetaInfoPropertyTypeTest {
 
     private val type = MetaInfoPropertyType(
         extensionFeature = GeneralExtensionFeature(),
-        metaInfoSearchExtension = MetaInfoSearchExtension(
-            extensionFeature = GeneralExtensionFeature(),
-            propertyService = mockk(),
-            structureService = mockk()
-        )
     )
 
     @Test

@@ -136,7 +136,7 @@ class ReleaseSearchIT : AbstractSearchTestSupport() {
                     index(RELEASE_SEARCH_INDEX)
                     // Search
                     val results = searchService.paginatedSearch(searchRequest(version)).items
-                    assertTrue(results.isNotEmpty())
+                    assertTrue(results.isNotEmpty(), "At least one result")
                     results[0].apply {
                         assertEquals(entityDisplayName, title)
                         assertEquals("$entityDisplayName having version/label/release $version", description)
