@@ -51,6 +51,20 @@ class ElasticSearchServiceImpl(
         size: Int,
     ): SearchNodeResults {
 
+        // Compute field boosts from the index mapping
+        val fieldBoosts = searchIndexer.indexMapping
+            ?.let { mapping ->
+                mapping.fields.map { field ->
+                    // Get the maximum boost across all types for this field
+                    val maxBoost = field.types.mapNotNull { it.scoreBoost }.maxOrNull()
+                    if (maxBoost != null && maxBoost > 0.0) {
+                        "${field.name}^$maxBoost"
+                    } else {
+                        field.name
+                    }
+                }
+            } ?: emptyList()
+
         val searchRequest = ESSearchRequestBuilder().apply {
             index(searchIndexer.indexName)
             from(offset)
@@ -58,8 +72,8 @@ class ElasticSearchServiceImpl(
             query { q ->
                 q.multiMatch { m ->
                     m.query(token)
-                        // TODO Field boosts
                         .type(TextQueryType.BestFields)
+                        .fields(fieldBoosts)
                 }
             }
         }.build()
