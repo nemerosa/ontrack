@@ -1,5 +1,4 @@
 import MainPage from "@components/layouts/MainPage";
-import JumpToProject from "@components/projects/JumpToProject";
 import DashboardContextProvider from "@components/dashboards/DashboardContextProvider";
 import DashboardView from "@components/dashboards/DashboardView";
 import DashboardCommandMenu from "@components/dashboards/DashboardCommandMenu";
@@ -12,7 +11,7 @@ export default function DashboardPage({title}) {
 
     const commands = [
         <NewProjectCommand key="create-project"/>,
-        <JumpToProject key="project"/>,
+        // <JumpToProject key="project"/>,
         <EnvironmentsCommand key="environments"/>,
         <DashboardCommandMenu key="dashboard"/>,
     ]
