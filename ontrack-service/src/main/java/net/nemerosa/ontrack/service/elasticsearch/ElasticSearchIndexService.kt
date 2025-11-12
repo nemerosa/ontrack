@@ -185,6 +185,8 @@ class ElasticSearchIndexService(
 
                 "text" -> propBuilder.text { typeBuilder ->
                     type.index?.let { typeBuilder.index(it) }
+                    type.analyzer?.let { typeBuilder.analyzer(it) }
+                    type.searchAnalyzer?.let { typeBuilder.searchAnalyzer(it) }
                     baseBuilderCode(typeBuilder)
                     typeBuilder
                 }

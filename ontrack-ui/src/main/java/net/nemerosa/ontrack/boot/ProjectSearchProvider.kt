@@ -52,7 +52,8 @@ class ProjectSearchProvider(
                 filters = listOf("lowercase")
             ),
             "autocomplete_search" to AnalyzerConfig(
-                tokenizer = "lowercase"
+                tokenizer = "standard",
+                filters = listOf("lowercase")
             )
         ),
         tokenizers = mapOf(
