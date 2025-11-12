@@ -30,6 +30,12 @@ class SearchIndexMappingBuilder<T : SearchItem> {
     fun timestamp(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("date", typeInit)
     fun text(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("text", typeInit)
 
+    fun autoCompleteText(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = text {
+        analyzer = "autocomplete"
+        searchAnalyzer = "autocomplete_search"
+        typeInit()
+    }
+
     fun createMapping() = SearchIndexMapping(
         fields = fields.map { it.createField() }
     )

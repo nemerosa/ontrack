@@ -45,32 +45,11 @@ class ProjectSearchProvider(
 
     override val indexName: String = PROJECT_SEARCH_INDEX
 
-    override val indexSettings = SearchIndexSettings(
-        analyzers = mapOf(
-            "autocomplete" to AnalyzerConfig(
-                tokenizer = "autocomplete_tokenizer",
-                filters = listOf("lowercase")
-            ),
-            "autocomplete_search" to AnalyzerConfig(
-                tokenizer = "standard",
-                filters = listOf("lowercase")
-            )
-        ),
-        tokenizers = mapOf(
-            "autocomplete_tokenizer" to TokenizerConfig(
-                type = "edge_ngram",
-                minGram = 3,
-                maxGram = 10,
-                tokenChars = listOf("letter", "digit", "punctuation")
-            )
-        )
-    )
+    override val indexSettings = autoCompleteSearchIndexSettings()
 
-    override val indexMapping: SearchIndexMapping = indexMappings<ProjectSearchItem> {
-        +ProjectSearchItem::name to text {
+    override val indexMapping: SearchIndexMapping = indexMappings {
+        +ProjectSearchItem::name to autoCompleteText {
             scoreBoost = 3.0
-            analyzer = "autocomplete"
-            searchAnalyzer = "autocomplete_search"
         }
         +ProjectSearchItem::description to text()
     }
