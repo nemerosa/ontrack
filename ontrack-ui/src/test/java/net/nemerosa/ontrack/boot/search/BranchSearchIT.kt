@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
@@ -55,13 +56,8 @@ class BranchSearchIT : AbstractSearchTestSupport() {
         index("branches")
         // Searches for the name
         val results = asUser { searchService.paginatedSearch(searchRequest(branch.name)).items }
-        assertEquals(2, results.size)
-        assertTrue(results[0].accuracy > results[1].accuracy, "Project is returned first")
-        results[0].apply {
-            assertEquals(project.entityDisplayName, title)
-            assertEquals(project.description, description)
-        }
-        results[1].apply {
+        assertEquals(1, results.size)
+        results.first().apply {
             assertEquals(branch.entityDisplayName, title)
             assertEquals(branch.description, description)
         }
@@ -77,13 +73,11 @@ class BranchSearchIT : AbstractSearchTestSupport() {
         index(BRANCH_SEARCH_INDEX)
         // Search on project name
         val results = asUser { searchService.paginatedSearch(searchRequest(branch.project.name)).items }
-        // Project is found
-        val projectResult = results.find { it.title == branch.project.entityDisplayName }
-                ?: error("Cannot find project")
         // Branch is found
-        val branchResult = results.find { it.title == branch.entityDisplayName } ?: error("Cannot find branch")
-        // Project result has a higher score than the branch
-        assertTrue(projectResult.accuracy >= branchResult.accuracy, "Project result has a higher score than the branch")
+        assertNotNull(
+            results.find { it.title == branch.entityDisplayName && it.type.id == BRANCH_SEARCH_RESULT_TYPE },
+            "Branch found"
+        )
     }
 
     @Test
@@ -110,7 +104,10 @@ class BranchSearchIT : AbstractSearchTestSupport() {
                 assertTrue(branches[0].entityDisplayName in foundNames, "Authorized branch must be found")
                 // Checks that unauthorized branches are NOT found
                 (1..3).forEach {
-                    assertTrue(branches[it].entityDisplayName !in foundNames, "Not authorized branches must be filtered out")
+                    assertTrue(
+                        branches[it].entityDisplayName !in foundNames,
+                        "Not authorized branches must be filtered out"
+                    )
                 }
             }
         }
