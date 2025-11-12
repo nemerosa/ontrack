@@ -59,6 +59,51 @@ class ElasticSearchIndexService(
         if (!indexExists) {
             logger.info("[elasticsearch][index][${indexer.indexName}] Creating index")
             val request = CreateIndexRequest.Builder().index(indexer.indexName).run {
+
+                // Add settings if provided
+                indexer.indexSettings?.let { settings ->
+                    settings { settingsBuilder ->
+                        settingsBuilder.analysis { analysisBuilder ->
+                            // Add analyzers
+                            settings.analyzers.forEach { (name, config) ->
+                                analysisBuilder.analyzer(name) { analyzerBuilder ->
+                                    analyzerBuilder.custom { customBuilder ->
+                                        customBuilder
+                                            .tokenizer(config.tokenizer)
+                                            .filter(config.filters)
+                                    }
+                                }
+                            }
+                            // Add tokenizers
+                            settings.tokenizers.forEach { (name, config) ->
+                                analysisBuilder.tokenizer(name) { tokenizerBuilder ->
+                                    tokenizerBuilder.definition { defBuilder ->
+                                        when (config.type) {
+                                            "edge_ngram" -> defBuilder.edgeNgram { edgeNgramBuilder ->
+                                                config.minGram?.let { edgeNgramBuilder.minGram(it) }
+                                                config.maxGram?.let { edgeNgramBuilder.maxGram(it) }
+                                                if (config.tokenChars.isNotEmpty()) {
+                                                    edgeNgramBuilder.tokenChars(
+                                                        config.tokenChars.map { char ->
+                                                            co.elastic.clients.elasticsearch._types.analysis.TokenChar.valueOf(
+                                                                char.replaceFirstChar { it.uppercase() }
+                                                            )
+                                                        }
+                                                    )
+                                                }
+                                                edgeNgramBuilder
+                                            }
+
+                                            else -> defBuilder
+                                        }
+                                    }
+                                }
+                            }
+                            analysisBuilder
+                        }
+                    }
+                }
+
                 indexer.indexMapping?.let { indexMapping ->
                     mappings { typeMappingBuilder ->
                         indexMapping.fields

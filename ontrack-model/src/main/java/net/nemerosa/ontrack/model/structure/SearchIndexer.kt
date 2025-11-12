@@ -45,6 +45,11 @@ interface SearchIndexer<T : SearchItem> {
     val indexMapping: SearchIndexMapping? get() = null
 
     /**
+     * General settings for this index.
+     */
+    val indexSettings: SearchIndexSettings? get() = null
+
+    /**
      * Number of items to include in a batch when re-indexing a whole collection.
      *
      * If not defined, the default settings will be used instead

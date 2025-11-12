@@ -20,7 +20,8 @@ class SearchIndexMappingBuilder<T : SearchItem> {
         return builder
     }
 
-    fun type(typeName: String, typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = SearchIndexMappingFieldTypeBuilder(typeName).apply { typeInit() }
+    fun type(typeName: String, typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) =
+        SearchIndexMappingFieldTypeBuilder(typeName).apply { typeInit() }
 
     fun id(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("long", typeInit)
     fun keyword(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("keyword", typeInit)
@@ -30,13 +31,13 @@ class SearchIndexMappingBuilder<T : SearchItem> {
     fun text(typeInit: SearchIndexMappingFieldTypeBuilder.() -> Unit = {}) = type("text", typeInit)
 
     fun createMapping() = SearchIndexMapping(
-            fields = fields.map { it.createField() }
+        fields = fields.map { it.createField() }
     )
 }
 
 @SearchIndexMappingMarker
 class SearchIndexMappingFieldBuilder<T : SearchItem>(
-        private val property: KProperty1<T, Any>
+    private val property: KProperty1<T, Any>
 ) {
 
     private val types = mutableListOf<SearchIndexMappingFieldType>()
@@ -47,8 +48,8 @@ class SearchIndexMappingFieldBuilder<T : SearchItem>(
     }
 
     fun createField() = SearchIndexMappingField(
-            name = property.name,
-            types = types.toList()
+        name = property.name,
+        types = types.toList()
     )
 
 }
@@ -58,12 +59,16 @@ class SearchIndexMappingFieldTypeBuilder(private val typeName: String) {
 
     var index: Boolean? = null
     var scoreBoost: Double? = null
+    var analyzer: String? = null
+    var searchAnalyzer: String? = null
 
     fun createType(): SearchIndexMappingFieldType {
         return SearchIndexMappingFieldType(
-                type = typeName,
-                index = index,
-                scoreBoost = scoreBoost
+            type = typeName,
+            index = index,
+            scoreBoost = scoreBoost,
+            analyzer = analyzer,
+            searchAnalyzer = searchAnalyzer,
         )
     }
 }
