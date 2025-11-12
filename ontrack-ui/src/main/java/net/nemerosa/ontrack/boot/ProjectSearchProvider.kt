@@ -61,7 +61,7 @@ class ProjectSearchProvider(
                 type = "edge_ngram",
                 minGram = 3,
                 maxGram = 10,
-                tokenChars = listOf("letter", "digit")
+                tokenChars = listOf("letter", "digit", "punctuation")
             )
         )
     )

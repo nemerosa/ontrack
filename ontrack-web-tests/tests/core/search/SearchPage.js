@@ -1,4 +1,3 @@
-import {expectOnPage} from "../../support/page-utils";
 import {expect} from "@playwright/test";
 
 export class SearchPage {
@@ -9,11 +8,6 @@ export class SearchPage {
     }
 
     async expectOnPage() {
-        await expectOnPage(this.page, "search")
-    }
-
-    async selectProjects() {
-        await this.page.getByRole('button', {name: 'Project', exact: false}).click()
     }
 
     async expectProjectResultPresent(name) {

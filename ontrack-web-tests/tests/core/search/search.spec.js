@@ -11,7 +11,6 @@ test('searching for a project', async ({page, ontrack}) => {
     const homePage = new HomePage(page, ontrack)
     const searchPage = await homePage.search(project.name)
 
-    await searchPage.selectProjects()
     await searchPage.expectProjectResultPresent(project.name)
 
     await searchPage.clickProjectResult(project.name)
