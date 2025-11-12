@@ -1,10 +1,8 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.Scalars.GraphQLString
-import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLNonNull
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
+import net.nemerosa.ontrack.graphql.support.stringArgument
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.model.structure.SearchService
@@ -32,12 +30,12 @@ class GQLRootQuerySearch(
                 fieldDescription = "Performs a search in Ontrack",
                 itemType = searchResult.typeName,
                 arguments = listOf(
-                        GraphQLArgument.newArgument().name(ARG_SEARCH_TOKEN).description("Query string").type(GraphQLNonNull(GraphQLString)).build(),
-                        GraphQLArgument.newArgument().name(ARG_SEARCH_TYPE).description("Result type").type(GraphQLString).build()
+                    stringArgument(ARG_SEARCH_TOKEN, "Query string", nullable = false),
+                    stringArgument(ARG_SEARCH_TYPE, "Result type", nullable = false),
                 ),
                 itemPaginatedListProvider = { env, offset, size ->
                     val token: String = env.getArgument(ARG_SEARCH_TOKEN)!!
-                    val type: String? = env.getArgument(ARG_SEARCH_TYPE)
+                    val type: String = env.getArgument(ARG_SEARCH_TYPE)!!
                     val request = SearchRequest(token, type, offset, size)
                     val results = searchService.paginatedSearch(request)
                     PaginatedList.create(

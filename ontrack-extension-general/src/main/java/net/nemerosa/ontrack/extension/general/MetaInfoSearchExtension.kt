@@ -16,7 +16,7 @@ class MetaInfoSearchExtension(
 
     override val searchResultType = SearchResultType(
         feature = extensionFeature.featureDescription,
-        id = "build-meta-info",
+        id = SEARCH_RESULT_TYPE,
         name = "Build with Meta Info",
         description = "Meta information pair using format name:[value] or value",
         order = SearchResultType.ORDER_PROPERTIES + 20,
@@ -72,6 +72,7 @@ class MetaInfoSearchExtension(
     }
 
     companion object {
+        const val SEARCH_RESULT_TYPE = "build-meta-info"
         const val SEARCH_RESULT_META_INFO_ITEMS = "metaInfoItems"
     }
 

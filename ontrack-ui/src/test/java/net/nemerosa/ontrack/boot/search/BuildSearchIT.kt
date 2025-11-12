@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.search
 
 import net.nemerosa.ontrack.boot.BUILD_SEARCH_INDEX
+import net.nemerosa.ontrack.boot.BUILD_SEARCH_RESULT_TYPE
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -25,7 +26,14 @@ class BuildSearchIT : AbstractSearchTestSupport() {
         // Indexes the builds
         index(BUILD_SEARCH_INDEX)
         // Searches for the builds using the name
-        val results = asUser { searchService.paginatedSearch(SearchRequest(name)).items }
+        val results = asUser {
+            searchService.paginatedSearch(
+                SearchRequest(
+                    token = name,
+                    type = BUILD_SEARCH_RESULT_TYPE,
+                )
+            ).items
+        }
         // Checks the builds have been found
         builds.forEach { build ->
             assertTrue(build.entityDisplayName in results.map { it.title })

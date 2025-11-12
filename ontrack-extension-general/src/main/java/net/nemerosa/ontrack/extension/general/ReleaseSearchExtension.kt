@@ -17,7 +17,7 @@ class ReleaseSearchExtension(
 
     override val searchResultType = SearchResultType(
         feature = extensionFeature.featureDescription,
-        id = "build-release",
+        id = SEARCH_RESULT_TYPE,
         name = "Build with Release",
         description = "Release, label or version attached to a build",
         order = SearchResultType.ORDER_PROPERTIES + 10,
@@ -72,6 +72,7 @@ class ReleaseSearchExtension(
 
     companion object {
         const val SEARCH_RESULT_RELEASE = "release"
+        const val SEARCH_RESULT_TYPE = "build-release"
     }
 
 }

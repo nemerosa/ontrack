@@ -22,47 +22,43 @@ class ElasticSearchServiceImpl(
         searchIndexers.associateBy { it.indexName }
     }
 
-    val allIndices = searchIndexers.joinToString(",") { it.indexName }
-
     val indexerByResultType: Map<String, SearchIndexer<*>> by lazy {
         searchIndexers.filter { it.searchResultType != null }.associateBy { it.searchResultType!!.id }
     }
 
-    override fun paginatedSearch(request: SearchRequest): SearchResults = rawSearch(
-        token = request.token,
-        indexName = request.type?.let { type ->
-            indexerByResultType[type]?.indexName
-        },
-        offset = request.offset,
-        size = request.size,
-    ).run {
-        SearchResults(
-            items = items.mapNotNull { toResult(it) },
-            offset = offset,
-            total = total,
-            message = message,
-        )
+    override fun paginatedSearch(request: SearchRequest): SearchResults {
+        val searchIndexer = indexerByResultType[request.type]
+            ?: return SearchResults.empty
+        return rawSearch(
+            token = request.token,
+            searchIndexer = searchIndexer,
+            offset = request.offset,
+            size = request.size,
+        ).run {
+            SearchResults(
+                items = items.mapNotNull { toResult(it) },
+                offset = offset,
+                total = total,
+                message = message,
+            )
+        }
     }
 
-    override fun rawSearch(
+    private fun rawSearch(
         token: String,
-        indexName: String?,
+        searchIndexer: SearchIndexer<*>,
         offset: Int,
         size: Int,
     ): SearchNodeResults {
 
         val searchRequest = ESSearchRequestBuilder().apply {
-            if (indexName != null) {
-                index(indexName)
-            } else {
-                // Restricting to all known indexes
-                index(allIndices)
-            }
+            index(searchIndexer.indexName)
             from(offset)
             size(size)
             query { q ->
                 q.multiMatch { m ->
                     m.query(token)
+                        // TODO Field boosts
                         .type(TextQueryType.BestFields)
                 }
             }
