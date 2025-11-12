@@ -117,14 +117,12 @@ class ElasticSearchIndexService(
             when (type.type) {
                 "long" -> propBuilder.long_ { typeBuilder ->
                     type.index?.let { typeBuilder.index(it) }
-                    type.scoreBoost?.let { typeBuilder.boost(it) }
                     baseBuilderCode(typeBuilder)
                     typeBuilder
                 }
 
                 "keyword" -> propBuilder.keyword { typeBuilder ->
                     type.index?.let { typeBuilder.index(it) }
-                    type.scoreBoost?.let { typeBuilder.boost(it) }
                     baseBuilderCode(typeBuilder)
                     typeBuilder
                 }
@@ -136,14 +134,12 @@ class ElasticSearchIndexService(
 
                 "date" -> propBuilder.date { typeBuilder ->
                     type.index?.let { typeBuilder.index(it) }
-                    type.scoreBoost?.let { typeBuilder.boost(it) }
                     baseBuilderCode(typeBuilder)
                     typeBuilder
                 }
 
                 "text" -> propBuilder.text { typeBuilder ->
                     type.index?.let { typeBuilder.index(it) }
-                    type.scoreBoost?.let { typeBuilder.boost(it) }
                     baseBuilderCode(typeBuilder)
                     typeBuilder
                 }
