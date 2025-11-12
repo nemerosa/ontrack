@@ -36,7 +36,7 @@ services:
       - "8086:8086"
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.17.28
+    image: docker.elastic.co/kibana/kibana:9.2.0
     ports:
       - "5601:5601"
     environment:
