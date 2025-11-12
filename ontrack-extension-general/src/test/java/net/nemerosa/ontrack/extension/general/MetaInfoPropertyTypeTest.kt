@@ -10,7 +10,6 @@ class MetaInfoPropertyTypeTest {
 
     private val type = MetaInfoPropertyType(
         extensionFeature = GeneralExtensionFeature(),
-        searchIndexService = mockk(),
         metaInfoSearchExtension = MetaInfoSearchExtension(
             extensionFeature = GeneralExtensionFeature(),
             propertyService = mockk(),
