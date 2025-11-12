@@ -21,6 +21,11 @@ interface SearchIndexer<T : SearchItem> {
     val indexerName: String
 
     /**
+     * Is this indexer enabled?
+     */
+    val enabled: Boolean get() = true
+
+    /**
      * Is the automated indexation disabled?
      *
      * By default, `false`, enabled.

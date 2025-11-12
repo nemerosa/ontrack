@@ -56,6 +56,16 @@ class ElasticSearchServiceImpl(
         size: Int,
     ): SearchNodeResults {
 
+        // Not enabled, returning an empty result set
+        if (!searchIndexer.enabled) {
+            return SearchNodeResults(
+                items = emptyList(),
+                offset = 0,
+                total = 0,
+                message = "Search index '${searchIndexer.indexName}' is disabled."
+            )
+        }
+
         // Compute field boosts from the index mapping
         val fieldBoosts = searchIndexer.indexMapping
             ?.let { mapping ->
@@ -148,6 +158,7 @@ class ElasticSearchServiceImpl(
     override val searchResultTypes: List<SearchResultType>
         get() =
             indexers
+                .filter { (_, indexer) -> indexer.enabled }
                 .mapNotNull { (_, indexer) -> indexer.searchResultType }
                 .sortedBy { it.order }
 

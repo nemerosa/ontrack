@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.scm.catalog.search
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
@@ -15,11 +16,14 @@ class SCMCatalogSearchIndexer(
     extensionFeature: SCMExtensionFeature,
     private val scmCatalog: SCMCatalog,
     private val catalogLinkService: CatalogLinkService,
+    scmExtensionConfigProperties: SCMExtensionConfigProperties,
 ) : SearchIndexer<SCMCatalogSearchItem> {
 
     override val indexerName: String = "SCM Catalog"
 
     override val indexName: String = "scm-catalog"
+
+    override val enabled: Boolean = scmExtensionConfigProperties.catalog.enabled
 
     override val searchResultType = SearchResultType(
         feature = extensionFeature.featureDescription,
