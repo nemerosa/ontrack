@@ -14,7 +14,6 @@ class SearchIT : AbstractSearchTestSupport() {
                 "Project", "Branch", "Build",
                 "Build with Release", "Build with Meta Info", "Linked Build",
                 "Git Branch", "Git Commit", "Git Issue",
-                "SCM Catalog"
             ),
             names
         )
