@@ -59,7 +59,7 @@ services:
 
   # ElasticSearch
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.2.0
     restart: always
     environment:
       - "discovery.type=single-node"
