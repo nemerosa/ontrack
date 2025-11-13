@@ -37,8 +37,8 @@ class BranchSearchProvider(
             mappings { mappings ->
                 mappings
                     .autoCompleteText(BranchSearchItem::name)
-                    .text(BranchSearchItem::description)
                     .autoCompleteText(BranchSearchItem::project)
+                    .text(BranchSearchItem::description)
             }
         }
 
@@ -50,9 +50,9 @@ class BranchSearchProvider(
             m.query(token)
                 .type(TextQueryType.BestFields)
                 .fields(
-                    BranchSearchItem::name to 3.0,
-                    BranchSearchItem::description to null,
-                    BranchSearchItem::project to 2.0,
+                    BranchSearchItem::name to 5.0,
+                    BranchSearchItem::project to 3.0,
+                    BranchSearchItem::description to 1.0,
                 )
         }
     }

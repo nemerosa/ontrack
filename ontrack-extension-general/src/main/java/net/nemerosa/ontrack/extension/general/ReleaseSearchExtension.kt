@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query
-import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
 import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
@@ -49,14 +48,9 @@ class ReleaseSearchExtension(
         q: Query.Builder,
         token: String
     ): ObjectBuilder<Query> {
-        return q.multiMatch { m ->
-            m.query(token)
-                .type(TextQueryType.BestFields)
-                .fields(
-                    ReleaseSearchItem::entityId to null,
-                    ReleaseSearchItem::entityType to 1.0,
-                    ReleaseSearchItem::release to 5.0,
-                )
+        return q.match { m ->
+            m.field(ReleaseSearchItem::release.name)
+                .query(token)
         }
     }
 

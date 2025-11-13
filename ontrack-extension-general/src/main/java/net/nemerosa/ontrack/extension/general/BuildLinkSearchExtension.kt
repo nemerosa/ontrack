@@ -44,9 +44,9 @@ class BuildLinkSearchExtension(
                 mappings
                     .id(BuildLinkSearchItem::fromBuildId)
                     .id(BuildLinkSearchItem::targetBuildId)
-                    .keyword(BuildLinkSearchItem::targetProject)
-                    .keyword(BuildLinkSearchItem::targetBuild)
-                    .text(BuildLinkSearchItem::targetKey)
+                    .autoCompleteText(BuildLinkSearchItem::targetProject)  // Changed from keyword
+                    .autoCompleteText(BuildLinkSearchItem::targetBuild)    // Changed from keyword
+                    .autoCompleteText(BuildLinkSearchItem::targetKey)      // Changed from text
             }
         }
 
@@ -58,11 +58,9 @@ class BuildLinkSearchExtension(
             m.query(token)
                 .type(TextQueryType.BestFields)
                 .fields(
-                    BuildLinkSearchItem::fromBuildId to null,
-                    BuildLinkSearchItem::targetBuild to null,
-                    BuildLinkSearchItem::targetProject to 1.0,
-                    BuildLinkSearchItem::targetBuild to 1.0,
-                    BuildLinkSearchItem::targetKey to 1.0,
+                    BuildLinkSearchItem::targetProject to 3.0,  // Project name priority
+                    BuildLinkSearchItem::targetBuild to 2.0,    // Build name secondary
+                    BuildLinkSearchItem::targetKey to 1.0,      // Combined key lowest
                 )
         }
     }
