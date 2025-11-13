@@ -60,9 +60,8 @@ class GitIssueSearchExtension(
             m.query(token)
                 .type(TextQueryType.BestFields)
                 .fields(
-                    GitIssueSearchItem::projectId to null,
-                    GitIssueSearchItem::key to 2.0,
                     GitIssueSearchItem::displayKey to 3.0,
+                    GitIssueSearchItem::key to 2.0,
                 )
         }
     }

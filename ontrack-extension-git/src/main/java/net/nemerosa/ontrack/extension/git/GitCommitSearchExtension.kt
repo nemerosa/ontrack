@@ -75,13 +75,12 @@ class GitCommitSearchExtension(
             m.query(token)
                 .type(TextQueryType.BestFields)
                 .fields(
-                    GitCommitSearchItem::projectId to null,
+                    GitCommitSearchItem::commit to 10.0,
+                    GitCommitSearchItem::commitShort to 10.0,
+                    GitCommitSearchItem::commitAuthor to 5.0,
+                    GitCommitSearchItem::commitMessage to 5.0,
                     GitCommitSearchItem::gitType to 1.0,
                     GitCommitSearchItem::gitName to 1.0,
-                    GitCommitSearchItem::commit to 3.0,
-                    GitCommitSearchItem::commitShort to 4.0,
-                    GitCommitSearchItem::commitAuthor to 1.0,
-                    GitCommitSearchItem::commitMessage to 2.0,
                 )
         }
     }
