@@ -40,6 +40,8 @@ class BuildLinkSearchExtension(
 
     override fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder =
         builder.run {
+            autoCompleteSettings()
+        }.run {
             mappings { mappings ->
                 mappings
                     .id(BuildLinkSearchItem::fromBuildId)
