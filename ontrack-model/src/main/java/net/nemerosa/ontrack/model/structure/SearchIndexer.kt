@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.model.structure
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.job.Schedule
 
@@ -45,14 +48,14 @@ interface SearchIndexer<T : SearchItem> {
     val indexName: String
 
     /**
-     * Index mapping if defined
+     * Initialization of the index in ElasticSearch.
      */
-    val indexMapping: SearchIndexMapping? get() = null
+    fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder
 
     /**
-     * General settings for this index.
+     * Building the query for a given text.
      */
-    val indexSettings: SearchIndexSettings? get() = null
+    fun buildQuery(q: Query.Builder, token: String): ObjectBuilder<Query>
 
     /**
      * Number of items to include in a batch when re-indexing a whole collection.

@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.boot
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.CoreExtensionFeature
 import net.nemerosa.ontrack.model.events.Event
@@ -26,14 +30,31 @@ class BranchSearchProvider(
 
     override val indexName: String = BRANCH_SEARCH_INDEX
 
-    override val indexSettings = autoCompleteSearchIndexSettings()
-
-    override val indexMapping: SearchIndexMapping = indexMappings {
-        +BranchSearchItem::name to autoCompleteText {
-            scoreBoost = 2.5
+    override fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder =
+        builder.run {
+            autoCompleteSettings()
+        }.run {
+            mappings { mappings ->
+                mappings
+                    .autoCompleteText(BranchSearchItem::name)
+                    .text(BranchSearchItem::description)
+                    .autoCompleteText(BranchSearchItem::project)
+            }
         }
-        +BranchSearchItem::description to text()
-        +BranchSearchItem::project to keyword()
+
+    override fun buildQuery(
+        q: Query.Builder,
+        token: String
+    ): ObjectBuilder<Query> {
+        return q.multiMatch { m ->
+            m.query(token)
+                .type(TextQueryType.BestFields)
+                .fields(
+                    BranchSearchItem::name to 3.0,
+                    BranchSearchItem::description to null,
+                    BranchSearchItem::project to 2.0,
+                )
+        }
     }
 
     override fun indexAll(processor: (BranchSearchItem) -> Unit) {

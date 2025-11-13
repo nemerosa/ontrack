@@ -7,6 +7,7 @@ dependencies {
     api(project(":ontrack-json"))
     api(project(":ontrack-common"))
     api("org.springframework:spring-tx")
+    api("co.elastic.clients:elasticsearch-java")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation(project(":ontrack-job"))

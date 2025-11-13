@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.extension.scm.catalog.search
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
@@ -80,10 +84,29 @@ class SCMCatalogSearchIndexer(
 
     override val indexerSchedule: Schedule = Schedule.EVERY_WEEK
 
-    override val indexMapping: SearchIndexMapping = indexMappings<SCMCatalogSearchItem> {
-        +SCMCatalogSearchItem::scm to keyword()
-        +SCMCatalogSearchItem::config to keyword()
-        +SCMCatalogSearchItem::repository to keyword { scoreBoost = 3.0 } to text()
+    override fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder =
+        builder.run {
+            mappings { mappings ->
+                mappings
+                    .keyword(SCMCatalogSearchItem::scm)
+                    .keyword(SCMCatalogSearchItem::config)
+                    .keywordAndText(SCMCatalogSearchItem::repository)
+            }
+        }
+
+    override fun buildQuery(
+        q: Query.Builder,
+        token: String
+    ): ObjectBuilder<Query> {
+        return q.multiMatch { m ->
+            m.query(token)
+                .type(TextQueryType.BestFields)
+                .fields(
+                    SCMCatalogSearchItem::scm to 1.0,
+                    SCMCatalogSearchItem::config to 1.0,
+                    SCMCatalogSearchItem::repository to 2.0,
+                )
+        }
     }
 }
 

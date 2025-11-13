@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.extension.git
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.extension.git.service.GitService
@@ -38,10 +42,29 @@ class GitIssueSearchExtension(
 
     override val isIndexationDisabled: Boolean = true
 
-    override val indexMapping: SearchIndexMapping? = indexMappings<GitIssueSearchItem> {
-        +GitIssueSearchItem::projectId to id { index = false }
-        +GitIssueSearchItem::key to keyword { index = false }
-        +GitIssueSearchItem::displayKey to keyword { scoreBoost = 3.0 }
+    override fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder =
+        builder.run {
+            mappings { mappings ->
+                mappings
+                    .id(GitIssueSearchItem::projectId)
+                    .keyword(GitIssueSearchItem::key)
+                    .keyword(GitIssueSearchItem::displayKey)
+            }
+        }
+
+    override fun buildQuery(
+        q: Query.Builder,
+        token: String
+    ): ObjectBuilder<Query> {
+        return q.multiMatch { m ->
+            m.query(token)
+                .type(TextQueryType.BestFields)
+                .fields(
+                    GitIssueSearchItem::projectId to null,
+                    GitIssueSearchItem::key to 2.0,
+                    GitIssueSearchItem::displayKey to 3.0,
+                )
+        }
     }
 
     /**

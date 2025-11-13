@@ -1,12 +1,15 @@
 package net.nemerosa.ontrack.extension.git
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
-import java.util.function.BiConsumer
 
 @Component
 class GitBranchSearchIndexer(
@@ -27,17 +30,35 @@ class GitBranchSearchIndexer(
 
     override val indexName: String = GIT_BRANCH_SEARCH_INDEX
 
-    override val indexMapping: SearchIndexMapping? = indexMappings {
-        +GitBranchSearchItem::branchId to id { index = false }
-        +GitBranchSearchItem::gitBranch to keyword { scoreBoost = 4.0 } to text()
+    override fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder =
+        builder.run {
+            mappings { mappings ->
+                mappings
+                    .id(GitBranchSearchItem::branchId)
+                    .keywordAndText(GitBranchSearchItem::gitBranch)
+            }
+        }
+
+    override fun buildQuery(
+        q: Query.Builder,
+        token: String
+    ): ObjectBuilder<Query> {
+        return q.multiMatch { m ->
+            m.query(token)
+                .type(TextQueryType.BestFields)
+                .fields(
+                    GitBranchSearchItem::id to null,
+                    GitBranchSearchItem::gitBranch to 3.0,
+                )
+        }
     }
 
     override fun indexAll(processor: (GitBranchSearchItem) -> Unit) {
-        gitService.forEachConfiguredBranch(BiConsumer { branch, branchConfig ->
+        gitService.forEachConfiguredBranch { branch, branchConfig ->
             processor(
                 GitBranchSearchItem(branch, branchConfig)
             )
-        })
+        }
     }
 
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {

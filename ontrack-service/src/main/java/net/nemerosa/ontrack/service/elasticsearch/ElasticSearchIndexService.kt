@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.service.elasticsearch
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient
 import co.elastic.clients.elasticsearch._types.ElasticsearchException
-import co.elastic.clients.elasticsearch._types.mapping.Property
-import co.elastic.clients.elasticsearch._types.mapping.PropertyBase
 import co.elastic.clients.elasticsearch.core.BulkRequest
 import co.elastic.clients.elasticsearch.core.DeleteRequest
 import co.elastic.clients.elasticsearch.core.GetRequest
@@ -58,66 +56,11 @@ class ElasticSearchIndexService(
         val indexExists = client.indices().exists(ExistsRequest.Builder().index(indexer.indexName).build()).value()
         if (!indexExists) {
             logger.info("[elasticsearch][index][${indexer.indexName}] Creating index")
-            val request = CreateIndexRequest.Builder().index(indexer.indexName).run {
-
-                // Add settings if provided
-                indexer.indexSettings?.let { settings ->
-                    settings { settingsBuilder ->
-                        settingsBuilder.analysis { analysisBuilder ->
-                            // Add analyzers
-                            settings.analyzers.forEach { (name, config) ->
-                                analysisBuilder.analyzer(name) { analyzerBuilder ->
-                                    analyzerBuilder.custom { customBuilder ->
-                                        customBuilder
-                                            .tokenizer(config.tokenizer)
-                                            .filter(config.filters)
-                                    }
-                                }
-                            }
-                            // Add tokenizers
-                            settings.tokenizers.forEach { (name, config) ->
-                                analysisBuilder.tokenizer(name) { tokenizerBuilder ->
-                                    tokenizerBuilder.definition { defBuilder ->
-                                        when (config.type) {
-                                            "edge_ngram" -> defBuilder.edgeNgram { edgeNgramBuilder ->
-                                                config.minGram?.let { edgeNgramBuilder.minGram(it) }
-                                                config.maxGram?.let { edgeNgramBuilder.maxGram(it) }
-                                                if (config.tokenChars.isNotEmpty()) {
-                                                    edgeNgramBuilder.tokenChars(
-                                                        config.tokenChars.map { char ->
-                                                            co.elastic.clients.elasticsearch._types.analysis.TokenChar.valueOf(
-                                                                char.replaceFirstChar { it.uppercase() }
-                                                            )
-                                                        }
-                                                    )
-                                                }
-                                                edgeNgramBuilder
-                                            }
-
-                                            else -> defBuilder
-                                        }
-                                    }
-                                }
-                            }
-                            analysisBuilder
-                        }
-                    }
-                }
-
-                indexer.indexMapping?.let { indexMapping ->
-                    mappings { typeMappingBuilder ->
-                        indexMapping.fields
-                            .filter { it.types.isNotEmpty() }
-                            .forEach { fieldMapping ->
-                                typeMappingBuilder.properties(fieldMapping.name) { propBuilder ->
-                                    setupProperty(fieldMapping, propBuilder)
-                                }
-                            }
-                        typeMappingBuilder
-                    }
-                } ?: this
-            }.build()
-
+            val request = CreateIndexRequest.Builder()
+                .index(indexer.indexName)
+                .let { builder: CreateIndexRequest.Builder ->
+                    indexer.initIndex(builder)
+                }.build()
             try {
                 client.indices().create(request)
             } catch (ex: ElasticsearchException) {
@@ -127,79 +70,6 @@ class ElasticSearchIndexService(
                     throw ex
                 }
             }
-        }
-    }
-
-    private fun setupProperty(
-        fieldMapping: SearchIndexMappingField,
-        propBuilder: Property.Builder
-    ): Property.Builder {
-        val primary = fieldMapping.types[0]
-        setType(propBuilder, primary) { baseBuilder ->
-            // Other types
-            if (fieldMapping.types.size > 1) {
-                fieldMapping.types.drop(1)
-                    .forEach { type ->
-                        if (!type.type.isNullOrBlank()) {
-                            baseBuilder.fields(type.type) { builder ->
-                                setType(builder, type) {}
-                                builder
-                            }
-                        }
-                    }
-            }
-        }
-        // OK
-        return propBuilder
-    }
-
-    private fun setType(
-        propBuilder: Property.Builder,
-        type: SearchIndexMappingFieldType,
-        baseBuilderCode: (PropertyBase.AbstractBuilder<*>) -> Unit,
-    ) {
-        if (type.type != null) {
-            when (type.type) {
-                "long" -> propBuilder.long_ { typeBuilder ->
-                    type.index?.let { typeBuilder.index(it) }
-                    baseBuilderCode(typeBuilder)
-                    typeBuilder
-                }
-
-                "keyword" -> propBuilder.keyword { typeBuilder ->
-                    type.index?.let { typeBuilder.index(it) }
-                    baseBuilderCode(typeBuilder)
-                    typeBuilder
-                }
-
-                "object" -> propBuilder.`object` { typeBuilder ->
-                    baseBuilderCode(typeBuilder)
-                    typeBuilder
-                }
-
-                "date" -> propBuilder.date { typeBuilder ->
-                    type.index?.let { typeBuilder.index(it) }
-                    baseBuilderCode(typeBuilder)
-                    typeBuilder
-                }
-
-                "text" -> propBuilder.text { typeBuilder ->
-                    type.index?.let { typeBuilder.index(it) }
-                    type.analyzer?.let { typeBuilder.analyzer(it) }
-                    type.searchAnalyzer?.let { typeBuilder.searchAnalyzer(it) }
-                    baseBuilderCode(typeBuilder)
-                    typeBuilder
-                }
-
-                "nested" -> propBuilder.nested { typeBuilder ->
-                    baseBuilderCode(typeBuilder)
-                    typeBuilder
-                }
-
-                else -> error("Unknown type ${type.type}")
-            }
-        } else {
-            error("Missing required type")
         }
     }
 

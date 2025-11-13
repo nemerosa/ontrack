@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.extension.general
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parseOrNull
@@ -27,13 +31,32 @@ class ReleaseSearchExtension(
 
     override val indexName: String = RELEASE_SEARCH_INDEX
 
-    override val indexSettings: SearchIndexSettings = autoCompleteSearchIndexSettings()
+    override fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder =
+        builder.run {
+            autoCompleteSettings()
+        }.run {
+            mappings { mappings ->
+                mappings
+                    .id(ReleaseSearchItem::entityId)
+                    .properties(ReleaseSearchItem::entityType.name) { property ->
+                        property.keyword { it.index(false) }
+                    }
+                    .autoCompleteText(ReleaseSearchItem::release)
+            }
+        }
 
-    override val indexMapping: SearchIndexMapping = indexMappings {
-        +ReleaseSearchItem::entityId to id { index = false }
-        +ReleaseSearchItem::entityType to keyword { index = false }
-        +ReleaseSearchItem::release to autoCompleteText {
-            scoreBoost = 5.0
+    override fun buildQuery(
+        q: Query.Builder,
+        token: String
+    ): ObjectBuilder<Query> {
+        return q.multiMatch { m ->
+            m.query(token)
+                .type(TextQueryType.BestFields)
+                .fields(
+                    ReleaseSearchItem::entityId to null,
+                    ReleaseSearchItem::entityType to 1.0,
+                    ReleaseSearchItem::release to 5.0,
+                )
         }
     }
 

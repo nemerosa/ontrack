@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.service.elasticsearch
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient
 import co.elastic.clients.elasticsearch._types.ElasticsearchException
-import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.*
@@ -66,32 +65,6 @@ class ElasticSearchServiceImpl(
             )
         }
 
-        // Compute field boosts from the index mapping
-        val fieldBoosts = searchIndexer.indexMapping
-            ?.let { mapping ->
-                mapping.fields.map { field ->
-                    // Get the maximum boost across all types for this field
-                    val maxBoost = field.types.mapNotNull { it.scoreBoost }.maxOrNull()
-                    if (maxBoost != null && maxBoost > 0.0) {
-                        "${field.name}^$maxBoost"
-                    } else {
-                        field.name
-                    }
-                }
-            } ?: emptyList()
-
-        // If no field mappings are available, return empty results early
-        // This prevents multi_match queries on empty indices from failing
-        if (fieldBoosts.isEmpty()) {
-            logger.debug("No field mappings available for index '${searchIndexer.indexName}', returning empty results")
-            return SearchNodeResults(
-                items = emptyList(),
-                offset = 0,
-                total = 0,
-                message = "Search index '${searchIndexer.indexName}' has no searchable fields configured."
-            )
-        }
-
         val searchRequest = ESSearchRequestBuilder().apply {
             index(searchIndexer.indexName)
             from(offset)
@@ -99,13 +72,7 @@ class ElasticSearchServiceImpl(
             // Allow partial search results even if some shards fail
             allowPartialSearchResults(true)
             query { q ->
-                q.multiMatch { m ->
-                    m.query(token)
-                        .type(TextQueryType.BestFields)
-                        .fields(fieldBoosts)
-                        // Lenient mode prevents failures when fields don't exist
-                        .lenient(true)
-                }
+                searchIndexer.buildQuery(q, token)
             }
         }.build()
 

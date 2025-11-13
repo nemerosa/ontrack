@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.extension.general
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -34,12 +38,33 @@ class BuildLinkSearchExtension(
         order = SearchResultType.ORDER_PROPERTIES + 30,
     )
 
-    override val indexMapping: SearchIndexMapping? = indexMappings<BuildLinkSearchItem> {
-        +BuildLinkSearchItem::fromBuildId to id { index = false }
-        +BuildLinkSearchItem::targetBuildId to id { index = false }
-        +BuildLinkSearchItem::targetProject to keyword()
-        +BuildLinkSearchItem::targetBuild to keyword()
-        +BuildLinkSearchItem::targetKey to text { scoreBoost = 1.0 }
+    override fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder =
+        builder.run {
+            mappings { mappings ->
+                mappings
+                    .id(BuildLinkSearchItem::fromBuildId)
+                    .id(BuildLinkSearchItem::targetBuildId)
+                    .keyword(BuildLinkSearchItem::targetProject)
+                    .keyword(BuildLinkSearchItem::targetBuild)
+                    .text(BuildLinkSearchItem::targetKey)
+            }
+        }
+
+    override fun buildQuery(
+        q: Query.Builder,
+        token: String
+    ): ObjectBuilder<Query> {
+        return q.multiMatch { m ->
+            m.query(token)
+                .type(TextQueryType.BestFields)
+                .fields(
+                    BuildLinkSearchItem::fromBuildId to null,
+                    BuildLinkSearchItem::targetBuild to null,
+                    BuildLinkSearchItem::targetProject to 1.0,
+                    BuildLinkSearchItem::targetBuild to 1.0,
+                    BuildLinkSearchItem::targetKey to 1.0,
+                )
+        }
     }
 
     override fun indexAll(processor: (BuildLinkSearchItem) -> Unit) {
