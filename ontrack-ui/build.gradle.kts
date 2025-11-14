@@ -34,12 +34,9 @@ dependencies {
     runtimeOnly(project(":ontrack-database"))
 
     // Metric runtimes
-    // TODO runtimeOnly("io.micrometer:micrometer-registry-influx")
+    runtimeOnly("io.micrometer:micrometer-registry-influx")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-    // TODO runtimeOnly("io.micrometer:micrometer-registry-elastic")
-
-    // Logging extensions
-    runtimeOnly("net.logstash.logback:logstash-logback-encoder")
+    runtimeOnly("io.micrometer:micrometer-registry-elastic")
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(testFixtures(project(":ontrack-model")))
