@@ -3,7 +3,7 @@ import com.avast.gradle.dockercompose.ComposeExtension
 plugins {
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.spring") version "2.1.20"
-    id("org.springframework.boot") version "3.5.3" apply false
+    id("org.springframework.boot") version "3.5.7" apply false
     id("io.spring.dependency-management") version "1.1.7"
     id("net.nemerosa.versioning") version "3.1.0"
     id("com.avast.gradle.docker-compose") version "0.17.12"
