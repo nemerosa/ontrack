@@ -68,7 +68,7 @@ services:
       postgres:
         condition: service_started
       elasticsearch:
-        condition: service_started
+        condition: service_healthy
       rabbitmq:
         condition: service_started
       keycloak:
