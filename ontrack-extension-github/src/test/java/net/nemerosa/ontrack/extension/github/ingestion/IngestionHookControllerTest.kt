@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettingsMissingTokenException
 import net.nemerosa.ontrack.it.MockAuthenticationStorageService
+import net.nemerosa.ontrack.it.MockSecurityService
 import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -54,6 +55,7 @@ class IngestionHookControllerTest {
                 tokensService = tokensService,
                 ingestionEventProcessors = listOf(ingestionEventProcessor),
                 authenticationStorageService = authenticationStorageService,
+                securityService = MockSecurityService(),
             )
 
         var storedPayload: IngestionHookPayload? = null
@@ -105,6 +107,7 @@ class IngestionHookControllerTest {
                 tokensService = tokensService,
                 ingestionEventProcessors = listOf(ingestionEventProcessor),
                 authenticationStorageService = authenticationStorageService,
+                securityService = MockSecurityService(),
             )
 
         val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
@@ -146,6 +149,7 @@ class IngestionHookControllerTest {
                 tokensService = tokensService,
                 ingestionEventProcessors = listOf(ingestionEventProcessor),
                 authenticationStorageService = authenticationStorageService,
+                securityService = MockSecurityService(),
             )
 
         var storedPayload: IngestionHookPayload? = null
@@ -194,6 +198,7 @@ class IngestionHookControllerTest {
                 tokensService = tokensService,
                 ingestionEventProcessors = listOf(ingestionEventProcessor),
                 authenticationStorageService = authenticationStorageService,
+                securityService = MockSecurityService(),
             )
 
         val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
@@ -230,6 +235,7 @@ class IngestionHookControllerTest {
                 tokensService = tokensService,
                 ingestionEventProcessors = listOf(ingestionEventProcessor),
                 authenticationStorageService = authenticationStorageService,
+                securityService = MockSecurityService(),
             )
 
         val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
@@ -268,6 +274,7 @@ class IngestionHookControllerTest {
                 tokensService = tokensService,
                 ingestionEventProcessors = listOf(ingestionEventProcessor),
                 authenticationStorageService = authenticationStorageService,
+                securityService = MockSecurityService(),
             )
 
         var storedPayload: IngestionHookPayload? = null
