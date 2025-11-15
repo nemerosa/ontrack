@@ -9,8 +9,7 @@ import net.nemerosa.ontrack.extension.queue.metrics.queueProcessErrored
 import net.nemerosa.ontrack.extension.queue.metrics.queueProcessTime
 import net.nemerosa.ontrack.extension.queue.record.QueueRecordService
 import net.nemerosa.ontrack.json.parseAsJson
-import net.nemerosa.ontrack.model.security.AccountSecurityContextService
-import net.nemerosa.ontrack.model.security.AccountService
+import net.nemerosa.ontrack.model.security.AuthenticationStorageService
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -29,10 +28,9 @@ class QueueListener(
     private val queueConfigProperties: QueueConfigProperties,
     private val queueProcessors: List<QueueProcessor<*>>,
     private val securityService: SecurityService,
+    private val authenticationStorageService: AuthenticationStorageService,
     private val queueRecordService: QueueRecordService,
     private val meterRegistry: MeterRegistry,
-    private val accountService: AccountService,
-    private val accountSecurityContextService: AccountSecurityContextService,
 ) : RabbitListenerConfigurer {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -120,13 +118,9 @@ class QueueListener(
                 securityService.asAdmin {
                     queueRecordService.processing(qp)
 
-                    // Gets the account to use from the queue payload
-                    val account = securityService.asAdmin {
-                        accountService.findAccountByName(qp.accountName)
-                            ?: throw QueuePayloadAccountNameNotFoundException(qp)
-                    }
-
-                    accountSecurityContextService.withAccount(account) {
+                    // Account ID
+                    val accountId = qp.accountName
+                    authenticationStorageService.withAccountId(accountId) {
                         try {
                             meterRegistry.queueProcessTime(qp) {
                                 logger.debug("Processing: {}", payload)

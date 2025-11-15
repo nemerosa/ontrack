@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
+import net.nemerosa.ontrack.it.NoAuthTest
 import net.nemerosa.ontrack.model.security.*
 import org.apache.commons.lang3.StringUtils
 import org.junit.jupiter.api.Test
@@ -150,6 +151,18 @@ class SecurityServiceIT : AbstractDSLTestSupport() {
                 securityService.checkProjectFunction(id.value, ValidationRunStatusCommentEditOwn::class.java)
                 //
                 true
+            }
+        }
+    }
+
+    @Test
+    @NoAuthTest
+    fun `As admin has a name`() {
+        securityService.asAdmin {
+            // The run-as account has a name
+            val name = securityService.currentUser?.name
+            assertNotNull(name, "Run-as admin name is defined") {
+                assertTrue(it.isNotBlank(), "Run-as admin name is not blank")
             }
         }
     }

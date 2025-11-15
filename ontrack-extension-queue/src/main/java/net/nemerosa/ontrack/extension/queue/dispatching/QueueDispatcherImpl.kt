@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.queue.dispatching
 
 import io.micrometer.core.instrument.MeterRegistry
-import net.nemerosa.ontrack.extension.queue.QueueAccountMissingException
 import net.nemerosa.ontrack.extension.queue.QueueConfigProperties
 import net.nemerosa.ontrack.extension.queue.QueuePayload
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
@@ -10,7 +9,7 @@ import net.nemerosa.ontrack.extension.queue.record.QueueRecordService
 import net.nemerosa.ontrack.extension.queue.source.QueueSource
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.format
-import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.AuthenticationStorageService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.AmqpTemplate
@@ -23,7 +22,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class QueueDispatcherImpl(
-    private val securityService: SecurityService,
+    private val authenticationStorageService: AuthenticationStorageService,
     private val queueConfigProperties: QueueConfigProperties,
     private val amqpTemplate: AmqpTemplate,
     private val queueRecordService: QueueRecordService,
@@ -45,11 +44,10 @@ class QueueDispatcherImpl(
             queueProcessor.process(payload, queueMetadata = null)
             QueueDispatchResult(type = QueueDispatchResultType.PROCESSED, id = null)
         } else {
-            val accountName = securityService.currentUser?.account?.email
-                ?: throw QueueAccountMissingException(queueProcessor.id)
+            val accountId = authenticationStorageService.getAccountId()
             val queuePayload = QueuePayload.create(
                 processor = queueProcessor,
-                accountName = accountName,
+                accountName = accountId,
                 body = payload
             )
             queueRecordService.start(queuePayload, source)

@@ -10,9 +10,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionHookProcessingService
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
-import net.nemerosa.ontrack.model.security.AccountSecurityContextService
-import net.nemerosa.ontrack.model.security.AccountService
-import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.AuthenticationStorageService
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.core.MessageListener
@@ -27,10 +25,8 @@ class AsyncIngestionHookQueueListener(
     private val ingestionConfigProperties: IngestionConfigProperties,
     private val ingestionHookProcessingService: IngestionHookProcessingService,
     private val ingestionHookPayloadStorage: IngestionHookPayloadStorage,
-    private val securityService: SecurityService,
     private val meterRegistry: MeterRegistry,
-    private val accountSecurityContextService: AccountSecurityContextService,
-    private val accountService: AccountService,
+    private val authenticationStorageService: AuthenticationStorageService,
 ) : RabbitListenerConfigurer {
 
     private val logger = LoggerFactory.getLogger(AsyncIngestionHookQueueListener::class.java)
@@ -97,15 +93,8 @@ class AsyncIngestionHookQueueListener(
             )
 
             // Gets the account to use from the queue payload
-            val account = securityService.asAdmin {
-                payload.accountName?.takeIf { it.isNotBlank() }
-                    ?.let {
-                        accountService.findAccountByName(it)
-                    }
-                    ?: error("Account not found: ${payload.accountName}")
-            }
-
-            accountSecurityContextService.withAccount(account) {
+            val accountId = payload.accountName ?: error("Account name is required in the payload")
+            authenticationStorageService.withAccountId(accountId) {
                 ingestionHookPayloadStorage.queue(payload, queue)
                 ingestionHookProcessingService.process(payload)
             }

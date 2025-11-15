@@ -14,7 +14,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.metrics.increment
-import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.AuthenticationStorageService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.TokensService
 import net.nemerosa.ontrack.model.structure.checkTokenForSecurityContext
@@ -30,7 +30,7 @@ class IngestionHookController(
     private val queue: IngestionHookQueue,
     private val storage: IngestionHookPayloadStorage,
     private val ingestionHookSignatureService: IngestionHookSignatureService,
-    private val securityService: SecurityService,
+    private val authenticationStorageService: AuthenticationStorageService,
     private val meterRegistry: MeterRegistry,
     private val cachedSettingsService: CachedSettingsService,
     private val tokensService: TokensService,
@@ -122,8 +122,7 @@ class IngestionHookController(
             payload = json,
             repository = repository,
             configuration = configuration,
-            accountName = securityService.currentUser?.name
-                ?: error("Missing account name to process the payload")
+            accountName = authenticationStorageService.getAccountId(),
         )
         // Pre-sorting
         return when (eventProcessor.preProcessingCheck(payload)) {

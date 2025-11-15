@@ -12,7 +12,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEvent
 import net.nemerosa.ontrack.extension.github.ingestion.queue.IngestionHookQueue
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettings
 import net.nemerosa.ontrack.extension.github.ingestion.settings.GitHubIngestionSettingsMissingTokenException
-import net.nemerosa.ontrack.it.MockSecurityService
+import net.nemerosa.ontrack.it.MockAuthenticationStorageService
 import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -37,7 +37,7 @@ class IngestionHookControllerTest {
     fun `Storage and queuing`() {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
-        val securityService = MockSecurityService()
+        val authenticationStorageService = MockAuthenticationStorageService()
         val meterRegistry = mockk<MeterRegistry>(relaxed = true)
 
         val ingestionEventProcessor = mockIngestionEventProcessor()
@@ -49,11 +49,11 @@ class IngestionHookControllerTest {
                 queue = queue,
                 storage = storage,
                 ingestionHookSignatureService = MockIngestionHookSignatureService(),
-                securityService = securityService,
                 meterRegistry = meterRegistry,
                 cachedSettingsService = mockSettings(),
                 tokensService = tokensService,
                 ingestionEventProcessors = listOf(ingestionEventProcessor),
+                authenticationStorageService = authenticationStorageService,
             )
 
         var storedPayload: IngestionHookPayload? = null
@@ -89,7 +89,7 @@ class IngestionHookControllerTest {
     fun `Disabling the ingestion`() {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
-        val securityService = MockSecurityService()
+        val authenticationStorageService = MockAuthenticationStorageService()
         val meterRegistry = mockk<MeterRegistry>()
 
         val ingestionEventProcessor = mockIngestionEventProcessor()
@@ -100,11 +100,11 @@ class IngestionHookControllerTest {
                 queue = queue,
                 storage = storage,
                 ingestionHookSignatureService = MockIngestionHookSignatureService(),
-                securityService = securityService,
                 meterRegistry = meterRegistry,
                 cachedSettingsService = mockSettings(enabled = false),
                 tokensService = tokensService,
                 ingestionEventProcessors = listOf(ingestionEventProcessor),
+                authenticationStorageService = authenticationStorageService,
             )
 
         val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
@@ -128,7 +128,7 @@ class IngestionHookControllerTest {
     fun `Excluding a repository`() {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
-        val securityService = MockSecurityService()
+        val authenticationStorageService = MockAuthenticationStorageService()
         val meterRegistry = mockk<MeterRegistry>(relaxed = true)
 
         val ingestionEventProcessor = mockIngestionEventProcessor()
@@ -139,13 +139,13 @@ class IngestionHookControllerTest {
                 queue = queue,
                 storage = storage,
                 ingestionHookSignatureService = MockIngestionHookSignatureService(),
-                securityService = securityService,
                 meterRegistry = meterRegistry,
                 cachedSettingsService = mockSettings(
                     repositoryExcludes = IngestionHookFixtures.sampleRepository,
                 ),
                 tokensService = tokensService,
                 ingestionEventProcessors = listOf(ingestionEventProcessor),
+                authenticationStorageService = authenticationStorageService,
             )
 
         var storedPayload: IngestionHookPayload? = null
@@ -181,7 +181,7 @@ class IngestionHookControllerTest {
     fun `Missing token for the signature`() {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
-        val securityService = MockSecurityService()
+        val authenticationStorageService = MockAuthenticationStorageService()
         val meterRegistry = mockk<MeterRegistry>()
         val ingestionEventProcessor = mockIngestionEventProcessor()
         val controller =
@@ -189,11 +189,11 @@ class IngestionHookControllerTest {
                 queue = queue,
                 storage = storage,
                 ingestionHookSignatureService = MockIngestionHookSignatureService(IngestionHookSignatureCheckResult.MISSING_TOKEN),
-                securityService = securityService,
                 meterRegistry = meterRegistry,
                 cachedSettingsService = mockSettings(),
                 tokensService = tokensService,
                 ingestionEventProcessors = listOf(ingestionEventProcessor),
+                authenticationStorageService = authenticationStorageService,
             )
 
         val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
@@ -217,7 +217,7 @@ class IngestionHookControllerTest {
     fun `Wrong signature`() {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
-        val securityService = MockSecurityService()
+        val authenticationStorageService = MockAuthenticationStorageService()
         val meterRegistry = mockk<MeterRegistry>(relaxed = true)
         val ingestionEventProcessor = mockIngestionEventProcessor()
         val controller =
@@ -225,11 +225,11 @@ class IngestionHookControllerTest {
                 queue = queue,
                 storage = storage,
                 ingestionHookSignatureService = MockIngestionHookSignatureService(IngestionHookSignatureCheckResult.MISMATCH),
-                securityService = securityService,
                 meterRegistry = meterRegistry,
                 cachedSettingsService = mockSettings(),
                 tokensService = tokensService,
                 ingestionEventProcessors = listOf(ingestionEventProcessor),
+                authenticationStorageService = authenticationStorageService,
             )
 
         val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
@@ -253,7 +253,7 @@ class IngestionHookControllerTest {
     fun `No storage nor queuing for a ping`() {
         val storage = mockk<IngestionHookPayloadStorage>()
         val queue = mockk<IngestionHookQueue>()
-        val securityService = MockSecurityService()
+        val authenticationStorageService = MockAuthenticationStorageService()
         val meterRegistry = mockk<MeterRegistry>(relaxed = true)
         val ingestionEventProcessor = mockIngestionEventProcessor("ping")
         every { ingestionEventProcessor.preProcessingCheck(any()) } returns IngestionEventPreprocessingCheck.IGNORED
@@ -263,11 +263,11 @@ class IngestionHookControllerTest {
                 queue = queue,
                 storage = storage,
                 ingestionHookSignatureService = MockIngestionHookSignatureService(),
-                securityService = securityService,
                 meterRegistry = meterRegistry,
                 cachedSettingsService = mockSettings(),
                 tokensService = tokensService,
-                ingestionEventProcessors = listOf(ingestionEventProcessor)
+                ingestionEventProcessors = listOf(ingestionEventProcessor),
+                authenticationStorageService = authenticationStorageService,
             )
 
         var storedPayload: IngestionHookPayload? = null
