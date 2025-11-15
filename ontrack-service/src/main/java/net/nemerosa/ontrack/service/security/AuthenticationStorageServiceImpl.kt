@@ -26,17 +26,18 @@ class AuthenticationStorageServiceImpl(
     }
 
     override fun withAccountId(accountId: String, code: () -> Unit) {
-        val user = if (accountId == AuthenticationStorageService.RUN_AS_ADMINISTRATOR_ACCOUNT_ID) {
-            RunAsAuthenticatedUser.runAsUser(null)
+        val authentication = if (accountId == AuthenticationStorageService.RUN_AS_ADMINISTRATOR_ACCOUNT_ID) {
+            RunAsAuthenticatedUser.authentication(null)
         } else {
-            val account = accountService.findAccountByName(accountId)
-                ?: throw AuthenticationStorageServiceAccountNotFoundException(accountId)
-            authenticationUserService.createAuthenticatedUser(account)
+            val account = securityService.asAdmin {
+                accountService.findAccountByName(accountId)
+            } ?: throw AuthenticationStorageServiceAccountNotFoundException(accountId)
+            val user = authenticationUserService.createAuthenticatedUser(account)
+            AuthenticatedUserAuthentication(
+                authenticatedUser = user,
+                authorities = AuthorityUtils.createAuthorityList(SecurityRole.USER.name),
+            )
         }
-        val authentication = AuthenticatedUserAuthentication(
-            authenticatedUser = user,
-            authorities = AuthorityUtils.createAuthorityList(SecurityRole.USER.name),
-        )
         val oldSecurityContext = SecurityContextHolder.getContext()
         val securityContext = TransientSecurityContext(authentication)
         try {
