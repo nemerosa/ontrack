@@ -15,6 +15,7 @@ import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.security.AuthenticationStorageService
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.TokensService
 import net.nemerosa.ontrack.model.structure.checkTokenForSecurityContext
@@ -34,6 +35,7 @@ class IngestionHookController(
     private val meterRegistry: MeterRegistry,
     private val cachedSettingsService: CachedSettingsService,
     private val tokensService: TokensService,
+    private val securityService: SecurityService,
     ingestionEventProcessors: List<IngestionEventProcessor>,
 ) {
 
@@ -112,49 +114,54 @@ class IngestionHookController(
                 )
             }
         }
-        // Creates the payload object
-        val payload = IngestionHookPayload(
-            gitHubDelivery = gitHubDelivery,
-            gitHubEvent = gitHubEvent,
-            gitHubHookID = gitHubHookID,
-            gitHubHookInstallationTargetID = gitHubHookInstallationTargetID,
-            gitHubHookInstallationTargetType = gitHubHookInstallationTargetType,
-            payload = json,
-            repository = repository,
-            configuration = configuration,
-            accountName = authenticationStorageService.getAccountId(),
-        )
-        // Pre-sorting
-        return when (eventProcessor.preProcessingCheck(payload)) {
-            IngestionEventPreprocessingCheck.TO_BE_PROCESSED -> {
-                meterRegistry.increment(
-                    IngestionMetrics.Hook.acceptedCount,
-                    INGESTION_METRIC_EVENT_TAG to gitHubEvent,
-                )
-                // Stores it
-                storage.store(payload, eventProcessor.getPayloadSource(payload))
-                // Pushes it on the queue
-                queue.queue(payload)
-                // Ok
-                IngestionHookResponse(
-                    message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received and is processed in the background.",
-                    uuid = payload.uuid,
-                    event = payload.gitHubEvent,
-                    processing = true,
-                )
-            }
 
-            IngestionEventPreprocessingCheck.IGNORED -> {
-                meterRegistry.increment(
-                    IngestionMetrics.Hook.ignoredCount,
-                    INGESTION_METRIC_EVENT_TAG to gitHubEvent,
-                )
-                IngestionHookResponse(
-                    message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received correctly but won't be processed.",
-                    uuid = payload.uuid,
-                    event = payload.gitHubEvent,
-                    processing = false,
-                )
+        // Running as admin for the actual processing
+        return securityService.asAdmin {
+
+            // Creates the payload object
+            val payload = IngestionHookPayload(
+                gitHubDelivery = gitHubDelivery,
+                gitHubEvent = gitHubEvent,
+                gitHubHookID = gitHubHookID,
+                gitHubHookInstallationTargetID = gitHubHookInstallationTargetID,
+                gitHubHookInstallationTargetType = gitHubHookInstallationTargetType,
+                payload = json,
+                repository = repository,
+                configuration = configuration,
+                accountName = authenticationStorageService.getAccountId(),
+            )
+            // Pre-sorting
+            when (eventProcessor.preProcessingCheck(payload)) {
+                IngestionEventPreprocessingCheck.TO_BE_PROCESSED -> {
+                    meterRegistry.increment(
+                        IngestionMetrics.Hook.acceptedCount,
+                        INGESTION_METRIC_EVENT_TAG to gitHubEvent,
+                    )
+                    // Stores it
+                    storage.store(payload, eventProcessor.getPayloadSource(payload))
+                    // Pushes it on the queue
+                    queue.queue(payload)
+                    // Ok
+                    IngestionHookResponse(
+                        message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received and is processed in the background.",
+                        uuid = payload.uuid,
+                        event = payload.gitHubEvent,
+                        processing = true,
+                    )
+                }
+
+                IngestionEventPreprocessingCheck.IGNORED -> {
+                    meterRegistry.increment(
+                        IngestionMetrics.Hook.ignoredCount,
+                        INGESTION_METRIC_EVENT_TAG to gitHubEvent,
+                    )
+                    IngestionHookResponse(
+                        message = "Ingestion request ${payload.uuid}/${payload.gitHubEvent} has been received correctly but won't be processed.",
+                        uuid = payload.uuid,
+                        event = payload.gitHubEvent,
+                        processing = false,
+                    )
+                }
             }
         }
     }
