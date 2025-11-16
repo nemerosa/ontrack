@@ -203,9 +203,10 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_MILESTONE = 'v1'
             }
             steps {
+                sh '''git status'''
+                // TODO Remove the build number suffix when ready to tag and release
                 sh '''
-                    git status
-                    ./gradlew versionDisplay versionFile --no-daemon
+                    ./gradlew versionDisplay versionFile -PversionSuffix=-${BUILD_NUMBER} --no-daemon
                 '''
                 script {
                     // Additional options
@@ -224,6 +225,7 @@ pipeline {
                             ./gradlew \\
                                 dockerBuild \\
                                 jibDockerBuild \\
+                                -PversionSuffix=-${BUILD_NUMBER} \\
                                 -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
@@ -237,6 +239,7 @@ pipeline {
                                 build \\
                                 dockerBuild \\
                                 jibDockerBuild \\
+                                -PversionSuffix=-${BUILD_NUMBER} \\
                                 -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
@@ -283,6 +286,7 @@ pipeline {
                     sh '''
                         ./gradlew \\
                             -Dorg.gradle.jvmargs=-Xmx2048m \\
+                            -PversionSuffix=-${BUILD_NUMBER} \\
                             --stacktrace \\
                             --console plain \\
                             --parallel \\
@@ -320,6 +324,7 @@ pipeline {
                     sh '''
                         ./gradlew \\
                             -Dorg.gradle.jvmargs=-Xmx3072m \\
+                            -PversionSuffix=-${BUILD_NUMBER} \\
                             --stacktrace \\
                             --console plain \\
                             --parallel \\
@@ -400,6 +405,10 @@ pipeline {
             }
             when {
                 beforeAgent true
+                // TODO
+                expression {
+                    false
+                }
                 anyOf {
                     branch 'release/*'
                 }
@@ -438,6 +447,10 @@ pipeline {
             when {
                 beforeAgent true
                 allOf {
+                    // TODO
+                    expression {
+                        false
+                    }
                     not {
                         anyOf {
                             branch '*alpha'
