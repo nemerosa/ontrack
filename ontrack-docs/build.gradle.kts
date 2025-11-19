@@ -30,7 +30,6 @@ asciidoctorj {
 
 // HTML specific settings
 tasks.named<AsciidoctorTask>("asciidoctor") {
-    dependsOn("integrationTest")
     description = "Generates HTML documentation."
     attributes = mapOf(
         "ontrack-version" to version,
@@ -53,7 +52,6 @@ tasks.named<AsciidoctorTask>("asciidoctor") {
 // PDF specific settings
 
 tasks.named<AsciidoctorPdfTask>("asciidoctorPdf") {
-    dependsOn("integrationTest")
     dependsOn("asciidoctor")
     description = "Generates PDF documentation."
     attributes = mapOf(
