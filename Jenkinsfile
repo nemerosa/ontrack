@@ -205,7 +205,11 @@ pipeline {
             steps {
                 sh '''
                     git status
-                    ./gradlew versionDisplay versionFile
+                    ./gradlew versionDisplay versionFile \\
+                        -Dorg.gradle.jvmargs=-Xmx6144m \\
+                        --stacktrace \\
+                        --parallel \\
+                        --console plain
                 '''
                 script {
                     // Additional options
