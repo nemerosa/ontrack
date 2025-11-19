@@ -12,7 +12,7 @@ export class SearchPage {
 
     async expectProjectResultPresent(name) {
         const link = this.page.getByRole('link', {name, exact: true})
-        await expect(link).toBeVisible()
+        await expect(link).toBeVisible({timeout: 20_000}) // Waiting a bit longer, in case ES is not ready yet
     }
 
     async clickProjectResult(name) {
