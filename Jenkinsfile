@@ -219,29 +219,26 @@ pipeline {
                 }
                 echo "Version = ${VERSION}"
                 script {
-                    if (params.JUST_BUILD_AND_PUSH) {
+                    if (!params.JUST_BUILD_AND_PUSH) {
                         sh '''
                             ./gradlew \\
-                                dockerBuild \\
-                                jibDockerBuild \\
-                                -Dorg.gradle.jvmargs=-Xmx6144m \\
-                                --stacktrace \\
-                                --parallel \\
-                                --console plain
-                        '''
-                    } else {
-                        sh '''
-                            ./gradlew \\
-                                check \\
                                 build \\
-                                dockerBuild \\
-                                jibDockerBuild \\
                                 -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
                                 --console plain
                         '''
                     }
+                    echo "Building the Docker images..."
+                    sh '''
+                            ./gradlew \\
+                                dockerBuild \\
+                                jibDockerBuild \\
+                                -Dorg.gradle.jvmargs=-Xmx6144m \\
+                                --stacktrace \\
+                                --parallel \\
+                                --console plain
+                        '''
                 }
             }
             post {
