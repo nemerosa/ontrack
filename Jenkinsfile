@@ -388,42 +388,33 @@ pipeline {
             }
         }
 
-        // TODO Release
+        // Release
 
-//        stage('Release') {
-//            environment {
-//                GITHUB_TOKEN = credentials("github-token")
-//            }
-//            when {
-//                beforeAgent true
-//                anyOf {
-//                    branch 'release/*'
-//                }
-//            }
-//            steps {
-//                sh '''
-//                    ./gradlew \\
-//                        --info \\
-//                        --console plain \\
-//                        --stacktrace \\
-//                        -PontrackUser=${ONTRACK_USR} \\
-//                        -PontrackToken=${ONTRACK_PSW} \\
-//                        -PgitHubToken=${GITHUB_TOKEN} \\
-//                        -PgitHubCommit=${GIT_COMMIT} \\
-//                        -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
-//                        -PgitHubChangeLogCurrentBuild=${ONTRACK_BUILD_NAME} \\
-//                        release
-//                '''
-//
-//            }
-//            post {
-//                always {
-//                    ontrackCliValidate(
-//                            stamp: 'GITHUB.RELEASE',
-//                    )
-//                }
-//            }
-//        }
+        stage('Release') {
+            when {
+                beforeAgent true
+                anyOf {
+                    branch 'release/*'
+                }
+            }
+            steps {
+                createGitHubRelease(
+                    credentialId: 'github-token',
+                    repository: 'nemerosa/ontrack',
+                    tag: env.VERSION,
+                    commitish: env.GIT_COMMIT,
+                    bodyFile: '', // TODO Getting the changelog
+                    draft: true,  // TODO OK, when Beta communicated
+                )
+            }
+            post {
+                always {
+                    ontrackCliValidate(
+                            stamp: 'GITHUB.RELEASE',
+                    )
+                }
+            }
+        }
 
         // TODO Documentation
 
