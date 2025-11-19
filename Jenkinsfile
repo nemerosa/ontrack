@@ -405,6 +405,7 @@ pipeline {
                 createGitHubRelease(
                     credentialId: 'github-token',
                     repository: 'nemerosa/ontrack',
+                    name: env.VERSION,
                     tag: env.VERSION,
                     commitish: env.GIT_COMMIT,
                     bodyFile: '', // TODO Getting the changelog
