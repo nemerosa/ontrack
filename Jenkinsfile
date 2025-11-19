@@ -214,6 +214,7 @@ pipeline {
                     def props = readProperties(file: 'build/version.properties')
                     env.VERSION = props.VERSION_DISPLAY
                     env.GIT_COMMIT = props.VERSION_COMMIT
+                    currentBuild.description = env.VERSION
                     // Creates a build
                     ontrackCliBuild(name: VERSION)
                 }
