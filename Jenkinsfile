@@ -205,7 +205,7 @@ pipeline {
             steps {
                 sh '''
                     git status
-                    ./gradlew versionDisplay versionFile --no-daemon
+                    ./gradlew versionDisplay versionFile
                 '''
                 script {
                     // Additional options
@@ -227,7 +227,6 @@ pipeline {
                                 -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
-                                --no-daemon \\
                                 --console plain
                         '''
                     } else {
@@ -240,7 +239,6 @@ pipeline {
                                 -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
-                                --no-daemon \\
                                 --console plain
                         '''
                     }
