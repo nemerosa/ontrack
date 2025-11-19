@@ -216,7 +216,7 @@ pipeline {
                     env.GIT_COMMIT = props.VERSION_COMMIT
                     currentBuild.description = env.VERSION
                     // Creates a build
-                    ontrackCliBuild(name: VERSION)
+                    ontrackCliBuild(name: VERSION, release: VERSION)
                 }
                 echo "Version = ${VERSION}"
                 script {
