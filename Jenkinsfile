@@ -392,96 +392,96 @@ pipeline {
             }
         }
 
-        // Release
+        // TODO Release
 
-        stage('Release') {
-            environment {
-                GITHUB_TOKEN = credentials("github-token")
-            }
-            when {
-                beforeAgent true
-                anyOf {
-                    branch 'release/*'
-                }
-            }
-            steps {
-                sh '''
-                    ./gradlew \\
-                        --info \\
-                        --console plain \\
-                        --stacktrace \\
-                        -PontrackUser=${ONTRACK_USR} \\
-                        -PontrackToken=${ONTRACK_PSW} \\
-                        -PgitHubToken=${GITHUB_TOKEN} \\
-                        -PgitHubCommit=${GIT_COMMIT} \\
-                        -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
-                        -PgitHubChangeLogCurrentBuild=${ONTRACK_BUILD_NAME} \\
-                        release
-                '''
+//        stage('Release') {
+//            environment {
+//                GITHUB_TOKEN = credentials("github-token")
+//            }
+//            when {
+//                beforeAgent true
+//                anyOf {
+//                    branch 'release/*'
+//                }
+//            }
+//            steps {
+//                sh '''
+//                    ./gradlew \\
+//                        --info \\
+//                        --console plain \\
+//                        --stacktrace \\
+//                        -PontrackUser=${ONTRACK_USR} \\
+//                        -PontrackToken=${ONTRACK_PSW} \\
+//                        -PgitHubToken=${GITHUB_TOKEN} \\
+//                        -PgitHubCommit=${GIT_COMMIT} \\
+//                        -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
+//                        -PgitHubChangeLogCurrentBuild=${ONTRACK_BUILD_NAME} \\
+//                        release
+//                '''
+//
+//            }
+//            post {
+//                always {
+//                    ontrackCliValidate(
+//                            stamp: 'GITHUB.RELEASE',
+//                    )
+//                }
+//            }
+//        }
 
-            }
-            post {
-                always {
-                    ontrackCliValidate(
-                            stamp: 'GITHUB.RELEASE',
-                    )
-                }
-            }
-        }
+        // TODO Documentation
 
-        // Documentation
-
-        stage('Documentation') {
-            environment {
-                AMS3_DELIVERY = credentials("digitalocean-spaces")
-            }
-            when {
-                beforeAgent true
-                allOf {
-                    not {
-                        anyOf {
-                            branch '*alpha'
-                            branch '*beta'
-                        }
-                    }
-                    anyOf {
-                        branch 'release/*'
-                        branch 'develop'
-                    }
-                }
-            }
-            steps {
-                script {
-                    if (BRANCH_NAME == 'develop') {
-                        env.DOC_DIR = 'develop'
-                    } else {
-                        env.DOC_DIR = env.VERSION
-                    }
-                }
-
-                sh '''
-                    s3cmd \\
-                        --access_key=${AMS3_DELIVERY_USR} \\
-                        --secret_key=${AMS3_DELIVERY_PSW} \\
-                        --host=ams3.digitaloceanspaces.com \\
-                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
-                        put \\
-                        build/site/release/* \\
-                        s3://ams3-delivery-space/ontrack/release/${DOC_DIR}/docs/ \\
-                        --acl-public \\
-                        --add-header=Cache-Control:max-age=86400 \\
-                        --recursive
-                '''
-
-            }
-            post {
-                always {
-                    ontrackCliValidate(
-                            stamp: 'DOCUMENTATION',
-                    )
-                }
-            }
-        }
+//        stage('Documentation') {
+//            environment {
+//                AMS3_DELIVERY = credentials("digitalocean-spaces")
+//            }
+//            when {
+//                beforeAgent true
+//                allOf {
+//                    not {
+//                        anyOf {
+//                            branch '*alpha'
+//                            branch '*beta'
+//                        }
+//                    }
+//                    anyOf {
+//                        branch 'release/*'
+//                        branch 'develop'
+//                    }
+//                }
+//            }
+//            steps {
+//                script {
+//                    if (BRANCH_NAME == 'develop') {
+//                        env.DOC_DIR = 'develop'
+//                    } else {
+//                        env.DOC_DIR = env.VERSION
+//                    }
+//                }
+//
+//                sh '''
+//                    s3cmd \\
+//                        --access_key=${AMS3_DELIVERY_USR} \\
+//                        --secret_key=${AMS3_DELIVERY_PSW} \\
+//                        --host=ams3.digitaloceanspaces.com \\
+//                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
+//                        put \\
+//                        build/site/release/* \\
+//                        s3://ams3-delivery-space/ontrack/release/${DOC_DIR}/docs/ \\
+//                        --acl-public \\
+//                        --add-header=Cache-Control:max-age=86400 \\
+//                        --recursive
+//                '''
+//
+//            }
+//            post {
+//                always {
+//                    ontrackCliValidate(
+//                            stamp: 'DOCUMENTATION',
+//                    )
+//                }
+//            }
+//        }
 
         // Master setup
 
