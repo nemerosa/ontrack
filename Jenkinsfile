@@ -409,7 +409,7 @@ pipeline {
                     tag: env.VERSION,
                     commitish: env.GIT_COMMIT,
                     bodyFile: '', // TODO Getting the changelog
-                    draft: true,  // TODO OK, when Beta communicated
+                    prerelease: true, // TODO
                 )
             }
             post {
