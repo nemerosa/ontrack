@@ -7,7 +7,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("net.nemerosa.versioning") version "3.1.0"
     id("com.avast.gradle.docker-compose") version "0.17.12"
-    id("com.google.cloud.tools.jib") version "3.4.4" apply false
+    id("com.google.cloud.tools.jib") version "3.5.1" apply false
     id("com.github.node-gradle.node") version "7.1.0" apply false
 }
 
