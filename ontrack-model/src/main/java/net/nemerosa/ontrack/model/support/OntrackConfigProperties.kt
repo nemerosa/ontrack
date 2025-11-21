@@ -155,6 +155,10 @@ class OntrackConfigProperties {
          * Name of the group to assign (must exists or must be blank)
          */
         var groupName = "Administrators"
+        /**
+         * Forcing the update of the admin account when already existing
+         */
+        var force = false
     }
 
     /**

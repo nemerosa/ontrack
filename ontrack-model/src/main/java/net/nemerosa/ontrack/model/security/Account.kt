@@ -39,6 +39,13 @@ data class Account(
         role = role,
     )
 
+    fun withFullName(fullName: String): Account = Account(
+        id = id,
+        fullName = fullName,
+        email = email,
+        role = role,
+    )
+
     fun update(input: AccountInput) =
         Account(
             id = id,

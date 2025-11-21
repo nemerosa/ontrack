@@ -30,32 +30,56 @@ class AccountProvisioningStartup(
             logger.info("[account provisioning] Admin email     : ${admin.email}")
             logger.info("[account provisioning] Admin full name : ${admin.fullName}")
             logger.info("[account provisioning] Admin group name: ${admin.groupName}")
+            logger.info("[account provisioning] Forcing         : ${admin.force}")
             // Checks the existing account
             val existing = accountRepository.findAccountByName(admin.email)
             if (existing != null) {
-                logger.info("[account provisioning] Admin username already existing, not touching")
-            } else {
-                val accountDef = Account(
-                    id = ID.NONE,
-                    fullName = admin.fullName,
-                    email = admin.email,
-                    role = SecurityRole.ADMINISTRATOR,
-                )
-                val account = accountRepository.newAccount(accountDef)
-                logger.info("[account provisioning] Admin user created with ID = ${account.id}")
-                // Linking to the group
-                if (admin.groupName.isNotBlank()) {
-                    logger.info("[account provisioning] Linking admin user to group ${admin.groupName}")
-                    val group = accountGroupRepository.findAccountGroupByName(admin.groupName)
-                        ?: error("Could not find group with name = ${admin.groupName}")
-                    accountGroupRepository.linkAccountToGroups(
-                        account.id(),
-                        listOf(group.id())
-                    )
+                if (admin.force) {
+                    logger.info("[account provisioning] Admin username already existing, forcing its update if needed")
+                    if (existing.fullName != admin.fullName) {
+                        logger.info("[account provisioning] Changing full name from ${existing.fullName} to ${admin.fullName}")
+                        accountRepository.saveAccount(
+                            existing.withFullName(admin.fullName)
+                        )
+                    }
+                    linkAdminGroup(admin, existing)
+                } else {
+                    logger.info("[account provisioning] Admin username already existing, not touching")
                 }
+
+            } else {
+                createAdminUser(admin)
             }
         } else {
             logger.info("[account provisioning] Provisioning of admin user not enabled")
+        }
+    }
+
+    private fun createAdminUser(admin: OntrackConfigProperties.AdminConfigProperties) {
+        val accountDef = Account(
+            id = ID.NONE,
+            fullName = admin.fullName,
+            email = admin.email,
+            role = SecurityRole.ADMINISTRATOR,
+        )
+        val account = accountRepository.newAccount(accountDef)
+        logger.info("[account provisioning] Admin user created with ID = ${account.id}")
+        // Linking to the group
+        linkAdminGroup(admin, account)
+    }
+
+    private fun linkAdminGroup(
+        admin: OntrackConfigProperties.AdminConfigProperties,
+        account: Account
+    ) {
+        if (admin.groupName.isNotBlank()) {
+            logger.info("[account provisioning] Linking admin user to group ${admin.groupName}")
+            val group = accountGroupRepository.findAccountGroupByName(admin.groupName)
+                ?: error("Could not find group with name = ${admin.groupName}")
+            accountGroupRepository.linkAccountToGroups(
+                account.id(),
+                listOf(group.id())
+            )
         }
     }
 }
