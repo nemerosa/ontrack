@@ -177,4 +177,81 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Rendering a change log using the SCM API`() {
+        asAdmin {
+            mockSCMTester.withMockSCMRepository {
+                project {
+                    branch {
+                        configureMockSCMBranch()
+
+                        build("1.01") {}
+                        val from = build {
+                            // Mock termination commit
+                            repositoryIssue("ISS-20", "Last issue before the change log")
+                            withRepositoryCommit("ISS-20 Last commit before the change log")
+                        }
+                        build("1.02") {
+                            repositoryIssue("ISS-21", "Some new feature")
+                            withRepositoryCommit("ISS-21 Some commits for a feature", property = false)
+                            withRepositoryCommit("ISS-21 Some fixes for a feature")
+                        }
+                        build("1.03") {
+                            repositoryIssue("ISS-22", "Some fixes are needed")
+                            withRepositoryCommit("ISS-22 Fixing some bugs")
+                        }
+                        build("1.04") {
+                            repositoryIssue("ISS-23", "Some nicer UI")
+                            withRepositoryCommit("ISS-23 Fixing some CSS")
+
+                            run(
+                                """
+                                {
+                                    branch(id: ${from.branch.id}) {
+                                        builds {
+                                            name
+                                        }
+                                    }
+                                    scmChangeLog(
+                                        from: ${from.id},
+                                        to: ${this@build.id}
+                                    ) {
+                                        render(
+                                            renderer: "markdown",
+                                            config: {
+                                                title: true,
+                                                commitsOption: ALWAYS,
+                                            },
+                                        )
+                                    }
+                                }
+                            """.trimIndent()
+                            ) { data ->
+                                val changeLog = data.path("scmChangeLog")
+                                    .path("render").asText()
+                                assertEquals(
+                                    """
+                                        ## Change log for [${project.name}](http://localhost:3000/project/${project.id}) from [${from.name}](http://localhost:3000/build/${from.id}) to [${this@build.name}](http://localhost:3000/build/${this@build.id})
+
+                                        * [ISS-21](mock://${repositoryName}/issue/ISS-21) Some new feature
+                                        * [ISS-22](mock://${repositoryName}/issue/ISS-22) Some fixes are needed
+                                        * [ISS-23](mock://${repositoryName}/issue/ISS-23) Some nicer UI
+
+                                        Commits:
+
+                                        * [main-5-543d857](mock://${repositoryName}/main-5-543d857) ISS-23 Fixing some CSS
+                                        * [main-4-dacf415](mock://${repositoryName}/main-4-dacf415) ISS-22 Fixing some bugs
+                                        * [main-3-a847748](mock://${repositoryName}/main-3-a847748) ISS-21 Some fixes for a feature
+                                        * [main-2-dfbccd9](mock://${repositoryName}/main-2-dfbccd9) ISS-21 Some commits for a feature
+                                    """.trimIndent(),
+                                    changeLog
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

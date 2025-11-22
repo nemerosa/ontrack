@@ -132,6 +132,13 @@ fun stringInputField(
 ): GraphQLInputObjectField =
     inputField(property, GraphQLString, description, nullable)
 
+inline fun <reified E : Enum<*>> enumInputField(
+    property: KProperty<E?>,
+    description: String? = null,
+    nullable: Boolean? = null
+): GraphQLInputObjectField =
+    inputField(property, GraphQLTypeReference(E::class.java.simpleName), description, nullable)
+
 fun booleanInputField(
     property: KProperty<Boolean?>,
     description: String? = null,
@@ -153,8 +160,12 @@ fun intInputField(
 ): GraphQLInputObjectField =
     inputField(property, GraphQLInt, description, nullable)
 
-fun stringListInputField(property: KProperty<List<String>?>): GraphQLInputObjectField =
-    inputField(property, GraphQLList(GraphQLNonNull(GraphQLString)))
+fun stringListInputField(property: KProperty<List<String>?>, nullable: Boolean? = null): GraphQLInputObjectField =
+    inputField(
+        property,
+        type = GraphQLList(GraphQLNonNull(GraphQLString)),
+        nullable = nullable,
+    )
 
 fun jsonInputField(property: KProperty<JsonNode?>): GraphQLInputObjectField =
     inputField(property, type = GQLScalarJSON.INSTANCE)

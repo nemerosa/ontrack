@@ -3,18 +3,15 @@ package net.nemerosa.ontrack.extension.scm.graphql
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
-import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLog
-import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogExportInput
-import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogExportService
+import net.nemerosa.ontrack.extension.scm.changelog.*
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.GQLTypeLinkChange
-import net.nemerosa.ontrack.graphql.support.field
-import net.nemerosa.ontrack.graphql.support.getTypeDescription
-import net.nemerosa.ontrack.graphql.support.listType
-import net.nemerosa.ontrack.graphql.support.parseOptionalArgument
+import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
+import net.nemerosa.ontrack.model.events.EventRendererRegistry
+import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.structure.LinkChangeService
 import org.springframework.stereotype.Component
 
@@ -26,6 +23,9 @@ class GQLTypeSCMChangeLog(
     private val linkChangeService: LinkChangeService,
     private val scmDetector: SCMDetector,
     private val scmChangeLogExportService: SCMChangeLogExportService,
+    private val eventRendererRegistry: EventRendererRegistry,
+    private val gqlInputChangeLogTemplatingServiceConfig: GQLInputChangeLogTemplatingServiceConfig,
+    private val changeLogTemplatingService: ChangeLogTemplatingService,
 ) : GQLType {
 
     override fun getTypeName(): String = SCMChangeLog::class.java.simpleName
@@ -72,7 +72,7 @@ class GQLTypeSCMChangeLog(
 
             .field {
                 it.name("export")
-                    .description("Exporting the issues of a change log")
+                    .description("Exporting the issues of a change log. You may want to use the `render` field instead, which has more advanced options.")
                     .argument { arg ->
                         arg.name("request")
                             .description("How to generate the exported change log")
@@ -89,5 +89,42 @@ class GQLTypeSCMChangeLog(
                     }
             }
 
+            .field {
+                it.name("render")
+                    .description("Rendering the change log.")
+                    .argument(
+                        stringArgument(
+                            name = RENDER_ARG_RENDERER,
+                            description = "Renderer to use for the change log rendering",
+                        )
+                    )
+                    .argument { arg ->
+                        arg.name(RENDER_ARG_CONFIG)
+                            .description("Configuration for the rendering")
+                            .type(gqlInputChangeLogTemplatingServiceConfig.typeRef)
+                    }
+                    .type(GraphQLString)
+                    .dataFetcher { env ->
+                        val changeLog = env.getSource<SCMChangeLog>()!!
+                        val renderer = env.getArgument<String?>(RENDER_ARG_RENDERER)
+                            ?.let { eventRendererRegistry.findEventRendererById(it) }
+                            ?: PlainEventRenderer.INSTANCE
+                        val config = parseOptionalArgument<ChangeLogTemplatingServiceConfig>(RENDER_ARG_CONFIG, env)
+                            ?: ChangeLogTemplatingServiceConfig()
+                        changeLogTemplatingService.render(
+                            fromBuild = changeLog.from,
+                            toBuild = changeLog.to,
+                            renderer = renderer,
+                            config = config,
+                        )
+                    }
+            }
+
             .build()
+
+    companion object {
+        const val RENDER_ARG_RENDERER = "renderer"
+        const val RENDER_ARG_CONFIG = "config"
+    }
+
 }

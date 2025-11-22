@@ -5560,7 +5560,7 @@ type Query {
     "Query string"
     token: String!,
     "Result type"
-    type: String
+    type: String!
   ): SearchResultPaginated
   "List of types of search results"
   searchResultTypes: [SearchResultType!]!
@@ -5908,7 +5908,7 @@ type SCMChangeLog {
   commits: [SCMDecoratedCommit!]!
   "URL to get the file diff between the two builds"
   diffLink: String
-  "Exporting the issues of a change log"
+  "Exporting the issues of a change log. You may want to use the `render` field instead, which has more advanced options."
   export(
     "How to generate the exported change log"
     request: SCMChangeLogExportInput
@@ -5919,6 +5919,13 @@ type SCMChangeLog {
   issues: SCMChangeLogIssues
   "All dependency changes"
   linkChanges: [LinkChange!]!
+  "Rendering the change log."
+  render(
+    "Configuration for the rendering"
+    config: ChangeLogTemplatingServiceConfig,
+    "Renderer to use for the change log rendering"
+    renderer: String
+  ): String
   "Boundary for the change log"
   to: Build!
 }
@@ -7969,6 +7976,13 @@ enum CHML {
   MEDIUM
 }
 
+"Option for the commit display in the templating"
+enum ChangeLogTemplatingCommitsOption {
+  ALWAYS
+  NONE
+  OPTIONAL
+}
+
 "List of supported attribute types for configurable indicators"
 enum ConfigurableIndicatorAttributeType {
   INT
@@ -8341,6 +8355,22 @@ input CancelSlotPipelineInput {
   pipelineId: String!
   "reason field"
   reason: String!
+}
+
+"ChangeLogTemplatingServiceConfig"
+input ChangeLogTemplatingServiceConfig {
+  "Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence."
+  allQualifiers: Boolean
+  "Defines how to render commits for a change log"
+  commitsOption: ChangeLogTemplatingCommitsOption
+  "If a qualifier has no previous link, uses the default qualifier (empty) qualifier."
+  defaultQualifierFallback: Boolean
+  "Comma-separated list of project links to follow one by one for a get deep change log. Each item in the list is either a project name, or a project name and qualifier separated by a colon (:)."
+  dependencies: [String!]
+  "String to use to render an empty or non existent change log"
+  empty: String
+  "Include a title for the change log"
+  title: Boolean
 }
 
 "Input type for the changeValidationRunStatusComment mutation."
