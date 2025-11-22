@@ -403,15 +403,15 @@ pipeline {
             }
             steps {
                 script {
-//                    // TODO Getting the changelog since the last RELEASE promotion
-//                    String changelog = ontrackCliChangelogSincePromotion(
-//                            promotion: 'RELEASE',
-//                            renderer: 'markdown',
-//                            config: [
-//                                    title: true,
-//                                    commitsOption: "ALWAYS",
-//                            ],
-//                    )
+                    // Getting the changelog since the last RELEASE promotion
+                    String changelog = ontrackCliChangelogSincePromotion(
+                            promotion: 'RELEASE',
+                            renderer: 'markdown',
+                            config: [
+                                    title: true,
+                                    commitsOption: "ALWAYS",
+                            ],
+                    )
                     // Creating the release in GitHub
                     createGitHubRelease(
                             credentialId: 'github-token',
@@ -419,8 +419,7 @@ pipeline {
                             name: env.VERSION,
                             tag: env.VERSION,
                             commitish: env.GIT_COMMIT,
-                            bodyFile: '',
-                            // TODO bodyFile: changelog,
+                            bodyFile: changelog,
                             prerelease: true, // TODO
                     )
                 }
