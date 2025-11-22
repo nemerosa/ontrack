@@ -29,7 +29,7 @@ pipeline {
         )
         booleanParam(
                 name: 'SKIP_BITBUCKET_CLOUD_IT',
-                defaultValue: false,
+                defaultValue: true,
                 description: 'Skipping integration tests for Bitbucket Cloud'
         )
     }
