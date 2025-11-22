@@ -117,19 +117,28 @@ class SCMBuildCommitIndexServiceImpl(
 
     override fun indexBuildCommit(build: Build, commit: String?) {
 
-        /**
-         * Not indexing when configurations are disabled.
-         */
+        // Not indexing when configurations are disabled.
         if (!ontrackConfigProperties.configurationTest) {
             return
         }
 
+        // Not indexing anything if no commit
+        if (commit.isNullOrBlank()) return
+
+        // Only some SCMs are indexable
         val scm = scmDetector.getSCM(build.project)
         if (scm !is SCMChangeLogEnabled) return
-        val existingCommit = scm.getBuildCommit(build) ?: return
-        if (commit != null && existingCommit != commit) return
-        val scmCommit = scm.getCommit(existingCommit) ?: return
 
+        // Getting the existing commit for this build
+        val existingCommit = getIndexedCommit(build.id())?.commitId
+
+        // Not re-indexing if same commit
+        if (existingCommit != null && existingCommit == commit) return
+
+        // Getting information about the commit
+        val scmCommit = scm.getCommit(commit) ?: return
+
+        // Saving the commit
         indexCommit(build.id(), scmCommit)
     }
 

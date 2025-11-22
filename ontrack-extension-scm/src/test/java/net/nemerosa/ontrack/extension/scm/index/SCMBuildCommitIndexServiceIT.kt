@@ -28,8 +28,8 @@ class SCMBuildCommitIndexServiceIT : AbstractDSLTestSupport() {
                         val commit = withRepositoryCommit("Commit 1")
                         scmBuildCommitIndexService.indexBuildCommit(this, commit)
                         val info = scmBuildCommitIndexService.getBuildCommit(this)
-                        assertNotNull(info) {
-                            assertEquals(id(), it.buildId)
+                        assertNotNull(info, "Commit has been indexed") {
+                            assertEquals(this.id(), it.buildId)
                         }
                     }
                 }
