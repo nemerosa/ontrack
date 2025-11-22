@@ -206,7 +206,16 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_MILESTONE = 'v1'
             }
             steps {
-                sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''
+                sh '''
+                    git status
+                    ./gradlew versionDisplay versionFile \\
+                        -Dorg.gradle.jvmargs=-Xmx6144m \\
+                        -Pdocumentation \\
+                        -PbowerOptions='--allow-root' \\
+                        --stacktrace \\
+                        --parallel \\
+                        --console plain
+                '''
                 script {
                     // Additional options
                     env.ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_IGNORE = params.SKIP_BITBUCKET_CLOUD_IT
@@ -219,31 +228,27 @@ pipeline {
                 }
                 echo "Version = ${VERSION}"
                 script {
-                    if (params.JUST_BUILD_AND_PUSH) {
+                    if (!params.JUST_BUILD_AND_PUSH) {
                         sh '''
                             ./gradlew \\
-                                dockerBuild \\
-                                -PbowerOptions='--allow-root' \\
-                                -Dorg.gradle.jvmargs=-Xmx6144m \\
-                                --stacktrace \\
-                                --parallel \\
-                                --no-daemon \\
-                                --console plain
-                        '''
-                    } else {
-                        sh '''
-                            ./gradlew \\
-                                test \\
                                 build \\
-                                integrationTest \\
-                                dockerBuild \\
-                                javadocPackage \\
+                                -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 -Pdocumentation \\
                                 -PbowerOptions='--allow-root' \\
-                                -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
-                                --no-daemon \\
+                                --console plain
+                        '''
+                    }
+                    echo "Building the Docker images..."
+                    sh '''
+                            ./gradlew \\
+                                dockerBuild \\
+                                -Dorg.gradle.jvmargs=-Xmx6144m \\
+                                -Pdocumentation \\
+                                -PbowerOptions='--allow-root' \\
+                                --stacktrace \\
+                                --parallel \\
                                 --console plain
                         '''
                     }
@@ -282,7 +287,9 @@ pipeline {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''
                         ./gradlew \\
-                            -Dorg.gradle.jvmargs=-Xmx2048m \\
+                            -Dorg.gradle.jvmargs=-Xmx6144m \\
+                            -Pdocumentation \\
+                            -PbowerOptions='--allow-root' \\
                             --stacktrace \\
                             --console plain \\
                             --parallel \\
@@ -319,7 +326,9 @@ pipeline {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''
                         ./gradlew \\
-                            -Dorg.gradle.jvmargs=-Xmx3072m \\
+                            -Dorg.gradle.jvmargs=-Xmx6144m \\
+                            -Pdocumentation \\
+                            -PbowerOptions='--allow-root' \\
                             --stacktrace \\
                             --console plain \\
                             --parallel \\
@@ -357,7 +366,9 @@ pipeline {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''
                         ./gradlew \\
-                            -Dorg.gradle.jvmargs=-Xmx3072m \\
+                            -Dorg.gradle.jvmargs=-Xmx6144m \\
+                            -Pdocumentation \\
+                            -PbowerOptions='--allow-root' \\
                             --stacktrace \\
                             --console plain \\
                             --parallel \\
@@ -427,6 +438,9 @@ pipeline {
             steps {
                 sh '''
                     ./gradlew \\
+                        -Dorg.gradle.jvmargs=-Xmx6144m \\
+                        -Pdocumentation \\
+                        -PbowerOptions='--allow-root' \\
                         --info \\
                         --console plain \\
                         --stacktrace \\
