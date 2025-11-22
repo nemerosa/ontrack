@@ -1,4 +1,4 @@
-@Library("ontrack-jenkins-cli-pipeline@4.9") _
+@Library("ontrack-jenkins-cli-pipeline@v5") _
 
 pipeline {
 
@@ -402,15 +402,27 @@ pipeline {
                 }
             }
             steps {
-                createGitHubRelease(
-                    credentialId: 'github-token',
-                    repository: 'nemerosa/ontrack',
-                    name: env.VERSION,
-                    tag: env.VERSION,
-                    commitish: env.GIT_COMMIT,
-                    bodyFile: '', // TODO Getting the changelog
-                    prerelease: true, // TODO
-                )
+                script {
+                    // Getting the changelog since the last RELEASE promotion
+                    String changelog = ontrackCliChangelogSincePromotion(
+                            promotion: 'RELEASE',
+                            renderer: 'markdown',
+                            config: [
+                                    title: true,
+                                    commitsOption: "ALWAYS",
+                            ],
+                    )
+                    // Creating the release in GitHub
+                    createGitHubRelease(
+                            credentialId: 'github-token',
+                            repository: 'nemerosa/ontrack',
+                            name: env.VERSION,
+                            tag: env.VERSION,
+                            commitish: env.GIT_COMMIT,
+                            bodyFile: changelog,
+                            prerelease: true, // TODO
+                    )
+                }
             }
             post {
                 always {
