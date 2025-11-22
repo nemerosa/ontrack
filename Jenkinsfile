@@ -121,21 +121,41 @@ pipeline {
                             Build ${build} has been promoted to ${promotionLevel}. 
                         '''
                 )
+                // Official release
+                if (env.BRANCH_NAME ==~ /^release\/\d+\.\d+$/) {
+                    ontrackCliSetupPromotionLevelNotifications(
+                            name: 'On RELEASE',
+                            promotion: 'RELEASE',
+                            channel: 'slack',
+                            channelConfig: [
+                                    channel: '#releases',
+                                    type   : 'SUCCESS'
+                            ],
+                            events: [
+                                    'new_promotion_run',
+                            ],
+                            contentTemplate: '''\
+                                Yontrack ${build} has been released.
+                                
+                                ${promotionRun.changelog?title=true}
+                                ''',
+                    )
+                }
                 ontrackCliSetupPromotionLevelNotifications(
                         name: 'On RELEASE',
                         promotion: 'RELEASE',
                         channel: 'slack',
                         channelConfig: [
-                                channel: env.BRANCH_NAME ==~ /^release\/\d+\.\d+$/ ? '#releases' : '#internal-releases',
+                                channel: '#internal-releases',
                                 type: 'SUCCESS'
                         ],
                         events: [
                                 'new_promotion_run',
                         ],
                         contentTemplate: '''\
-                            Ontrack ${build} has been released.
+                            Yontrack ${build} has been released.
                             
-                            ${promotionRun.changelog?title=true}
+                            ${promotionRun.changelog?title=true&commitsOption=ALWAYS}
                             ''',
                 )
                 ontrackCliSetupPromotionLevelNotifications(
