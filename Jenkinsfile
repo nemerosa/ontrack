@@ -122,24 +122,26 @@ pipeline {
                         '''
                 )
                 // Official release
-                if (env.BRANCH_NAME ==~ /^release\/\d+\.\d+$/) {
-                    ontrackCliSetupPromotionLevelNotifications(
-                            name: 'On RELEASE',
-                            promotion: 'RELEASE',
-                            channel: 'slack',
-                            channelConfig: [
-                                    channel: '#releases',
-                                    type   : 'SUCCESS'
-                            ],
-                            events: [
-                                    'new_promotion_run',
-                            ],
-                            contentTemplate: '''\
-                                Yontrack ${build} has been released.
-                                
-                                ${promotionRun.changelog?title=true}
-                                ''',
-                    )
+                script {
+                    if (env.BRANCH_NAME ==~ /^release\/\d+\.\d+$/) {
+                        ontrackCliSetupPromotionLevelNotifications(
+                                name: 'On RELEASE',
+                                promotion: 'RELEASE',
+                                channel: 'slack',
+                                channelConfig: [
+                                        channel: '#releases',
+                                        type   : 'SUCCESS'
+                                ],
+                                events: [
+                                        'new_promotion_run',
+                                ],
+                                contentTemplate: '''\
+                                    Yontrack ${build} has been released.
+                                    
+                                    ${promotionRun.changelog?title=true}
+                                    ''',
+                        )
+                    }
                 }
                 ontrackCliSetupPromotionLevelNotifications(
                         name: 'On RELEASE',
