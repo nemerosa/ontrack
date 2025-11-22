@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.boot.migration.v5
 
+import net.nemerosa.ontrack.model.security.AccountManagement
 import net.nemerosa.ontrack.model.security.AccountService
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -11,13 +13,17 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/rest/migration/v5")
 class MigrationV5Controller(
+    private val securityService: SecurityService,
     private val accountService: AccountService,
 ) {
 
     @GetMapping("status")
-    fun status() = MigrationV5Status(
-        users = usersStatus(),
-    )
+    fun status(): MigrationV5Status {
+        securityService.checkGlobalFunction(AccountManagement::class.java)
+        return MigrationV5Status(
+            users = usersStatus(),
+        )
+    }
 
     private fun usersStatus(): MigrationV5UsersStatus {
         // List of all users
