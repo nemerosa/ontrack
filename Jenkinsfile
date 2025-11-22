@@ -242,16 +242,15 @@ pipeline {
                     }
                     echo "Building the Docker images..."
                     sh '''
-                            ./gradlew \\
-                                dockerBuild \\
-                                -Dorg.gradle.jvmargs=-Xmx6144m \\
-                                -Pdocumentation \\
-                                -PbowerOptions='--allow-root' \\
-                                --stacktrace \\
-                                --parallel \\
-                                --console plain
-                        '''
-                    }
+                        ./gradlew \\
+                            dockerBuild \\
+                            -Dorg.gradle.jvmargs=-Xmx6144m \\
+                            -Pdocumentation \\
+                            -PbowerOptions='--allow-root' \\
+                            --stacktrace \\
+                            --parallel \\
+                            --console plain
+                    '''
                 }
             }
             post {
