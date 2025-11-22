@@ -61,6 +61,29 @@ class SCMBuildCommitIndexServiceIT : AbstractDSLTestSupport() {
 
     @Test
     @AsAdminTest
+    fun `Indexing a build commit when it's already indexed with a different commit`() {
+        mockSCMTester.withMockSCMRepository {
+            project {
+                branch {
+                    configureMockSCMBranch()
+                    build {
+                        val commit1 = withRepositoryCommit("Commit 1")
+                        val commit2 = withRepositoryCommit("Commit 2")
+                        scmBuildCommitIndexService.indexBuildCommit(this, commit1)
+                        scmBuildCommitIndexService.indexBuildCommit(this, commit2)
+                        val info = scmBuildCommitIndexService.getBuildCommit(this)
+                        assertNotNull(info) {
+                            assertEquals(id(), it.buildId)
+                            assertEquals(commit2, it.commitId)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    @AsAdminTest
     fun `Getting the earliest build after a commit`() {
         mockSCMTester.withMockSCMRepository {
             project {
