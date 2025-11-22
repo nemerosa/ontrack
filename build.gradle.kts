@@ -35,7 +35,7 @@ plugins {
     java
     id("net.nemerosa.versioning") version "3.0.0" apply false
     id("org.sonarqube") version "2.5"
-    id("com.avast.gradle.docker-compose") version "0.16.12"
+    id("com.avast.gradle.docker-compose") version "0.17.12"
     id("com.bmuschko.docker-remote-api") version "9.3.1"
     id("org.springframework.boot") version Versions.springBootVersion apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
