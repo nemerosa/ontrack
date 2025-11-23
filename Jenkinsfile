@@ -431,7 +431,7 @@ pipeline {
                             renderer: 'markdown',
                             config: [
                                     title: true,
-                                    commitsOption: "ALWAYS",
+                                    commitsOption: "OPTIONAL",
                             ],
                     )
                     // Creating the release in GitHub
