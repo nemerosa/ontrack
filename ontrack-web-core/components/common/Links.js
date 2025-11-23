@@ -26,7 +26,6 @@ export function branchAutoVersioningUri(branch) {
 }
 
 export function buildUri(build) {
-    console.log(`[buildUri] build = ${build}`)
     return `/build/${build.id}`
 }
 
