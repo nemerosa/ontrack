@@ -357,7 +357,7 @@ pipeline {
                         --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
                         put \\
                         build/docs/* \\
-                        s3://ams3-delivery-space/ontrack/release/${VERSION}/docs/ \\
+                        s3://ams3-delivery-space/yontrack/release/${VERSION}/docs/ \\
                         --acl-public \\
                         --add-header=Cache-Control:max-age=86400 \\
                         --recursive
