@@ -26,7 +26,7 @@ export default function PromotionRunDeleteAction({promotionRun, onDeletion}) {
                     }
                 }
             `,
-            {promotionRunId: promotionRun.id}
+            {promotionRunId: Number(promotionRun.id)}
         ).then(() => {
             if (onDeletion) onDeletion()
         }).finally(() => {

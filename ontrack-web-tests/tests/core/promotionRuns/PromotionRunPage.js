@@ -1,4 +1,5 @@
 import {expect} from "@playwright/test";
+import {confirmBox} from "../../support/confirm";
 
 export class PromotionRunPage {
 
@@ -17,6 +18,13 @@ export class PromotionRunPage {
             this.page.locator("#promotion-run-notifications")
                 .getByText(text, {exact: true})
         ).toBeVisible()
+    }
+
+    async deletePromotionRun() {
+        const button = this.page.getByRole('button', {name: 'Delete'})
+        await expect(button).toBeVisible()
+        await button.click()
+        await confirmBox(this.page, "Removing this promotion run", {okText: "Confirm deletion"})
     }
 
 }

@@ -15,6 +15,10 @@ export class BuildPage {
         await this.page.goto(`${this.build.ontrack.connection.ui}/build/${this.build.id}`)
         await this.assertName(this.build.name)
         // Widgets must be visible
+        await this.checkOnBuildPage()
+    }
+
+    async checkOnBuildPage() {
         await expect(this.page.getByText("Promotions")).toBeVisible()
         await expect(this.page.getByText("Validations")).toBeVisible()
         await expect(this.page.getByText("Downstream links")).toBeVisible()
