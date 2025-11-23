@@ -441,7 +441,7 @@ pipeline {
                             name: env.VERSION,
                             tag: env.VERSION,
                             commitish: env.GIT_COMMIT,
-                            bodyFile: changelog,
+                            bodyText: changelog,
                             prerelease: true, // TODO
                     )
                 }
