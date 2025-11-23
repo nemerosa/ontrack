@@ -323,59 +323,55 @@ pipeline {
             }
         }
 
-        // TODO Documentation
+        // Documentation
 
-//        stage('Documentation') {
-//            environment {
-//                AMS3_DELIVERY = credentials("digitalocean-spaces")
-//            }
-//            when {
-//                beforeAgent true
-//                allOf {
-//                    not {
-//                        anyOf {
-//                            branch '*alpha'
-//                            branch '*beta'
-//                        }
-//                    }
-//                    anyOf {
-//                        branch 'release/*'
-//                        branch 'develop'
-//                    }
-//                }
-//            }
-//            steps {
-//                script {
-//                    if (BRANCH_NAME == 'develop') {
-//                        env.DOC_DIR = 'develop'
-//                    } else {
-//                        env.DOC_DIR = env.VERSION
-//                    }
-//                }
-//
-//                sh '''
-//                    s3cmd \\
-//                        --access_key=${AMS3_DELIVERY_USR} \\
-//                        --secret_key=${AMS3_DELIVERY_PSW} \\
-//                        --host=ams3.digitaloceanspaces.com \\
-//                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
-//                        put \\
-//                        build/site/release/* \\
-//                        s3://ams3-delivery-space/ontrack/release/${DOC_DIR}/docs/ \\
-//                        --acl-public \\
-//                        --add-header=Cache-Control:max-age=86400 \\
-//                        --recursive
-//                '''
-//
-//            }
-//            post {
-//                always {
-//                    ontrackCliValidate(
-//                            stamp: 'DOCUMENTATION',
-//                    )
-//                }
-//            }
-//        }
+        stage('Documentation') {
+            environment {
+                AMS3_DELIVERY = credentials("digitalocean-spaces")
+            }
+            when {
+                beforeAgent true
+                allOf {
+                    not {
+                        branch '*alpha'
+                    }
+                    anyOf {
+                        branch 'release/*'
+                    }
+                }
+            }
+            steps {
+                sh '''
+                    rm -rf build/docs
+                    mkdir -p build/docs/pdf
+                    
+                    cp -r ontrack-docs/build/docs/asciidoc build/docs/web
+                    rm -rf build/docs/web/.asciidoctor
+                    
+                    cp -r ontrack-docs/build/docs/asciidocPdf/index.pdf build/docs/pdf/index.pdf
+
+                    s3cmd \\
+                        --access_key=${AMS3_DELIVERY_USR} \\
+                        --secret_key=${AMS3_DELIVERY_PSW} \\
+                        --host=ams3.digitaloceanspaces.com \\
+                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
+                        put \\
+                        build/docs/* \\
+                        s3://ams3-delivery-space/ontrack/release/${VERSION}/docs/ \\
+                        --acl-public \\
+                        --add-header=Cache-Control:max-age=86400 \\
+                        --recursive
+                '''
+
+            }
+            post {
+                always {
+                    ontrackCliValidate(
+                            stamp: 'DOCUMENTATION',
+                    )
+                }
+            }
+        }
 
         // Master setup
 
