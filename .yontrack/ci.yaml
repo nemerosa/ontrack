@@ -45,7 +45,7 @@ configuration:
               type: 'SUCCESS'
             contentTemplate: |
               Build ${build} has been promoted to ${promotionLevel}.
-          - name: On RELEASE
+          - name: On internal release
             promotion: RELEASE
             events:
               - new_promotion_run
@@ -54,9 +54,9 @@ configuration:
               channel: '#internal-releases'
               type: 'SUCCESS'
             contentTemplate: |
-              Ontrack ${build} has been released.
+              Yontrack ${build} has been released.
 
-              ${promotionRun.changelog?title=true}
+              ${promotionRun.changelog?title=true&commitsOption=ALWAYS}
   custom:
     configs:
       - conditions:
@@ -64,20 +64,15 @@ configuration:
         branch:
           notificationsConfig:
             notifications:
-              - name: On RELEASE
-                channelConfig:
-                  channel: '#internal-releases'
-              - name: On RELEASE deploy the Demo Beta
-                promotion: RELEASE
-                events:
-                  - new_promotion_run
-                channel: workflow
-                channelConfig:
-                  workflow:
-                    name: Deploy Demo Beta
-                    nodes:
-                      - id: start
-                        description: Start deployment
-                        executorId: slot-pipeline-creation
-                        data:
-                          environment: demo-beta
+            - name: On RELEASE
+              promotion: RELEASE
+              events:
+                - new_promotion_run
+              channel: slack
+              channelConfig:
+                channel: '#releases'
+                type: 'SUCCESS'
+              contentTemplate: |
+                Yontrack ${build} has been released.
+                
+                ${promotionRun.changelog?title=true&commitsOption=OPTIONAL}

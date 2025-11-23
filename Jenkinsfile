@@ -54,138 +54,6 @@ pipeline {
 
     stages {
 
-        stage('Setup') {
-            when {
-                not {
-                    branch 'master'
-                }
-            }
-            steps {
-                scmSkip(deleteBuild: false)
-                ontrackCliSetup(
-                    autoValidationStamps: true,
-                    validations: [
-                        [
-                            name: 'KDSL.ACCEPTANCE',
-                            tests: [
-                                warningIfSkipped: false,
-                            ],
-                        ],
-                    ],
-                    promotions: [
-                        BRONZE: [
-                            validations: [
-                                'BUILD',
-                                'UI_UNIT',
-                                'KDSL.ACCEPTANCE',
-                                'PLAYWRIGHT',
-                            ],
-                        ],
-                        RELEASE: [
-                            promotions: [
-                                'BRONZE',
-                            ],
-                            validations: [
-                                'GITHUB.RELEASE',
-                            ]
-                        ],
-                    ]
-                )
-                ontrackCliSetupBranchNotifications(
-                        name: 'On validation error',
-                        channel: 'slack',
-                        channelConfig: [
-                                channel: '#notifications',
-                                type: 'ERROR'
-                        ],
-                        events: [
-                                'new_validation_run',
-                        ],
-                        keywords: 'failed',
-                        contentTemplate: '''\
-                            Build ${build} has failed on ${validationStamp}. 
-                        '''
-                )
-                ontrackCliSetupPromotionLevelNotifications(
-                        name: 'On BRONZE',
-                        promotion: 'BRONZE',
-                        channel: 'slack',
-                        channelConfig: [
-                                channel: '#notifications',
-                                type: 'SUCCESS'
-                        ],
-                        events: [
-                                'new_promotion_run',
-                        ],
-                        contentTemplate: '''\
-                            Build ${build} has been promoted to ${promotionLevel}. 
-                        '''
-                )
-                // Official release
-                script {
-                    if (env.BRANCH_NAME ==~ /^release\/\d+\.\d+$/) {
-                        ontrackCliSetupPromotionLevelNotifications(
-                                name: 'On RELEASE',
-                                promotion: 'RELEASE',
-                                channel: 'slack',
-                                channelConfig: [
-                                        channel: '#releases',
-                                        type   : 'SUCCESS'
-                                ],
-                                events: [
-                                        'new_promotion_run',
-                                ],
-                                contentTemplate: '''\
-                                    Yontrack ${build} has been released.
-                                    
-                                    ${promotionRun.changelog?title=true}
-                                    ''',
-                        )
-                    }
-                }
-                ontrackCliSetupPromotionLevelNotifications(
-                        name: 'On RELEASE',
-                        promotion: 'RELEASE',
-                        channel: 'slack',
-                        channelConfig: [
-                                channel: '#internal-releases',
-                                type: 'SUCCESS'
-                        ],
-                        events: [
-                                'new_promotion_run',
-                        ],
-                        contentTemplate: '''\
-                            Yontrack ${build} has been released.
-                            
-                            ${promotionRun.changelog?title=true&commitsOption=ALWAYS}
-                            ''',
-                )
-                ontrackCliSetupPromotionLevelNotifications(
-                        name: 'On RELEASE deploy the Demo Beta',
-                        promotion: 'RELEASE',
-                        channel: 'workflow',
-                        channelConfig: [
-                                workflow: [
-                                        name: "Deploy Demo Beta",
-                                        nodes: [
-                                                [
-                                                        id: "start",
-                                                        description: "Start deployment",
-                                                        executorId: "slot-pipeline-creation",
-                                                        data: [
-                                                                environment: "demo-beta",
-                                                        ]
-                                                ]
-                                        ]
-                                ]
-                        ],
-                        events: [
-                                'new_promotion_run',
-                        ],
-                )
-            }
-        }
-
         stage('Build') {
             when {
                 not {
@@ -241,8 +109,8 @@ pipeline {
                     env.VERSION = props.VERSION_DISPLAY
                     env.GIT_COMMIT = props.VERSION_COMMIT
                     currentBuild.description = env.VERSION
-                    // Creates a build
-                    ontrackCliBuild(name: VERSION, release: VERSION)
+                    // Setup
+                    ontrackCliCIConfig(logging: true)
                 }
                 echo "Version = ${VERSION}"
                 script {
