@@ -327,7 +327,7 @@ pipeline {
 
         stage('Documentation') {
             environment {
-                AMS3_DELIVERY = credentials("digitalocean-spaces")
+                AMS3_DELIVERY = credentials("do-yontrack-docs-space")
             }
             when {
                 beforeAgent true
@@ -353,11 +353,11 @@ pipeline {
                     s3cmd \\
                         --access_key=${AMS3_DELIVERY_USR} \\
                         --secret_key=${AMS3_DELIVERY_PSW} \\
-                        --host=ams3.digitaloceanspaces.com \\
-                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
+                        --host=fra1.digitaloceanspaces.com \\
+                        --host-bucket='%(bucket)s.fra1.digitaloceanspaces.com' \\
                         put \\
                         build/docs/* \\
-                        s3://ams3-delivery-space/yontrack/release/${VERSION}/docs/ \\
+                        s3://yontrack-docs/release/${VERSION}/docs/ \\
                         --acl-public \\
                         --add-header=Cache-Control:max-age=86400 \\
                         --recursive
