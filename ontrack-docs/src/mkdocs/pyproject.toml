@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "mkdocs>=1.6.1",
+    "mkdocs-macros-plugin>=1.5.0",
     "mkdocs-material>=9.7.0",
     "pymdown-extensions>=10.17.2",
 ]

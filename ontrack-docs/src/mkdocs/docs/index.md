@@ -1,1 +1,1 @@
-# Welcome to Yontrack
+# Welcome to Yontrack {{ version }}

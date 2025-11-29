@@ -16,4 +16,7 @@ markdown_extensions:
       base_path: docs/snippets
 extra_css:
   - stylesheets/extra.css
-
+plugins:
+  - macros
+extra:
+  version: !ENV [VERSION, 'local']  # Second value is the default
