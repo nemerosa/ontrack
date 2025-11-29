@@ -1,0 +1,19 @@
+site_name: Yontrack documentation
+theme:
+  # https://squidfunk.github.io/mkdocs-material/
+  name: material
+  custom_dir: docs/overrides
+  # Customization
+  logo: img/yontrack-logo.svg
+  favicon: img/favicon.ico
+  palette:
+    scheme: yontrack
+  font:
+    text: Hanken Grotesk
+use_directory_urls: false
+markdown_extensions:
+  - pymdownx.snippets:
+      base_path: docs/snippets
+extra_css:
+  - stylesheets/extra.css
+
