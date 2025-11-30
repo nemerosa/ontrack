@@ -36,6 +36,8 @@ nav:
       - Configuration: content/start/configuration.md
   - Security:
       - Tokens: content/security/tokens.md
+  - Reference:
+      - Configuration properties: content/generated/configurations/index.md
   - Appendix:
       - CI Configuration: content/appendix/ci-config.md
       - Configuration as Code: content/appendix/casc.md

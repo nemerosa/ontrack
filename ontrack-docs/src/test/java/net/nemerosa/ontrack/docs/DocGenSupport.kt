@@ -24,7 +24,7 @@ class DocGenSupport {
     }
 
     companion object {
-        const val DOCS_ROOT = "src/docs/asciidoc"
+        const val DOCS_ROOT = "docs/content/generated"
     }
 
 }

@@ -31,7 +31,7 @@ class DocGenDirectoryContext(
         fileName: String,
         code: (s: StringBuilder) -> Unit,
     ) {
-        val file = File(dir, "${fileName}.adoc")
+        val file = File(dir, "${fileName}.md")
 
         val s = StringBuilder()
         code(s)
@@ -39,6 +39,7 @@ class DocGenDirectoryContext(
         file.writeText(s.toString())
     }
 
+    @Deprecated("Use Markdown")
     fun writeFile(
         fileId: String,
         fileName: String = fileId,
@@ -58,6 +59,21 @@ class DocGenDirectoryContext(
         }
     }
 
+    fun writeFile(
+        fileId: String,
+        fileName: String = fileId,
+        title: String,
+        code: (s: StringBuilder) -> Unit,
+    ) {
+        writeFile(
+            fileName = fileName,
+        ) { s ->
+            s.title(title)
+            code(s)
+        }
+    }
+
+    @Deprecated("Use inline generation of links for Markdown")
     fun writeIndex(
         fileId: String,
         level: Int,

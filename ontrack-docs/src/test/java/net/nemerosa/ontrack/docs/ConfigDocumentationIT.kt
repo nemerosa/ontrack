@@ -38,8 +38,11 @@ class ConfigDocumentationIT : AbstractDocGenIT() {
             writeFile(
                 fileName = "index",
             ) { s ->
+                s.title("List of configuration properties for Yontrack.")
                 for (configuration in configurations) {
-                    s.append("include::${configuration::class.jvmName}.adoc[]\n\n")
+                    val id = configuration::class.jvmName
+                    val name = getAPITypeName(configuration::class)
+                    s.tocItem(name, fileName = "${id}.md")
                 }
             }
 
@@ -61,21 +64,17 @@ class ConfigDocumentationIT : AbstractDocGenIT() {
 
         directoryContext.writeFile(
             fileId = id,
-            level = 4,
             title = name,
         ) { s ->
             // Description
             val description = getAPITypeDescription(configuration::class)
             if (!description.isNullOrBlank()) {
-                s.append("\n").append(description).append("\n")
+                s.paragraph(description)
             }
 
             // Fields
-            s.append("\n")
-            s.append("|===\n")
-            s.append("| Name | Environment | Description | Default value | Notes\n")
+            s.table("Name", "Environment", "Description", "Default value", "Notes")
             writeProperties(s, directoryContext, configuration, configuration)
-            s.append("|===\n")
 
         }
     }
@@ -142,12 +141,13 @@ class ConfigDocumentationIT : AbstractDocGenIT() {
 
                         val description = getPropertyDescription(member)
 
-                        s.append("\n")
-                        s.append("|`").append(propertyName).append(".<*>").append("`\n")
-                        s.append("|`").append("-").append("`\n")
-                        s.append("|").append(description).append("\n")
-                        s.append("|").append("_Empty_").append("\n")
-                        s.append("|").append(deprecatedReason).append("\n")
+                        s.tableRow(
+                            "`$propertyName.<.*>`",
+                            "`-`",
+                            description,
+                            "_Empty_",
+                            deprecatedReason,
+                        )
 
                         writeProperties(
                             s = s,
@@ -264,12 +264,13 @@ class ConfigDocumentationIT : AbstractDocGenIT() {
         defaultValue: String,
         deprecatedReason: String,
     ) {
-        s.append("\n")
-        s.append("|`").append(propertyName).append("`\n")
-        s.append("|`").append(envName).append("`\n")
-        s.append("|").append(description).append("\n")
-        s.append("|`").append(defaultValue).append("`\n")
-        s.append("|").append(deprecatedReason).append("\n")
+        s.tableRow(
+            "`${propertyName}`",
+            "`${envName}`",
+            description,
+            defaultValue,
+            deprecatedReason
+        )
     }
 
     fun isScalarProperty(prop: KProperty<*>): Boolean {
