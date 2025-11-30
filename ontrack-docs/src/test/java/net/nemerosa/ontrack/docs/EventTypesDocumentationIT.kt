@@ -13,14 +13,16 @@ class EventTypesDocumentationIT : AbstractDocGenIT() {
     fun `Events generation`() {
         docGenSupport.inDirectory("events") {
 
-            writeIndex(
-                fileId = "appendix-event-index",
-                level = 4,
-                title = "List of events",
-                items = eventFactory.eventTypes.associate { eventType ->
-                    getEventTypeFileId(eventType) to eventType.id
+            writeFile(
+                fileName = "index",
+            ) { s ->
+                s.title("List of configuration properties for Yontrack.")
+                for (eventType in eventFactory.eventTypes) {
+                    val id = getEventTypeFileId(eventType)
+                    val name = eventType.id
+                    s.tocItem(name, fileName = "${id}.md")
                 }
-            )
+            }
 
             eventFactory.eventTypes.forEach { eventType ->
                 generateEventType(this, eventType)
@@ -35,13 +37,12 @@ class EventTypesDocumentationIT : AbstractDocGenIT() {
 
         directoryContext.writeFile(
             fileId = fileId,
-            level = 5,
             title = id,
         ) { s ->
 
-            s.append(eventType.description).append("\n\n")
+            s.paragraph(eventType.description)
 
-            s.append("Context:\n\n")
+            s.h2("Context")
 
             eventType.context.items.forEach { (name, item) ->
                 s.append("* ")
@@ -54,11 +55,9 @@ class EventTypesDocumentationIT : AbstractDocGenIT() {
                 s.append(" - ").append(item.description).append("\n")
             }
 
-            s.append("\nDefault template:\n\n")
-            s.append("[source]\n")
-            s.append("----\n")
-            s.append(eventType.template)
-            s.append("\n----\n\n")
+            s.h2("Default template")
+
+            s.code(eventType.template)
 
         }
     }

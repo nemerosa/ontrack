@@ -15,8 +15,20 @@ fun StringBuilder.title(title: String) {
     appendLine()
 }
 
+fun StringBuilder.h2(title: String) {
+    appendLine()
+    appendLine("## $title")
+    appendLine()
+}
+
 fun StringBuilder.tocItem(text: String, fileName: String) {
     appendLine("* [$text]($fileName)")
+}
+
+fun StringBuilder.code(code: String) {
+    appendLine("```")
+    appendLine(code)
+    appendLine("```")
 }
 
 fun StringBuilder.table(vararg headers: String) {
