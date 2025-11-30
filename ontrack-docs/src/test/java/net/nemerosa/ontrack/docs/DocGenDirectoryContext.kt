@@ -13,18 +13,20 @@ class DocGenDirectoryContext(
         fields: List<FieldDocumentation>,
         level: Int = 1,
     ) {
-        fields.sortedBy { it.name }.forEach { (name, description, type, required, subfields) ->
-            s.append("*".repeat(level)).append(" **").append(name).append("** - ")
-                .append(type)
-                .append(" - ")
-                .append(if (required) "required" else "optional")
-                .append(" - ")
-                .append(description?.trimIndent()).append("\n")
-                .append("\n")
-            if (subfields.isNotEmpty()) {
-                writeFields(s, subfields, level + 1)
+        fields
+            .sortedBy { it.name }
+            .forEach { (name, description, type, required, subfields) ->
+                s.append(" ".repeat(4 * (level - 1))).append("*").append(" **").append(name).append("** - ")
+                    .append(type)
+                    .append(" - ")
+                    .append(if (required) "required" else "optional")
+                    .append(" - ")
+                    .append(description?.trimIndent()).append("\n")
+                    .append("\n")
+                if (subfields.isNotEmpty()) {
+                    writeFields(s, subfields, level + 1)
+                }
             }
-        }
     }
 
     fun writeFile(
@@ -97,6 +99,7 @@ class DocGenDirectoryContext(
         }
     }
 
+    @Deprecated("Use Markdown")
     fun writeFile(
         fileId: String,
         level: Int,
@@ -130,6 +133,53 @@ class DocGenDirectoryContext(
 
             if (fields.isNotEmpty()) {
                 s.append("Configuration:\n\n")
+                writeFields(s, fields, 1)
+            }
+
+            extendedConfig(s)
+
+            if (!example.isNullOrBlank()) {
+                s.append("Example:").append("\n").append("\n")
+                s.append("[source]\n----\n")
+                s.append(example)
+                s.append("\n----\n")
+            }
+
+        }
+    }
+
+    fun writeFile(
+        fileId: String,
+        title: String,
+        header: String?,
+        fields: List<FieldDocumentation>,
+        example: String?,
+        links: List<DocumentationLink> = emptyList(),
+        linksPrefix: String,
+        extendedHeader: (s: StringBuilder) -> Unit = {},
+        extendedConfig: (s: StringBuilder) -> Unit = {},
+    ) {
+        writeFile(
+            fileId = fileId,
+            title = title,
+        ) { s ->
+
+            if (!header.isNullOrBlank()) {
+                s.paragraph(header.trimIndent())
+            }
+
+            extendedHeader(s)
+
+            if (links.isNotEmpty()) {
+                s.h2("Links")
+                links.forEach { link ->
+                    s.listLinkItem(link.name, linksPrefix + link.value)
+                }
+                s.append("\n")
+            }
+
+            if (fields.isNotEmpty()) {
+                s.h2("Configuration")
                 writeFields(s, fields, 1)
             }
 

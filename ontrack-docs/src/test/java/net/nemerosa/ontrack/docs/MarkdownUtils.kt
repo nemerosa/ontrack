@@ -25,10 +25,20 @@ fun StringBuilder.tocItem(text: String, fileName: String) {
     appendLine("* [$text]($fileName)")
 }
 
+fun StringBuilder.listLinkItem(text: String, link: String) {
+    appendLine("* [$text]($link)")
+}
+
 fun StringBuilder.code(code: String) {
     appendLine("```")
     appendLine(code)
     appendLine("```")
+}
+
+fun StringBuilder.note(text: String) {
+    appendLine("!!! note")
+    appendLine("    ")
+    appendLine(text.trimIndent().prependIndent("    "))
 }
 
 fun StringBuilder.table(vararg headers: String) {

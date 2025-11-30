@@ -38,22 +38,22 @@ class NotificationChannelsDocumentationIT : AbstractDocGenIT() {
 
             directoryContext.writeFile(
                 fileId = fileId,
-                level = 4,
                 title = getNotificationChannelTitle(channel),
                 header = description,
                 fields = parameters,
                 example = example,
                 links = channel::class.findAnnotations(),
+                linksPrefix = "../../",
                 extendedConfig = { s ->
                     val output = getFieldsDocumentation(channel::class, section = "output")
                     if (output.isNotEmpty()) {
-                        s.append("Output:\n\n")
+                        s.h2("Output")
                         directoryContext.writeFields(s, output)
                     }
                 },
                 extendedHeader = { s ->
                     if (channel::class.hasAnnotation<NoTemplate>()) {
-                        s.append("\n\n_This channel does not use the custom template._\n\n")
+                        s.note("This channel does not use the custom template.")
                     }
                 }
             )
@@ -61,14 +61,16 @@ class NotificationChannelsDocumentationIT : AbstractDocGenIT() {
 
         docGenSupport.inDirectory("notifications") {
 
-            writeIndex(
-                fileId = "appendix-notifications-backends",
-                level = 4,
-                title = "List of notification backends",
-                items = notificationChannels.associate { channel ->
-                    getNotificationChannelFileId(channel) to getNotificationChannelTitle(channel)
+            writeFile(
+                fileName = "index",
+            ) { s ->
+                s.title("List of notification backends.")
+                for (channel in notificationChannels) {
+                    val id = getNotificationChannelFileId(channel)
+                    val name = getNotificationChannelTitle(channel)
+                    s.tocItem(name, fileName = "${id}.md")
                 }
-            )
+            }
 
             notificationChannels.forEach { channel ->
                 generateNotificationChannel(this, channel)

@@ -41,9 +41,14 @@ nav:
       - Groups: content/security/groups.md
       - Group mappings: content/security/group-mappings.md
       - Tokens: content/security/tokens.md
+  - Integrations:
+      - Notifications:
+          - Overview: content/integrations/notifications/index.md
+          - Jenkins: content/integrations/notifications/jenkins.md
   - Reference:
       - Configuration properties: content/generated/configurations/index.md
       - Event types: content/generated/events/index.md
+      - Notification channels: content/generated/notifications/index.md
   - Appendix:
       - CI Configuration: content/appendix/ci-config.md
       - Configuration as Code: content/appendix/casc.md
