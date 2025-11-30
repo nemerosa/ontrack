@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
     rsync \
     curl \
     graphviz \
-    python3-setuptools
+    python3-setuptools \
+    python3.10-venv
 
 # Git installation
 RUN add-apt-repository --yes ppa:git-core/ppa \

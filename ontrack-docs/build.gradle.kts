@@ -52,7 +52,7 @@ tasks.register<Exec>("installDeps") {
     commandLine(venvPython.absolutePath, "-m", "pip", "install", ".")
 
     // Track input files to detect when reinstall is needed
-    inputs.files("setup.py", "pyproject.toml", "requirements.txt")
+    inputs.files("pyproject.toml")
         .withPathSensitivity(PathSensitivity.RELATIVE)
         .optional()
     outputs.file("$venvDir/.deps-installed")
