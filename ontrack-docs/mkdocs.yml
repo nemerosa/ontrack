@@ -27,3 +27,5 @@ nav:
   - Getting started:
       - Installation: content/start/getting-started.md
       - Configuration: content/start/configuration.md
+  - Appendix:
+      - Configuration as Code: content/appendix/casc.md
