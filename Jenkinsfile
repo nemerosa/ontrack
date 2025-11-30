@@ -343,21 +343,16 @@ pipeline {
             steps {
                 sh '''
                     rm -rf build/docs
-                    mkdir -p build/docs/pdf
+                    mkdir -p build/docs
                     
-                    cp -r ontrack-docs/build/docs/asciidoc build/docs/web
-                    rm -rf build/docs/web/.asciidoctor
-                    
-                    cp -r ontrack-docs/build/docs/asciidocPdf/index.pdf build/docs/pdf/index.pdf
-
                     s3cmd \\
                         --access_key=${AMS3_DELIVERY_USR} \\
                         --secret_key=${AMS3_DELIVERY_PSW} \\
                         --host=fra1.digitaloceanspaces.com \\
                         --host-bucket='%(bucket)s.fra1.digitaloceanspaces.com' \\
                         put \\
-                        build/docs/* \\
-                        s3://yontrack-docs/release/${VERSION}/docs/ \\
+                        ontrack-docs/site/* \\
+                        s3://yontrack-docs/release/${VERSION}/docs/site/ \\
                         --acl-public \\
                         --add-header=Cache-Control:max-age=86400 \\
                         --recursive
