@@ -35,7 +35,9 @@ casc:
 
 ## Using secrets
 
+{% raw %}
 Casc files can refer to secrets through `{{ secret.name.property }}` expressions which are extrapolated using environment variables or secret files.
+{% endraw %}
 
 ### Using environment variables
 
@@ -44,6 +46,7 @@ The default behavior is to use environment variables. The name of the environmen
 
 For example, if your CasC fragment contains:
 
+{% raw %}
 ```yaml
 ontrack:
   config:
@@ -51,6 +54,7 @@ ontrack:
       - name: github.com
         token: {{ secret.github.token }}
 ```
+{% endraw %}
 
 Given a `ontrack-github` K8S secret containing the secret token in its `token` property, you can set the following
 values for the chart:
@@ -71,6 +75,7 @@ Instead of using environment variables, you can also map secrets to files and te
 
 Given the example below:
 
+{% raw %}
 ```yaml
 ontrack:
   config:
@@ -78,6 +83,7 @@ ontrack:
       - name: github.com
         token: {{ secret.yontrack-github.token }}
 ```
+{% endraw %}
 
 You can map the `yontrack-github` K8S secret onto a volume and tell Ontrack to use this volume:
 

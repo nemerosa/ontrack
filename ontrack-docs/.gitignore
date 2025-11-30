@@ -1,4 +1,4 @@
 /.venv
 /build
-/yontrack_docs.egg-info
+/src/yontrack_docs.egg-info
 
