@@ -1,4 +1,4 @@
-The Docker image is published in Docker Hub with name `nemerosa/ontrack-build:5.0.1`.
+The Docker image is published in Docker Hub with name `nemerosa/ontrack-build:5.0.2`.
 
 To build this image on MacOS (ARM) for `linux/amd64`:
 
@@ -22,13 +22,13 @@ This creates and switches to a new builder instance.
 Build the Image for AMD: Use the --platform flag to specify the target architecture:
 
 ```bash
-docker buildx build --platform linux/amd64 -t nemerosa/ontrack-build:5.0.1 --load .
+docker buildx build --platform linux/amd64 -t nemerosa/ontrack-build:5.0.2 --load .
 ```
 
 Push the image to Docker Hub:
 
 ```bash
-docker image push nemerosa/ontrack-build:5.0.1
+docker image push nemerosa/ontrack-build:5.0.2
 ```
 
 This image is used in the [`Jenkinsfile`](../Jenkinsfile).
