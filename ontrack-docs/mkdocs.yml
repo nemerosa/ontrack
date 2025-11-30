@@ -31,5 +31,7 @@ nav:
   - Getting started:
       - Installation: content/start/getting-started.md
       - Configuration: content/start/configuration.md
+  - Security:
+      - Tokens: content/security/tokens.md
   - Appendix:
       - Configuration as Code: content/appendix/casc.md
