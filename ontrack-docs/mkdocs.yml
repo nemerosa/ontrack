@@ -1,4 +1,4 @@
-site_name: Yontrack documentation
+site_name: !ENV [ YONTRACK_DOCS_TITLE, 'Local Yontrack documentation' ]
 theme:
   # https://squidfunk.github.io/mkdocs-material/
   name: material
@@ -21,11 +21,11 @@ markdown_extensions:
 extra_css:
   - stylesheets/extra.css
 plugins:
+  - search
   - macros:
       on_error_fail: false
       on_undefined: strict
 extra:
-  version: !ENV [VERSION, 'local']  # Second value is the default
   ontrack_github_actions_cli_config_version: 1.0.3
   ontrack_cli_version: 5.0.0-beta+002
 nav:
