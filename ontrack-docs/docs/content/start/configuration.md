@@ -18,7 +18,7 @@ First, Yontrack needs to be able to access the GitHub API. Create the GitHub tok
 
 Create a secret in the same namespace as Yontrack with the name `yontrack-github` and with the value of the GitHub token in the `token` key.
 
-In your Yontrack Casc files, define:
+In your _Yontrack Casc files_, define:
 
 {% raw %}
 ```yaml
@@ -31,7 +31,7 @@ ontrack:
 ```
 {% endraw %}
 
-In the Helm chart values for your Yontrack installation, declare this secret:
+In the_ Helm chart values_ for your Yontrack installation, declare this secret:
 
 ```yaml
 ontrack:
@@ -42,7 +42,7 @@ ontrack:
         - yontrack-github
 ```
 
-When Yontrack is restarted, it will be able to access the GitHub API. You can check this by navigating to your user menu at _Configurations_ > _GitHub configurations_. You should see the GitHub configuration you just created and you can test it by using the (?) button.
+When Yontrack is restarted, it will be able to access the GitHub API. You can check this by navigating to your user menu at _Configurations_ > _GitHub configurations_. You should see the GitHub configuration you just created and you can test it by using the :octicons-question-16: button.
 
 ## Jenkins with GitHub
 
