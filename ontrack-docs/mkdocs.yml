@@ -26,6 +26,8 @@ plugins:
       on_undefined: strict
 extra:
   version: !ENV [VERSION, 'local']  # Second value is the default
+  ontrack_github_actions_cli_config_version: 1.0.3
+  ontrack_cli_version: 5.0.0-beta+002
 nav:
   - Home: index.md
   - Getting started:

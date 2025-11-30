@@ -61,18 +61,16 @@ You're now ready to start feeding information into Yontrack from your GitHub wor
 
 In any workflow, you can use the following steps:
 
-{% raw %}
 ```yaml
   - name: "Yontrack configuration"
     id: yontrack-config
-    uses: nemerosa/ontrack-github-actions-cli-config@v1.0.3
+    uses: nemerosa/ontrack-github-actions-cli-config@v{{ ontrack_github_actions_cli_config_version }}
     env:
-      YONTRACK_URL: ${{ vars.YONTRACK_URL }}
-      YONTRACK_TOKEN: ${{ secrets.YONTRACK_TOKEN }}
+      YONTRACK_URL: ${{ '{{' }} vars.YONTRACK_URL {{ '}}' }}
+      YONTRACK_TOKEN: ${{ '{{' }} secrets.YONTRACK_TOKEN {{ '}}' }}
     with:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+      github-token: ${{ '{{' }} secrets.GITHUB_TOKEN {{ '}}' }}
 ```
-{% endraw %}
 
 !!! note
 
@@ -80,18 +78,16 @@ In any workflow, you can use the following steps:
 
     If you want to use a specific version of the CLI, you can use the `version` parameter instead of `github-token`:
 
-    {% raw %}
     ```yaml
-      - name: "Yontrack configuration"
-        id: yontrack-config
-        uses: nemerosa/ontrack-github-actions-cli-config@v1.0.3
-        env:
-          YONTRACK_URL: ${{ vars.YONTRACK_URL }}
-          YONTRACK_TOKEN: ${{ secrets.YONTRACK_TOKEN }}
-        with:
-          version: 5.0.0-beta+002
+    - name: "Yontrack configuration"
+      id: yontrack-config
+      uses: nemerosa/ontrack-github-actions-cli-config@v{{ ontrack_github_actions_cli_config_version }}
+      env:
+        YONTRACK_URL: ${{ '{{' }} vars.YONTRACK_URL {{ '}}' }}
+        YONTRACK_TOKEN: ${{ '{{' }} secrets.YONTRACK_TOKEN {{ '}}' }}
+      with:
+        version: {{ ontrack_cli_version }}
     ```
-    {% endraw %}
 
 ## Jenkins with GitHub
 
