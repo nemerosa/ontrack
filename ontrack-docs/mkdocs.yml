@@ -39,3 +39,4 @@ nav:
   - Appendix:
       - CI Configuration: content/appendix/ci-config.md
       - Configuration as Code: content/appendix/casc.md
+      - Migration from V4: content/appendix/migration-from-v4.md
