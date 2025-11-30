@@ -35,6 +35,11 @@ nav:
       - Installation: content/start/getting-started.md
       - Configuration: content/start/configuration.md
   - Security:
+      - OIDC: content/security/oidc.md
+      - LDAP: content/security/ldap.md
+      - Roles: content/security/roles.md
+      - Groups: content/security/groups.md
+      - Group mappings: content/security/group-mappings.md
       - Tokens: content/security/tokens.md
   - Reference:
       - Configuration properties: content/generated/configurations/index.md
