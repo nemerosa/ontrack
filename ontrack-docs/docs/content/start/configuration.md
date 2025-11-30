@@ -59,6 +59,19 @@ At your repository (or organization) level, create the following elements:
 
 You're now ready to start feeding information into Yontrack from your GitHub workflows.
 
+Start by creating a `.yontrack/ci.yaml` file at the root of your repository:
+
+```yaml
+version: v1
+configuration: {}
+```
+
+!!! note
+
+    This uses a default configuration for the items created in Yontrack.
+
+    See [CI Configuration](../appendix/ci-config.md) for more information.
+
 In any workflow, you can use the following step:
 
 ```yaml

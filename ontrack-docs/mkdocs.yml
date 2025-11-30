@@ -36,4 +36,5 @@ nav:
   - Security:
       - Tokens: content/security/tokens.md
   - Appendix:
+      - CI Configuration: content/appendix/ci-config.md
       - Configuration as Code: content/appendix/casc.md
