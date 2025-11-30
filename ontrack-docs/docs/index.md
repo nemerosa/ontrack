@@ -1,2 +1,2 @@
-# Welcome to Yontrack {{ version }}
+# Welcome to Yontrack {{ yontrack_version }}
 

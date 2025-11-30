@@ -26,6 +26,7 @@ plugins:
       on_error_fail: false
       on_undefined: strict
 extra:
+  yontrack_version: !ENV [ YONTRACK_VERSION, 'dev' ]
   ontrack_github_actions_cli_config_version: 1.0.3
   ontrack_cli_version: 5.0.0-beta+002
 nav:
