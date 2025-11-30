@@ -59,7 +59,7 @@ At your repository (or organization) level, create the following elements:
 
 You're now ready to start feeding information into Yontrack from your GitHub workflows.
 
-In any workflow, you can use the following steps:
+In any workflow, you can use the following step:
 
 ```yaml
   - name: "Yontrack configuration"
@@ -88,6 +88,35 @@ In any workflow, you can use the following steps:
       with:
         version: {{ ontrack_cli_version }}
     ```
+
+This configures a project, branch and a build in Yontrack. The rest of the steps have now access to the [Yontrack CLI](https://github.com/nemerosa/ontrack-cli) to interact with Yontrack.
+
+For example, to create a simple validation for the current build:
+
+```yaml
+- name: Validation
+  run: |
+    yontrack validate --validation BUILD --status PASSED
+```
+
+or better, with a condition on a previous step you want to validate:
+
+{% raw %}
+```yaml
+- name: Some step
+  id: some-step # The ID is needed to identity the step
+  run: |
+    # ... some steps ...
+- name: Validation
+  # Checking if the step has actually run at all
+  if: ${{ steps.some-step.outcome != '' }}
+  # Validation status depending on the outcome of the step
+  run: |
+    yontrack validate \
+      --validation some-step \
+      --status ${{ steps.some-step.outcome == 'success' && 'PASSED' || 'FAILED' }}
+```
+{% endraw %}
 
 ## Jenkins with GitHub
 
