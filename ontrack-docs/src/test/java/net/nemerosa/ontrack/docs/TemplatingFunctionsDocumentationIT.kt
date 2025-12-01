@@ -16,14 +16,14 @@ class TemplatingFunctionsDocumentationIT : AbstractDocGenIT() {
     fun `Templating functions generation`() {
         docGenSupport.inDirectory("templating/functions") {
 
-            writeIndex(
-                fileId = "appendix-templating-functions-index",
-                level = 4,
-                title = "List of templating functions",
-                items = templatingFunctions.associate { templatingFunction ->
-                    getTemplatingFunctionFileId(templatingFunction) to templatingFunction.id
+            writeFile(
+                fileName = "index",
+            ) { s ->
+                s.title("List of templating functions.")
+                for (templatingFunction in templatingFunctions) {
+                    s.tocItem(templatingFunction.id, fileName = "${getTemplatingFunctionFileId(templatingFunction)}.md")
                 }
-            )
+            }
 
             templatingFunctions.forEach { templatingFunction ->
                 generateTemplatingFunction(this, templatingFunction)
@@ -44,11 +44,12 @@ class TemplatingFunctionsDocumentationIT : AbstractDocGenIT() {
 
         directoryContext.writeFile(
             fileId = fileId,
-            level = 5,
             title = id,
             header = description,
             fields = parameters,
             example = example,
+            links = emptyList(),
+            linksPrefix = "../../../",
         )
     }
 

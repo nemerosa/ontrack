@@ -52,6 +52,7 @@ nav:
       - Properties: content/generated/properties/index.md
       - Templating:
           - Filters: content/generated/templating/filters/index.md
+          - Functions: content/generated/templating/functions/index.md
   - Appendix:
       - CI Configuration: content/appendix/ci-config.md
       - Configuration as Code: content/appendix/casc.md
