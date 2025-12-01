@@ -29,16 +29,17 @@ class TemplatingRenderableDocumentationIT : AbstractDocGenIT() {
 
             directoryContext.writeFile(
                 fileId = fileId,
-                level = 5,
                 title = getTRDTitle(trd),
                 header = description,
                 fields = emptyList(),
                 example = example,
+                links = emptyList(),
+                linksPrefix = "../../../",
                 extendedConfig = { s ->
                     // Context
                     s.append("Context: ${trd.contextName}\n\n")
                     // Fields
-                    s.append("Available fields:\n\n")
+                    s.h2("Fields")
                     trd.fields.forEach { field ->
                         s.append("* `${field.name}`: ${field.description}\n\n")
                         field.config?.let {
@@ -52,14 +53,15 @@ class TemplatingRenderableDocumentationIT : AbstractDocGenIT() {
 
 
         docGenSupport.inDirectory("templating/renderables") {
-            writeIndex(
-                fileId = "appendix-templating-renderable-index",
-                level = 4,
-                title = "List of special templating objects",
-                items = templatingRenderableDocs.associate { trd ->
-                    getTRDFileId(trd) to getTRDTitle(trd)
+
+            writeFile(
+                fileName = "index",
+            ) { s ->
+                s.title("List of special templating objects")
+                for (trd in templatingRenderableDocs) {
+                    s.tocItem(getTRDTitle(trd), fileName = "${getTRDFileId(trd)}.md")
                 }
-            )
+            }
 
             templatingRenderableDocs.forEach { trd ->
                 generateTRD(this, trd)
