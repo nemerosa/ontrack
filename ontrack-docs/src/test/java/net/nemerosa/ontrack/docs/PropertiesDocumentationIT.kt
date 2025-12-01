@@ -24,14 +24,14 @@ class PropertiesDocumentationIT : AbstractDocGenIT() {
 
             val prodProperties = propertyTypes.filter { it.isNotTest() }
 
-            writeIndex(
-                fileId = "appendix-properties-index",
-                level = 3,
-                title = "List of properties",
-                items = prodProperties.associate { propertyType ->
-                    propertyType.fileId to propertyType.fileTitle
+            writeFile(
+                fileName = "index",
+            ) { s ->
+                s.title("List of configuration properties for Yontrack.")
+                for (propertyType in prodProperties) {
+                    s.tocItem(propertyType.fileTitle, fileName = "${propertyType.fileId}.md")
                 }
-            )
+            }
 
             prodProperties.forEach { propertyType ->
                 generateProperty(this, propertyType)
@@ -53,12 +53,12 @@ class PropertiesDocumentationIT : AbstractDocGenIT() {
 
         directoryContext.writeFile(
             fileId = fileId,
-            level = 4,
             title = propertyType.fileTitle,
             header = description,
             fields = parameters,
             example = null,
             links = propertyType::class.findAnnotations(),
+            linksPrefix = "../../",
         )
     }
 
@@ -86,7 +86,7 @@ class PropertiesDocumentationIT : AbstractDocGenIT() {
         }
 
         val scope = propertyType.supportedEntityTypes
-        s.append("Scope:\n\n")
+        s.h2("Scope")
         for (type in scope) {
             s.append("* ").append(type.displayName).append("\n")
         }
