@@ -187,9 +187,7 @@ class DocGenDirectoryContext(
 
             if (!example.isNullOrBlank()) {
                 s.append("Example:").append("\n").append("\n")
-                s.append("[source]\n----\n")
-                s.append(example)
-                s.append("\n----\n")
+                s.code(example)
             }
 
         }

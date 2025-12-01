@@ -50,6 +50,8 @@ nav:
       - Event types: content/generated/events/index.md
       - Notification channels: content/generated/notifications/index.md
       - Properties: content/generated/properties/index.md
+      - Templating:
+          - Filters: content/generated/templating/filters/index.md
   - Appendix:
       - CI Configuration: content/appendix/ci-config.md
       - Configuration as Code: content/appendix/casc.md

@@ -15,14 +15,14 @@ class TemplatingFiltersDocumentationIT : AbstractDocGenIT() {
     fun `Templating filters generation`() {
         docGenSupport.inDirectory("templating/filters") {
 
-            writeIndex(
-                fileId = "appendix-templating-filters-index",
-                level = 4,
-                title = "List of templating filters",
-                items = templatingFilters.associate { templatingFilter ->
-                    getTemplatingFilterFileId(templatingFilter) to templatingFilter.id
+            writeFile(
+                fileName = "index",
+            ) { s ->
+                s.title("List of templating filters.")
+                for (templatingFilter in templatingFilters) {
+                    s.tocItem(templatingFilter.id, fileName = "${getTemplatingFilterFileId(templatingFilter)}.md")
                 }
-            )
+            }
 
             templatingFilters.forEach { templatingFilter ->
                 generateTemplatingFilter(this, templatingFilter)
@@ -39,11 +39,12 @@ class TemplatingFiltersDocumentationIT : AbstractDocGenIT() {
 
         directoryContext.writeFile(
             fileId = fileId,
-            level = 5,
             title = id,
             header = description,
             fields = emptyList(),
             example = example,
+            links = emptyList(),
+            linksPrefix = "../../../",
         )
     }
 
