@@ -22,14 +22,14 @@ class TemplatingSourcesDocumentationIT : AbstractDocGenIT() {
     fun `Templating sources generation`() {
         docGenSupport.inDirectory("templating/sources") {
 
-            writeIndex(
-                fileId = "appendix-templating-sources-index",
-                level = 4,
-                title = "List of templating sources",
-                items = templatingSources.associate { templatingSource ->
-                    getTemplatingSourceFileId(templatingSource) to getTemplatingSourceTitle(templatingSource)
+            writeFile(
+                fileName = "index",
+            ) { s ->
+                s.title("List of templating sources.")
+                for (templatingSource in templatingSources) {
+                    s.tocItem(getTemplatingSourceTitle(templatingSource), fileName = "${getTemplatingSourceFileId(templatingSource)}.md")
                 }
-            )
+            }
 
             templatingSources.forEach { templatingSource ->
                 generateTemplatingSource(this, templatingSource)
@@ -58,11 +58,12 @@ class TemplatingSourcesDocumentationIT : AbstractDocGenIT() {
 
         directoryContext.writeFile(
             fileId = fileId,
-            level = 5,
             title = getTemplatingSourceTitle(templatingSource),
             header = description,
             fields = parameters,
             example = example,
+            links = emptyList(),
+            linksPrefix = "../..",
             extendedHeader = { s ->
                 s.append("Applicable for:\n\n")
                 types.forEach { type ->
