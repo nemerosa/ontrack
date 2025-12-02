@@ -29,10 +29,12 @@ fun StringBuilder.listLinkItem(text: String, link: String) {
     appendLine("* [$text]($link)")
 }
 
-fun StringBuilder.code(code: String) {
-    appendLine("```")
+fun StringBuilder.code(code: String, language: String = "text") {
+    appendLine("{% raw %}")
+    appendLine("```${language}")
     appendLine(code)
     appendLine("```")
+    appendLine("{% endraw %}")
 }
 
 fun StringBuilder.note(text: String) {
