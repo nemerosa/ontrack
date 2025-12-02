@@ -20,7 +20,7 @@ class TemplatingFunctionsDocumentationIT : AbstractDocGenIT() {
                 fileName = "index",
             ) { s ->
                 s.title("List of templating functions.")
-                for (templatingFunction in templatingFunctions) {
+                for (templatingFunction in templatingFunctions.sortedBy { it.id }) {
                     s.tocItem(templatingFunction.id, fileName = "${getTemplatingFunctionFileId(templatingFunction)}.md")
                 }
             }

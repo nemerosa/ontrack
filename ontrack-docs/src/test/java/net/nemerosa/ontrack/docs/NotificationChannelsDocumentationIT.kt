@@ -65,7 +65,7 @@ class NotificationChannelsDocumentationIT : AbstractDocGenIT() {
                 fileName = "index",
             ) { s ->
                 s.title("List of notification backends.")
-                for (channel in notificationChannels) {
+                for (channel in notificationChannels.sortedBy { getNotificationChannelTitle(it) }) {
                     val id = getNotificationChannelFileId(channel)
                     val name = getNotificationChannelTitle(channel)
                     s.tocItem(name, fileName = "${id}.md")

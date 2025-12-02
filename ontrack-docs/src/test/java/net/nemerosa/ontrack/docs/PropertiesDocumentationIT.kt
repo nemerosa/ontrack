@@ -28,7 +28,7 @@ class PropertiesDocumentationIT : AbstractDocGenIT() {
                 fileName = "index",
             ) { s ->
                 s.title("List of properties for Yontrack.")
-                for (propertyType in prodProperties) {
+                for (propertyType in prodProperties.sortedBy { it.fileTitle }) {
                     s.tocItem(propertyType.fileTitle, fileName = "${propertyType.fileId}.md")
                 }
             }

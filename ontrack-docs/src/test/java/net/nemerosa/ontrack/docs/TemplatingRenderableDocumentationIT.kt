@@ -58,7 +58,7 @@ class TemplatingRenderableDocumentationIT : AbstractDocGenIT() {
                 fileName = "index",
             ) { s ->
                 s.title("List of special templating objects")
-                for (trd in templatingRenderableDocs) {
+                for (trd in templatingRenderableDocs.sortedBy { getTRDTitle(it) }) {
                     s.tocItem(getTRDTitle(trd), fileName = "${getTRDFileId(trd)}.md")
                 }
             }

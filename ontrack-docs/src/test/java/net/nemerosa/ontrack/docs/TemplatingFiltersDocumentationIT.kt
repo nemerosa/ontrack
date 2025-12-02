@@ -19,7 +19,7 @@ class TemplatingFiltersDocumentationIT : AbstractDocGenIT() {
                 fileName = "index",
             ) { s ->
                 s.title("List of templating filters.")
-                for (templatingFilter in templatingFilters) {
+                for (templatingFilter in templatingFilters.sortedBy { it.id }) {
                     s.tocItem(templatingFilter.id, fileName = "${getTemplatingFilterFileId(templatingFilter)}.md")
                 }
             }

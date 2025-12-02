@@ -54,7 +54,6 @@ The next sections list the available sources, functions, contexts and filters.
 
 There are also special objects, known as _templating renderable_, which are specific to some contexts, like [auto-versioning](../integrations/auto-versioning/auto-versioning.md) or [workflows](../integrations/workflows/workflows.md).
 
-* contexts TODO
 * [sources](../generated/templating/sources/index.md)
 * [functions](../generated/templating/functions/index.md)
 * [filters](../generated/templating/filters/index.md)

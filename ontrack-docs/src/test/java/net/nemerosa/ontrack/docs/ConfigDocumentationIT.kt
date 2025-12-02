@@ -39,7 +39,7 @@ class ConfigDocumentationIT : AbstractDocGenIT() {
                 fileName = "index",
             ) { s ->
                 s.title("List of configuration properties for Yontrack.")
-                for (configuration in configurations) {
+                for (configuration in configurations.sortedBy { getAPITypeName(it::class) }) {
                     val id = configuration::class.jvmName
                     val name = getAPITypeName(configuration::class)
                     s.tocItem(name, fileName = "${id}.md")

@@ -26,8 +26,11 @@ class TemplatingSourcesDocumentationIT : AbstractDocGenIT() {
                 fileName = "index",
             ) { s ->
                 s.title("List of templating sources.")
-                for (templatingSource in templatingSources) {
-                    s.tocItem(getTemplatingSourceTitle(templatingSource), fileName = "${getTemplatingSourceFileId(templatingSource)}.md")
+                for (templatingSource in templatingSources.sortedBy { getTemplatingSourceTitle(it) }) {
+                    s.tocItem(
+                        getTemplatingSourceTitle(templatingSource),
+                        fileName = "${getTemplatingSourceFileId(templatingSource)}.md"
+                    )
                 }
             }
 
