@@ -17,7 +17,7 @@ class EventTypesDocumentationIT : AbstractDocGenIT() {
                 fileName = "index",
             ) { s ->
                 s.title("List of configuration properties for Yontrack.")
-                for (eventType in eventFactory.eventTypes) {
+                for (eventType in eventFactory.eventTypes.sortedBy { it.id }) {
                     val id = getEventTypeFileId(eventType)
                     val name = eventType.id
                     s.tocItem(name, fileName = "${id}.md")
