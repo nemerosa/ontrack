@@ -11,4 +11,6 @@ In most cases, you'll configure Yontrack to use your own identity provider:
 * [OIDC](../security/oidc.md)
 * [LDAP](../security/ldap.md)
 
-Once done, you can start configuring [groups](../security/groups.md) and map them to the [groups of your identity provider](../security/group-mappings.md).
+Once authentication has been setup, you can start configuring [groups](../security/groups.md) and map them to the [groups of your identity provider](../security/group-mappings.md).
+
+Where to go next? Start [configuring](configuration.md) your Yontrack instance.
