@@ -9,6 +9,8 @@ theme:
     scheme: yontrack
   font:
     text: Hanken Grotesk
+  features:
+    - navigation.path
 use_directory_urls: false
 markdown_extensions:
   - attr_list
