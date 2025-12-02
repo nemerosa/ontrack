@@ -12,7 +12,10 @@ class TestOnGitHubCondition {
 
     companion object {
         @JvmStatic
-        fun isTestOnGitHubEnabled(): Boolean =
-            !getOptionalEnv("ontrack.test.extension.github.organization").isNullOrBlank()
+        fun isTestOnGitHubEnabled(): Boolean {
+            val ignore = getOptionalEnv("ontrack.test.extension.github.ignore")?.let { it == "true" } ?: false
+            return !ignore &&
+                    !getOptionalEnv("ontrack.test.extension.github.organization").isNullOrBlank()
+        }
     }
 }

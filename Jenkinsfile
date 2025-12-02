@@ -23,6 +23,11 @@ pipeline {
                 description: 'Skipping legacy acceptance tests'
         )
         booleanParam(
+                name: 'SKIP_GITHUB_IT',
+                defaultValue: false,
+                description: 'Skipping integration tests for GitHub'
+        )
+        booleanParam(
                 name: 'SKIP_BITBUCKET_CLOUD_IT',
                 defaultValue: true,
                 description: 'Skipping integration tests for Bitbucket Cloud'
@@ -104,6 +109,7 @@ pipeline {
                 script {
                     // Additional options
                     env.ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_IGNORE = params.SKIP_BITBUCKET_CLOUD_IT
+                    env.ONTRACK_TEST_EXTENSION_GITHUB_IGNORE = params.SKIP_GITHUB_IT
                     // Reads version information
                     def props = readProperties(file: 'build/version.properties')
                     env.VERSION = props.VERSION_DISPLAY
