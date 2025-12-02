@@ -41,10 +41,12 @@ nav:
       - Groups: content/security/groups.md
       - Group mappings: content/security/group-mappings.md
       - Tokens: content/security/tokens.md
-  - Integrations:
+  - Automation:
       - Notifications:
           - Overview: content/integrations/notifications/index.md
           - Jenkins: content/integrations/notifications/jenkins.md
+      - Auto-versioning: content/integrations/auto-versioning/auto-versioning.md
+      - Workflows: content/integrations/workflows/workflows.md
   - Reference:
       - Configuration properties: content/generated/configurations/index.md
       - Event types: content/generated/events/index.md

@@ -123,3 +123,11 @@ Change log for the dependency:
 
 ${promotionRun.changelog?project=dependency}
 ```
+
+## Notification backends
+
+!!! note
+
+    The whole list of notification backends is available in the [references](../../generated/notifications/index.md). You'll find below some detail about the most common ones.
+
+* [Jenkins](jenkins.md) - triggering a Jenkins job
