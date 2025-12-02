@@ -38,17 +38,16 @@ class WorkflowNodeExecutorsDocumentationIT : AbstractDocGenIT() {
 
             directoryContext.writeFile(
                 fileId = fileId,
-                level = 4,
                 title = getWNXTitle(wnx),
                 header = description,
                 fields = parameters,
                 example = example,
                 links = wnx::class.findAnnotations(),
+                linksPrefix = "../../",
                 extendedConfig = { s ->
-                    val output = outputFieldsDocumentation
-                    if (output.isNotEmpty()) {
+                    if (outputFieldsDocumentation.isNotEmpty()) {
                         s.append("Output:\n\n")
-                        directoryContext.writeFields(s, output)
+                        directoryContext.writeFields(s, outputFieldsDocumentation)
                     }
                 },
             )
@@ -56,14 +55,14 @@ class WorkflowNodeExecutorsDocumentationIT : AbstractDocGenIT() {
 
         docGenSupport.inDirectory("workflow-node-executors") {
 
-            writeIndex(
-                fileId = "appendix-workflow-node-executors-index",
-                level = 4,
-                title = "List of workflow node executors",
-                items = workflowNodeExecutors.associate { workflowNodeExecutor ->
-                    getWNXFileId(workflowNodeExecutor) to getWNXTitle(workflowNodeExecutor)
+            writeFile(
+                fileName = "index",
+            ) { s ->
+                s.title("List of workflow node executors")
+                for (trd in workflowNodeExecutors.sortedBy { getWNXTitle(it) }) {
+                    s.tocItem(getWNXTitle(trd), fileName = "${getWNXFileId(trd)}.md")
                 }
-            )
+            }
 
             workflowNodeExecutors.forEach { wnx ->
                 generateWNX(this, wnx)

@@ -59,6 +59,7 @@ nav:
           - Functions: content/generated/templating/functions/index.md
           - Renderables: content/generated/templating/renderables/index.md
           - Sources: content/generated/templating/sources/index.md
+      - Workflow node executors: content/generated/workflow-node-executors/index.md
   - Operations:
       - Metrics: content/operations/metrics.md
   - Appendix:
