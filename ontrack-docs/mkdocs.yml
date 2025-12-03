@@ -46,6 +46,7 @@ nav:
       - Tokens: content/security/tokens.md
   - Concepts:
       - Model: content/concepts/model/index.md
+      - Build links: content/concepts/model/build-links.md
   - Configuration:
       - CI Configuration: content/configuration/ci-config.md
       - Configuration as Code: content/configuration/casc.md
