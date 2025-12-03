@@ -55,7 +55,7 @@ Creation:
 
 Global permissions are created or deleted, not updated.
 
-By using [Configuration as Code](../appendix/casc.md), you have a better control over the global permissions:
+By using [Configuration as Code](../configuration/casc.md), you have a better control over the global permissions:
 
 ```yaml
 ontrack:
@@ -112,7 +112,7 @@ Project permissions are created or deleted, not updated.
 
     As of now, the Yontrack UI does not allow to set the project permissions.
 
-By using [Configuration as Code](../appendix/casc.md), you have a better control over the project permissions:
+By using [Configuration as Code](../configuration/casc.md), you have a better control over the project permissions:
 
 ```yaml
 ontrack:

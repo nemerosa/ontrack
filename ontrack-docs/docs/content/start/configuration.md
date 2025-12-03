@@ -1,6 +1,6 @@
 # Configuration
 
-While Yontrack can be configured using its UI, it's recommended to use the CasC ([Configuration as Code](../appendix/casc.md)).
+While Yontrack can be configured using its UI, it's recommended to use the CasC ([Configuration as Code](../configuration/casc.md)).
 
 Find below different scenarios for configuring Yontrack using CasC.
 
@@ -8,7 +8,7 @@ Find below different scenarios for configuring Yontrack using CasC.
 
 In this section, we'll see how to configure Yontrack for GitHub workflows.
 
-> Don't forget to check the [Configuration as Code](../appendix/casc.md) section
+> Don't forget to check the [Configuration as Code](../configuration/casc.md) section
 > to see how to configure Yontrack using CasC.
 
 ### Yontrack configuration
@@ -70,7 +70,7 @@ configuration: {}
 
     This uses a default configuration for the items created in Yontrack.
 
-    See [CI Configuration](../appendix/ci-config.md) for more information.
+    See [CI Configuration](../configuration/ci-config.md) for more information.
 
 In any workflow, you can use the following step:
 

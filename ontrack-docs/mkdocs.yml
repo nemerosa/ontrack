@@ -49,6 +49,9 @@ nav:
           - Jenkins: content/integrations/notifications/jenkins.md
       - Auto-versioning: content/integrations/auto-versioning/auto-versioning.md
       - Workflows: content/integrations/workflows/workflows.md
+  - Configuration:
+      - CI Configuration: content/configuration/ci-config.md
+      - Configuration as Code: content/configuration/casc.md
   - Reference:
       - Configuration properties: content/generated/configurations/index.md
       - Event types: content/generated/events/index.md
@@ -63,7 +66,5 @@ nav:
   - Operations:
       - Metrics: content/operations/metrics.md
   - Appendix:
-      - CI Configuration: content/appendix/ci-config.md
-      - Configuration as Code: content/appendix/casc.md
       - Templating: content/appendix/templating.md
       - Migration from V4: content/appendix/migration-from-v4.md

@@ -58,7 +58,7 @@ The management of the global subscriptions is exactly the same as for the [local
 
 !!! note
 
-    Global subscriptions can be configured using [CasC](../../appendix/casc.md). For example:
+    Global subscriptions can be configured using [CasC](../../configuration/casc.md). For example:
     
     ```yaml
     ontrack:
