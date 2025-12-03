@@ -123,17 +123,6 @@ This downloads a `ontrack-casc-schema.json` file.
 
 > Note that this schema is versioned.
 
-You can use it to validate your CasC YAML files.
-
-When using Intellij IDEA:
-
-* in the _Settings_, select _Languages & Frameworks_ > _Schema & DTDs_ > _JSON Schema Mappings_
-* in _Schema file or URL_, click on the folder icon and select the downloaded `ontrack-casc-schema.json` file
-* apply and save the settings
-
-Open a YAML file.
-To associate it with the Ontrack Casc schema, click on the _Schema_ component in the bottom right corner of the file and select `ontrack-casc`.
-
-You should now have auto-completion and validation.
+You can use it to validate your CasC YAML files. See the [appendixes](../appendix/json-schemas.md) to learn more about using JSON schemas for edition and validation.
 
 [//]: # (TODO Using the API)

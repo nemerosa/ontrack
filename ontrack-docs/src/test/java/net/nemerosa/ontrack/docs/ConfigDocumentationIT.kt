@@ -278,20 +278,4 @@ class ConfigDocumentationIT : AbstractDocGenIT() {
         return classifier is KClass<*> && isScalarClass(classifier)
     }
 
-    fun isScalarClass(classifier: KClass<*>): Boolean = classifier in SCALAR_CLASSES
-
-    companion object {
-        private val SCALAR_CLASSES: Set<KClass<*>> = setOf(
-            Boolean::class,
-            Byte::class,
-            Short::class,
-            Int::class,
-            Long::class,
-            Float::class,
-            Double::class,
-            Char::class,
-            String::class,
-        )
-    }
-
 }

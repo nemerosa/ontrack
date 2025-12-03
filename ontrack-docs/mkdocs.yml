@@ -11,6 +11,7 @@ theme:
     text: Hanken Grotesk
   features:
     - navigation.path
+    - content.code.copy
 use_directory_urls: false
 markdown_extensions:
   - attr_list
@@ -43,17 +44,25 @@ nav:
       - Groups: content/security/groups.md
       - Group mappings: content/security/group-mappings.md
       - Tokens: content/security/tokens.md
+  - Concepts:
+      - Model: content/concepts/model/index.md
+  - Configuration:
+      - CI Configuration: content/configuration/ci-config.md
+      - Configuration as Code: content/configuration/casc.md
   - Automation:
       - Notifications:
           - Overview: content/integrations/notifications/index.md
           - Jenkins: content/integrations/notifications/jenkins.md
       - Auto-versioning: content/integrations/auto-versioning/auto-versioning.md
       - Workflows: content/integrations/workflows/workflows.md
-  - Configuration:
-      - CI Configuration: content/configuration/ci-config.md
-      - Configuration as Code: content/configuration/casc.md
   - Reference:
+      - API:
+          - GraphQL API: content/api/graphql.md
       - Configuration properties: content/generated/configurations/index.md
+      - CI Configuration:
+          - Conditions: content/generated/ci-config/conditions/index.md
+          - CI Engines: content/reference/ci-config/ci-engines/index.md
+          - SCM Engines: content/reference/ci-config/scm-engines/index.md
       - Event types: content/generated/events/index.md
       - Notification channels: content/generated/notifications/index.md
       - Properties: content/generated/properties/index.md
@@ -67,4 +76,5 @@ nav:
       - Metrics: content/operations/metrics.md
   - Appendix:
       - Templating: content/appendix/templating.md
+      - JSON schemas: content/appendix/json-schemas.md
       - Migration from V4: content/appendix/migration-from-v4.md

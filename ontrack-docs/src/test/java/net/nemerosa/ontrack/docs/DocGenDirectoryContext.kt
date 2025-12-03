@@ -8,6 +8,7 @@ class DocGenDirectoryContext(
     private val dir: File,
 ) {
 
+    @Deprecated("Use StringBuilder extension in MarkdownUtils.kt")
     fun writeFields(
         s: StringBuilder,
         fields: List<FieldDocumentation>,

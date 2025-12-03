@@ -10,6 +10,7 @@ dependencies {
     testImplementation(project(":ontrack-ui"))
 
     // Extensions needed for the docs
+    testImplementation(project(":ontrack-extension-config"))
     testImplementation(project(":ontrack-extension-notifications"))
     testImplementation(project(":ontrack-extension-workflows"))
 

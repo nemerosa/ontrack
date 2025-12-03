@@ -2,11 +2,22 @@ package net.nemerosa.ontrack.extension.config.ci.conditions
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import org.springframework.stereotype.Component
+import kotlin.reflect.KClass
 
 @Component
+@APIDescription("Checks the SCM branch name matches a regular expression.")
+@DocumentationExampleCode(
+    """
+        branch: '^release/.*$'
+    """
+)
 class BranchCondition : Condition {
     override val name: String = "branch"
+    override val schema: KClass<*> = String::class
+    override val schemaDescription: String? = "Regular expression to match against the SCM branch name"
     override fun matches(
         ciEngine: CIEngine,
         config: JsonNode,
