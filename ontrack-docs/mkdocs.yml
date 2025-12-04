@@ -65,6 +65,7 @@ nav:
       - Notifications:
           - Overview: content/integrations/notifications/index.md
           - Jenkins: content/integrations/notifications/jenkins.md
+          - GitHub Workflows: content/integrations/notifications/github-workflow.md
       - Auto-versioning: content/integrations/auto-versioning/auto-versioning.md
       - Workflows: content/integrations/workflows/workflows.md
   - Reference:
