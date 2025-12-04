@@ -859,15 +859,19 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun waitUntilWorkflowRun(repository: String, runId: Long, retries: Int, retriesDelaySeconds: Int) {
+    override fun getWorkflowRun(repository: String, runId: Long): WorkflowRun {
         val client = createGitHubRestTemplate()
+        return client.getForObject<WorkflowRun>("/repos/$repository/actions/runs/$runId")
+    }
+
+    override fun waitUntilWorkflowRun(repository: String, runId: Long, retries: Int, retriesDelaySeconds: Int) {
         val success = runBlocking {
             untilTimeout(
                 name = "Waiting for workflow run $repository/$runId",
                 retryCount = retries,
                 retryDelay = Duration.ofSeconds(retriesDelaySeconds.toLong()),
             ) {
-                val run = client.getForObject<WorkflowRun>("/repos/$repository/actions/runs/$runId")
+                val run = getWorkflowRun(repository, runId)
                 run.success
             }
         }

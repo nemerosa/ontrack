@@ -185,6 +185,13 @@ class MockOntrackGitHubClient(
         TODO("Not yet implemented")
     }
 
+    override fun getWorkflowRun(
+        repository: String,
+        runId: Long
+    ): WorkflowRun {
+        TODO("Not yet implemented")
+    }
+
     override fun waitUntilWorkflowRun(
         repository: String,
         runId: Long,

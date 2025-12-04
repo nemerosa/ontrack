@@ -5249,6 +5249,11 @@ type Query {
     "Parameters for getting the chart"
     input: GetChartInput!
   ): JSON
+  "Getting a GitHub configuration by name"
+  gitHubConfiguration(
+    "Name of the configuration to get"
+    name: String!
+  ): GitHubEngineConfiguration
   "List of GitHub configurations"
   gitHubConfigurations(
     "Name of the configuration to get"

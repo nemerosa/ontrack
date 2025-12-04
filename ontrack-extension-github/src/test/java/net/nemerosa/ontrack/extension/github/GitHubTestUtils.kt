@@ -20,6 +20,7 @@ data class GitHubTestEnv(
     val paths: GitHubTestEnvKnownPaths,
     val changeLog: GitHubTestChangeLog,
     val issues: GitHubTestIssues,
+    val actions: GitHubTestActions,
 ) {
     val fullRepository: String = "$organization/$repository"
 }
@@ -48,6 +49,11 @@ data class GitHubTestIssues(
     val issueSummary: String,
     val issueLabels: List<String>,
     val milestone: String,
+)
+
+data class GitHubTestActions(
+    val workflowId: String,
+    val branch: String,
 )
 
 /**
@@ -86,7 +92,11 @@ val githubTestEnv: GitHubTestEnv by lazy {
             issueSummary = getEnv("ontrack.test.extension.github.issues.issueSummary"),
             issueLabels = getEnv("ontrack.test.extension.github.issues.issueLabels").split("|"),
             milestone = getEnv("ontrack.test.extension.github.issues.milestone"),
-        )
+        ),
+        actions = GitHubTestActions(
+            workflowId = getEnv("ontrack.test.extension.github.actions.workflowId"),
+            branch = getEnv("ontrack.test.extension.github.actions.branch"),
+        ),
     )
 }
 

@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":ontrack-extension-indicators"))
     implementation(project(":ontrack-extension-auto-versioning"))
     implementation(project(":ontrack-extension-config"))
+    implementation(project(":ontrack-extension-notifications"))
     implementation("io.jsonwebtoken:jjwt-api")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("io.micrometer:micrometer-core")
@@ -39,6 +40,7 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-git")))
     testImplementation(testFixtures(project(":ontrack-extension-config")))
     testImplementation(testFixtures(project(":ontrack-extension-scm")))
+    testImplementation(testFixtures(project(":ontrack-extension-queue")))
 
     testFixturesImplementation("org.junit.jupiter:junit-jupiter-api")
     testFixturesImplementation(project(":ontrack-test-utils"))

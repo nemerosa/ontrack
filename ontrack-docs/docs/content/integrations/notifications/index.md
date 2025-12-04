@@ -130,4 +130,5 @@ ${promotionRun.changelog?project=dependency}
 
     The whole list of notification backends is available in the [references](../../generated/notifications/index.md). You'll find below some detail about the most common ones.
 
+* [GitHub workflows](github-workflow.md) - triggering a GitHub Actions workflow
 * [Jenkins](jenkins.md) - triggering a Jenkins job

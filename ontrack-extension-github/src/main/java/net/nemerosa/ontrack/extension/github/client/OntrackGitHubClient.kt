@@ -268,7 +268,7 @@ interface OntrackGitHubClient {
      * @param workflow Name of the workflow, like `my-workflow.yml`
      * @param branch Branch where to launch the workflow
      * @param inputs List of parameters to pass to the workflow
-     * @param retries The amount of times we check for successful scheduling
+     * @param retries The number of times we check for successful scheduling
      * @param retriesDelaySeconds The time (in seconds) between two checks for successful scheduling
      * @return Launched workflow
      */
@@ -295,6 +295,15 @@ interface OntrackGitHubClient {
         retries: Int = 10,
         retriesDelaySeconds: Int = 30,
     )
+
+    /**
+     * Gets a workflow run by its ID.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param runId ID of the workflow run
+     * @return Workflow run information.
+     */
+    fun getWorkflowRun(repository: String, runId: Long): WorkflowRun
 
     /**
      * Gets the last commit for a given issue
