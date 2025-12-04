@@ -96,6 +96,8 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_MESSAGES = '#1 Commit with issue'
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_ISSUELABELS = 'type:defect'
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_MILESTONE = 'v1'
+                ONTRACK_TEST_EXTENSION_GITHUB_ACTIONS_WORKFLOWID = "main.yml"
+                ONTRACK_TEST_EXTENSION_GITHUB_ACTIONS_BRANCH = "main"
             }
             steps {
                 sh '''
