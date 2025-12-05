@@ -6,6 +6,10 @@ enum class AutoVersioningAuditState(
 ) {
 
     CREATED,
+    SCHEDULED,
+
+    THROTTLED(isRunning = false),
+
     RECEIVED,
     ERROR(isRunning = false),
     PROCESSING_START(isProcessing = true),

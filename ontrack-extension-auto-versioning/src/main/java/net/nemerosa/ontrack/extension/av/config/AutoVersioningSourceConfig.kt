@@ -60,6 +60,16 @@ data class AutoVersioningSourceConfig(
     @APIDescription("Additional paths to change")
     @ListRef(embedded = true, suffix = "Input")
     val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
+    @APIDescription("Cron schedule (when to start applying queued requests)")
+    val cronSchedule: String? = null,
+    @APIDescription("Number of requests to keep at one given moment. If > 0, this is an actual throttling of the requests for this configuration.")
+    val throttling: Int? = null,
+    @APIDescription("Maximum number of retries. If null or 0, no retry is performed.")
+    val maxRetries: Int? = null,
+    @APIDescription("Exponential interval to wait between retries. If null, default value is taken from the settings.")
+    val retryIntervalSeconds: Int? = null,
+    @APIDescription("Exponential factor. 1.0 means that the interval is linear. If null, default value is taken from the setings. If < 1, 1.0 is assumer.")
+    val retryIntervalFactor: Double? = null,
 ) {
 
     /**
@@ -173,6 +183,11 @@ data class AutoVersioningSourceConfig(
             prBodyTemplate = prBodyTemplate,
             prBodyTemplateFormat = prBodyTemplateFormat,
             additionalPaths = additionalPaths,
+            cronSchedule = cronSchedule,
+            throttling = throttling,
+            maxRetries = maxRetries,
+            retryIntervalSeconds = retryIntervalSeconds,
+            retryIntervalFactor = retryIntervalFactor,
         )
 
 }
