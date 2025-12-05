@@ -10,27 +10,88 @@ import java.time.LocalDateTime
 interface AutoVersioningAuditStore {
 
     /**
-     * Cancelling all current orders whose processing has not started yet. Only requests
-     * targetting the exact same [branch][AutoVersioningOrder.branch] are cancelled.
+     * Cancels all orders whose processing has not started yet.
+     *
+     * Only the requests having the same:
+     *
+     * * source project
+     * * qualifier
+     * * target branch
+     * * list of paths
+     *
+     * as the [order] are considered.
+     *
+     * @param order Order used to identify the requests to cancel
+     * @return Number of requests canceled
      */
-    fun cancelQueuedOrders(order: AutoVersioningOrder)
+    fun throttling(order: AutoVersioningOrder): Int
 
     /**
      * Creates a new entry
      *
      * @param order Audit entry to create
-     * @return The [order] (for convenience)
+     * @return The created audit entry
      */
-    fun create(order: AutoVersioningOrder, routing: String): AutoVersioningOrder
+    fun create(order: AutoVersioningOrder): AutoVersioningAuditEntry
 
     /**
      * Adds a new state to an auto versioning process.
      */
-    fun addState(targetBranch: Branch, uuid: String, queue: String? = null, upgradeBranch: String? = null, state: AutoVersioningAuditState, vararg data: Pair<String, String>)
+    fun addState(
+        targetBranch: Branch,
+        uuid: String,
+        routing: String? = null,
+        queue: String? = null,
+        upgradeBranch: String? = null,
+        state: AutoVersioningAuditState,
+        vararg data: Pair<String, String>
+    )
 
     fun findByUUID(targetBranch: Branch, uuid: String): AutoVersioningAuditEntry?
-    fun findByFilter(filter: AutoVersioningAuditQueryFilter): List<AutoVersioningAuditEntry>
-    fun countByFilter(filter: AutoVersioningAuditQueryFilter): Int
+
+    /**
+     * Counts the number of auto versioning audit entries which are in the given [state]
+     *
+     * @param state State to look for
+     * @return Number of auto versioning audit entries which are in the given [state]
+     */
+    fun countByState(state: AutoVersioningAuditState): Int
+
+    /**
+     * Global query to get audit versioning entries.
+     *
+     * @param filter Filter to use
+     * @return List of audit entries matching the [filter]
+     */
+    fun auditVersioningEntries(
+        filter: AutoVersioningAuditQueryFilter
+    ): List<AutoVersioningAuditEntry>
+
+    /**
+     * Looks for all entries that are ready to be processed at any given time.
+     */
+    fun findByReady(
+        time: LocalDateTime,
+    ): List<AutoVersioningAuditEntry>
+
+    /**
+     * Global query to get the count versioning entries.
+     *
+     * @param filter Filter to use
+     * @return Count of audit entries matching the [filter]
+     */
+    fun auditVersioningEntriesCount(
+        filter: AutoVersioningAuditQueryFilter
+    ): Int
+
+    /**
+     * Gets all audit entries before [retentionDate].
+     *
+     * @param retentionDate All items before this date will be removed
+     * @param nonRunningOnly Criteria on running state
+     * @return List of entries
+     */
+    fun findAllBefore(retentionDate: LocalDateTime, nonRunningOnly: Boolean): List<AutoVersioningAuditEntry>
 
     /**
      * Removes all audit entries before [retentionDate].

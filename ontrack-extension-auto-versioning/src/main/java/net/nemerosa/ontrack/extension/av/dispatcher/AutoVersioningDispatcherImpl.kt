@@ -1,34 +1,26 @@
 package net.nemerosa.ontrack.extension.av.dispatcher
 
-import net.nemerosa.ontrack.extension.av.AutoVersioningConfigProperties
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditService
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
-import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetricsService
-import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueuePayload
-import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueueProcessor
-import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueueSourceData
-import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueueSourceExtension
+import net.nemerosa.ontrack.extension.av.scheduler.AutoVersioningScheduler
+import net.nemerosa.ontrack.extension.av.scheduler.ScheduleService
 import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTracking
-import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
-import net.nemerosa.ontrack.extension.queue.source.createQueueSource
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.PromotionRun
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 import java.util.*
 
 @Component
 class AutoVersioningDispatcherImpl(
     private val securityService: SecurityService,
-    private val queueDispatcher: QueueDispatcher,
-    private val queueProcessor: AutoVersioningQueueProcessor,
-    private val queueSourceExtension: AutoVersioningQueueSourceExtension,
     private val versionSourceFactory: VersionSourceFactory,
     private val autoVersioningAuditService: AutoVersioningAuditService,
-    private val autoVersioningConfigProperties: AutoVersioningConfigProperties,
-    private val metrics: AutoVersioningMetricsService,
+    private val scheduleService: ScheduleService,
+    private val autoVersioningScheduler: AutoVersioningScheduler,
 ) : AutoVersioningDispatcher {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningDispatcherImpl::class.java)
@@ -53,31 +45,16 @@ class AutoVersioningDispatcherImpl(
                                 it.withOrder(branchTrail, order)
                             }
 
-                            // Cancelling any previous order
-                            if (autoVersioningConfigProperties.queue.cancelling) {
-                                autoVersioningAuditService.cancelQueuedOrders(order)
+                            // Throttling
+                            autoVersioningAuditService.throttling(order)
+
+                            // Starting the audit
+                            val entry = autoVersioningAuditService.onCreated(order)
+
+                            // Triggering the scheduler immediately when no schedule is planned
+                            if (entry.order.schedule == null) {
+                                autoVersioningScheduler.scheduleEntry(entry)
                             }
-
-                            // Sending the request on the queue
-                            val result = queueDispatcher.dispatch(
-                                queueProcessor = queueProcessor,
-                                payload = AutoVersioningQueuePayload(
-                                    order = order,
-                                ),
-                                source = queueSourceExtension.createQueueSource(
-                                    AutoVersioningQueueSourceData(
-                                        orderUuid = order.uuid,
-                                    )
-                                ),
-                            )
-
-                            // Audit & metrics
-                            val routingKey = result.routingKey ?: "n/a"
-                            autoVersioningAuditService.onQueuing(
-                                order,
-                                routingKey,
-                            )
-                            metrics.onQueuing(order, routingKey)
                         }
                     }
                 }
@@ -121,6 +98,11 @@ class AutoVersioningDispatcherImpl(
                 prBodyTemplate = config.prBodyTemplate,
                 prBodyTemplateFormat = config.prBodyTemplateFormat,
                 additionalPaths = config.additionalPaths ?: emptyList(),
+                schedule = computeSchedule(config.cronSchedule),
+                retries = 0, // No try yet
+                maxRetries = config.maxRetries,
+                retryIntervalSeconds = config.retryIntervalSeconds,
+                retryIntervalFactor = config.retryIntervalFactor,
             )
         } catch (ex: Exception) {
             // Logging the event
@@ -136,6 +118,13 @@ class AutoVersioningDispatcherImpl(
             return null
         }
     }
+
+    private fun computeSchedule(cronSchedule: String?): LocalDateTime? =
+        if (cronSchedule.isNullOrBlank()) {
+            null
+        } else {
+            scheduleService.nextExecutionTime(cronSchedule)
+        }
 
     private fun getBuildSourceVersion(promotionRun: PromotionRun, config: AutoVersioningSourceConfig): String {
         return versionSourceFactory.getBuildVersion(promotionRun.build, config)

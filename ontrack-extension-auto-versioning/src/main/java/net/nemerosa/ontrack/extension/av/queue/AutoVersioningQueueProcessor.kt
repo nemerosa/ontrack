@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.extension.queue.QueueAckMode
 import net.nemerosa.ontrack.extension.queue.QueueMetadata
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
 import net.nemerosa.ontrack.model.security.SecurityService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 
@@ -21,6 +23,8 @@ class AutoVersioningQueueProcessor(
     private val autoVersioningAuditService: AutoVersioningAuditService,
     private val autoVersioningProcessingService: AutoVersioningProcessingService,
 ) : QueueProcessor<AutoVersioningQueuePayload> {
+
+    private val logger: Logger = LoggerFactory.getLogger(AutoVersioningQueueProcessor::class.java)
 
     override val id: String = "auto-versioning"
 
@@ -37,15 +41,20 @@ class AutoVersioningQueueProcessor(
         val order = payload.order
         val entry = autoVersioningAuditQueryService.findByUUID(order.branch, order.uuid)
         return if (entry == null) {
-            "No audit entry found upon receiving the processing order"
+            val message = "No audit entry found upon receiving the processing order [${order.uuid}]"
+            logger.warn(message)
+            message
         } else if (!entry.mostRecentState.state.isRunning) {
-            "Cancelled order, not processing"
+            val message = "Cancelled order [${order.uuid}], not processing"
+            logger.warn(message)
+            message
         } else {
             null
         }
     }
 
     override fun process(payload: AutoVersioningQueuePayload, queueMetadata: QueueMetadata?) {
+        logger.info("Processing order [{}] started...", payload.order.uuid)
         val order = payload.order
         val queue = queueMetadata?.queueName
         metrics.onReceiving(order, queue)
@@ -55,6 +64,7 @@ class AutoVersioningQueueProcessor(
                 val outcome = metrics.processingTiming(order, queue) {
                     autoVersioningProcessingService.process(order)
                 }
+                logger.info("Processing order [{}] completed.", payload.order.uuid)
                 metrics.onProcessingCompleted(order, outcome)
             } catch (any: Throwable) {
                 autoVersioningAuditService.onError(order, any)

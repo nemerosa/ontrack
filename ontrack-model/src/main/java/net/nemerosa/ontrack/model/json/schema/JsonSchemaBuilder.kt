@@ -121,6 +121,7 @@ private class JsonSchemaBuilder(
             cls == Map::class -> toMap(type, description, context)
             cls == JsonNode::class -> JsonRawJsonType(description)
             cls == Duration::class -> JsonDurationType(description)
+            cls == Double::class -> JsonDoubleType(description)
             cls.isSubclassOf(Enum::class) -> toEnumType(cls, description)
             cls.jvmName.startsWith("net.nemerosa.ontrack.") -> toObject(type, description, context)
             else -> error("$type is not supported at $context")

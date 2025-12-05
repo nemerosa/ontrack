@@ -7,9 +7,9 @@ import net.nemerosa.ontrack.kdsl.connector.support.PaginatedList
 import net.nemerosa.ontrack.kdsl.connector.support.emptyPaginatedList
 import net.nemerosa.ontrack.kdsl.spec.Ontrack
 
-fun Ontrack.search(token: String): PaginatedList<SearchResult> =
+fun Ontrack.search(type: String, token: String): PaginatedList<SearchResult> =
     graphqlConnector.query(
-        SearchQuery(token, 40)
+        SearchQuery(type, token, 40)
     )?.paginate(
         pageInfo = { it.search?.pageInfo?.pageInfoContent },
         pageItems = { it.search?.pageItems }

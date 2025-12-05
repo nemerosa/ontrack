@@ -6,6 +6,7 @@ plugins {
 dependencies {
     api(project(":ontrack-extension-support"))
 
+    implementation(project(":ontrack-repository"))
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-scm"))
     implementation(project(":ontrack-extension-general"))
@@ -25,6 +26,7 @@ dependencies {
     implementation(project(":ontrack-extension-config"))
 
     testImplementation(project(":ontrack-extension-general"))
+    testImplementation(testFixtures(project(":ontrack-common")))
     testImplementation(testFixtures(project(":ontrack-model")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testImplementation(testFixtures(project(":ontrack-extension-casc")))
@@ -32,10 +34,7 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-notifications")))
     testImplementation(testFixtures(project(":ontrack-extension-scm")))
     testImplementation(testFixtures(project(":ontrack-extension-config")))
-    // testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
-    // testImplementation(project(path = ":ontrack-extension-workflows", configuration = "tests"))
-    // testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))
-    // testImplementation(project(path = ":ontrack-extension-recordings", configuration = "tests"))
+    testImplementation(testFixtures(project(":ontrack-extension-queue")))
     testImplementation("com.networknt:json-schema-validator")
     testImplementation(project(":ontrack-it-utils"))
 

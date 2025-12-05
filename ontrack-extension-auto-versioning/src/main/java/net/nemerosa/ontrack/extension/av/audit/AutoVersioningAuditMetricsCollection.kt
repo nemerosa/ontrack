@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 @Component
 class AutoVersioningAuditMetricsCollection(
     private val meterRegistry: MeterRegistry,
-    private val autoVersioningAuditStoreHelper: AutoVersioningAuditStoreHelper,
+    private val autoVersioningAuditStore: AutoVersioningAuditStore,
 ) {
 
     @PostConstruct
@@ -22,7 +22,7 @@ class AutoVersioningAuditMetricsCollection(
                 ),
                 this
             ) {
-                autoVersioningAuditStoreHelper.countByState(state).toDouble()
+                autoVersioningAuditStore.countByState(state).toDouble()
             }
         }
     }

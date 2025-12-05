@@ -5,7 +5,7 @@ data class AutoVersioningAuditEntry(
     val running: Boolean,
     val mostRecentState: AutoVersioningAuditEntryState,
     val audit: List<AutoVersioningAuditEntryState>,
-    val routing: String,
+    val routing: String?,
     val queue: String?,
 )
 

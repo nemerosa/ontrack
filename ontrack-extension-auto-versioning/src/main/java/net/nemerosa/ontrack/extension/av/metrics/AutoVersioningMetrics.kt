@@ -1,6 +1,12 @@
 package net.nemerosa.ontrack.extension.av.metrics
 
+@Suppress("ConstPropertyName")
 object AutoVersioningMetrics {
+
+    object Scheduling {
+        const val scheduledCount = "ontrack_extension_auto_versioning_scheduling_scheduled_count"
+        const val schedulingCancelledCount = "ontrack_extension_auto_versioning_scheduling_scheduling_cancelled_count"
+    }
 
     object Queue {
         const val producedCount = "ontrack_extension_auto_versioning_queue_produced_count"

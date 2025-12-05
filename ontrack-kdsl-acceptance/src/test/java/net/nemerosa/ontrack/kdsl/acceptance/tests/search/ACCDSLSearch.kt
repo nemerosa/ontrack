@@ -29,7 +29,7 @@ class ACCDSLSearch : AbstractACCDSLTestSupport() {
                 }
 
                 // Checks that we find one build on exact match
-                var results = ontrack.search("$value-$value1")
+                var results = ontrack.search("build", "$value-$value1")
                 val build1Result =
                     results.items.find { it.title == "Build ${build1.branch.project.name}/${build1.branch.name}/${build1.name}" }
                 assertNotNull(build1Result, "Build 1 found")
@@ -39,7 +39,7 @@ class ACCDSLSearch : AbstractACCDSLTestSupport() {
 
 
                 // Checks that we find two builds on prefix match
-                results = ontrack.search(value)
+                results = ontrack.search("build", value)
                 assertNotNull(
                     results.items.find { it.title == "Build ${build1.branch.project.name}/${build1.branch.name}/${build1.name}" },
                     "Build 1 found"

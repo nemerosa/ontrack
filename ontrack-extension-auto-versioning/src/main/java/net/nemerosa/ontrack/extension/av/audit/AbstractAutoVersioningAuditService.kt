@@ -12,39 +12,66 @@ abstract class AbstractAutoVersioningAuditService(
 
     protected val logger: Logger = LoggerFactory.getLogger(AutoVersioningAuditService::class.java)
 
-    override fun cancelQueuedOrders(order: AutoVersioningOrder) {
-        store.cancelQueuedOrders(order)
+    override fun throttling(order: AutoVersioningOrder): Int {
+        return store.throttling(order)
     }
 
-    override fun onQueuing(order: AutoVersioningOrder, routing: String) {
-        store.create(order, routing)
+    override fun onCreated(order: AutoVersioningOrder) =
+        store.create(order)
+
+    override fun onScheduled(
+        order: AutoVersioningOrder,
+        routing: String
+    ) {
+        store.addState(
+            targetBranch = order.branch,
+            uuid = order.uuid,
+            routing = routing,
+            upgradeBranch = null,
+            state = AutoVersioningAuditState.SCHEDULED
+        )
     }
 
     override fun onReceived(order: AutoVersioningOrder, queue: String) {
-        store.addState(order.branch, order.uuid, queue, null, AutoVersioningAuditState.RECEIVED)
+        store.addState(
+            targetBranch = order.branch,
+            uuid = order.uuid,
+            routing = null,
+            queue = queue,
+            state = AutoVersioningAuditState.RECEIVED
+        )
     }
 
     override fun onError(order: AutoVersioningOrder, error: Throwable) {
         val stack = reducedStackTrace(error)
         store.addState(
-            order.branch,
-            order.uuid,
-            null,
-            null,
-            AutoVersioningAuditState.ERROR,
+            targetBranch = order.branch,
+            uuid = order.uuid,
+            routing = null,
+            queue = null,
+            upgradeBranch = null,
+            state = AutoVersioningAuditState.ERROR,
             "message" to (error.message ?: error::class.java.name),
             "error" to stack
         )
     }
 
     override fun onProcessingStart(order: AutoVersioningOrder) {
-        store.addState(order.branch, order.uuid, null, null, AutoVersioningAuditState.PROCESSING_START)
+        store.addState(
+            targetBranch = order.branch,
+            uuid = order.uuid,
+            routing = null,
+            queue = null,
+            upgradeBranch = null,
+            state = AutoVersioningAuditState.PROCESSING_START
+        )
     }
 
     override fun onProcessingAborted(order: AutoVersioningOrder, message: String) {
         store.addState(
             order.branch,
             order.uuid,
+            null,
             null,
             null,
             AutoVersioningAuditState.PROCESSING_ABORTED,
@@ -56,6 +83,7 @@ abstract class AbstractAutoVersioningAuditService(
         store.addState(
             targetBranch = order.branch,
             uuid = order.uuid,
+            routing = null,
             queue = null,
             upgradeBranch = upgradeBranch,
             state = AutoVersioningAuditState.PROCESSING_CREATING_BRANCH,
@@ -66,6 +94,7 @@ abstract class AbstractAutoVersioningAuditService(
     override fun onProcessingUpdatingFile(order: AutoVersioningOrder, upgradeBranch: String, targetPath: String) {
         store.addState(
             order.branch, order.uuid,
+            null,
             null,
             null,
             AutoVersioningAuditState.PROCESSING_UPDATING_FILE,
@@ -80,6 +109,7 @@ abstract class AbstractAutoVersioningAuditService(
             order.uuid,
             null,
             null,
+            null,
             AutoVersioningAuditState.POST_PROCESSING_START,
             "branch" to upgradeBranch
         )
@@ -92,6 +122,7 @@ abstract class AbstractAutoVersioningAuditService(
         store.addState(
             targetBranch = order.branch,
             uuid = order.uuid,
+            routing = null,
             queue = null,
             upgradeBranch = null,
             state = AutoVersioningAuditState.POST_PROCESSING_LAUNCHED,
@@ -105,6 +136,7 @@ abstract class AbstractAutoVersioningAuditService(
             order.uuid,
             null,
             null,
+            null,
             AutoVersioningAuditState.POST_PROCESSING_END,
             "branch" to upgradeBranch
         )
@@ -116,6 +148,7 @@ abstract class AbstractAutoVersioningAuditService(
             order.uuid,
             null,
             null,
+            null,
             AutoVersioningAuditState.PR_CREATING,
             "branch" to upgradeBranch
         )
@@ -124,6 +157,7 @@ abstract class AbstractAutoVersioningAuditService(
     override fun onPRTimeout(order: AutoVersioningOrder, upgradeBranch: String, prName: String, prLink: String) {
         store.addState(
             order.branch, order.uuid,
+            null,
             null,
             null,
             AutoVersioningAuditState.PR_TIMEOUT,
@@ -138,6 +172,7 @@ abstract class AbstractAutoVersioningAuditService(
             order.branch, order.uuid,
             null,
             null,
+            null,
             AutoVersioningAuditState.PR_CREATED,
             AutoVersioningAuditEntryStateDataKeys.BRANCH to upgradeBranch,
             AutoVersioningAuditEntryStateDataKeys.PR_NAME to prName,
@@ -150,6 +185,7 @@ abstract class AbstractAutoVersioningAuditService(
             order.branch, order.uuid,
             null,
             null,
+            null,
             AutoVersioningAuditState.PR_APPROVED,
             AutoVersioningAuditEntryStateDataKeys.BRANCH to upgradeBranch,
             AutoVersioningAuditEntryStateDataKeys.PR_NAME to prName,
@@ -160,6 +196,7 @@ abstract class AbstractAutoVersioningAuditService(
     override fun onPRMerged(order: AutoVersioningOrder, upgradeBranch: String, prName: String, prLink: String) {
         store.addState(
             order.branch, order.uuid,
+            null,
             null,
             null,
             AutoVersioningAuditState.PR_MERGED,

@@ -3,14 +3,27 @@ package net.nemerosa.ontrack.kdsl.spec.extension.av
 import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
+import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.AutoVersioningAuditEntriesQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.AutoVersioningAuditEntryByIdQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.AutoVersioningAuditPurgeMutation
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 /**
  * Management interface for the audit of the auto versioning
  */
 class AutoVersioningAuditMgt(connector: Connector) : Connected(connector) {
+
+    /**
+     * Purging all the auto-versioning audit entries
+     */
+    fun purge() {
+        graphqlConnector.mutate(
+            AutoVersioningAuditPurgeMutation()
+        ) {
+            it?.purgeAutoVersioningAuditEntries?.payloadUserErrors?.convert()
+        }
+    }
 
     /**
      * Gets an entry by ID

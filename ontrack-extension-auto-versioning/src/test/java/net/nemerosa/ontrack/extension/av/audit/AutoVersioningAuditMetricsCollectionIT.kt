@@ -29,14 +29,20 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
             branch {
                 // Purge existing audit entries
                 autoVersioningAuditCleanupService.purge()
+                // Created
+                create(source) {
+                    autoVersioningAuditService.onCreated(it)
+                }
                 // In queue
                 create(source) {
-                    autoVersioningAuditService.onQueuing(it, "routing")
+                    autoVersioningAuditService.onCreated(it)
+                    autoVersioningAuditService.onScheduled(it, "routing")
                 }
                 // Received
                 repeat(2) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                     }
                 }
@@ -44,7 +50,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 val error = RuntimeException("test")
                 repeat(3) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                         autoVersioningAuditService.onError(it, error)
                     }
@@ -52,7 +59,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 // Processing start
                 repeat(4) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                         autoVersioningAuditService.onProcessingStart(it)
                     }
@@ -60,7 +68,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 // Processing aborted
                 repeat(5) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                         autoVersioningAuditService.onProcessingStart(it)
                         autoVersioningAuditService.onProcessingAborted(it, "test")
@@ -69,7 +78,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 // Processing creating branch
                 repeat(6) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                         autoVersioningAuditService.onProcessingStart(it)
                         autoVersioningAuditService.onProcessingCreatingBranch(it, "branch")
@@ -78,7 +88,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 // Processing updating file
                 repeat(7) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                         autoVersioningAuditService.onProcessingStart(it)
                         autoVersioningAuditService.onProcessingCreatingBranch(it, "branch")
@@ -88,7 +99,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 // Processing post processing start
                 repeat(8) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                         autoVersioningAuditService.onProcessingStart(it)
                         autoVersioningAuditService.onProcessingCreatingBranch(it, "branch")
@@ -99,7 +111,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 // Processing post processing end
                 repeat(9) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                         autoVersioningAuditService.onProcessingStart(it)
                         autoVersioningAuditService.onProcessingCreatingBranch(it, "branch")
@@ -112,7 +125,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 // PR creating
                 repeat(10) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                         autoVersioningAuditService.onProcessingStart(it)
                         autoVersioningAuditService.onProcessingCreatingBranch(it, "branch")
@@ -123,7 +137,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 // PR merged
                 repeat(11) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                         autoVersioningAuditService.onProcessingStart(it)
                         autoVersioningAuditService.onProcessingCreatingBranch(it, "branch")
@@ -135,7 +150,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 // PR created
                 repeat(12) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                         autoVersioningAuditService.onProcessingStart(it)
                         autoVersioningAuditService.onProcessingCreatingBranch(it, "branch")
@@ -147,7 +163,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 // PR approved
                 repeat(13) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                         autoVersioningAuditService.onProcessingStart(it)
                         autoVersioningAuditService.onProcessingCreatingBranch(it, "branch")
@@ -159,7 +176,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 // PR timeout
                 repeat(14) {
                     create(source) {
-                        autoVersioningAuditService.onQueuing(it, "routing")
+                        autoVersioningAuditService.onCreated(it)
+                        autoVersioningAuditService.onScheduled(it, "routing")
                         autoVersioningAuditService.onReceived(it, "queue")
                         autoVersioningAuditService.onProcessingStart(it)
                         autoVersioningAuditService.onProcessingCreatingBranch(it, "branch")
@@ -182,6 +200,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 assertEquals(
                     mapOf(
                         AutoVersioningAuditState.CREATED to 1.0,
+                        AutoVersioningAuditState.SCHEDULED to 1.0,
+                        AutoVersioningAuditState.THROTTLED to 0.0,
                         AutoVersioningAuditState.RECEIVED to 2.0,
                         AutoVersioningAuditState.ERROR to 3.0,
                         AutoVersioningAuditState.PROCESSING_START to 4.0,
@@ -197,8 +217,8 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                         AutoVersioningAuditState.PR_CREATED to 12.0,
                         AutoVersioningAuditState.PR_APPROVED to 13.0,
                         AutoVersioningAuditState.PR_TIMEOUT to 14.0,
-                    ),
-                    stateValues
+                    ).toSortedMap(),
+                    stateValues.toSortedMap()
                 )
             }
         }

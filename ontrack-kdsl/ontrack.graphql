@@ -3,11 +3,22 @@ schema {
   mutation: Mutation
 }
 
+"This directive allows results to be deferred during execution"
+directive @defer(
+    "Deferred behaviour is controlled by this argument"
+    if: Boolean! = true,
+    "A unique label that represents the fragment being deferred"
+    label: String
+  ) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
 "Marks the field, argument, input field or enum value as deprecated"
 directive @deprecated(
     "The reason for the deprecation"
-    reason: String = "No longer supported"
+    reason: String! = "No longer supported"
   ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM_VALUE | INPUT_FIELD_DEFINITION
+
+"This directive disables error propagation when a non nullable field returns null for the given operation."
+directive @experimental_disableErrorPropagation on QUERY | MUTATION | SUBSCRIPTION
 
 "Directs the executor to include this field or fragment only when the `if` argument is true"
 directive @include(
@@ -70,8 +81,6 @@ type Account {
   "List of groups the account belongs to"
   groups: [AccountGroup!]!
   id: ID!
-  "Links"
-  links: AccountLinks @deprecated(reason : "Use the `actions` field instead.")
   "Unique name for the account"
   name: String! @deprecated(reason : "Will be removed in V6. Use email instead. Replaced by email.")
   "Security role (admin or none)"
@@ -89,32 +98,7 @@ type AccountGroup {
   "Global role for the account group"
   globalRole: GlobalRole
   id: ID!
-  "Links"
-  links: AccountGroupLinks @deprecated(reason : "Use the `actions` field instead.")
   name: String
-}
-
-"AccountGroup links"
-type AccountGroupLinks {
-  _delete: String
-  _self: String
-  _update: String
-}
-
-"Account links"
-type AccountLinks {
-  _delete: String
-  _self: String
-  _update: String
-}
-
-type Action {
-  "enabled field"
-  enabled: Boolean
-  id: String
-  name: String
-  type: String
-  uri: String
 }
 
 "Output type for the addSlotWorkflow mutation."
@@ -157,7 +141,7 @@ type AutoVersioningAuditEntry {
   "Actual queue where the order was posted"
   queue: String
   "Queue routing key used for this order"
-  routing: String!
+  routing: String
   "Running state"
   running: Boolean
   "Actual SCM branch being used"
@@ -240,6 +224,8 @@ type AutoVersioningOrder {
   postProcessing: String
   "JSON configuration for the post processing"
   postProcessingConfig: JSON
+  "Qualifier for the link between the source and target"
+  qualifier: String
   "Link to the target repository"
   repositoryHtmlURL: String
   "List of reviewers to always add to the pull request"
@@ -282,6 +268,10 @@ type AutoVersioningSourceConfig {
   backValidation: String
   "Build link creation. True by default."
   buildLinkCreation: Boolean
+  "Cron schedule (when to start applying queued requests)"
+  cronSchedule: String
+  "Maximum number of retries. If null or 0, no retry is performed."
+  maxRetries: Int
   "List of notifications subscriptions to setup for this auto versioning"
   notifications: [AutoVersioningNotification!]
   "Type of post processing to launch after the version has been updated"
@@ -296,6 +286,10 @@ type AutoVersioningSourceConfig {
   prTitleTemplate: String
   "Qualifier for the build link to create (when links are created)"
   qualifier: String
+  "Exponential factor. 1.0 means that the interval is linear. If null, default value is taken from the setings. If < 1, 1.0 is assumer."
+  retryIntervalFactor: Float
+  "Exponential interval to wait between retries. If null, default value is taken from the settings."
+  retryIntervalSeconds: Int
   "List of reviewers to always set on the pull request created by the auto versioning"
   reviewers: [String!]
   "Branches to watch using a regular expression"
@@ -314,6 +308,8 @@ type AutoVersioningSourceConfig {
   targetPropertyType: String
   "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
   targetRegex: String
+  "Number of requests to keep at one given moment. If > 0, this is an actual throttling of the requests for this configuration."
+  throttling: Int
   "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`"
   upgradeBranchPattern: String
   "Validation stamp to create on auto versioning (optional)"
@@ -362,8 +358,6 @@ type Branch implements Authorizable & ProjectEntity {
   ): BuildAutoVersioning
   "Auto versioning configuration"
   autoVersioningConfig: AutoVersioningConfig
-  "Actions to get a diff on builds of the branch"
-  buildDiffActions: [Action!]!
   "List of forms for the build filters (for the creation of new filters)"
   buildFilterForms: [BuildFilterForm!]!
   "List of shared build filters for this branch"
@@ -409,19 +403,8 @@ type Branch implements Authorizable & ProjectEntity {
   favourite: Boolean
   "Git branch"
   gitBranchConfigurationProperty: Property
-  gitChangeLog(
-    "Name of the build to start the change log with"
-    from: String!,
-    "Name of the build to end the change log with"
-    to: String!
-  ): GitChangeLog
   "Registered GitHub ingestion configuration"
   gitHubIngestionConfig: GitHubIngestionConfig
-  "Graph of dependencies for this branch"
-  graph(
-    "Direction for the dependencies"
-    direction: BranchLinksDirection!
-  ): BranchLinksNode! @deprecated(reason : "Graph UI will be dropped in 4.6 and `graph` fields in 5.0.")
   id: ID!
   "List of information components attached to this entity"
   information: [EntityInformation!]!
@@ -429,8 +412,6 @@ type Branch implements Authorizable & ProjectEntity {
   jenkinsJobProperty: Property
   "List of links."
   linkProperty: Property
-  "Links"
-  links: BranchLinks @deprecated(reason : "Use the `actions` field instead.")
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
@@ -491,22 +472,22 @@ type Branch implements Authorizable & ProjectEntity {
   validationStatuses(names: [String!]!): [ValidationRun!]!
 }
 
-"Branch and associated information"
+"Information about a branch"
 type BranchInfo {
   "Associated branch"
-  branch: Branch
-  "First build which contains the commit"
+  branch: Branch!
+  "First build on this branch"
   firstBuild: Build
-  "First promotion for every promotion level"
+  "List of promotions on this branch"
   promotions: [PromotionRun!]!
 }
 
-"Type of branch associated with information about the corresponding branches."
+"Collecting information about a set of branches."
 type BranchInfos {
-  "List of branches and their associated information"
+  "List of information per branch"
   branchInfoList: [BranchInfo!]!
-  "Type of branch"
-  type: String
+  "Name of the group of branches"
+  type: String!
 }
 
 "Qualified link to a branch"
@@ -521,80 +502,6 @@ type BranchLink {
   sourceBuild: Build!
   "Last target build"
   targetBuild: Build!
-}
-
-"Branch links"
-type BranchLinks {
-  _actions: String
-  _allValidationStampFilters: String
-  _branches: String
-  _buildFilterForms: String
-  _buildFilterResources: String
-  _buildFilterSave: String
-  _buildFilterShare: String
-  _bulkUpdate: String
-  _clone: String
-  _copy: String
-  _createBuild: String
-  _createPromotionLevel: String
-  _createValidationStamp: String
-  _decorations: String
-  _delete: String
-  _disable: String
-  _download: String
-  _enable: String
-  _events: String
-  _extra: String
-  _favourite: String
-  _page: String
-  _project: String
-  _promotionLevels: String
-  _properties: String
-  _reorderPromotionLevels: String
-  _reorderValidationStamps: String
-  _self: String
-  _status: String
-  _unfavourite: String
-  _update: String
-  _validationStampFilterCreate: String
-  _validationStampViews: String
-  _validationStamps: String
-  _view: String
-}
-
-type BranchLinksDecoration {
-  "Optional longer text, typically used as a tooltip"
-  description: String
-  "Feature contributing to this decoration"
-  feature: ExtensionFeatureDescription!
-  "Optional name to an image for the decoration. This name is used together with the [feature] and the [id] to build a URL on the client side"
-  icon: String
-  "ID of the decoration provider"
-  id: String!
-  "Short text to display at edge level for the decoration"
-  text: String!
-  "Optional link from the decoration to another page"
-  url: String
-}
-
-"BranchLinksEdge"
-type BranchLinksEdge {
-  "decorations field"
-  decorations: [BranchLinksDecoration!]!
-  "direction field"
-  direction: BranchLinksDirection!
-  "linkedTo field"
-  linkedTo: BranchLinksNode!
-}
-
-"BranchLinksNode"
-type BranchLinksNode {
-  "Branch associated to this node"
-  branch: Branch!
-  "Actual build for this node"
-  build: Build
-  "Edges coming out of this node to other nodes"
-  edges: [BranchLinksEdge!]!
 }
 
 type Build implements Authorizable & ProjectEntity {
@@ -627,19 +534,12 @@ type Build implements Authorizable & ProjectEntity {
     type: String
   ): [Decoration!]!
   description: String
+  "Display name for this build or the build's name if not available"
+  displayName: String!
   "List of slots this eligible to"
   eligibleSlots: [Slot!]!
-  gitChangeLog(
-    "Name of the build to end the change log with. If not set, compares with the previous build."
-    to: String
-  ): GitChangeLog
   "Git commit"
   gitCommitProperty: Property
-  "Graph of dependencies for this build"
-  graph(
-    "Direction for the dependencies"
-    direction: BranchLinksDirection!
-  ): BranchLinksNode! @deprecated(reason : "Graph UI will be dropped in 4.6 and `graph` fields in 5.0.")
   id: ID!
   "List of information components attached to this entity"
   information: [EntityInformation!]!
@@ -647,8 +547,6 @@ type Build implements Authorizable & ProjectEntity {
   jenkinsBuildProperty: Property
   "List of links."
   linkProperty: Property
-  "Links"
-  links: BuildLinks @deprecated(reason : "Use the `actions` field instead.")
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
@@ -702,17 +600,6 @@ type Build implements Authorizable & ProjectEntity {
     qualifier: String
   ): [Slot!]!
   "List of builds using this one."
-  usedBy(
-    "Keeps only links targeted from this branch. `project` argument is also required."
-    branch: String,
-    "Offset for the page"
-    offset: Int = 0,
-    "Keeps only links targeted from this project"
-    project: String,
-    "Size of the page"
-    size: Int = 20
-  ): BuildPaginated @deprecated(reason : "usedByQualified must be used instead")
-  "List of builds using this one."
   usedByQualified(
     "Keeps only links targeted from this branch. `project` argument is also required."
     branch: String,
@@ -725,17 +612,6 @@ type Build implements Authorizable & ProjectEntity {
   ): BuildLinkPaginated
   "List of actions available for this entity"
   userMenuActions: [UserMenuAction!]!
-  "List of builds being used by this one."
-  using(
-    "Keeps only links targeted from this branch. `project` argument is also required."
-    branch: String,
-    "Offset for the page"
-    offset: Int = 0,
-    "Keeps only links targeted from this project"
-    project: String,
-    "Size of the page"
-    size: Int = 20
-  ): BuildPaginated @deprecated(reason : "usingQualified must be used instead")
   "List of builds being used by this one."
   usingQualified(
     "Keeps only links targeted from this branch. `project` argument is also required."
@@ -798,8 +674,6 @@ type BuildAutoVersioning {
 
 "Form to create a new build filter."
 type BuildFilterForm {
-  "Form for the filter."
-  form: JSON @deprecated(reason : "Form is only used for the Ontrack legacy UI")
   "If the filter is predefined and cannot be configured."
   isPredefined: Boolean
   "FQCN for the build filter provider"
@@ -816,25 +690,24 @@ type BuildFilterResource {
   error: String
   "Is this filter shared?"
   isShared: Boolean
-  "Links"
-  links: BuildFilterResourceLinks @deprecated(reason : "Use the `actions` field instead.")
   "Name for this filter"
   name: String!
   "FQCN of the build filter provider"
   type: String!
 }
 
-"BuildFilterResource links"
-type BuildFilterResourceLinks {
-  _delete: String
-  _share: String
-  _update: String
-}
-
 "Build filter validation result."
 type BuildFilterValidation {
   "Validation message or null if valid."
   error: String
+}
+
+"Link between a build and a Git commit"
+type BuildGitCommitLink {
+  "ID of the link"
+  id: String!
+  "Display name for the link"
+  name: String!
 }
 
 "Qualified link to a build"
@@ -850,33 +723,6 @@ type BuildLinkPaginated {
   pageInfo: PageInfo
   "Items in the current page"
   pageItems: [BuildLink!]!
-}
-
-"Build links"
-type BuildLinks {
-  _actions: String
-  _buildLinksFrom: String
-  _changeLog: String
-  _changeLogPage: String
-  _collectSonarQube: String
-  _decorations: String
-  _delete: String
-  _events: String
-  _extra: String
-  _lastPromotionRuns: String
-  _next: String
-  _page: String
-  _previous: String
-  _promote: String
-  _promotionRuns: String
-  _properties: String
-  _runInfo: String
-  _self: String
-  _signature: String
-  _update: String
-  _validate: String
-  _validationRuns: String
-  _validationStampRunViews: String
 }
 
 type BuildPaginated {
@@ -930,11 +776,6 @@ type CasC {
   yaml: String!
 }
 
-type ChangePasswordPayload implements PayloadInterface {
-  "List of errors"
-  errors: [PayloadUserError]
-}
-
 "Output type for the changeValidationRunStatusComment mutation."
 type ChangeValidationRunStatusCommentPayload implements Payload {
   "List of errors"
@@ -969,6 +810,18 @@ type ChartDefinition {
 type CheckAutoVersioningPayload implements Payload {
   "List of errors"
   errors: [UserError]
+}
+
+"Output type for the cleanupAutoVersioningAuditEntries mutation."
+type CleanupAutoVersioningAuditEntriesPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
+"Status for an individual connector"
+type CollectedConnectorStatus {
+  status: ConnectorStatus!
+  time: String!
 }
 
 "Definition of an attribute for a configurable indicator"
@@ -1011,17 +864,10 @@ type ConfigurableIndicatorTypeState {
   category: IndicatorComputedCategory!
   "Indicator type ID"
   id: String
-  "Links"
-  links: ConfigurableIndicatorTypeStateLinks @deprecated(reason : "Use the `actions` field instead.")
   "Indicator type name"
   name: String
   "Saved stated for this configurable indicator"
   state: ConfigurableIndicatorState
-}
-
-"ConfigurableIndicatorTypeState links"
-type ConfigurableIndicatorTypeStateLinks {
-  _update: String
 }
 
 "Generic configuration"
@@ -1034,12 +880,51 @@ type Configuration {
   name: String!
 }
 
+"Output type for the configureBuild mutation."
+type ConfigureBuildPayload implements Payload {
+  "Configured build"
+  build: Build
+  "List of errors"
+  errors: [UserError]
+}
+
 "Result of testing a configuration"
 type ConnectionResult {
   "Result message"
   message: String!
   "Type of result"
   type: ConnectionResultType!
+}
+
+"Definition of a connector"
+type Connector {
+  "Name of the connector"
+  name: String
+  "Type of connector"
+  type: String
+}
+
+"Description for a connector"
+type ConnectorDescription {
+  connection: String
+  connector: Connector
+}
+
+"List of statuses for all connectors"
+type ConnectorGlobalStatus {
+  count: Int!
+  downCount: Int!
+  percent: Int!
+  status: ConnectorStatusType!
+  statuses: [CollectedConnectorStatus!]!
+  upCount: Int!
+}
+
+"Connector status"
+type ConnectorStatus {
+  description: ConnectorDescription!
+  error: String
+  type: ConnectorStatusType!
 }
 
 "Output type for the createAccountGroup mutation."
@@ -1190,6 +1075,14 @@ type CreateValidationRunByIdPayload implements Payload {
   validationRun: ValidationRun
 }
 
+"Output type for the createValidationRunByRelease mutation."
+type CreateValidationRunByReleasePayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+  "Created validation run"
+  validationRun: ValidationRun
+}
+
 "Output type for the createValidationRun mutation."
 type CreateValidationRunPayload implements Payload {
   "List of errors"
@@ -1265,6 +1158,12 @@ type DeleteAutoVersioningConfigPayload implements Payload {
   errors: [UserError]
 }
 
+"Output type for the deleteBranchById mutation."
+type DeleteBranchByIdPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 "Output type for the deleteBranchGitConfigPropertyById mutation."
 type DeleteBranchGitConfigPropertyByIdPayload implements Payload {
   "Branch updated"
@@ -1325,6 +1224,12 @@ type DeleteBranchReleaseValidationPropertyByIdPayload implements Payload {
 type DeleteBranchReleaseValidationPropertyPayload implements Payload {
   "Branch updated"
   branch: Branch
+  "List of errors"
+  errors: [UserError]
+}
+
+"Output type for the deleteBuildById mutation."
+type DeleteBuildByIdPayload implements Payload {
   "List of errors"
   errors: [UserError]
 }
@@ -1811,6 +1716,12 @@ type DeleteValidationStampByIdPayload implements Payload {
   errors: [UserError]
 }
 
+"Output type for the deleteValidationStampFilterById mutation."
+type DeleteValidationStampFilterByIdPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 "Output type for the deleteValidationStampMessagePropertyById mutation."
 type DeleteValidationStampMessagePropertyByIdPayload implements Payload {
   "List of errors"
@@ -1975,8 +1886,6 @@ type EventSubscriptionPayload {
   channel: String!
   "Channel configuration"
   channelConfig: JSON!
-  "Textual description of the channel configuration"
-  channelConfigText: String!
   "Optional template to use for the message"
   contentTemplate: String
   "If this subscription is disabled"
@@ -2006,16 +1915,6 @@ type EventType {
   description: String!
   "id field"
   id: String!
-}
-
-"Definition of an export format for the issues."
-type ExportFormat {
-  "ID of the format"
-  id: String!
-  "Display name of the format"
-  name: String!
-  "MIME type of the format"
-  type: String!
 }
 
 type ExtensionFeatureDescription {
@@ -2059,97 +1958,6 @@ type GenerateTokenPayload implements Payload {
   errors: [UserError]
   "Generated token"
   token: Token
-}
-
-type GitChangeLog {
-  "From build"
-  buildFrom: Build!
-  "To build"
-  buildTo: Build!
-  "List of commits in the change log"
-  commits: [GitUICommit!]!
-  "List of commits as a plot"
-  commitsPlot: JSON
-  "Gets the change of some dependency"
-  depChangeLog(
-    "Name of the project to follow"
-    project: String!
-  ): GitChangeLog
-  "Link to a diff between the two builds"
-  diffLink: String
-  "Export of the change log according to some specifications"
-  export(
-    "Export specifications"
-    request: IssueChangeLogExportRequest
-  ): String
-  "List of files changes"
-  files: GitChangeLogFiles!
-  "Checking if a change log can have issues"
-  hasIssues: Boolean!
-  "List of issues in the change log"
-  issues: GitChangeLogIssues
-  "All dependency changes"
-  linkChanges: [LinkChange!]!
-  "Project linked to the change log"
-  project: Project!
-  "If an error has occured during the synchronization"
-  syncError: Boolean
-  "UUID of the change log."
-  uuid: String!
-}
-
-"Change on one file"
-type GitChangeLogFile {
-  "changeType field"
-  changeType: SCMChangeLogFileChangeType!
-  "newPath field"
-  newPath: String!
-  "oldPath field"
-  oldPath: String!
-  "Old path if set, new path otherwiser"
-  path: String!
-  "url field"
-  url: String!
-}
-
-"List of files changes"
-type GitChangeLogFiles {
-  "List of individual file changes"
-  list: [GitChangeLogFile!]!
-}
-
-"Description for an issue"
-type GitChangeLogIssue {
-  "Issue representation with minimal fields"
-  issue: Issue!
-  "Issue representation as JSON"
-  issueObject: JSON
-}
-
-"List of issues associated with their issue service representation"
-type GitChangeLogIssues {
-  "Configuration of the issue service associated with this list of issues"
-  issueServiceConfiguration: IssueServiceConfigurationRepresentation
-  "List of issues"
-  list: [GitChangeLogIssue!]!
-}
-
-"GitCommit"
-type GitCommit {
-  "author field"
-  author: GitPerson!
-  "commitTime field"
-  commitTime: LocalDateTime!
-  "committer field"
-  committer: GitPerson!
-  "fullMessage field"
-  fullMessage: String!
-  "id field"
-  id: String!
-  "shortId field"
-  shortId: String!
-  "shortMessage field"
-  shortMessage: String!
 }
 
 "GitHub App token information"
@@ -2202,8 +2010,6 @@ type GitHubEngineConfiguration {
   appToken: GitHubAppToken
   "Authentication type"
   authenticationType: String
-  "Links"
-  links: GitHubEngineConfigurationLinks @deprecated(reason : "Use the `actions` field instead.")
   "Name of the configuration"
   name: String
   "Rate limits for this configuration"
@@ -2212,13 +2018,6 @@ type GitHubEngineConfiguration {
   url: String!
   "User used to connect to GitHub. Can be used with a password or an OAuth2 token. Not needed if using only the OAUth2 token or a GitHub App."
   user: String
-}
-
-"GitHubEngineConfiguration links"
-type GitHubEngineConfigurationLinks {
-  _delete: String
-  _self: String
-  _update: String
 }
 
 "Output type for the gitHubIngestionBuildLinksByBuildLabel mutation."
@@ -2280,7 +2079,7 @@ type GitHubIngestionFilterConfig {
 "Payload received by the GitHub Ingestion Hook"
 type GitHubIngestionHookPayload {
   "Identity of the user"
-  accountName: String!
+  accountName: String
   "Timestamp for the end of the processing"
   completion: LocalDateTime
   "Mapped to the `X-GitHub-Delivery` header"
@@ -2380,14 +2179,6 @@ type GitHubRepository {
   owner: GitHubOwner!
 }
 
-"GitPerson"
-type GitPerson {
-  "email field"
-  email: String!
-  "name field"
-  name: String!
-}
-
 "Git pull request associated to a branch"
 type GitPullRequest {
   "PR id"
@@ -2410,32 +2201,6 @@ type GitPullRequest {
   title: String!
   "Link to the PR web page"
   url: String!
-}
-
-"GitUICommit"
-type GitUICommit {
-  "annotatedMessage field"
-  annotatedMessage: String!
-  "author field"
-  author: String!
-  "authorEmail field"
-  authorEmail: String!
-  "Build associated with this commit"
-  build: Build
-  "commit field"
-  commit: GitCommit!
-  "fullAnnotatedMessage field"
-  fullAnnotatedMessage: String!
-  "id field"
-  id: String!
-  "link field"
-  link: String!
-  "message field"
-  message: String!
-  "shortId field"
-  shortId: String!
-  "timestamp field"
-  timestamp: LocalDateTime!
 }
 
 "Granted global permission"
@@ -2477,14 +2242,6 @@ type GroupMapping {
   group: AccountGroup!
   "IdP group name"
   idpGroup: String!
-}
-
-"Home page settings"
-type HomePageSettingsType {
-  "Maximum of branches to display per favorite project"
-  maxBranches: Int!
-  "Maximum of projects starting from which we need to switch to a search mode"
-  maxProjects: Int!
 }
 
 "HookInfoLink"
@@ -2559,13 +2316,6 @@ type IndicatorCategories {
     "ID of the indicator category"
     id: String
   ): [IndicatorCategory!]!
-  "Links"
-  links: IndicatorCategoriesLinks @deprecated(reason : "Use the `actions` field instead.")
-}
-
-"IndicatorCategories links"
-type IndicatorCategoriesLinks {
-  _create: String
 }
 
 "Indicator category"
@@ -2574,8 +2324,6 @@ type IndicatorCategory {
   deprecated: String
   "Indicator category ID"
   id: String
-  "Links"
-  links: IndicatorCategoryLinks @deprecated(reason : "Use the `actions` field instead.")
   "Indicator category name"
   name: String
   "Reporting the indicators for the types in this category"
@@ -2595,12 +2343,6 @@ type IndicatorCategory {
   source: IndicatorSource
   "List of indicator types belonging to this category."
   types: [ProjectIndicatorType!]!
-}
-
-"IndicatorCategory links"
-type IndicatorCategoryLinks {
-  _delete: String
-  _update: String
 }
 
 "Report of indicators for a category"
@@ -2665,17 +2407,10 @@ type IndicatorPortfolio {
     "Number of seconds (> 0) to get indicator trends from."
     duration: Int
   ): [IndicatorCategoryStats!]! @deprecated(reason : "Use viewStats with viewId = null. This field will be removed in V5.")
-  "Global indicator stats"
-  globalStats(
-    "Number of seconds (> 0) to get indicator trends from."
-    duration: Int
-  ): [IndicatorCategoryStats!]! @deprecated(reason : "Use indicator views. This field will be removed in V5.")
   "ID of the portfolio"
   id: String
   "Label for this portfolio"
   label: Label
-  "Links"
-  links: IndicatorPortfolioLinks @deprecated(reason : "Use the `actions` field instead.")
   "Name of the portfolio"
   name: String
   "List of projects associated with this portfolio"
@@ -2687,28 +2422,6 @@ type IndicatorPortfolio {
     "ID of the indicator view, set to null to use the portfolio default configuration"
     id: String
   ): [IndicatorCategoryStats!]
-}
-
-"IndicatorPortfolio links"
-type IndicatorPortfolioLinks {
-  _delete: String
-  _update: String
-}
-
-"List of portfolios"
-type IndicatorPortfolioOfPortfolios {
-  "Global indicator categories"
-  categories: [IndicatorCategory!]! @deprecated(reason : "Use indicator views")
-  "Links"
-  links: IndicatorPortfolioOfPortfoliosLinks @deprecated(reason : "Use the `actions` field instead.")
-  "List of portfolios"
-  portfolios: [IndicatorPortfolio!]!
-}
-
-"IndicatorPortfolioOfPortfolios links"
-type IndicatorPortfolioOfPortfoliosLinks {
-  _create: String
-  _globalIndicators: String
 }
 
 "Indicator stats from the past"
@@ -2775,8 +2488,6 @@ type IndicatorTypeStats {
 
 "Aggregator of indicator types"
 type IndicatorTypes {
-  "Links"
-  links: IndicatorTypesLinks @deprecated(reason : "Use the `actions` field instead.")
   "List of indicator types"
   types(
     "ID of the indicator category"
@@ -2784,11 +2495,6 @@ type IndicatorTypes {
     "ID of the indicator type"
     id: String
   ): [ProjectIndicatorType!]!
-}
-
-"IndicatorTypes links"
-type IndicatorTypesLinks {
-  _create: String
 }
 
 "Indicator value type"
@@ -2807,8 +2513,6 @@ type IndicatorView {
   categories: [IndicatorCategory!]!
   "Unique ID for this view"
   id: String!
-  "Links"
-  links: IndicatorViewLinks @deprecated(reason : "Use the `actions` field instead.")
   "Name of the view"
   name: String!
   "List of indicator stats per project for all categories in this view"
@@ -2830,16 +2534,8 @@ type IndicatorView {
   ): [IndicatorViewProjectReport!]!
 }
 
-"IndicatorView links"
-type IndicatorViewLinks {
-  _delete: String
-  _update: String
-}
-
 "List of indicator views and management links."
 type IndicatorViewList {
-  "Links"
-  links: IndicatorViewListLinks @deprecated(reason : "Use the `actions` field instead.")
   "List of indicator views"
   views(
     "ID of the view to put in the list"
@@ -2847,11 +2543,6 @@ type IndicatorViewList {
     "Name of the view to put in the list"
     name: String
   ): [IndicatorView!]!
-}
-
-"IndicatorViewList links"
-type IndicatorViewListLinks {
-  _create: String
 }
 
 "View report line for a project"
@@ -3030,14 +2721,6 @@ type Issue {
   url: String
 }
 
-"Format for exporting a list of issues"
-type IssueExportFormat {
-  "Unique ID for this format"
-  id: String!
-  "Display name for this format"
-  name: String!
-}
-
 "Technical representation of an issue service and its configuration"
 type IssueServiceConfigurationRepresentation {
   "ID of the issue service"
@@ -3211,6 +2894,18 @@ type JobType {
   name: String!
 }
 
+"Available JSON schema"
+type JsonSchemaDefinition {
+  "Description for the JSON schema"
+  description: String!
+  "URI ID for the JSON schema"
+  id: String!
+  "Internal key"
+  key: String!
+  "Title for the JSON schema"
+  title: String!
+}
+
 "Label"
 type Label {
   "category field"
@@ -3225,18 +2920,10 @@ type Label {
   foregroundColor: String!
   "id field"
   id: Int!
-  "Links"
-  links: LabelLinks @deprecated(reason : "Use the `actions` field instead.")
   "name field"
   name: String!
   "List of associated projects"
   projects: [Project!]!
-}
-
-"Label links"
-type LabelLinks {
-  _delete: String
-  _update: String
 }
 
 "LabelProviderDescription"
@@ -3370,8 +3057,6 @@ type Mutation {
     "Input for the mutation"
     input: CancelSlotPipelineInput
   ): CancelSlotPipelinePayload
-  "Changing the password of the current user"
-  changePassword(input: ChangePasswordInput!): ChangePasswordPayload
   "Change the status of a validation run"
   changeValidationRunStatus(
     "Input for the mutation"
@@ -3387,6 +3072,13 @@ type Mutation {
     "Input for the mutation"
     input: CheckAutoVersioningInput
   ): CheckAutoVersioningPayload
+  "Cleans auto-versioning audit entries based on the retention policy"
+  cleanupAutoVersioningAuditEntries: CleanupAutoVersioningAuditEntriesPayload
+  "Configuration of a Yontrack build based on some input"
+  configureBuild(
+    "Input for the mutation"
+    input: ConfigureBuildInput
+  ): ConfigureBuildPayload
   "Creates an account group"
   createAccountGroup(
     "Input for the mutation"
@@ -3487,6 +3179,11 @@ type Mutation {
     "Input for the mutation"
     input: CreateValidationRunByIdInput
   ): CreateValidationRunByIdPayload
+  "Creating a validation run for a build identified by its release label"
+  createValidationRunByRelease(
+    "Input for the mutation"
+    input: CreateValidationRunByReleaseInput
+  ): CreateValidationRunByReleasePayload
   "Creates a new validation stamp from a branch ID"
   createValidationStampById(
     "Input for the mutation"
@@ -3517,6 +3214,11 @@ type Mutation {
     "Input for the mutation"
     input: DeleteAutoVersioningConfigInput
   ): DeleteAutoVersioningConfigPayload
+  "Deletes a branch using its ID"
+  deleteBranchById(
+    "Input for the mutation"
+    input: DeleteBranchByIdInput
+  ): DeleteBranchByIdPayload
   "Deletes the git branch property on a branch identified by name."
   deleteBranchGitConfigProperty(
     "Input for the mutation"
@@ -3557,6 +3259,11 @@ type Mutation {
     "Input for the mutation"
     input: DeleteBranchReleaseValidationPropertyByIdInput
   ): DeleteBranchReleaseValidationPropertyByIdPayload
+  "Deletes a build by ID"
+  deleteBuildById(
+    "Input for the mutation"
+    input: DeleteBuildByIdInput
+  ): DeleteBuildByIdPayload
   "Deletes a build filter for current user and for all users if shared"
   deleteBuildFilter(
     "Input for the mutation"
@@ -3886,6 +3593,11 @@ type Mutation {
     "Input for the mutation"
     input: DeleteValidationStampByIdInput
   ): DeleteValidationStampByIdPayload
+  "Deletes a validation stamp filter"
+  deleteValidationStampFilterById(
+    "Input for the mutation"
+    input: DeleteValidationStampFilterByIdInput
+  ): DeleteValidationStampFilterByIdPayload
   "Deletes the message property on a validation stamp identified by name."
   deleteValidationStampMessageProperty(
     "Input for the mutation"
@@ -4074,6 +3786,8 @@ type Mutation {
     "Input for the mutation"
     input: PostQueueInput
   ): PostQueuePayload
+  "Deletes all auto-versioning audit entries"
+  purgeAutoVersioningAuditEntries: PurgeAutoVersioningAuditEntriesPayload
   "Purging all records for Hook messages"
   purgeHookRecordings: PurgeHookRecordingsPayload
   "Purging all records for Queue messages"
@@ -4140,6 +3854,11 @@ type Mutation {
     "Input for the mutation"
     input: SaveYamlWorkflowInput
   ): SaveYamlWorkflowPayload
+  "Scheduling the auto-versioning at a given time"
+  scheduleAutoVersioning(
+    "Input for the mutation"
+    input: ScheduleAutoVersioningInput
+  ): ScheduleAutoVersioningPayload
   "Selects a dashboard"
   selectDashboard(input: SelectDashboardInput!): SelectDashboardPayload
   "Sets the auto versioning configuration for a branch"
@@ -4636,6 +4355,11 @@ type Mutation {
     "Input for the mutation"
     input: TestJenkinsConfigurationInput
   ): TestJenkinsConfigurationPayload
+  "Tests a webhook"
+  testWebhook(
+    "Input for the mutation"
+    input: TestWebhookInput
+  ): TestWebhookPayload
   "Unmarks a branch as favourite"
   unfavouriteBranch(
     "Input for the mutation"
@@ -4701,6 +4425,11 @@ type Mutation {
     "Input for the mutation"
     input: UpdateValidationStampFilterInput
   ): UpdateValidationStampFilterPayload
+  "Updating an existing webhook"
+  updateWebhook(
+    "Input for the mutation"
+    input: UpdateWebhookInput
+  ): UpdateWebhookPayload
   "Validates a build identified by id with CHML data"
   validateBuildByIdWithCHML(
     "Input for the mutation"
@@ -4811,24 +4540,6 @@ type NotificationSourceData {
   data: JSON!
   "ID of the notification source"
   id: String!
-}
-
-"Information about a commit"
-type OntrackGitCommitInfo {
-  "Associated branch info per types of branches"
-  branchInfosList: [BranchInfos!]!
-  "Information about the commit itself"
-  uiCommit: GitUICommit
-}
-
-"Information about an issue"
-type OntrackGitIssueInfo {
-  "Information about the last commit associated with this issue"
-  commitInfo: OntrackGitCommitInfo
-  "JSON representation of the issue"
-  issue: JSON
-  "Issue service associated with the issue"
-  issueServiceConfigurationRepresentation: IssueServiceConfigurationRepresentation
 }
 
 "Output type for the overridePipelineRule mutation."
@@ -4950,9 +4661,15 @@ type Project implements Authorizable & ProjectEntity {
   autoVersioningProjectProperty: Property
   "Associates the project with a Bitbucket Cloud repository"
   bitbucketCloudProjectConfigurationProperty: Property
+  branch(
+    "Name of the branch to look for"
+    name: String!
+  ): Branch!
   branches(
     "Maximum number of branches to return. No limit if not specified."
     count: Int,
+    "If null, does not filter on the branch disabled status. If true, looks only for enabled branches. If false, looks only for disabled branches."
+    enabled: Boolean,
     "Gets only favorite branches"
     favourite: Boolean,
     "Regular expression to match against the branch name"
@@ -4976,24 +4693,8 @@ type Project implements Authorizable & ProjectEntity {
   disabled: Boolean!
   "Is this project a favourite of the current user?"
   favourite: Boolean
-  "Information about a Git commit in the project"
-  gitCommitInfo(
-    "Full or abbreviated hash of the commit to look for"
-    commit: String!,
-    "Flag to display only the first branch per type"
-    first: Boolean
-  ): OntrackGitCommitInfo
   "Associates the project with a GitHub repository"
   gitHubProjectConfigurationProperty: Property
-  "List of formats supported for the export of issues in this project"
-  gitIssueExportFormats: [ExportFormat!]! @deprecated(reason : "List of issue export formats can be taken from the root and is now called issueExportFormats.")
-  "Information about an issue in the project"
-  gitIssueInfo(
-    "Flag to display only the first branch per type"
-    first: Boolean,
-    "Key or full name of an issue"
-    token: String!
-  ): OntrackGitIssueInfo
   "Associates the project with a GitLab repository"
   gitLabProjectConfigurationProperty: Property
   "Associates the project with a Git repository"
@@ -5005,8 +4706,6 @@ type Project implements Authorizable & ProjectEntity {
   indicatorPortfolios: [IndicatorPortfolio!]!
   "List of information components attached to this entity"
   information: [EntityInformation!]!
-  "List of links to follow when displaying information about an issue."
-  jIRAFollowLinksProperty: Property
   "Link to a Jenkins Job"
   jenkinsJobProperty: Property
   "Labels for this project"
@@ -5018,13 +4717,6 @@ type Project implements Authorizable & ProjectEntity {
   ): [PromotionRun!]!
   "List of links."
   linkProperty: Property
-  "Links"
-  links: ProjectLinks @deprecated(reason : "Use the `actions` field instead.")
-  """
-  List of project labels which describes the list of build links
-  to display in a build links decoration.
-  """
-  mainBuildLinksProjectProperty: Property
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
@@ -5055,8 +4747,18 @@ type Project implements Authorizable & ProjectEntity {
   ): [Property!]!
   "SCM catalog entry the project is linked with, if any"
   scmCatalogEntry: SCMCatalogEntry
+  "SCM information about a commit"
+  scmCommitInfo(
+    "ID of the commit"
+    commitId: String!
+  ): SCMCommitInfo
   "List of saved SCM file filters for the project"
   scmFileChangeFilters: SCMFileChangeFilters!
+  "SCM information about an issue"
+  scmIssueInfo(
+    "Key of the issue"
+    issueKey: String!
+  ): SCMIssueInfo
   "Graph of environment slots for a project"
   slotGraph(
     "Qualifier for the slots"
@@ -5154,8 +4856,6 @@ type ProjectIndicator {
     "Size of the page"
     size: Int = 20
   ): ProjectIndicatorHistoryItemPaginated
-  "Links"
-  links: ProjectIndicatorLinks @deprecated(reason : "Use the `actions` field instead.")
   "Previous value for this indicator"
   previousValue: ProjectIndicator
   "Associated project"
@@ -5199,12 +4899,6 @@ type ProjectIndicatorHistoryItemPaginated {
   pageItems: [ProjectIndicatorHistoryItem!]!
 }
 
-"ProjectIndicator links"
-type ProjectIndicatorLinks {
-  _delete: String
-  _update: String
-}
-
 "Type of indicator"
 type ProjectIndicatorType {
   "Associated category"
@@ -5232,8 +4926,6 @@ type ProjectIndicatorType {
   ): [ProjectIndicator!]!
   "Link to the definition of the indicator"
   link: String
-  "Links"
-  links: ProjectIndicatorTypeLinks @deprecated(reason : "Use the `actions` field instead.")
   "Name for the indicator type"
   name: String
   "Source for this type"
@@ -5242,12 +4934,6 @@ type ProjectIndicatorType {
   valueConfig: JSON
   "Value type"
   valueType: IndicatorValueType
-}
-
-"ProjectIndicatorType links"
-type ProjectIndicatorTypeLinks {
-  _delete: String
-  _update: String
 }
 
 "List of indicators for a project"
@@ -5265,34 +4951,6 @@ type ProjectIndicators {
   project: Project
 }
 
-"Project links"
-type ProjectLinks {
-  _actions: String
-  _branchStatusViews: String
-  _branches: String
-  _buildDiffActions: String
-  _buildSearch: String
-  _clone: String
-  _createBranch: String
-  _decorations: String
-  _delete: String
-  _disable: String
-  _enable: String
-  _events: String
-  _extra: String
-  _favourite: String
-  _gitSync: String
-  _labelFromToken: String
-  _labels: String
-  _labelsCreate: String
-  _page: String
-  _permissions: String
-  _properties: String
-  _self: String
-  _unfavourite: String
-  _update: String
-}
-
 type ProjectRole {
   "description field"
   description: String!
@@ -5303,8 +4961,6 @@ type ProjectRole {
 }
 
 type PromotionLevel implements Authorizable & ProjectEntity {
-  "Link to the image"
-  _image: String
   "Description with links."
   annotatedDescription: String
   "Authorizations for this context"
@@ -5333,8 +4989,6 @@ type PromotionLevel implements Authorizable & ProjectEntity {
   jenkinsJobProperty: Property
   "List of links."
   linkProperty: Property
-  "Links"
-  links: PromotionLevelLinks @deprecated(reason : "Use the `actions` field instead.")
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
@@ -5377,23 +5031,6 @@ type PromotionLevel implements Authorizable & ProjectEntity {
   userMenuActions: [UserMenuAction!]!
 }
 
-"PromotionLevel links"
-type PromotionLevelLinks {
-  _actions: String
-  _branch: String
-  _bulkUpdate: String
-  _decorations: String
-  _delete: String
-  _events: String
-  _image: String
-  _page: String
-  _project: String
-  _properties: String
-  _runs: String
-  _self: String
-  _update: String
-}
-
 type PromotionRun implements Authorizable & ProjectEntity {
   "Description with links."
   annotatedDescription: String
@@ -5417,8 +5054,6 @@ type PromotionRun implements Authorizable & ProjectEntity {
   jenkinsBuildProperty: Property
   "List of links."
   linkProperty: Property
-  "Links"
-  links: PromotionRunLinks @deprecated(reason : "Use the `actions` field instead.")
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
@@ -5435,16 +5070,6 @@ type PromotionRun implements Authorizable & ProjectEntity {
   ): [Property!]!
   "List of actions available for this entity"
   userMenuActions: [UserMenuAction!]!
-}
-
-"PromotionRun links"
-type PromotionRunLinks {
-  _all: String
-  _delete: String
-  _image: String
-  _page: String
-  _properties: String
-  _self: String
 }
 
 type PromotionRunPaginated {
@@ -5473,6 +5098,12 @@ type PropertyType {
   supportedEntityTypes: [ProjectEntityType!]!
   "Full type name for the property"
   typeName: String!
+}
+
+"Output type for the purgeAutoVersioningAuditEntries mutation."
+type PurgeAutoVersioningAuditEntriesPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
 }
 
 "Output type for the purgeHookRecordings mutation."
@@ -5558,6 +5189,8 @@ type Query {
     "Generic filter based on a configured filter"
     filter: GenericBuildFilter!
   ): BuildFilterValidation
+  "List of build/commit links"
+  buildGitCommitLinks: [BuildGitCommitLink!]!
   builds(
     "Name of a branch - requires 'project' to be filled as well"
     branch: String,
@@ -5595,6 +5228,11 @@ type Query {
   ): [Configuration!]!
   "List of available widgets"
   dashboardWidgets: [Widget!]!
+  "Getting the effective configuration for the current CI without actually configuring anything"
+  effectiveCIConfiguration(
+    "Input for the CI configuration"
+    input: ConfigureBuildInput!
+  ): JSON
   "Getting the eligible slots for a build"
   eligibleSlotsForBuild(
     "ID of the build"
@@ -5624,6 +5262,8 @@ type Query {
     "Filter on the environments"
     filter: EnvironmentFilter
   ): [Environment!]!
+  "Returns the number of environments"
+  environmentsCount: Int!
   "List of event subscriptions"
   eventSubscriptions(
     "Filter for the subscriptions"
@@ -5640,22 +5280,11 @@ type Query {
     "Parameters for getting the chart"
     input: GetChartInput!
   ): JSON
-  gitChangeLog(
-    "ID of the build to start the change log with"
-    from: Int!,
-    "ID of the build to end the change log with"
-    to: Int!
-  ): GitChangeLog @deprecated(reason : "Will be removed in V5. Prefer using the `scmChangeLog` query.")
-  "Gets a change log by its UUID"
-  gitChangeLogByUUID(
-    "UUID of the change log"
-    uuid: String!
-  ): GitChangeLog @deprecated(reason : "Will be removed in V5. Prefer using the `scmChangeLog` query.")
-  "Getting Ontrack information about a Git commit and a project."
-  gitCommitInfo(
-    "Commit hash (full form) to look for."
-    commit: String!
-  ): OntrackGitCommitInfo
+  "Getting a GitHub configuration by name"
+  gitHubConfiguration(
+    "Name of the configuration to get"
+    name: String!
+  ): GitHubEngineConfiguration
   "List of GitHub configurations"
   gitHubConfigurations(
     "Name of the configuration to get"
@@ -5692,11 +5321,6 @@ type Query {
     "Filter on the UUID"
     uuid: String
   ): GitHubIngestionHookPayloadPaginated
-  "Getting Ontrack information about a Git issue and a project."
-  gitIssueInfo(
-    "Issue key"
-    issue: String!
-  ): OntrackGitIssueInfo
   "List of global messages"
   globalMessages: [Message!]!
   "List of global permissions"
@@ -5721,8 +5345,6 @@ type Query {
   ): HookRecordingPaginated
   "List of indicator categories"
   indicatorCategories: IndicatorCategories
-  "List of all portfolios"
-  indicatorPortfolioOfPortfolios: IndicatorPortfolioOfPortfolios
   "List of indicator portfolios"
   indicatorPortfolios(
     "ID of the indicator portfolio"
@@ -5736,8 +5358,6 @@ type Query {
   indicatorsManagement: IndicatorsManagement! @deprecated(reason : "Will be removed in 4.6")
   "Gets information about the application"
   info: Info
-  "List of available export formats"
-  issueExportFormats: [IssueExportFormat!]! @deprecated(reason : "Use the templating service")
   "List of issue services"
   issueServiceConfigurations: [IssueServiceConfigurationRepresentation!]!
   "Getting a Jenkins configuration by name"
@@ -5773,6 +5393,8 @@ type Query {
     "Type key"
     type: String
   ): JobStatusPaginated
+  "Gets the JSON schema definitions"
+  jsonSchemaDefinitions: [JsonSchemaDefinition!]!
   "List of all labels"
   labels(
     "Category to look for"
@@ -5974,7 +5596,7 @@ type Query {
     "Query string"
     token: String!,
     "Result type"
-    type: String
+    type: String!
   ): SearchResultPaginated
   "List of types of search results"
   searchResultTypes: [SearchResultType!]!
@@ -5997,6 +5619,8 @@ type Query {
     "Slot workflow instance if"
     id: String!
   ): SlotWorkflowInstance
+  "Application health status"
+  systemHealth: SystemHealth
   "Getting the list of template renderers"
   templatingRenderers: [TemplatingRenderer!]!
   "List of workflow instance statuses"
@@ -6035,6 +5659,13 @@ type Query {
     "Part of the name to look for"
     token: String!
   ): [String!]!
+  "List of available webhook authenticators"
+  webhookAuthenticators: [WebhookAuthenticator!]!
+  "Getting a webhook using its name"
+  webhookByName(
+    "Name of the webhook"
+    name: String!
+  ): Webhook
   "List of registred webhooks"
   webhooks(
     "Name of the webhook"
@@ -6065,7 +5696,10 @@ type Query {
     triggerId: String
   ): WorkflowInstancePaginated
   "List of all workflow node executors"
-  workflowNodeExecutors: [WorkflowNodeExecutor!]!
+  workflowNodeExecutors(
+    "Gets only the matching executors"
+    enabled: Boolean
+  ): [WorkflowNodeExecutor!]!
 }
 
 "QueueDispatchResult"
@@ -6310,7 +5944,7 @@ type SCMChangeLog {
   commits: [SCMDecoratedCommit!]!
   "URL to get the file diff between the two builds"
   diffLink: String
-  "Exporting the issues of a change log"
+  "Exporting the issues of a change log. You may want to use the `render` field instead, which has more advanced options."
   export(
     "How to generate the exported change log"
     request: SCMChangeLogExportInput
@@ -6321,6 +5955,13 @@ type SCMChangeLog {
   issues: SCMChangeLogIssues
   "All dependency changes"
   linkChanges: [LinkChange!]!
+  "Rendering the change log."
+  render(
+    "Configuration for the rendering"
+    config: ChangeLogTemplatingServiceConfig,
+    "Renderer to use for the change log rendering"
+    renderer: String
+  ): String
   "Boundary for the change log"
   to: Build!
 }
@@ -6351,6 +5992,14 @@ type SCMCommit {
   timestamp: LocalDateTime!
 }
 
+"Information about a commit"
+type SCMCommitInfo {
+  "Information about the branches associated with this commit"
+  branchInfos: [BranchInfos!]!
+  "Associated decorated SCM commit"
+  scmDecoratedCommit: SCMDecoratedCommit!
+}
+
 "SCMDecoratedCommit"
 type SCMDecoratedCommit {
   "Annotated message with links"
@@ -6375,6 +6024,16 @@ type SCMFileChangeFilters {
   canManage: Boolean!
   "List of filters"
   filters: [SCMFileChangeFilter!]!
+}
+
+"Information about an issue and linked SCM information."
+type SCMIssueInfo {
+  "issue field"
+  issue: Issue!
+  "issueServiceConfigurationRepresentation field"
+  issueServiceConfigurationRepresentation: IssueServiceConfigurationRepresentation!
+  "scmCommitInfo field"
+  scmCommitInfo: SCMCommitInfo
 }
 
 "Output type for the saveBuildFilter mutation."
@@ -6439,6 +6098,12 @@ type Schedule {
   periodText: String!
   "unit field"
   unit: String
+}
+
+"Output type for the scheduleAutoVersioning mutation."
+type ScheduleAutoVersioningPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
 }
 
 "Search result"
@@ -7119,8 +6784,6 @@ type SetValidationStampPropertyPayload implements Payload {
 
 "Ontrack settings"
 type Settings {
-  "Home page settings"
-  homePage: HomePageSettingsType!
   "List of all settings and their values"
   list: [SettingsEntry!]!
   "Getting some settings using their ID"
@@ -7243,8 +6906,12 @@ type Slot implements Authorizable {
   lastDeployedPipeline: SlotPipeline
   "Paginated list of pipelines"
   pipelines(
+    "Name of the branch to get the pipelines for"
+    branchName: String,
     "Filtering on a build"
     buildId: Int,
+    "Filtering on finished pipelines"
+    done: Boolean,
     "Offset for the page"
     offset: Int = 0,
     "Size of the page"
@@ -7571,6 +7238,14 @@ type SubscribeValidationStampToEventsPayload implements Payload {
   subscription: EventSubscriptionPayload
 }
 
+"Application health"
+type SystemHealth {
+  "Connectors"
+  connectors: ConnectorGlobalStatus
+  "Health endpoints"
+  health: JSON!
+}
+
 "Data to be rendered in a template"
 type TemplatingContextData {
   "Data associated with the context, used by the handler associated with the ID"
@@ -7599,6 +7274,12 @@ type TestConfigurationPayload implements Payload {
 type TestJenkinsConfigurationPayload implements Payload {
   "Result of the test"
   connectionResult: ConnectionResult
+  "List of errors"
+  errors: [UserError]
+}
+
+"Output type for the testWebhook mutation."
+type TestWebhookPayload implements Payload {
   "List of errors"
   errors: [UserError]
 }
@@ -7729,6 +7410,12 @@ type UpdateValidationStampFilterPayload implements Payload {
   errors: [UserError]
   "Validation stamp filter having been updated"
   validationStampFilter: ValidationStampFilter
+}
+
+"Output type for the updateWebhook mutation."
+type UpdateWebhookPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
 }
 
 "Representation of the current user"
@@ -7912,8 +7599,6 @@ type ValidationRun implements Authorizable & ProjectEntity {
   lastStatus: ValidationRunStatus!
   "List of links."
   linkProperty: Property
-  "Links"
-  links: ValidationRunLinks @deprecated(reason : "Use the `actions` field instead.")
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
@@ -7951,19 +7636,6 @@ type ValidationRunData {
   descriptor: ValidationDataTypeDescriptor
 }
 
-"ValidationRun links"
-type ValidationRunLinks {
-  _decorations: String
-  _extra: String
-  _image: String
-  _page: String
-  _properties: String
-  _runInfo: String
-  _self: String
-  _validationRunStatusChange: String
-  _validationStampLink: String
-}
-
 type ValidationRunPaginated {
   "Information about the current page"
   pageInfo: PageInfo
@@ -7984,8 +7656,6 @@ type ValidationRunStatus implements Authorizable {
     "Filtering the issues on their status"
     status: String
   ): [Issue!]!
-  "Links"
-  links: ValidationRunStatusLinks @deprecated(reason : "Use the `actions` field instead.")
   "Status ID"
   statusID: ValidationRunStatusID
 }
@@ -8003,14 +7673,7 @@ type ValidationRunStatusID {
   root: Boolean
 }
 
-"ValidationRunStatus links"
-type ValidationRunStatusLinks {
-  _comment: String
-}
-
 type ValidationStamp implements Authorizable & ProjectEntity {
-  "Link to the image"
-  _image: String
   "Description with links."
   annotatedDescription: String
   "Authorizations for this context"
@@ -8037,8 +7700,6 @@ type ValidationStamp implements Authorizable & ProjectEntity {
   jenkinsJobProperty: Property
   "List of links."
   linkProperty: Property
-  "Links"
-  links: ValidationStampLinks @deprecated(reason : "Use the `actions` field instead.")
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
@@ -8077,39 +7738,12 @@ type ValidationStampFilter implements Authorizable {
   authorizations: [Authorization!]!
   "ID of the filter"
   id: Int
-  "Links"
-  links: ValidationStampFilterLinks @deprecated(reason : "Use the `actions` field instead.")
   "Name of the filter"
   name: String!
   "Scope of the filter"
   scope: ValidationStampFilterScope!
   "List of validation stamps"
   vsNames: [String!]!
-}
-
-"ValidationStampFilter links"
-type ValidationStampFilterLinks {
-  _delete: String
-  _shareAtGlobal: String
-  _shareAtProject: String
-  _update: String
-}
-
-"ValidationStamp links"
-type ValidationStampLinks {
-  _actions: String
-  _branch: String
-  _bulkUpdate: String
-  _decorations: String
-  _delete: String
-  _events: String
-  _image: String
-  _page: String
-  _project: String
-  _properties: String
-  _runs: String
-  _self: String
-  _update: String
 }
 
 "Version information"
@@ -8128,6 +7762,8 @@ type VersionInfo {
 
 "Webhook registration"
 type Webhook {
+  "Configuration for the webhook authentication"
+  authenticationConfig: JSON
   "Webhook authentication"
   authenticationType: String
   "Webhook enabled or not"
@@ -8147,6 +7783,14 @@ type Webhook {
   timeoutSeconds: Int
   "Webhook endpoint"
   url: String!
+}
+
+"Webhook authenticator"
+type WebhookAuthenticator {
+  "Webhook authentication display name"
+  displayName: String!
+  "Webhook authentication identifier"
+  type: String!
 }
 
 "Webhook exchange"
@@ -8306,6 +7950,8 @@ type WorkflowNode {
 type WorkflowNodeExecutor {
   "displayName field"
   displayName: String!
+  "Checks if this node executor is enabled."
+  enabled: Boolean
   "id field"
   id: String!
 }
@@ -8335,6 +7981,7 @@ enum AutoVersioningAuditState {
   CREATED
   ERROR
   POST_PROCESSING_END
+  POST_PROCESSING_LAUNCHED
   POST_PROCESSING_START
   PROCESSING_ABORTED
   PROCESSING_CANCELLED
@@ -8347,6 +7994,8 @@ enum AutoVersioningAuditState {
   PR_MERGED
   PR_TIMEOUT
   RECEIVED
+  SCHEDULED
+  THROTTLED
 }
 
 "List of directions when getting auto versioning information between two builds."
@@ -8363,18 +8012,19 @@ enum AutoVersioningNotificationScope {
   SUCCESS
 }
 
-"Direction for dependencies"
-enum BranchLinksDirection {
-  USED_BY
-  USING
-}
-
 "CHML values"
 enum CHML {
   CRITICAL
   HIGH
   LOW
   MEDIUM
+}
+
+"Option for the commit display in the templating"
+enum ChangeLogTemplatingCommitsOption {
+  ALWAYS
+  NONE
+  OPTIONAL
 }
 
 "List of supported attribute types for configurable indicators"
@@ -8388,6 +8038,12 @@ enum ConfigurableIndicatorAttributeType {
 enum ConnectionResultType {
   ERROR
   OK
+}
+
+"Status type for a connector"
+enum ConnectorStatusType {
+  DOWN
+  UP
 }
 
 enum DashboardContextUserScope {
@@ -8503,16 +8159,6 @@ enum QueueRecordState {
   ROUTING_READY
   SENT
   STARTED
-}
-
-"Type of change on a file."
-enum SCMChangeLogFileChangeType {
-  ADDED
-  COPIED
-  DELETED
-  MODIFIED
-  RENAMED
-  UNDEFINED
 }
 
 "Type of change in a deployment"
@@ -8631,6 +8277,10 @@ input AutoVersioningSourceConfigInput {
   backValidation: String
   "Build link creation. True by default."
   buildLinkCreation: Boolean
+  "Cron schedule (when to start applying queued requests)"
+  cronSchedule: String
+  "Maximum number of retries. If null or 0, no retry is performed."
+  maxRetries: Int
   "List of notifications subscriptions to setup for this auto versioning"
   notifications: [AutoVersioningNotificationInput!]
   "Type of post processing to launch after the version has been updated"
@@ -8645,6 +8295,10 @@ input AutoVersioningSourceConfigInput {
   prTitleTemplate: String
   "Qualifier for the build link to create (when links are created)"
   qualifier: String
+  "Exponential factor. 1.0 means that the interval is linear. If null, default value is taken from the setings. If < 1, 1.0 is assumer."
+  retryIntervalFactor: Float
+  "Exponential interval to wait between retries. If null, default value is taken from the settings."
+  retryIntervalSeconds: Int
   "List of reviewers to always set on the pull request created by the auto versioning"
   reviewers: [String!]
   "Branches to watch using a regular expression"
@@ -8663,6 +8317,8 @@ input AutoVersioningSourceConfigInput {
   targetPropertyType: String
   "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
   targetRegex: String
+  "Number of requests to keep at one given moment. If > 0, this is an actual throttling of the requests for this configuration."
+  throttling: Int
   "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`"
   upgradeBranchPattern: String
   "Validation stamp to create on auto versioning (optional)"
@@ -8740,6 +8396,13 @@ input CHMLLevel {
   value: Int!
 }
 
+input CIEnv {
+  "Name of the variable"
+  name: String!
+  "Value of the variable"
+  value: String!
+}
+
 "Input type for the cancelSlotPipeline mutation."
 input CancelSlotPipelineInput {
   "pipelineId field"
@@ -8748,14 +8411,20 @@ input CancelSlotPipelineInput {
   reason: String!
 }
 
-"""
- =================================================================================
- User change password
- =================================================================================
-"""
-input ChangePasswordInput {
-  newPassword: String!
-  oldPassword: String!
+"ChangeLogTemplatingServiceConfig"
+input ChangeLogTemplatingServiceConfig {
+  "Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence."
+  allQualifiers: Boolean
+  "Defines how to render commits for a change log"
+  commitsOption: ChangeLogTemplatingCommitsOption
+  "If a qualifier has no previous link, uses the default qualifier (empty) qualifier."
+  defaultQualifierFallback: Boolean
+  "Comma-separated list of project links to follow one by one for a get deep change log. Each item in the list is either a project name, or a project name and qualifier separated by a colon (:)."
+  dependencies: [String!]
+  "String to use to render an empty or non existent change log"
+  empty: String
+  "Include a title for the change log"
+  title: Boolean
 }
 
 "Input type for the changeValidationRunStatusComment mutation."
@@ -8784,6 +8453,18 @@ input CheckAutoVersioningInput {
   build: String!
   "Project name"
   project: String!
+}
+
+"Input type for the configureBuild mutation."
+input ConfigureBuildInput {
+  "Type of CI engine. Will be guessed from the environment if not specified."
+  ci: String
+  "YAML configuration"
+  config: String!
+  "List of environment variables"
+  env: [CIEnv!]!
+  "Type of SCM. Will be guessed from the environment if not specified."
+  scm: String
 }
 
 "Input type for the createAccountGroup mutation."
@@ -9032,6 +8713,26 @@ input CreateValidationRunByIdInput {
   validationStamp: String!
 }
 
+"Input type for the createValidationRunByRelease mutation."
+input CreateValidationRunByReleaseInput {
+  "Build release"
+  buildRelease: String!
+  "Data to associated with the validation"
+  data: JSON
+  "Type of the data to associated with the validation"
+  dataTypeId: String
+  "Validation description"
+  description: String
+  "Project name"
+  project: String!
+  "Run info"
+  runInfo: RunInfoInput
+  "Validation run status"
+  validationRunStatus: String
+  "Validation stamp name"
+  validationStamp: String!
+}
+
 "Input type for the createValidationRun mutation."
 input CreateValidationRunInput {
   "Branch name"
@@ -9108,6 +8809,12 @@ input DeleteAutoVersioningConfigInput {
   branchId: Int!
 }
 
+"Input type for the deleteBranchById mutation."
+input DeleteBranchByIdInput {
+  "ID of the branch to delete"
+  id: Int!
+}
+
 "Input type for the deleteBranchGitConfigPropertyById mutation."
 input DeleteBranchGitConfigPropertyByIdInput {
   "ID of the branch"
@@ -9162,6 +8869,12 @@ input DeleteBranchReleaseValidationPropertyInput {
   branch: String!
   "Project name"
   project: String!
+}
+
+"Input type for the deleteBuildById mutation."
+input DeleteBuildByIdInput {
+  "ID of the build to delete"
+  id: Int!
 }
 
 "Input type for the deleteBuildFilter mutation."
@@ -9625,6 +9338,12 @@ input DeleteValidationStampByIdInput {
   id: Int!
 }
 
+"Input type for the deleteValidationStampFilterById mutation."
+input DeleteValidationStampFilterByIdInput {
+  "ID of the validation stamp filter"
+  id: Int!
+}
+
 "Input type for the deleteValidationStampMessagePropertyById mutation."
 input DeleteValidationStampMessagePropertyByIdInput {
   "ID of the validation stamp"
@@ -9677,10 +9396,8 @@ input DisableProjectInput {
 
 "Input type for the disableSubscription mutation."
 input DisableSubscriptionInput {
-  "ID of the subscription to disable"
-  id: String
   "Name of the subscription to disable"
-  name: String
+  name: String!
   "Target project entity (null for global events)"
   projectEntity: ProjectEntityIDInput
 }
@@ -9719,10 +9436,8 @@ input EnableProjectInput {
 
 "Input type for the enableSubscription mutation."
 input EnableSubscriptionInput {
-  "ID of the subscription to enable"
-  id: String
   "Name of the subscription to enable"
-  name: String
+  name: String!
   "Target project entity (null for global events)"
   projectEntity: ProjectEntityIDInput
 }
@@ -9739,10 +9454,6 @@ input EventSubscriptionFilter {
   channel: String
   "Filter against the channel configuration (channel is required)"
   channelConfig: String
-  "Subscriptions created before or on this date"
-  createdBefore: LocalDateTime
-  "Name of the user who created this subscription"
-  creator: String
   "Entity subscribed to."
   entity: ProjectEntityIDInput
   "Event type"
@@ -10339,6 +10050,12 @@ input SaveSlotWorkflowInput {
 input SaveYamlWorkflowInput {
   "workflow field"
   workflow: String!
+}
+
+"Input type for the scheduleAutoVersioning mutation."
+input ScheduleAutoVersioningInput {
+  "Time at which to schedule the auto-versioning"
+  time: LocalDateTime
 }
 
 input SelectDashboardInput {
@@ -11340,6 +11057,8 @@ input SetupTestSummaryValidationStampInput {
   branch: String!
   "Description of the validation stamp"
   description: String
+  "If set, the status is set to failure if there is are no test at all."
+  failWhenNoResults: Boolean
   "Name of the project"
   project: String!
   "Name of the validation stamp"
@@ -11661,6 +11380,12 @@ input TestJenkinsConfigurationInput {
   user: String
 }
 
+"Input type for the testWebhook mutation."
+input TestWebhookInput {
+  "Name of the webhook to test"
+  name: String!
+}
+
 "Input type for the unfavouriteBranch mutation."
 input UnfavouriteBranchInput {
   "Branch ID"
@@ -11789,6 +11514,22 @@ input UpdateValidationStampFilterInput {
   id: Int!
   "Validation stamp names"
   vsNames: [String!]!
+}
+
+"Input type for the updateWebhook mutation."
+input UpdateWebhookInput {
+  "authenticationConfig field"
+  authenticationConfig: JSON!
+  "authenticationType field"
+  authenticationType: String!
+  "enabled field"
+  enabled: Boolean!
+  "name field"
+  name: String!
+  "timeoutSeconds field"
+  timeoutSeconds: Long!
+  "url field"
+  url: String!
 }
 
 "Input type for the validateBuildByIdWithCHML mutation."

@@ -60,7 +60,7 @@ class AutoVersioningWorkflowNodeExecutor(
         workflowNodeExecutorResultFeedback(output.asJson())
 
         // Starting the audit trail
-        autoVersioningAuditService.onQueuing(order, routing = "")
+        // TODO autoVersioningAuditService.onQueuing(order, routing = "")
 
         // Actual auto-versioning process
         val outcome = autoVersioningProcessingService.process(order)
@@ -121,6 +121,11 @@ class AutoVersioningWorkflowNodeExecutor(
             prBodyTemplate = resolvedData.prBodyTemplate,
             prBodyTemplateFormat = resolvedData.prBodyTemplateFormat,
             additionalPaths = resolvedData.additionalPaths,
+            schedule = TODO(),
+            retries = TODO(),
+            maxRetries = TODO(),
+            retryIntervalSeconds = TODO(),
+            retryIntervalFactor = TODO(),
         )
     }
 

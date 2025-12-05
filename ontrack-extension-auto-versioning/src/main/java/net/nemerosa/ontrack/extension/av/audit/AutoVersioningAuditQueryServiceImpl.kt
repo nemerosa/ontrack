@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.av.audit
 import net.nemerosa.ontrack.model.structure.Branch
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -14,9 +15,11 @@ class AutoVersioningAuditQueryServiceImpl(
         store.findByUUID(branch, uuid)
 
     override fun findByFilter(filter: AutoVersioningAuditQueryFilter): List<AutoVersioningAuditEntry> =
-        store.findByFilter(filter)
+        store.auditVersioningEntries(filter)
 
     override fun countByFilter(filter: AutoVersioningAuditQueryFilter): Int =
-        store.countByFilter(filter)
+        store.auditVersioningEntriesCount(filter)
 
+    override fun findByReady(time: LocalDateTime): List<AutoVersioningAuditEntry> =
+        store.findByReady(time = time)
 }

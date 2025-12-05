@@ -6,6 +6,10 @@ enum class AutoVersioningAuditState(
 ) {
 
     CREATED,
+    SCHEDULED,
+
+    THROTTLED(isRunning = false),
+
     RECEIVED,
     ERROR(isRunning = false),
     PROCESSING_START(isProcessing = true),
@@ -39,7 +43,7 @@ enum class AutoVersioningAuditState(
     PR_MERGED(isRunning = false);
 
     companion object {
-        val runningAndNotProcessingStates = values().filter { it.isRunning && !it.isProcessing }.toSet()
+        val runningAndNotProcessingStates = entries.filter { it.isRunning && !it.isProcessing }.toSet()
     }
 
 }
