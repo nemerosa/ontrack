@@ -13,8 +13,14 @@ import kotlin.reflect.full.findAnnotation
  */
 fun getPropertyDescription(property: KProperty<*>, description: String? = null): String =
     description
-        ?: property.findAnnotation<APIDescription>()?.value
+        ?: getOptionalPropertyDescription(property)
         ?: "${getPropertyName(property)} field"
+
+/**
+ * Getting the description for a property.
+ */
+fun getOptionalPropertyDescription(property: KProperty<*>): String? =
+    property.findAnnotation<APIDescription>()?.value
 
 /**
  * Getting the label for a property.

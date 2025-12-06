@@ -25,6 +25,7 @@ theme:
     - content.code.copy
 use_directory_urls: false
 markdown_extensions:
+  - def_list
   - attr_list
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
@@ -77,6 +78,7 @@ nav:
           - CI Engines: content/reference/ci-config/ci-engines/index.md
           - SCM Engines: content/reference/ci-config/scm-engines/index.md
       - Event types: content/generated/events/index.md
+      - Metrics: content/generated/metrics/index.md
       - Notification channels: content/generated/notifications/index.md
       - Properties: content/generated/properties/index.md
       - Templating:
