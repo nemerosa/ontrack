@@ -17,11 +17,13 @@ interface QueueDispatcher {
      * @param queueProcessor Processor used for the processing of messages
      * @param payload Message to post
      * @param source Information about the source of the message
+     * @param routingFeedback Optional routing feedback, called as soon as the routing key is known
      */
     fun <T : Any> dispatch(
         queueProcessor: QueueProcessor<T>,
         payload: T,
         source: QueueSource?,
+        routingFeedback: (routingKey: String) -> Unit = {},
     ): QueueDispatchResult
 
 }

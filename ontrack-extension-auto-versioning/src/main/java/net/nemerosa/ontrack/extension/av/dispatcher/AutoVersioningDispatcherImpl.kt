@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.extension.av.dispatcher
 
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditEntryUUIDNotFoundException
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditService
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditStore
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.scheduler.AutoVersioningScheduler
 import net.nemerosa.ontrack.extension.av.scheduler.ScheduleService
+import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningBranchTrail
 import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTracking
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Branch
@@ -21,6 +24,7 @@ class AutoVersioningDispatcherImpl(
     private val autoVersioningAuditService: AutoVersioningAuditService,
     private val scheduleService: ScheduleService,
     private val autoVersioningScheduler: AutoVersioningScheduler,
+    private val autoVersioningAuditStore: AutoVersioningAuditStore,
 ) : AutoVersioningDispatcher {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningDispatcherImpl::class.java)
@@ -41,20 +45,7 @@ class AutoVersioningDispatcherImpl(
                         )
                         // Posts the event on the queue
                         if (order != null) {
-                            tracking.withTrail {
-                                it.withOrder(branchTrail, order)
-                            }
-
-                            // Throttling
-                            autoVersioningAuditService.throttling(order)
-
-                            // Starting the audit
-                            val entry = autoVersioningAuditService.onCreated(order)
-
-                            // Triggering the scheduler immediately when no schedule is planned
-                            if (entry.order.schedule == null) {
-                                autoVersioningScheduler.scheduleEntry(entry)
-                            }
+                            dispatchOrderWithTrail(tracking, branchTrail, order)
                         }
                     }
                 }
@@ -62,6 +53,53 @@ class AutoVersioningDispatcherImpl(
                 logger.error("Dispatching not possible because no trail was created (auto-versioning may not be enabled after all)")
             }
         }
+    }
+
+    private fun dispatchOrderWithTrail(
+        tracking: AutoVersioningTracking,
+        branchTrail: AutoVersioningBranchTrail,
+        order: AutoVersioningOrder
+    ) {
+        tracking.withTrail {
+            it.withOrder(branchTrail, order)
+        }
+
+        dispatchOrder(order)
+    }
+
+    private fun dispatchOrder(order: AutoVersioningOrder) {
+        // Throttling
+        autoVersioningAuditService.throttling(order)
+
+        // Starting the audit
+        val entry = autoVersioningAuditService.onCreated(order)
+
+        // Triggering the scheduler immediately when no schedule is planned
+        if (entry.order.schedule == null) {
+            autoVersioningScheduler.scheduleEntry(entry)
+        }
+    }
+
+    /**
+     * Reschedule an entry, without any schedule
+     */
+    override fun reschedule(branch: Branch, uuid: String): AutoVersioningOrder {
+        // Getting the entry to reschedule
+        val entry = autoVersioningAuditStore.findByUUID(branch, uuid)
+            ?: throw AutoVersioningAuditEntryUUIDNotFoundException(uuid)
+
+        // Copying the order
+        val order = entry.order.copy(
+            uuid = UUID.randomUUID().toString(),
+            schedule = null,
+            retries = 0,
+        )
+
+        // Dispatching the order
+        dispatchOrder(order)
+
+        // OK
+        return order
     }
 
     private fun createAutoVersioningOrder(

@@ -2,8 +2,13 @@ package net.nemerosa.ontrack.extension.av.graphql
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditCleanupService
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditEntryUUIDNotFoundException
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryFilter
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryService
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
+import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningDispatcher
+import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.scheduler.AutoVersioningScheduler
 import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationService
 import net.nemerosa.ontrack.graphql.schema.Mutation
@@ -22,6 +27,8 @@ class AutoVersioningMutations(
     private val autoVersioningValidationService: AutoVersioningValidationService,
     private val autoVersioningAuditCleanupService: AutoVersioningAuditCleanupService,
     private val autoVersioningScheduler: AutoVersioningScheduler,
+    private val autoVersioningDispatcher: AutoVersioningDispatcher,
+    private val autoVersioningAuditQueryService: AutoVersioningAuditQueryService,
 ) : TypedMutationProvider() {
     override val mutations: List<Mutation> = listOf(
 
@@ -111,6 +118,29 @@ class AutoVersioningMutations(
             )
         },
 
-        )
+        simpleMutation(
+            name = "rescheduleAutoVersioning",
+            description = "Rescheduling an auto-versioning order",
+            input = RescheduleAutoVersioningInput::class,
+            outputName = "order",
+            outputDescription = "Rescheduled order",
+            outputType = AutoVersioningOrder::class
+        ) { input ->
+            // Getting the order to reschedule
+            val entry = autoVersioningAuditQueryService.findByFilter(
+                filter = AutoVersioningAuditQueryFilter(
+                    uuid = input.uuid,
+                )
+            )
+                .firstOrNull()
+                ?: throw AutoVersioningAuditEntryUUIDNotFoundException(input.uuid)
+            // Rescheduling the order
+            autoVersioningDispatcher.reschedule(
+                entry.order.branch,
+                input.uuid,
+            )
+        }
+
+    )
 }
 

@@ -78,7 +78,7 @@ class AutoVersioningScheduler(
 
         // Sending the request on the queue
         logger.info("Queuing [${entry.order.uuid}] entry...")
-        val result = queueDispatcher.dispatch(
+        queueDispatcher.dispatch(
             queueProcessor = queueProcessor,
             payload = AutoVersioningQueuePayload(
                 order = entry.order,
@@ -88,17 +88,15 @@ class AutoVersioningScheduler(
                     orderUuid = entry.order.uuid,
                 )
             ),
+            routingFeedback = { routingKey ->
+                logger.info("Entry [${entry.order.uuid}] scheduled on routing key [$routingKey]")
+                autoVersioningAuditService.onScheduled(
+                    order = entry.order,
+                    routing = routingKey,
+                )
+                metrics.onQueuing(entry.order, routingKey)
+            }
         )
-
-        // Audit & metrics
-        val routingKey = result.routingKey ?: "n/a"
-        logger.info("Entry [${entry.order.uuid}] scheduled on routing key [$routingKey]")
-        // Scheduling the entry
-        autoVersioningAuditService.onScheduled(
-            order = entry.order,
-            routing = routingKey,
-        )
-        metrics.onQueuing(entry.order, routingKey)
     }
 
 }

@@ -34,7 +34,8 @@ class QueueDispatcherImpl(
     override fun <T : Any> dispatch(
         queueProcessor: QueueProcessor<T>,
         payload: T,
-        source: QueueSource?
+        source: QueueSource?,
+        routingFeedback: (routingKey: String) -> Unit
     ): QueueDispatchResult =
         if (sync(queueProcessor)) {
             if (queueConfigProperties.general.warnIfAsync) {
@@ -51,11 +52,14 @@ class QueueDispatcherImpl(
                 body = payload
             )
             queueRecordService.start(queuePayload, source)
+
             val routingKey = queueConfigProperties.getRoutingKey(
                 queueProcessor,
                 payload
             )
             queueRecordService.setRouting(queuePayload, routingKey)
+            routingFeedback(routingKey)
+
             val message = queuePayload.asJson().format()
             val topic = "ontrack.queue.${queueProcessor.id}"
             amqpTemplate.convertAndSend(
