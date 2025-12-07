@@ -141,7 +141,7 @@ type AutoVersioningAuditEntry {
   "Actual queue where the order was posted"
   queue: String
   "Queue routing key used for this order"
-  routing: String!
+  routing: String
   "Running state"
   running: Boolean
   "Actual SCM branch being used"
@@ -220,6 +220,8 @@ type AutoVersioningOrder {
   autoApprovalMode: AutoApprovalMode!
   "Target branch for the processing order"
   branch: Branch
+  "Maximum number of retries. If null or 0, no retry is performed."
+  maxRetries: Int
   "Post processing type"
   postProcessing: String
   "JSON configuration for the post processing"
@@ -228,8 +230,16 @@ type AutoVersioningOrder {
   qualifier: String
   "Link to the target repository"
   repositoryHtmlURL: String
+  "Number of retries already performed"
+  retries: Int
+  "Exponential factor. 1.0 means that the interval is linear. If null, default value is taken from the setings. If < 1, 1.0 is assumer."
+  retryIntervalFactor: Float
+  "Exponential interval to wait between retries. If null, default value is taken from the settings."
+  retryIntervalSeconds: Int
   "List of reviewers to always add to the pull request"
   reviewers: [String!]!
+  "Schedule time"
+  schedule: LocalDateTime
   "Source project for the processing order"
   sourceProject: String!
   "Source promotion for the processing order"
@@ -268,6 +278,10 @@ type AutoVersioningSourceConfig {
   backValidation: String
   "Build link creation. True by default."
   buildLinkCreation: Boolean
+  "Cron schedule (when to start applying queued requests)"
+  cronSchedule: String
+  "Maximum number of retries. If null or 0, no retry is performed."
+  maxRetries: Int
   "List of notifications subscriptions to setup for this auto versioning"
   notifications: [AutoVersioningNotification!]
   "Type of post processing to launch after the version has been updated"
@@ -282,6 +296,10 @@ type AutoVersioningSourceConfig {
   prTitleTemplate: String
   "Qualifier for the build link to create (when links are created)"
   qualifier: String
+  "Exponential factor. 1.0 means that the interval is linear. If null, default value is taken from the setings. If < 1, 1.0 is assumer."
+  retryIntervalFactor: Float
+  "Exponential interval to wait between retries. If null, default value is taken from the settings."
+  retryIntervalSeconds: Int
   "List of reviewers to always set on the pull request created by the auto versioning"
   reviewers: [String!]
   "Branches to watch using a regular expression"
@@ -300,6 +318,8 @@ type AutoVersioningSourceConfig {
   targetPropertyType: String
   "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
   targetRegex: String
+  "Number of requests to keep at one given moment. If > 0, this is an actual throttling of the requests for this configuration."
+  throttling: Int
   "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`"
   upgradeBranchPattern: String
   "Validation stamp to create on auto versioning (optional)"
@@ -798,6 +818,12 @@ type ChartDefinition {
 
 "Output type for the checkAutoVersioning mutation."
 type CheckAutoVersioningPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
+"Output type for the cleanupAutoVersioningAuditEntries mutation."
+type CleanupAutoVersioningAuditEntriesPayload implements Payload {
   "List of errors"
   errors: [UserError]
 }
@@ -3056,6 +3082,8 @@ type Mutation {
     "Input for the mutation"
     input: CheckAutoVersioningInput
   ): CheckAutoVersioningPayload
+  "Cleans auto-versioning audit entries based on the retention policy"
+  cleanupAutoVersioningAuditEntries: CleanupAutoVersioningAuditEntriesPayload
   "Configuration of a Yontrack build based on some input"
   configureBuild(
     "Input for the mutation"
@@ -3768,6 +3796,8 @@ type Mutation {
     "Input for the mutation"
     input: PostQueueInput
   ): PostQueuePayload
+  "Deletes all auto-versioning audit entries"
+  purgeAutoVersioningAuditEntries: PurgeAutoVersioningAuditEntriesPayload
   "Purging all records for Hook messages"
   purgeHookRecordings: PurgeHookRecordingsPayload
   "Purging all records for Queue messages"
@@ -3789,6 +3819,11 @@ type Mutation {
     "Input for the mutation"
     input: ReorderPromotionLevelByIdInput
   ): ReorderPromotionLevelByIdPayload
+  "Rescheduling an auto-versioning order"
+  rescheduleAutoVersioning(
+    "Input for the mutation"
+    input: RescheduleAutoVersioningInput
+  ): RescheduleAutoVersioningPayload
   "Resuming the execution of all jobs"
   resumeAllJobs: JobActionResult!
   "Resumes a job"
@@ -3834,6 +3869,11 @@ type Mutation {
     "Input for the mutation"
     input: SaveYamlWorkflowInput
   ): SaveYamlWorkflowPayload
+  "Scheduling the auto-versioning at a given time"
+  scheduleAutoVersioning(
+    "Input for the mutation"
+    input: ScheduleAutoVersioningInput
+  ): ScheduleAutoVersioningPayload
   "Selects a dashboard"
   selectDashboard(input: SelectDashboardInput!): SelectDashboardPayload
   "Sets the auto versioning configuration for a branch"
@@ -5075,6 +5115,12 @@ type PropertyType {
   typeName: String!
 }
 
+"Output type for the purgeAutoVersioningAuditEntries mutation."
+type PurgeAutoVersioningAuditEntriesPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 "Output type for the purgeHookRecordings mutation."
 type PurgeHookRecordingsPayload implements Payload {
   "List of errors"
@@ -5794,6 +5840,14 @@ type ReorderPromotionLevelByIdPayload implements Payload {
   errors: [UserError]
 }
 
+"Output type for the rescheduleAutoVersioning mutation."
+type RescheduleAutoVersioningPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+  "Rescheduled order"
+  order: AutoVersioningOrder
+}
+
 "Output type for the revokeAccountTokens mutation."
 type RevokeAccountTokensPayload implements Payload {
   "List of errors"
@@ -6067,6 +6121,12 @@ type Schedule {
   periodText: String!
   "unit field"
   unit: String
+}
+
+"Output type for the scheduleAutoVersioning mutation."
+type ScheduleAutoVersioningPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
 }
 
 "Search result"
@@ -7947,7 +8007,6 @@ enum AutoVersioningAuditState {
   POST_PROCESSING_LAUNCHED
   POST_PROCESSING_START
   PROCESSING_ABORTED
-  PROCESSING_CANCELLED
   PROCESSING_CREATING_BRANCH
   PROCESSING_START
   PROCESSING_UPDATING_FILE
@@ -7957,6 +8016,8 @@ enum AutoVersioningAuditState {
   PR_MERGED
   PR_TIMEOUT
   RECEIVED
+  SCHEDULED
+  THROTTLED
 }
 
 "List of directions when getting auto versioning information between two builds."
@@ -8238,6 +8299,10 @@ input AutoVersioningSourceConfigInput {
   backValidation: String
   "Build link creation. True by default."
   buildLinkCreation: Boolean
+  "Cron schedule (when to start applying queued requests)"
+  cronSchedule: String
+  "Maximum number of retries. If null or 0, no retry is performed."
+  maxRetries: Int
   "List of notifications subscriptions to setup for this auto versioning"
   notifications: [AutoVersioningNotificationInput!]
   "Type of post processing to launch after the version has been updated"
@@ -8252,6 +8317,10 @@ input AutoVersioningSourceConfigInput {
   prTitleTemplate: String
   "Qualifier for the build link to create (when links are created)"
   qualifier: String
+  "Exponential factor. 1.0 means that the interval is linear. If null, default value is taken from the setings. If < 1, 1.0 is assumer."
+  retryIntervalFactor: Float
+  "Exponential interval to wait between retries. If null, default value is taken from the settings."
+  retryIntervalSeconds: Int
   "List of reviewers to always set on the pull request created by the auto versioning"
   reviewers: [String!]
   "Branches to watch using a regular expression"
@@ -8270,6 +8339,8 @@ input AutoVersioningSourceConfigInput {
   targetPropertyType: String
   "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
   targetRegex: String
+  "Number of requests to keep at one given moment. If > 0, this is an actual throttling of the requests for this configuration."
+  throttling: Int
   "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`"
   upgradeBranchPattern: String
   "Validation stamp to create on auto versioning (optional)"
@@ -9860,6 +9931,12 @@ input ReorderPromotionLevelByIdInput {
   oldName: String!
 }
 
+"Input type for the rescheduleAutoVersioning mutation."
+input RescheduleAutoVersioningInput {
+  "UUID of the order to reschedule"
+  uuid: String!
+}
+
 "Input type for the revokeAccountTokens mutation."
 input RevokeAccountTokensInput {
   "accountId field"
@@ -10001,6 +10078,12 @@ input SaveSlotWorkflowInput {
 input SaveYamlWorkflowInput {
   "workflow field"
   workflow: String!
+}
+
+"Input type for the scheduleAutoVersioning mutation."
+input ScheduleAutoVersioningInput {
+  "Time at which to schedule the auto-versioning"
+  time: LocalDateTime
 }
 
 input SelectDashboardInput {

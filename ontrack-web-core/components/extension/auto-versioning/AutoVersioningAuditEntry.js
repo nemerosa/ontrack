@@ -63,6 +63,11 @@ export default function AutoVersioningAuditEntry({entry}) {
             </Typography.Paragraph>,
         },
         {
+            key: 'schedule',
+            label: "Schedule",
+            children: entry.order.schedule,
+        },
+        {
             key: 'routing',
             label: "Routing key",
             children: entry.routing,
