@@ -84,6 +84,11 @@ class GQLTypeAutoVersioningOrder(
                             ?.repositoryHtmlURL
                     }
             }
+            .localDateTimeField(AutoVersioningOrder::schedule)
+            .intField(AutoVersioningOrder::retries)
+            .intField(AutoVersioningOrder::maxRetries)
+            .intField(AutoVersioningOrder::retryIntervalSeconds)
+            .doubleField(AutoVersioningOrder::retryIntervalFactor)
             .listField(AutoVersioningOrder::additionalPaths)
             .build()
 }
