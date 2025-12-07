@@ -5,6 +5,7 @@ import {OntrackConfigurations} from "@ontrack/configurations";
 import {getBranchById} from "@ontrack/branch";
 import {EnvironmentsExtension} from "@ontrack/extensions/environments/environments";
 import {OntrackSettings} from "@ontrack/settings";
+import {AutoVersioningExtension} from "@ontrack/extensions/auto-versioning/AutoVersioningExtension";
 
 /**
  * Ontrack service
@@ -29,6 +30,7 @@ export class Ontrack {
     // Extensions
 
     environments = new EnvironmentsExtension(this)
+    autoVersioning = new AutoVersioningExtension(this)
 
     // Cloning with a specific token
     withToken = (token) => new Ontrack(

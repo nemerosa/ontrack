@@ -125,6 +125,19 @@ class MockSCMContext {
         }
     }
 
+    async repositoryFile({branch = 'main', path, content}) {
+        await restCallPostForJson(
+            this.ontrack.connection,
+            "/extension/scm/mock/file",
+            {
+                name: this.repositoryName,
+                scmBranch: branch,
+                path,
+                content,
+            }
+        )
+    }
+
     async repositoryCommit({branch = 'main', message}) {
         const json = await restCallPostForJson(
             this.ontrack.connection,

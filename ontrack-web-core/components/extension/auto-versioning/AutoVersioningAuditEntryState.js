@@ -1,5 +1,6 @@
 import {Space, Tooltip, Typography} from "antd";
 import {
+    FaCalendar,
     FaCheck,
     FaCodeBranch,
     FaCog,
@@ -14,190 +15,128 @@ import {
     FaWindowClose
 } from "react-icons/fa";
 
-export default function AutoVersioningAuditEntryState({status}) {
-    return (
-        <>
-            {
-                status.state === 'ERROR' &&
-                <Typography.Text type="danger">
+const statuses = {
+    ERROR: {
+        type: 'danger',
+        icon: <FaTimes/>,
+        text: "Error",
+    },
+    PROCESSING_ABORTED: {
+        type: 'warning',
+        icon: <FaRegClock/>,
+        text: "Aborted",
+    },
+    PR_TIMEOUT: {
+        type: 'danger',
+        tooltip: "The PR was created but its checks timed out before it could be merged.",
+        icon: <FaTimesCircle/>,
+        text: "PR timed out",
+    },
+    PR_PROCESSED: {
+        type: 'success',
+        icon: <FaCheck/>,
+        text: "PR processed",
+    },
+    PR_MERGED: {
+        type: 'success',
+        tooltip: "The PR has merged by Yontrack",
+        icon: <FaCheck/>,
+        text: "PR merged",
+    },
+    PR_CREATED: {
+        type: 'success',
+        tooltip: "The PR was created by Yontrack",
+        icon: <FaCheck/>,
+        text: "PR created",
+    },
+    PR_APPROVED: {
+        type: 'success',
+        tooltip: "The PR has created and approved by Yontrack",
+        icon: <FaCheck/>,
+        text: "PR approved",
+    },
+    CREATED: {
+        type: 'secondary',
+        tooltip: "Auto-versioning request registered",
+        icon: <FaPlay/>,
+        text: "Created",
+    },
+    RECEIVED: {
+        type: 'secondary',
+        tooltip: "Auto-versioning request dequeued",
+        icon: <FaThumbsUp/>,
+        text: "Received",
+    },
+    PROCESSING_START: {
+        type: 'secondary',
+        tooltip: "Auto-versioning processing started",
+        icon: <FaCog/>,
+        text: "Processing started",
+    },
+    THROTTLED: {
+        type: 'warning',
+        tooltip: "Auto-versioning request throttled",
+        icon: <FaWindowClose/>,
+        text: "Throttled",
+    },
+    PROCESSING_CREATING_BRANCH: {
+        type: 'secondary',
+        tooltip: "Target branch being created",
+        icon: <FaCodeBranch/>,
+        text: "Branch created",
+    },
+    PROCESSING_UPDATING_FILE: {
+        type: 'secondary',
+        tooltip: "Updating the files on the target branches",
+        icon: <FaFile/>,
+        text: "Updating files",
+    },
+    POST_PROCESSING_START: {
+        type: 'secondary',
+        tooltip: "Post-processing starts",
+        icon: <FaCog/>,
+        text: "Post-processing starts",
+    },
+    POST_PROCESSING_LAUNCHED: {
+        type: 'secondary',
+        tooltip: "Post-processing launched",
+        icon: <FaRocket/>,
+        text: "Post-processing launched",
+    },
+    POST_PROCESSING_END: {
+        type: 'secondary',
+        tooltip: "Post-processing ends",
+        icon: <FaPause/>,
+        text: "Post-processing ends",
+    },
+    PR_CREATING: {
+        type: 'secondary',
+        tooltip: "PR is being created",
+        icon: <FaCodeBranch/>,
+        text: "Creating PR",
+    },
+    SCHEDULED: {
+        type: 'secondary',
+        tooltip: "Auto-versioning request is scheduled for later processing",
+        icon: <FaCalendar/>,
+        text: "Scheduled",
+    },
+}
+
+export default function AutoVersioningAuditEntryState({status, id}) {
+    const state = statuses[status.state]
+    if (state) {
+        return <>
+            <Typography.Text type={state.type}>
+                <Tooltip title={state.tooltip}>
                     <Space>
-                        <FaTimes/>
-                        Error
+                        {state.icon}
+                        <span data-testid={id}>{state.text}</span>
                     </Space>
-                </Typography.Text>
-            }
-            {
-                status.state === 'PROCESSING_ABORTED' &&
-                <Typography.Text type="warning">
-                    <Space>
-                        <FaRegClock/>
-                        Processing aborted
-                    </Space>
-                </Typography.Text>
-            }
-            {
-                status.state === 'PR_TIMEOUT' &&
-                <Typography.Text type="danger">
-                    <Tooltip title="The PR was created but its checks timed out before it could be merged.">
-                        <Space>
-                            <FaTimesCircle/>
-                            PR timed out
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'PR_PROCESSED' &&
-                <Typography.Text type="success">
-                    <Space>
-                        <FaCheck/>
-                        PR processed
-                    </Space>
-                </Typography.Text>
-            }
-            {
-                status.state === 'PR_MERGED' &&
-                <Typography.Text type="success">
-                    <Tooltip title="The PR has merged by Ontrack">
-                        <Space>
-                            <FaCheck/>
-                            PR merged
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'PR_CREATED' &&
-                <Typography.Text type="success">
-                    <Tooltip title="The PR was created by Ontrack">
-                        <Space>
-                            <FaCheck/>
-                            PR created
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'PR_APPROVED' &&
-                <Typography.Text type="success">
-                    <Tooltip title="The PR has created and approved by Ontrack">
-                        <Space>
-                            <FaCheck/>
-                            PR approved
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'CREATED' &&
-                <Typography.Text type="secondary">
-                    <Tooltip title="Auto-versioning request registered.">
-                        <Space>
-                            <FaPlay/>
-                            Created
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'RECEIVED' &&
-                <Typography.Text type="secondary">
-                    <Tooltip title="Auto-versioning request dequeued.">
-                        <Space>
-                            <FaThumbsUp/>
-                            Received
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'PROCESSING_START' &&
-                <Typography.Text type="secondary">
-                    <Tooltip title="Auto-versioning processing started.">
-                        <Space>
-                            <FaCog/>
-                            Processing started
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'THROTTLED' &&
-                <Typography.Text type="warning">
-                    <Tooltip title="Auto-versioning request throttled.">
-                        <Space>
-                            <FaWindowClose/>
-                            Throttled
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'PROCESSING_CREATING_BRANCH' &&
-                <Typography.Text type="secondary">
-                    <Tooltip title="Target branch being created.">
-                        <Space>
-                            <FaCodeBranch/>
-                            Branch created
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'PROCESSING_UPDATING_FILE' &&
-                <Typography.Text type="secondary">
-                    <Tooltip title="Updating the files on the target branches">
-                        <Space>
-                            <FaFile/>
-                            Updating files
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'POST_PROCESSING_START' &&
-                <Typography.Text type="secondary">
-                    <Tooltip title="Post processing starts">
-                        <Space>
-                            <FaCog/>
-                            Post processing starts
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'POST_PROCESSING_LAUNCHED' &&
-                <Typography.Text type="secondary">
-                    <Tooltip title="Post processing launched">
-                        <Space>
-                            <FaRocket/>
-                            Post processing launched
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'POST_PROCESSING_END' &&
-                <Typography.Text type="secondary">
-                    <Tooltip title="Post processing ends">
-                        <Space>
-                            <FaPause/>
-                            Post processing ends
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
-            {
-                status.state === 'PR_CREATING' &&
-                <Typography.Text type="secondary">
-                    <Tooltip title="PR is being created">
-                        <Space>
-                            <FaCodeBranch/>
-                            Creating PR
-                        </Space>
-                    </Tooltip>
-                </Typography.Text>
-            }
+                </Tooltip>
+            </Typography.Text>
         </>
-    )
+    } else {
+        return `Unknown state: ${status.state}`
+    }
 }

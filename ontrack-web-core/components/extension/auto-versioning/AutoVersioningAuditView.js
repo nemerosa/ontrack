@@ -21,6 +21,8 @@ export default function AutoVersioningAuditView() {
         <>
             <Space className="ot-line" direction="vertical">
                 <StandardTable
+                    id="auto-versioning-audit-table"
+                    rowKey={entry => entry.order.uuid}
                     filterForm={[
                         <Form.Item
                             key="targetProject"
