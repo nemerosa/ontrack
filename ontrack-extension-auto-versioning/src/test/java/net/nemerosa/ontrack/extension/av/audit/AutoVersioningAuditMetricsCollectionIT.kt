@@ -206,7 +206,6 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                         AutoVersioningAuditState.ERROR to 3.0,
                         AutoVersioningAuditState.PROCESSING_START to 4.0,
                         AutoVersioningAuditState.PROCESSING_ABORTED to 5.0,
-                        AutoVersioningAuditState.PROCESSING_CANCELLED to 0.0,
                         AutoVersioningAuditState.PROCESSING_CREATING_BRANCH to 6.0,
                         AutoVersioningAuditState.PROCESSING_UPDATING_FILE to 7.0,
                         AutoVersioningAuditState.POST_PROCESSING_START to 8.0,

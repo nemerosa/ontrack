@@ -91,7 +91,7 @@ export default function AutoVersioningAuditEntryState({status}) {
             {
                 status.state === 'CREATED' &&
                 <Typography.Text type="secondary">
-                    <Tooltip title="Auto versioning request registered.">
+                    <Tooltip title="Auto-versioning request registered.">
                         <Space>
                             <FaPlay/>
                             Created
@@ -102,7 +102,7 @@ export default function AutoVersioningAuditEntryState({status}) {
             {
                 status.state === 'RECEIVED' &&
                 <Typography.Text type="secondary">
-                    <Tooltip title="Auto versioning request dequeued.">
+                    <Tooltip title="Auto-versioning request dequeued.">
                         <Space>
                             <FaThumbsUp/>
                             Received
@@ -113,7 +113,7 @@ export default function AutoVersioningAuditEntryState({status}) {
             {
                 status.state === 'PROCESSING_START' &&
                 <Typography.Text type="secondary">
-                    <Tooltip title="Auto versioning processing started.">
+                    <Tooltip title="Auto-versioning processing started.">
                         <Space>
                             <FaCog/>
                             Processing started
@@ -122,12 +122,12 @@ export default function AutoVersioningAuditEntryState({status}) {
                 </Typography.Text>
             }
             {
-                status.state === 'PROCESSING_CANCELLED' &&
-                <Typography.Text type="danger">
-                    <Tooltip title="Auto versioning processing cancelled.">
+                status.state === 'THROTTLED' &&
+                <Typography.Text type="warning">
+                    <Tooltip title="Auto-versioning request throttled.">
                         <Space>
                             <FaWindowClose/>
-                            Processing cancelled
+                            Throttled
                         </Space>
                     </Tooltip>
                 </Typography.Text>
