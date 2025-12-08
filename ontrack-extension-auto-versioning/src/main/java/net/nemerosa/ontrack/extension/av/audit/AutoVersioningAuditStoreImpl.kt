@@ -66,16 +66,31 @@ class AutoVersioningAuditStoreImpl(
 
     override fun create(order: AutoVersioningOrder): AutoVersioningAuditEntry {
         val signature = signature()
+
         val initialState = AutoVersioningAuditEntryState(
             signature = signature,
             state = AutoVersioningAuditState.CREATED,
             data = emptyMap()
         )
 
-        val statesJson = writeJson(listOf(initialState))
-        val targetPathsJson = writeJson(order.defaultPath.paths)
-        val reviewersJson = writeJson(order.reviewers)
-        val additionalPathsJson = writeJson(order.additionalPaths)
+        val entry = AutoVersioningAuditEntry(
+            order = order,
+            audit = listOf(initialState),
+            routing = null,
+            queue = null,
+            upgradeBranch = null,
+        )
+
+        saveEntry(entry)
+
+        return entry
+    }
+
+    internal fun saveEntry(entry: AutoVersioningAuditEntry) {
+        val statesJson = writeJson(entry.audit)
+        val targetPathsJson = writeJson(entry.order.defaultPath.paths)
+        val reviewersJson = writeJson(entry.order.reviewers)
+        val additionalPathsJson = writeJson(entry.order.additionalPaths)
 
         val sql = """
             INSERT INTO AV_AUDIT (
@@ -100,48 +115,46 @@ class AutoVersioningAuditStoreImpl(
         """.trimIndent()
 
         val params = mapOf(
-            "uuid" to order.uuid,
-            "timestamp" to dateTimeForDB(initialState.signature.time),
-            "branchId" to order.branch.id(),
-            "sourceProject" to order.sourceProject,
-            "sourceBuildId" to order.sourceBuildId,
-            "sourcePromotionRunId" to order.sourcePromotionRunId,
-            "sourcePromotion" to order.sourcePromotion,
-            "sourceBackValidation" to order.sourceBackValidation,
-            "qualifier" to order.qualifier,
+            "uuid" to entry.order.uuid,
+            "timestamp" to dateTimeForDB(entry.mostRecentState.signature.time),
+            "branchId" to entry.order.branch.id(),
+            "sourceProject" to entry.order.sourceProject,
+            "sourceBuildId" to entry.order.sourceBuildId,
+            "sourcePromotionRunId" to entry.order.sourcePromotionRunId,
+            "sourcePromotion" to entry.order.sourcePromotion,
+            "sourceBackValidation" to entry.order.sourceBackValidation,
+            "qualifier" to entry.order.qualifier,
             "targetPaths" to targetPathsJson,
-            "targetRegex" to order.targetRegex,
-            "targetProperty" to order.targetProperty,
-            "targetPropertyRegex" to order.targetPropertyRegex,
-            "targetPropertyType" to order.targetPropertyType,
-            "targetVersion" to order.targetVersion,
-            "autoApproval" to order.autoApproval,
-            "upgradeBranchPattern" to order.upgradeBranchPattern,
-            "upgradeBranch" to null, // Not known yet
-            "autoApprovalMode" to order.autoApprovalMode.name,
-            "postProcessing" to order.postProcessing,
-            "postProcessingConfig" to writeJson(order.postProcessingConfig),
-            "validationStamp" to order.validationStamp,
-            "mostRecentState" to initialState.state.name,
-            "running" to initialState.state.isRunning,
+            "targetRegex" to entry.order.targetRegex,
+            "targetProperty" to entry.order.targetProperty,
+            "targetPropertyRegex" to entry.order.targetPropertyRegex,
+            "targetPropertyType" to entry.order.targetPropertyType,
+            "targetVersion" to entry.order.targetVersion,
+            "autoApproval" to entry.order.autoApproval,
+            "upgradeBranchPattern" to entry.order.upgradeBranchPattern,
+            "upgradeBranch" to entry.upgradeBranch,
+            "autoApprovalMode" to entry.order.autoApprovalMode.name,
+            "postProcessing" to entry.order.postProcessing,
+            "postProcessingConfig" to writeJson(entry.order.postProcessingConfig),
+            "validationStamp" to entry.order.validationStamp,
+            "mostRecentState" to entry.mostRecentState.state.name,
+            "running" to entry.mostRecentState.state.isRunning,
             "states" to statesJson,
             "routing" to null,
             "queue" to null,
             "reviewers" to reviewersJson,
-            "prTitleTemplate" to order.prTitleTemplate,
-            "prBodyTemplate" to order.prBodyTemplate,
-            "prBodyTemplateFormat" to order.prBodyTemplateFormat,
+            "prTitleTemplate" to entry.order.prTitleTemplate,
+            "prBodyTemplate" to entry.order.prBodyTemplate,
+            "prBodyTemplateFormat" to entry.order.prBodyTemplateFormat,
             "additionalPaths" to additionalPathsJson,
-            "schedule" to dateTimeForDB(order.schedule),
-            "retries" to order.retries,
-            "maxRetries" to order.maxRetries,
-            "retryIntervalSeconds" to order.retryIntervalSeconds,
-            "retryIntervalFactor" to order.retryIntervalFactor
+            "schedule" to dateTimeForDB(entry.order.schedule),
+            "retries" to entry.order.retries,
+            "maxRetries" to entry.order.maxRetries,
+            "retryIntervalSeconds" to entry.order.retryIntervalSeconds,
+            "retryIntervalFactor" to entry.order.retryIntervalFactor
         )
 
         namedParameterJdbcTemplate!!.update(sql, params)
-        return findByUUID(order.branch, order.uuid)
-            ?: error("Cannot find auto-versioning order after creation: $order")
     }
 
     override fun addState(
