@@ -84,6 +84,7 @@ class GQLTypeAutoVersioningOrder(
                             ?.repositoryHtmlURL
                     }
             }
+            .localDateTimeField(AutoVersioningOrder::schedule)
             .listField(AutoVersioningOrder::additionalPaths)
             .build()
 }

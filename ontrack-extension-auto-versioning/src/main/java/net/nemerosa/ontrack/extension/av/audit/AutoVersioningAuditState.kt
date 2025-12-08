@@ -15,10 +15,6 @@ enum class AutoVersioningAuditState(
     PROCESSING_START(isProcessing = true),
     PROCESSING_ABORTED(isRunning = false),
 
-    /**
-     * Processing was cancelled because there is more recent request on the same target branch.
-     */
-    PROCESSING_CANCELLED(isRunning = false),
     PROCESSING_CREATING_BRANCH(isProcessing = true),
     PROCESSING_UPDATING_FILE(isProcessing = true),
     POST_PROCESSING_START(isProcessing = true),
@@ -43,7 +39,7 @@ enum class AutoVersioningAuditState(
     PR_MERGED(isRunning = false);
 
     companion object {
-        val runningAndNotProcessingStates = values().filter { it.isRunning && !it.isProcessing }.toSet()
+        val runningAndNotProcessingStates = entries.filter { it.isRunning && !it.isProcessing }.toSet()
     }
 
 }

@@ -18,5 +18,9 @@ export const restCallPost = async (connection, path, body) => {
 
 export const restCallPostForJson = async (connection, path, body) => {
     const response = await restCallPost(connection, path, body)
-    return response.json()
+    if (response.status === 202) {
+        return null
+    } else {
+        return response.json()
+    }
 }

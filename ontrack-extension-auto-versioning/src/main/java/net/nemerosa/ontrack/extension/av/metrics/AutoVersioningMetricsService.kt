@@ -6,6 +6,9 @@ import net.nemerosa.ontrack.extension.av.processing.AutoVersioningProcessingOutc
 
 interface AutoVersioningMetricsService {
 
+    fun onScheduled(order: AutoVersioningOrder)
+    fun onScheduledCancelled(order: AutoVersioningOrder)
+
     fun onQueuing(order: AutoVersioningOrder, routingKey: String)
     fun onReceiving(order: AutoVersioningOrder, queue: String?)
 

@@ -10,8 +10,14 @@ import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSettings
 import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioning
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import net.nemerosa.ontrack.kdsl.spec.settings.settings
+import org.junit.jupiter.api.BeforeEach
 
 abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport() {
+
+    @BeforeEach
+    fun init() {
+        ontrack.autoVersioning.audit.purge()
+    }
 
     protected fun withAutoVersioning(
         enabled: Boolean = true,
@@ -46,6 +52,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
         timeout: Long = ACCProperties.AutoVersioning.autoVersioningCompletion,
     ) {
         waitUntil(
+            task = "Auto-versioning completion",
             initial = 1_000L,
             timeout = timeout,
         ) {

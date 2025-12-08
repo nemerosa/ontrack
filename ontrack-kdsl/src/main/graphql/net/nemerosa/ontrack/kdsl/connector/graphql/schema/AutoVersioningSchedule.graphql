@@ -1,0 +1,7 @@
+mutation AutoVersioningSchedule(
+    $time: LocalDateTime,
+) {
+    scheduleAutoVersioning(input: {time: $time}) {
+        ...PayloadUserErrors
+    }
+}

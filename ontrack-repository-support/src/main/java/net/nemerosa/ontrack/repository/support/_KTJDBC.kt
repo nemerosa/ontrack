@@ -27,6 +27,15 @@ fun ResultSet.getNullableInt(column: String): Int? {
     }
 }
 
+fun ResultSet.getNullableDouble(column: String): Double? {
+    val value = getDouble(column)
+    return if (wasNull()) {
+        null
+    } else {
+        value
+    }
+}
+
 fun ResultSet.getDocumentWithType(bytesColumn: String, type: String): Document {
     val bytes: ByteArray? = getBytes(bytesColumn)
     return if (bytes != null && bytes.isNotEmpty()) {

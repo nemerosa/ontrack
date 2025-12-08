@@ -10,12 +10,12 @@ import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import org.junit.jupiter.api.Test
 
 /**
- * Testing the cancellation of requests when they start to pile up
+ * Testing the throttling of requests when they start to pile up
  */
-class ACCAutoVersioningCancelling : AbstractACCAutoVersioningTestSupport() {
+class ACCAutoVersioningThrottling : AbstractACCAutoVersioningTestSupport() {
 
     @Test
-    fun `Auto versioning auto cancellation`() {
+    fun `Throttling of requests`() {
         withMockScmRepository(ontrack) {
             withAutoVersioning {
                 repositoryFile("gradle.properties") {
@@ -76,10 +76,10 @@ class ACCAutoVersioningCancelling : AbstractACCAutoVersioningTestSupport() {
                             entry != null && entry.mostRecentState.state == "PR_MERGED"
                         }
 
-                        // Checks the previous orders have been cancelled
+                        // Checks the previous orders have been throttled
                         (2..4).forEach { no ->
                             waitUntil(
-                                task = "1.0.$no has been cancelled",
+                                task = "1.0.$no has been throttled",
                                 timeout = 10_000L,
                                 interval = 1_000L,
                                 onTimeout = {
@@ -99,7 +99,7 @@ class ACCAutoVersioningCancelling : AbstractACCAutoVersioningTestSupport() {
                                     branch = name,
                                     version = "1.0.$no",
                                 ).firstOrNull()
-                                entry != null && entry.mostRecentState.state == "PROCESSING_CANCELLED"
+                                entry != null && entry.mostRecentState.state == "THROTTLED"
                             }
                         }
 

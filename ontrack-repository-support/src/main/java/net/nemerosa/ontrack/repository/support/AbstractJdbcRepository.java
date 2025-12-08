@@ -183,6 +183,7 @@ public abstract class AbstractJdbcRepository {
         return readJson(rs.getString(column));
     }
 
+    @Nullable
     protected JsonNode readJson(String json) {
         try {
             if (StringUtils.isBlank(json)) {

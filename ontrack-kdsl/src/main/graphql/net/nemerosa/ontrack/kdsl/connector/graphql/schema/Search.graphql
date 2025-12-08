@@ -1,8 +1,9 @@
 query Search(
+    $type: String!,
     $token: String!,
     $size: Int!,
 ) {
-    search(token: $token, size: $size) {
+    search(type: $type, token: $token, size: $size) {
         pageInfo {
             ...PageInfoContent
         }

@@ -27,11 +27,15 @@ fun StringBuilder.h2(title: String) {
 }
 
 fun StringBuilder.tocItem(text: String, fileName: String, description: String? = null) {
-    appendLine("* [$text]($fileName) ${description?.takeIf { it.isNotBlank() }?.let { " - _${it}_" }}")
+    appendLine("* [$text]($fileName) ${description?.takeIf { it.isNotBlank() }?.let { " - _${it}_" } ?: ""}")
 }
 
 fun StringBuilder.listLinkItem(text: String, link: String) {
     appendLine("* [$text]($link)")
+}
+
+fun StringBuilder.definition(text: String) {
+    appendLine(":    $text")
 }
 
 fun StringBuilder.code(code: String, language: String = "text") {

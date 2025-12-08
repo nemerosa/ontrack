@@ -71,6 +71,7 @@ fun Branch.setAutoVersioningConfig(
                             )
                         }
                     ),
+                    cronSchedule = Optional.presentIfNotNull(config.cronSchedule),
                 )
             }
         )

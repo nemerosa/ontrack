@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.test.TestUtils.uid
+import java.time.LocalDateTime
 import java.util.*
 
 object AutoVersioningTestFixtures {
@@ -40,6 +41,7 @@ object AutoVersioningTestFixtures {
         prBodyTemplate = null,
         prBodyTemplateFormat = null,
         additionalPaths = emptyList(),
+        schedule = null,
     )
 
     fun Branch.createOrder(
@@ -52,6 +54,7 @@ object AutoVersioningTestFixtures {
         prTitleTemplate: String? = null,
         prBodyTemplate: String? = null,
         prBodyTemplateFormat: String? = null,
+        schedule: LocalDateTime? = null,
     ) = AutoVersioningOrder(
         uuid = UUID.randomUUID().toString(),
         sourceProject = sourceProject,
@@ -77,6 +80,7 @@ object AutoVersioningTestFixtures {
         prBodyTemplate = prBodyTemplate,
         prBodyTemplateFormat = prBodyTemplateFormat,
         additionalPaths = emptyList(),
+        schedule = schedule,
     )
 
     fun sampleConfig() = AutoVersioningConfig(
@@ -98,6 +102,7 @@ object AutoVersioningTestFixtures {
         postProcessingConfig: JsonNode? = null,
         autoApprovalMode: AutoApprovalMode? = null,
         notifications: List<AutoVersioningNotification>? = null,
+        cronSchedule: String? = null,
     ) = AutoVersioningSourceConfig(
         sourceProject = sourceProject,
         sourceBranch = sourceBranch,
@@ -119,6 +124,8 @@ object AutoVersioningTestFixtures {
         prTitleTemplate = null,
         prBodyTemplate = null,
         prBodyTemplateFormat = null,
+        additionalPaths = null,
+        cronSchedule = cronSchedule,
     )
 
 }

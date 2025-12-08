@@ -25,7 +25,8 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             branch {
                 val orders = (1..20).map {
                     createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
+                        autoVersioningAuditService.onScheduled(this, "routing")
                         autoVersioningAuditService.onReceived(this, "queue")
                     }
                 }
@@ -48,7 +49,8 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             branch {
                 val orders = (1..20).map {
                     createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
+                        autoVersioningAuditService.onScheduled(this, "routing")
                         autoVersioningAuditService.onReceived(this, "queue")
                     }
                 }
@@ -72,7 +74,8 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             branch {
                 val orders = (1..20).map {
                     createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
+                        autoVersioningAuditService.onScheduled(this, "routing")
                         autoVersioningAuditService.onReceived(this, "queue")
                     }
                 }
@@ -101,7 +104,8 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             branch {
                 val orders = (1..20).map {
                     createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
+                        autoVersioningAuditService.onScheduled(this, "routing")
                         autoVersioningAuditService.onReceived(this, "queue")
                     }
                 }
@@ -125,7 +129,8 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             branch {
                 val orders = (1..20).map {
                     createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
+                        autoVersioningAuditService.onScheduled(this, "routing")
                         autoVersioningAuditService.onReceived(this, "queue")
                     }
                 }
@@ -149,8 +154,9 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             branch {
                 val orders = (1..20).map {
                     createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
                         if (it % 2 == 0) {
+                            autoVersioningAuditService.onScheduled(this, "routing")
                             autoVersioningAuditService.onReceived(this, "queue")
                         }
                     }
@@ -176,8 +182,9 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             branch {
                 val orders = (1..20).map {
                     createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
                         if (it % 2 == 0) {
+                            autoVersioningAuditService.onScheduled(this, "routing")
                             autoVersioningAuditService.onReceived(this, "queue")
                         }
                     }
@@ -204,12 +211,14 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             branch {
                 (1..5).forEach {
                     createOrder(sourceProject = sourceA.name, targetVersion = "2.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
+                        autoVersioningAuditService.onScheduled(this, "routing")
                     }
                 }
                 val ordersB = (1..5).map {
                     createOrder(sourceProject = sourceB.name, targetVersion = "3.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
+                        autoVersioningAuditService.onScheduled(this, "routing")
                     }
                 }
                 val entries = autoVersioningAuditQueryService.findByFilter(
@@ -233,14 +242,16 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             branch {
                 orders += (1..5).map {
                     createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
+                        autoVersioningAuditService.onScheduled(this, "routing")
                     }
                 }
             }
             branch {
                 orders += (1..5).map {
                     createOrder(sourceProject = source.name, targetVersion = "3.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
+                        autoVersioningAuditService.onScheduled(this, "routing")
                     }
                 }
             }
@@ -289,12 +300,14 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
             (1..20).forEach {
                 orders += if (it % 2 == 0) {
                     branch1.createOrder(sourceProject = source.name, targetVersion = "1.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
+                        autoVersioningAuditService.onScheduled(this, "routing")
                         autoVersioningAuditService.onReceived(this, "queue")
                     }
                 } else {
                     branch2.createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                        autoVersioningAuditService.onQueuing(this, "routing")
+                        autoVersioningAuditService.onCreated(this)
+                        autoVersioningAuditService.onScheduled(this, "routing")
                         autoVersioningAuditService.onReceived(this, "queue")
                     }
                 }
@@ -328,12 +341,14 @@ class AutoVersioningAuditQueryServiceIT : AbstractAutoVersioningTestSupport() {
         (1..20).forEach {
             orders += if (it % 2 == 0) {
                 branch1.createOrder(sourceProject = source.name, targetVersion = "1.0.$it").apply {
-                    autoVersioningAuditService.onQueuing(this, "routing")
+                    autoVersioningAuditService.onCreated(this)
+                    autoVersioningAuditService.onScheduled(this, "routing")
                     autoVersioningAuditService.onReceived(this, "queue")
                 }
             } else {
                 branch2.createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                    autoVersioningAuditService.onQueuing(this, "routing")
+                    autoVersioningAuditService.onCreated(this)
+                    autoVersioningAuditService.onScheduled(this, "routing")
                     autoVersioningAuditService.onReceived(this, "queue")
                 }
             }

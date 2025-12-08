@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component
 class AutoVersioningConfigProperties {
 
     var queue = QueueConfigProperties()
+    var scheduling = SchedulingConfigProperties()
 
     class QueueConfigProperties {
         @APIDescription("Cancelling the previous orders for the same source and same target if a new order comes in")
@@ -24,11 +25,22 @@ class AutoVersioningConfigProperties {
         var scale: Int = 10
     }
 
+    class SchedulingConfigProperties {
+        @APIDescription("Scheduling enabled?")
+        var enabled: Boolean = true
+        @APIDescription("Cron expression for the scheduling of the auto-versioning orders")
+        var cron: String = DEFAULT_CRON
+    }
+
     companion object {
         /**
          * Prefix for the properties
          */
         const val PREFIX = "ontrack.extension.auto-versioning"
+        /**
+         * Default cron for the scheduling
+         */
+        const val DEFAULT_CRON = "0 */30 * * * *" // Every 30 minutes
     }
 
 }
