@@ -122,10 +122,6 @@ class AutoVersioningWorkflowNodeExecutor(
             prBodyTemplateFormat = resolvedData.prBodyTemplateFormat,
             additionalPaths = resolvedData.additionalPaths,
             schedule = null,
-            retries = 0,
-            maxRetries = null,
-            retryIntervalSeconds = null,
-            retryIntervalFactor = null,
         )
     }
 

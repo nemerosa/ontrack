@@ -38,14 +38,6 @@ data class AutoVersioningOrder(
     val additionalPaths: List<AutoVersioningSourceConfigPath>,
     @APIDescription("Schedule time")
     val schedule: LocalDateTime?,
-    @APIDescription("Number of retries already performed")
-    val retries: Int,
-    @APIDescription("Maximum number of retries. If null or 0, no retry is performed.")
-    val maxRetries: Int? = null,
-    @APIDescription("Exponential interval to wait between retries. If null, default value is taken from the settings.")
-    val retryIntervalSeconds: Int? = null,
-    @APIDescription("Exponential factor. 1.0 means that the interval is linear. If null, default value is taken from the setings. If < 1, 1.0 is assumer.")
-    val retryIntervalFactor: Double? = null,
 ) {
     /**
      * Gets a meaningful commit message for this order

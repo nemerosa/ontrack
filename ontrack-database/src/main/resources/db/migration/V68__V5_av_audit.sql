@@ -53,12 +53,8 @@ CREATE TABLE AV_AUDIT
     -- Additional paths
     ADDITIONAL_PATHS        JSONB,                 -- JSON array of AutoVersioningSourceConfigPath objects
 
-    -- Scheduling and retries
+    -- Scheduling
     SCHEDULE                VARCHAR(24),
-    RETRIES                 INTEGER      NOT NULL,
-    MAX_RETRIES             INTEGER,
-    RETRY_INTERVAL_SECONDS  INTEGER,
-    RETRY_INTERVAL_FACTOR   DOUBLE PRECISION,
 
     CONSTRAINT AV_AUDIT_FK_BRANCH FOREIGN KEY (BRANCH_ID) REFERENCES BRANCHES (ID)
 );

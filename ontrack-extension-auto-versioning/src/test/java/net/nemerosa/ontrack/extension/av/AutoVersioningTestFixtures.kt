@@ -42,10 +42,6 @@ object AutoVersioningTestFixtures {
         prBodyTemplateFormat = null,
         additionalPaths = emptyList(),
         schedule = null,
-        retries = 0,
-        maxRetries = null,
-        retryIntervalSeconds = null,
-        retryIntervalFactor = null,
     )
 
     fun Branch.createOrder(
@@ -85,10 +81,6 @@ object AutoVersioningTestFixtures {
         prBodyTemplateFormat = prBodyTemplateFormat,
         additionalPaths = emptyList(),
         schedule = schedule,
-        retries = 0,
-        maxRetries = null,
-        retryIntervalSeconds = null,
-        retryIntervalFactor = null,
     )
 
     fun sampleConfig() = AutoVersioningConfig(
@@ -134,9 +126,6 @@ object AutoVersioningTestFixtures {
         prBodyTemplateFormat = null,
         additionalPaths = null,
         cronSchedule = cronSchedule,
-        maxRetries = null,
-        retryIntervalSeconds = null,
-        retryIntervalFactor = null,
     )
 
 }

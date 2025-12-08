@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.repository.BranchJdbcRepositoryAccessor
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
-import net.nemerosa.ontrack.repository.support.getNullableDouble
 import net.nemerosa.ontrack.repository.support.getNullableInt
 import net.nemerosa.ontrack.repository.support.readLocalDateTime
 import org.slf4j.Logger
@@ -101,7 +100,7 @@ class AutoVersioningAuditStoreImpl(
                 POST_PROCESSING, POST_PROCESSING_CONFIG, VALIDATION_STAMP,
                 MOST_RECENT_STATE, RUNNING, STATES, ROUTING, QUEUE,
                 REVIEWERS, PR_TITLE_TEMPLATE, PR_BODY_TEMPLATE, PR_BODY_TEMPLATE_FORMAT,
-                ADDITIONAL_PATHS, SCHEDULE, RETRIES, MAX_RETRIES, RETRY_INTERVAL_SECONDS, RETRY_INTERVAL_FACTOR
+                ADDITIONAL_PATHS, SCHEDULE
             ) VALUES (
                 :uuid, :timestamp, :branchId,
                 :sourceProject, :sourceBuildId, :sourcePromotionRunId, :sourcePromotion, :sourceBackValidation, :qualifier,
@@ -110,7 +109,7 @@ class AutoVersioningAuditStoreImpl(
                 :postProcessing, CAST(:postProcessingConfig as JSONB), :validationStamp,
                 :mostRecentState, :running, CAST(:states as JSONB), :routing, :queue,
                 :reviewers, :prTitleTemplate, :prBodyTemplate, :prBodyTemplateFormat,
-                CAST(:additionalPaths as JSONB), :schedule, :retries, :maxRetries, :retryIntervalSeconds, :retryIntervalFactor
+                CAST(:additionalPaths as JSONB), :schedule
             )
         """.trimIndent()
 
@@ -148,10 +147,6 @@ class AutoVersioningAuditStoreImpl(
             "prBodyTemplateFormat" to entry.order.prBodyTemplateFormat,
             "additionalPaths" to additionalPathsJson,
             "schedule" to dateTimeForDB(entry.order.schedule),
-            "retries" to entry.order.retries,
-            "maxRetries" to entry.order.maxRetries,
-            "retryIntervalSeconds" to entry.order.retryIntervalSeconds,
-            "retryIntervalFactor" to entry.order.retryIntervalFactor
         )
 
         namedParameterJdbcTemplate!!.update(sql, params)
@@ -328,10 +323,6 @@ class AutoVersioningAuditStoreImpl(
                 prBodyTemplateFormat = getString("PR_BODY_TEMPLATE_FORMAT"),
                 additionalPaths = additionalPaths,
                 schedule = readLocalDateTime("SCHEDULE"),
-                retries = getInt("RETRIES"),
-                maxRetries = getNullableInt("MAX_RETRIES"),
-                retryIntervalSeconds = getNullableInt("RETRY_INTERVAL_SECONDS"),
-                retryIntervalFactor = getNullableDouble("RETRY_INTERVAL_FACTOR"),
             ),
             audit = readStates(),
             routing = getString("ROUTING"),

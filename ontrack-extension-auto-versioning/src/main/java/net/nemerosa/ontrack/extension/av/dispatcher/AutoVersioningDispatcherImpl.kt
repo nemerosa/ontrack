@@ -92,7 +92,6 @@ class AutoVersioningDispatcherImpl(
         val order = entry.order.copy(
             uuid = UUID.randomUUID().toString(),
             schedule = null,
-            retries = 0,
         )
 
         // Dispatching the order
@@ -137,10 +136,6 @@ class AutoVersioningDispatcherImpl(
                 prBodyTemplateFormat = config.prBodyTemplateFormat,
                 additionalPaths = config.additionalPaths ?: emptyList(),
                 schedule = computeSchedule(config.cronSchedule),
-                retries = 0, // No try yet
-                maxRetries = config.maxRetries,
-                retryIntervalSeconds = config.retryIntervalSeconds,
-                retryIntervalFactor = config.retryIntervalFactor,
             )
         } catch (ex: Exception) {
             // Logging the event
