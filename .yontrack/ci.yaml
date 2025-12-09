@@ -2,6 +2,13 @@ version: v1
 configuration:
   defaults:
     branch:
+      autoVersioning:
+        configurations:
+          - sourceProject: yontrack
+            sourceBranch: '&latest'
+            sourcePromotion: RELEASE
+            targetPath: versions.properties
+            targetProperty: yontrack
       validations:
         BUILD:
           tests: {}
