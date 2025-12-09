@@ -49,71 +49,13 @@ because they are like actual stamps we would put on a given package, the [build]
 The validation stamps can be typed but not necessarily. For example, we can wish to represent a validation as a test
 summary, with the number of failed tests, skipped tests, passed tests, etc.
 
-### Validation stamp types
-
-#### Test summary
-
-Value:
-
-* `passed` - Count of passed tests
-* `skipped` - Count of skipped/ignored tests
-* `failed` - Count of failed tests
-
-Configuration:
-
-* `warningIfSkipped` - If set to true, the status is set to warning if there is at least one skipped test.
-* `failWhenNoResults` - If set to true, the status is set to failure if there is are no test at all.
-
-#### CHML
-
-This type means Critical / High / Medium / Low. It is used to represent the results of some scans (security, code
-quality, etc.).
-
-Value:
-
-* `CRITICAL` - number of critical severity issues
-* `HIGH` - number of high severity issues
-* `MEDIUM` - number of medium severity issues
-* `LOW` - number of low severity issues
-
-Configuration:
-
-* `warningLevel`:
-  * `level`: CRITICAL / HIGH / MEDIUM / LOW
-  * `value`: when the number of issues in this `level` is above this threshold, the validation stamp is in warning
-* `failedLevel`:
-    * `level`: CRITICAL / HIGH / MEDIUM / LOW
-    * `value`: when the number of issues in this `level` is above this threshold, the validation stamp is failed
-
-#### Percentage
-
-Value: an integer between 0 and 100.
-
-Configuration:
-
-* `warningThreshold`: integer between 0 and 100. If the value is below this threshold, the stamp is in warning.
-* `failureThreshold`: integer between 0 and 100. If the value is below this threshold, the stamp is is failed.
-* `okIfGreater`: boolean. If true, the stamp is OK when above the thresholds
-
-#### Number
-
-Value: any number
-
-Configuration:
-
-* `warningThreshold`: integer. If the value is below this threshold, the stamp is in warning.
-* `failureThreshold`: integer. If the value is below this threshold, the stamp is is failed.
-* `okIfGreater`: boolean. If true, the stamp is OK when above the thresholds
-
-#### Metrics
-
-This type is used collect arbitrary metrics, the associated of names with measurements.
-
-Value: a map of measurements (name --> double)
-
-Configuration: none
-
 ## Promotion levels
+
+While validation stamps are linked to a specific kind of check, test, scan result, etc., _promotion levels_ are used to talk more generally about the quality of a given build.
+
+They can typically group several validation stamps together, rely on other promotion levels. They can also be granted independently.
+
+Promotion level names can be anything, but you have to agree at your organization level on their meanings. They will often be used to talk about quality throughout all your projects. Something often used is to use abstract names, like medal names, like gold, silver, bronze, etc. But again, this is up to you.
 
 ## Validation runs
 
@@ -132,7 +74,75 @@ some data, of the same type as the validation stamp.
 
 ## Promotions
 
+A promotion level can be granted to a [build](#builds). This is called a _promotion_ or _promotion run_. This can happen several times for a given promotion level and a given build.
+
+A promotion is either granted or not granted at all. There is no notion of data associated with a promotion.
+
 ## Properties
+
+## Validation stamp types
+
+### Test summary
+
+Value:
+
+* `passed` - Count of passed tests
+* `skipped` - Count of skipped/ignored tests
+* `failed` - Count of failed tests
+
+Configuration:
+
+* `warningIfSkipped` - If set to true, the status is set to warning if there is at least one skipped test.
+* `failWhenNoResults` - If set to true, the status is set to failure if there is are no test at all.
+
+### CHML
+
+This type means Critical / High / Medium / Low. It is used to represent the results of some scans (security, code
+quality, etc.).
+
+Value:
+
+* `CRITICAL` - number of critical severity issues
+* `HIGH` - number of high severity issues
+* `MEDIUM` - number of medium severity issues
+* `LOW` - number of low severity issues
+
+Configuration:
+
+* `warningLevel`:
+    * `level`: CRITICAL / HIGH / MEDIUM / LOW
+    * `value`: when the number of issues in this `level` is above this threshold, the validation stamp is in warning
+* `failedLevel`:
+    * `level`: CRITICAL / HIGH / MEDIUM / LOW
+    * `value`: when the number of issues in this `level` is above this threshold, the validation stamp is failed
+
+### Percentage
+
+Value: an integer between 0 and 100.
+
+Configuration:
+
+* `warningThreshold`: integer between 0 and 100. If the value is below this threshold, the stamp is in warning.
+* `failureThreshold`: integer between 0 and 100. If the value is below this threshold, the stamp is is failed.
+* `okIfGreater`: boolean. If true, the stamp is OK when above the thresholds
+
+### Number
+
+Value: any number
+
+Configuration:
+
+* `warningThreshold`: integer. If the value is below this threshold, the stamp is in warning.
+* `failureThreshold`: integer. If the value is below this threshold, the stamp is is failed.
+* `okIfGreater`: boolean. If true, the stamp is OK when above the thresholds
+
+### Metrics
+
+This type is used collect arbitrary metrics, the associated of names with measurements.
+
+Value: a map of measurements (name --> double)
+
+Configuration: none
 
 ## Run info
 
