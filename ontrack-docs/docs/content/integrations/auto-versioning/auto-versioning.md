@@ -394,7 +394,8 @@ To update the `myVersion` property in the `images` table, one can set the auto v
 In some cases, it's not enough to have only a version being updated into one file.
 Some additional post-processing may be needed.
 
-For example, if using Gradle or NPM dependency locks, after the version is updated, you'd need to resolve and write the new dependency locks.
+For example, if using Gradle or NPM dependency locks, after the version is updated, you'd need to resolve and write the
+new dependency locks.
 
 The auto-versioning feature allows you to configure this post-processing.
 
@@ -408,13 +409,207 @@ As of now, only two post-processing mechanisms are supported:
 * [Jenkins pipeline](jenkins.md)
 * [GitHub Actions workflow](github.md)
 
+## Pull requests
+
+After a branch is created to hold the new version, after this branch has been optionally post-processed, Yontrack will
+create a pull request from this branch to the initial target branch.
+
+The `autoApproval` [branch configuration property](#configuration) (set to `true` by default) is used by Yontrack to
+check how pull requests are to be handled.
+
+If set to `false`, Yontrack will just create a pull request and stop here.
+
+If set to `true`, the fate of the pull request depends on the `autoApprovalMode` which has been set in
+the [branch configuration](#configuration):
+
+`CLIENT`
+
+:    This is the default behaviour. Ontrack takes the ownership of the pull request lifecycle:
+
+:    * PR is approved automatically
+:    * Yontrack waits for the PR to become mergeable
+:    * Yontrack merges the PR
+:    Pros: Full visibility on the PR lifecycle within Yontrack
+:    Cons: This creates additional load on Yontrack
+
+`SCM`
+
+:    Ontrack relies on the SCM (GitHub for example) for the lifecycle of the pull request, in a "fire and forget" mode:
+
+:    * PR is approved automatically
+:    * PR is set for auto merge
+:    * In the background, the PR will be merged automatically once all the conditions are met, but Ontrack does not
+follow that up
+:    Pros: Less load on Ontrack since the PR lifecycle is fully managed by the SCM
+:    Cons: Less visibility on the PR lifecycle from Ontrack
+
+### Configuration of approvals
+
+Both modes, `CLIENT` and `SCM`, need the SCM configuration used by Yontrack to have additional attributes.
+
+#### Configuration for GitHub
+
+The GitHub configuration used by the Yontrack project must have its `autoMergeToken` attribute set to a GitHub Personal
+Access Token with the following permissions:
+
+* `repo`
+
+and the corresponding user must have at least the `Triage` role on the target repositories.
+
+!!! note
+
+    This `autoMergeToken` must be linked to a user _which is not_ the user used by the GitHub configuration.
+    It's because a user cannot approve their own pull requests.
+
+### `CLIENT` mode
+
+No specific configuration is needed for the `CLIENT` mode.
+
+### `SCM` mode
+
+There is some configuration to be done at SCM level.
+
+#### `SCM` mode for GitHub
+
+The target repository, the one defining the project being auto-versioned, must have the following settings:
+
+* the `Allow auto-merge` feature must be enabled in the repository
+
+## Audit logs
+
+All auto-versioning processes and all their statuses are recorded in an audit log, which can be accessed using dedicated
+pages.
+
+The auto-versioning audit can be accessed:
+
+* from the _Auto versioning audit_ user menu, for all projects and branches
+* from the _Tools > Auto versioning audit (target)_ from a project page when the project is considered a _target_ of the
+  auto versioning
+* from the _Tools > Auto versioning audit (source)_ from a project page when the project is considered a _source_ of the
+  auto versioning
+* from the _Tools > Auto versioning audit_ from a branch page when the branch is targeted by the auto versioning
+
+All these pages are similar and show:
+
+* a form to filter the audit log entries
+* a paginated list of audit log entries
+
+Each log entry contains the following information:
+
+* the unique ID of the auto-versioning process
+* target project and branch (only available in global & project views)
+* source project
+* version being updated
+* the [schedule](#scheduling) if set
+* [post-processing](#post-processing) ID if any
+* [auto approval mode](#pull-requests) if any
+* running flag - is the auto-versioning process still running?
+* current state of the auto-versioning process
+* link to the PR if any
+* timestamp of the latest state
+* duration of the process until the latest state
+
+You can click on the ID to get more details about the auto-versioning process. The following information is available:
+
+* the history of the states of the process
+* all details stored in the auto-versioning order
+
+### Audit cleanup
+
+To avoid accumulating audit log entries forever, a cleanup job is run every day to remove obsolete entries.
+The behaviour of the cleanup is controlled through the [global settings](#general-configuration).
+
+### Audit metrics
+
+Yontrack exports some [operational metrics](../../operations/metrics.md) about the auto-versioning processes.
+
+See the [reference](../../generated/metrics/net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetrics.md) for the
+list of these metrics.
+
+## Auto versioning checks
+
+While auto)versioning is configured to automatically upgrade branches upon the promotion of some other projects, it's
+also possible to use this very configuration to check if a given build is up-to-date or not with the latest
+dependencies.
+
+One can call the Yontrack API (or better, make use of the existing [integrations](#integrations)) to check if a build is
+up-to-date or not. This creates a [validation run](../../concepts/model/index.md#validation-runs) on this build:
+
+* it'll be `PASSED` if the dependency are up-to-date
+* `FAILED` otherwise
+
+The name of the validation stamp is defined by the `validationStamp` parameter in the [configuration](#configuration) of
+the branch:
+
+* if defined, will use this name
+* if set to `auto`, the validation stamp name will be `auto-versioning-<project>`, with `<project>` being the name of
+  the source project
+* if not set, no validation is created
+
+## Notifications
+
+The auto)versioning feature integrates with the [notifications](../notifications/index.md) framework by emitting several
+events you can subscribe to:
+
+* `auto-versioning-success` - whenever an auto versioning process completes
+* `auto-versioning-error` - whenever an auto versioning process finishes with an error
+* `auto-versioning-pr-merge-timeout-error` - whenever an auto versioning process cannot merge a pull request because of
+  a timeout on its merge condition (only when `autoApprovalMode` is set to `CLIENT` - see <<auto-versioning-pr>>)
+
+## Throttling
+
+By default, when auto-versioning requests pile up for a given source and target, all the intermediary processing
+requests are canceled.
+
+For example, given the following scenario, for a given source project and a given target branch:
+
+* (1) auto versioning to version 1.0.1
+* auto versioning to version 1.0.2 while (1) is still processed
+* auto versioning to version 1.0.3 while (1) is still processed
+* auto versioning to version 1.0.4 while (1) is finished
+
+In this scenario, the processing of 1.0.1 and 1.0.4 will have been processed and completed while 1.0.2 and 1.0.3 would
+have been canceled.
+
+!!! note
+
+    The auto cancellation can be disabled by setting the `ontrack.extension.auto-versioning.queue.cancelling` [configuration property](../../generated/configurations/net.nemerosa.ontrack.extension.av.AutoVersioningConfigProperties.md) to `false`.
+
+## Scheduling
+
+The auto-versioning [configuration](#configuration) can use the `cronSchedule` parameter to schedule the auto-versioning
+process at a given time.
+
+As long as the schedule is not reached, all the auto-versioning requests will be [throttled](#throttling) and the last
+one active will be kept until it becomes time to process it.
+
+For example, given the following configuration:
+
+```yaml
+cronSchedule: '0 0 23 * * *'
+```
+
+All the auto-versioning requests but the last one will be canceled during the day. At 23:00 UTC every day, if there is
+one auto-versioning request still active, it will be processed.
+
+## Rescheduling
+
+Any existing auto-versioning request can be rescheduled from its detail page accessible from
+the [audit log](#audit-logs).
+
+Navigate to the detail page of the auto-versioning details page and click on the _Reschedule_ button.
+
+This creates a _new request_ and schedule it for immediate processing.
+
 ## Integrations
 
-While using the [CI config injection](../../configuration/ci-config.md#auto-versioning) for the configuration of the auto-versioning, there are several other ways to setup it.
+While using the [CI config injection](../../configuration/ci-config.md#auto-versioning) for the configuration of the
+auto-versioning, there are several other ways to setup it.
 
 ### Jenkins pipeline
 
-By using the [Jenkins Yontrack pipeline library](https://github.com/nemerosa/ontrack-jenkins-cli-pipeline), you can setup the auto versioning configuration for a branch.
+By using the [Jenkins Yontrack pipeline library](https://github.com/nemerosa/ontrack-jenkins-cli-pipeline), you can
+setup the auto versioning configuration for a branch.
 
 For example:
 
@@ -429,20 +624,26 @@ where `auto-versioning.yaml` is a file in the repository containing for example:
 
 ```yaml
 dependencies:
-- project: my-library
-  branch: release-1.3"
-  promotion: IRON
-  path: gradle.properties
-  property: my-version
-  postProcessing: jenkins
-  postProcessingConfig:
-  dockerImage  : openjdk:8
-  dockerCommand: ./gradlew clean
+  - project: my-library
+    branch: release-1.3"
+    promotion: IRON
+    path: gradle.properties
+    property: my-version
+    postProcessing: jenkins
+    postProcessingConfig:
+    dockerImage: openjdk:8
+    dockerCommand: ./gradlew clean
 ```
 
 !!! warning
 
     For historical reasons, this YAML file uses `dependencies` as a root instead of `configurations`.
+
+The [auto-versioning check](#auto-versioning-checks) is called using:
+
+```groovy
+ontrackCliAutoVersioningCheck()
+```
 
 ## Examples
 
