@@ -80,6 +80,17 @@ A promotion is either granted or not granted at all. There is no notion of data 
 
 ## Properties
 
+Properties are heavily used in Yontrack to enrich the model with additional information. They can be attached to any
+entity in the model.
+
+For example, in this documentation, we'll often talk about the "release label" of a build. This is actually represented by a [property](../../generated/properties/property-net.nemerosa.ontrack.extension.general.ReleasePropertyType.md) attached to the [build](#builds).
+
+Properties can be set by users using the UI, but more often than not, they are set automatically by the [CI engine](../../configuration/ci-config.md).
+
+!!! note
+
+    The list of all existing properties is available in the [reference](../../generated/properties/index.md).
+
 ## Validation stamp types
 
 ### Test summary
