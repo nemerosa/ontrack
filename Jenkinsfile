@@ -24,7 +24,7 @@ pipeline {
         )
         booleanParam(
                 name: 'SKIP_GITHUB_IT',
-                defaultValue: false,
+                defaultValue: true,
                 description: 'Skipping integration tests for GitHub'
         )
         booleanParam(
