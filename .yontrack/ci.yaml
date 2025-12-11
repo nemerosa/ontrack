@@ -30,6 +30,32 @@ configuration:
             - BRONZE
           validations:
             - GITHUB.RELEASE
+      workflows:
+        RELEASE:
+          - name: On internal release
+            nodes:
+              - id: notification
+                executorId: notification
+                data:
+                  channel: slack
+                  channelConfig:
+                    channel: '#internal-releases'
+                    type: 'SUCCESS'
+                  template: |
+                    Yontrack ${build} has been released.
+      
+                    ${promotionRun.changelog?title=true&commitsOption=ALWAYS}
+              - id: docs.yontrack.com
+                executorId: notification
+                data:
+                  channel: github-workflow
+                  channelConfig:
+                    config: github.com
+                    owner: yontrack
+                    repository: doc.yontrack.com
+                    workflowId: doc.yml
+                    reference: main
+                    callMode: ASYNC
       notificationsConfig:
         notifications:
           - name: On validation error
@@ -52,18 +78,6 @@ configuration:
               type: 'SUCCESS'
             contentTemplate: |
               Build ${build} has been promoted to ${promotionLevel}.
-          - name: On internal release
-            promotion: RELEASE
-            events:
-              - new_promotion_run
-            channel: slack
-            channelConfig:
-              channel: '#internal-releases'
-              type: 'SUCCESS'
-            contentTemplate: |
-              Yontrack ${build} has been released.
-
-              ${promotionRun.changelog?title=true&commitsOption=ALWAYS}
   custom:
     configs:
       - conditions:
