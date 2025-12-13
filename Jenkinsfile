@@ -110,11 +110,12 @@ pipeline {
                     // Reads version information
                     env.VERSION = readFile(file: 'build/version.txt')
                     currentBuild.description = env.VERSION
+                    // A bit of logging
+                    echo "Version = ${env.VERSION}"
+                    echo "Git commit = ${env.GIT_COMMIT}"
                     // Setup
                     ontrackCliCIConfig(logging: true)
                 }
-                echo "Version = ${env.VERSION}"
-                echo "Git commit = ${env.GIT_VERSION}"
                 script {
                     if (!params.JUST_BUILD_AND_PUSH) {
                         sh '''
