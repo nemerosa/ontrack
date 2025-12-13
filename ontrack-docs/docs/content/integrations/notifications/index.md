@@ -132,3 +132,7 @@ ${promotionRun.changelog?project=dependency}
 
 * [GitHub workflows](github-workflow.md) - triggering a GitHub Actions workflow
 * [Jenkins](jenkins.md) - triggering a Jenkins job
+
+## Notification metrics
+
+See the [reference](../../generated/metrics/net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics.md)

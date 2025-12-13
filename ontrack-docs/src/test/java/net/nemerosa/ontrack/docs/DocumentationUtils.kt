@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.annotations.getOptionalPropertyDescription
 import net.nemerosa.ontrack.model.docs.DocumentationIgnore
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
+import kotlin.reflect.KVisibility
 import kotlin.reflect.full.findAnnotations
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
@@ -63,7 +64,7 @@ fun <T : Annotation> getObjectFields(root: Any, annotationClass: KClass<T>): Lis
     ) {
         val klass = current::class
         klass.memberProperties.forEach { property: KProperty1<out Any, *> ->
-            if (!property.hasAnnotation<DocumentationIgnore>()) {
+            if (!property.hasAnnotation<DocumentationIgnore>() && property.visibility == KVisibility.PUBLIC) {
                 val propertyType = property.returnType.classifier as KClass<*>
                 if (isScalarClass(propertyType)) {
                     fields += createField(property, path)

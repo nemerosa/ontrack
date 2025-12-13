@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.extension.notifications.dispatching
 
+import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
+import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
 import net.nemerosa.ontrack.extension.notifications.model.NotificationSourceData
 import net.nemerosa.ontrack.extension.notifications.model.createData
 import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueuePayload
@@ -17,6 +19,7 @@ import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
 import net.nemerosa.ontrack.extension.queue.source.createQueueSource
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.dehydrate
+import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -31,6 +34,7 @@ class DefaultNotificationDispatcher(
     private val globalSubscriptionNotificationSource: GlobalSubscriptionNotificationSource,
     private val notificationQueueProcessor: NotificationQueueProcessor,
     private val notificationQueueSourceExtension: NotificationQueueSourceExtension,
+    private val meterRegistry: MeterRegistry,
 ) : NotificationDispatcher {
 
     private val logger: Logger = LoggerFactory.getLogger(DefaultNotificationDispatcher::class.java)
@@ -81,6 +85,12 @@ class DefaultNotificationDispatcher(
                         subscriptionName = eventSubscription.name,
                     )
                 )
+            )
+            // Event
+            meterRegistry.increment(
+                NotificationsMetrics.event_dispatching_queued,
+                "event" to event.eventType.id,
+                "channel" to eventSubscription.channel,
             )
             // OK
             true

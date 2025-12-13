@@ -1,6 +1,6 @@
 site_name: !ENV [ YONTRACK_DOCS_TITLE, 'Local Yontrack documentation' ]
 repo_url: https://github.com/nemerosa/ontrack
-edit_uri: !ENV [ YONTRACK_DOCS_EDIT, 'edit/master/ontrack-docs/docs' ]
+edit_uri: !ENV [ YONTRACK_DOCS_EDIT, 'edit/main/ontrack-docs/docs' ]
 theme:
   # https://squidfunk.github.io/mkdocs-material/
   name: material
