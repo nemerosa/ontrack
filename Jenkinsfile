@@ -109,6 +109,10 @@ pipeline {
                     env.ONTRACK_TEST_EXTENSION_GITHUB_IGNORE = params.SKIP_GITHUB_IT
                     // Reads version information
                     env.VERSION = readFile(file: 'build/version.txt')
+                    env.GIT_COMMIT = sh(
+                            returnStdout: true,
+                            script: 'git rev-parse HEAD'
+                    ).trim()
                     currentBuild.description = env.VERSION
                     // A bit of logging
                     echo "Version = ${env.VERSION}"
