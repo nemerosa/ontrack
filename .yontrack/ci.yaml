@@ -3,12 +3,7 @@ configuration:
   defaults:
     branch:
       autoVersioning:
-        configurations:
-          - sourceProject: yontrack
-            sourceBranch: '&latest'
-            sourcePromotion: RELEASE
-            targetPath: versions.properties
-            targetProperty: yontrack
+        configurations: []
       validations:
         BUILD:
           tests: {}
@@ -81,7 +76,7 @@ configuration:
   custom:
     configs:
       - conditions:
-          branch: '^release/\d+\.\d+$'
+          branch: 'main'
         branch:
           notificationsConfig:
             notifications:
