@@ -331,7 +331,7 @@ pipeline {
             when {
                 beforeAgent true
                 anyOf {
-                    branch 'main/*'
+                    branch 'main'
                     branch 'release/*'
                 }
             }

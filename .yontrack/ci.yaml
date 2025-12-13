@@ -13,6 +13,7 @@ configuration:
           tests: {}
         PLAYWRIGHT:
           tests: {}
+        DOCUMENTATION: {}
       promotions:
         BRONZE:
           validations:
@@ -25,6 +26,7 @@ configuration:
             - BRONZE
           validations:
             - GITHUB.RELEASE
+            - DOCUMENTATION
       workflows:
         RELEASE:
           - name: On internal release
