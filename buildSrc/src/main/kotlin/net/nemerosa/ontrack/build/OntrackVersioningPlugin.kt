@@ -18,8 +18,10 @@ class OntrackVersioningPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         val computed = computeVersion(project)
-        project.version = computed
-        project.logger.lifecycle("Computed version: $computed")
+        val isCI = System.getenv("CI")?.equals("true", ignoreCase = true) == true
+        val finalVersion = if (isCI) computed else "$computed-dev"
+        project.version = finalVersion
+        project.logger.lifecycle("Computed version: $finalVersion")
 
         project.tasks.register("writeVersion") {
             description = "Called by the CI engine to write the version into a file"
