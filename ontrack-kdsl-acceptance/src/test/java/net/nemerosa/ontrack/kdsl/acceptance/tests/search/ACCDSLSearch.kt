@@ -1,52 +1,58 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.search
 
+import net.nemerosa.ontrack.common.waitFor
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
-import net.nemerosa.ontrack.kdsl.spec.extension.general.label
+import net.nemerosa.ontrack.kdsl.spec.extension.general.release
 import net.nemerosa.ontrack.kdsl.spec.search.search
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.time.Duration.Companion.seconds
 
 class ACCDSLSearch : AbstractACCDSLTestSupport() {
 
     @Test
-    @Disabled
-    fun `Searching for a build based on its release information`() {
+    fun `Searching for a build based on its release information using the build index`() {
         val value = uid("V")
         val value1 = uid("V1")
         val value2 = uid("V2")
         project {
             branch("test") {
-                val build1 = build("1", "Build 1") {
-                    label = "$value-$value1"
+                build("1", "Build 1") {
+                    release = "$value-$value1"
                     this
                 }
-                val build2 = build("2", "Build 2") {
-                    label = "$value-$value2"
+                build("2", "Build 2") {
+                    release = "$value-$value2"
                     this
                 }
 
-                // Checks that we find one build on exact match
+                // Checks that we find one build on an exact match
                 var results = ontrack.search("build", "$value-$value1")
-                val build1Result =
-                    results.items.find { it.title == "Build ${build1.branch.project.name}/${build1.branch.name}/${build1.name}" }
-                assertNotNull(build1Result, "Build 1 found")
-                val build2Result =
-                    results.items.find { it.title == "Build ${build2.branch.project.name}/${build2.branch.name}/${build2.name}" }
-                assertNull(build2Result, "Build 2 not found")
+                val build1Result = results.items.single()
+                assertEquals(
+                    "$value-$value1",
+                    build1Result.title,
+                    "Build 1 as first result"
+                )
 
-
-                // Checks that we find two builds on prefix match
-                results = ontrack.search("build", value)
+                // Checks that we find two builds on the prefix match
+                results = waitFor(
+                    message = "Waiting for the indexation of the builds",
+                    interval = 1.seconds,
+                ) {
+                    ontrack.search("build", value)
+                } until {
+                    it.items.size >= 2
+                }
                 assertNotNull(
-                    results.items.find { it.title == "Build ${build1.branch.project.name}/${build1.branch.name}/${build1.name}" },
-                    "Build 1 found"
+                    results.items.find { it.title == "$value-$value1" },
+                    "Build 1 found on prefix"
                 )
                 assertNotNull(
-                    results.items.find { it.title == "Build ${build2.branch.project.name}/${build2.branch.name}/${build2.name}" },
-                    "Build 2 found"
+                    results.items.find { it.title == "$value-$value2" },
+                    "Build 2 found on prefix"
                 )
             }
         }

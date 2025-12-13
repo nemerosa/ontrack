@@ -40,5 +40,6 @@ constructor(
         const val SEARCH_RESULT_PROJECT = "project"
         const val SEARCH_RESULT_BRANCH = "branch"
         const val SEARCH_RESULT_BUILD = "build"
+        const val SEARCH_RESULT_BUILD_RELEASE = "release"
     }
 }

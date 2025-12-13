@@ -85,14 +85,13 @@ class ReleaseSearchExtension(
                 type = searchResultType,
                 data = mapOf(
                     SearchResult.SEARCH_RESULT_BUILD to entity,
-                    SEARCH_RESULT_RELEASE to item.release,
+                    SearchResult.SEARCH_RESULT_BUILD_RELEASE to item.release,
                 )
             )
         }
     }
 
     companion object {
-        const val SEARCH_RESULT_RELEASE = "release"
         const val SEARCH_RESULT_TYPE = "build-release"
     }
 

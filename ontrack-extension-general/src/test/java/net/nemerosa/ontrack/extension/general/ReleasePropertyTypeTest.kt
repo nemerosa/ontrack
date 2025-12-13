@@ -14,7 +14,9 @@ class ReleasePropertyTypeTest {
                     extensionFeature = GeneralExtensionFeature(),
                     propertyService = mockk(),
                     structureService = mockk()
-            )
+            ),
+            eventFactory = mockk(),
+            eventPostService = mockk()
     )
 
     @Test

@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
+import net.nemerosa.ontrack.model.events.EventFactory
+import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.json.schema.JsonType
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.json.schema.toType
@@ -17,6 +19,8 @@ class ReleasePropertyType(
     private val searchIndexService: SearchIndexService,
     private val releaseSearchExtension: ReleaseSearchExtension,
     private val releasePropertyListeners: List<ReleasePropertyListener> = emptyList(),
+    private val eventFactory: EventFactory,
+    private val eventPostService: EventPostService,
 ) : AbstractPropertyType<ReleaseProperty>(extensionFeature) {
 
     override val name: String = "Release"
@@ -42,10 +46,22 @@ class ReleasePropertyType(
             listener.onBuildReleaseLabel(entity as Build, value)
         }
         searchIndexService.createSearchIndex(releaseSearchExtension, ReleaseSearchItem(entity, value))
+        eventPostService.post(
+            eventFactory.updateBuildDisplayName(
+                build = entity as Build,
+                displayName = value.name,
+            )
+        )
     }
 
     override fun onPropertyDeleted(entity: ProjectEntity, oldValue: ReleaseProperty) {
         searchIndexService.deleteSearchIndex(releaseSearchExtension, ReleaseSearchItem(entity, oldValue).id)
+        eventPostService.post(
+            eventFactory.updateBuildDisplayName(
+                build = entity as Build,
+                displayName = "",
+            )
+        )
     }
 
     override fun fromClient(node: JsonNode): ReleaseProperty {
@@ -54,7 +70,7 @@ class ReleasePropertyType(
 
     override fun fromStorage(node: JsonNode): ReleaseProperty {
         return ReleaseProperty(
-                node.path("name").asText()
+            node.path("name").asText()
         )
     }
 
@@ -63,26 +79,26 @@ class ReleasePropertyType(
     }
 
     override fun containsValue(value: ReleaseProperty, propertyValue: String): Boolean =
-            if ("*" in propertyValue) {
-                val regex = propertyValue.replace("*", ".*").toRegex(RegexOption.IGNORE_CASE)
-                regex.matches(value.name)
-            } else {
-                value.name.equals(propertyValue, ignoreCase = true)
-            }
+        if ("*" in propertyValue) {
+            val regex = propertyValue.replace("*", ".*").toRegex(RegexOption.IGNORE_CASE)
+            regex.matches(value.name)
+        } else {
+            value.name.equals(propertyValue, ignoreCase = true)
+        }
 
     override fun getSearchArguments(token: String): PropertySearchArguments? {
         return if (token.isNotBlank()) {
             if ("*" in token) {
                 PropertySearchArguments(
-                        null,
-                        "pp.json->>'name' ilike :token",
-                        mapOf("token" to token.replace("*", "%"))
+                    null,
+                    "pp.json->>'name' ilike :token",
+                    mapOf("token" to token.replace("*", "%"))
                 )
             } else {
                 PropertySearchArguments(
-                        null,
-                        "UPPER(pp.json->>'name') = UPPER(:token)",
-                        mapOf("token" to token)
+                    null,
+                    "UPPER(pp.json->>'name') = UPPER(:token)",
+                    mapOf("token" to token)
                 )
             }
         } else {

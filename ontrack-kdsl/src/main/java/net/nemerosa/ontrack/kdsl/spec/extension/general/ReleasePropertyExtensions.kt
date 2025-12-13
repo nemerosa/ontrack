@@ -7,19 +7,8 @@ import net.nemerosa.ontrack.kdsl.spec.setProperty
 
 /**
  * Sets a release property (label) on a build.
- *
- * Alias for [setReleaseProperty].
  */
-var Build.label: String?
-    get() = releaseProperty
-    set(value) {
-        releaseProperty = value
-    }
-
-/**
- * Sets a release property (label) on a build.
- */
-var Build.releaseProperty: String?
+var Build.release: String?
     get() = getProperty(RELEASE_PROPERTY)?.path("name")?.asText()
     set(value) {
         if (value != null) {

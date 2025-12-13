@@ -2,38 +2,40 @@ package net.nemerosa.ontrack.model.events
 
 import net.nemerosa.ontrack.model.events.Event.Companion.of
 import net.nemerosa.ontrack.model.events.EventFactory.Companion.DELETE_BRANCH
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.DELETE_PROJECT
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.DISABLE_BRANCH
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.DISABLE_PROJECT
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.ENABLE_BRANCH
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.ENABLE_PROJECT
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_BRANCH
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_PROJECT
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_BRANCH
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_PROJECT
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_BUILD
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_BUILD
 import net.nemerosa.ontrack.model.events.EventFactory.Companion.DELETE_BUILD
 import net.nemerosa.ontrack.model.events.EventFactory.Companion.DELETE_CONFIGURATION
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_PROMOTION_LEVEL
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.IMAGE_PROMOTION_LEVEL
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_PROMOTION_LEVEL
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.DELETE_PROJECT
 import net.nemerosa.ontrack.model.events.EventFactory.Companion.DELETE_PROMOTION_LEVEL
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.REORDER_PROMOTION_LEVEL
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_VALIDATION_STAMP
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.IMAGE_VALIDATION_STAMP
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_VALIDATION_STAMP
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.DELETE_VALIDATION_STAMP
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.REORDER_VALIDATION_STAMP
-import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_PROMOTION_RUN
 import net.nemerosa.ontrack.model.events.EventFactory.Companion.DELETE_PROMOTION_RUN
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.DELETE_VALIDATION_STAMP
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.DISABLE_BRANCH
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.DISABLE_PROJECT
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.DISPLAY_NAME
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.ENABLE_BRANCH
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.ENABLE_PROJECT
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.IMAGE_PROMOTION_LEVEL
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.IMAGE_VALIDATION_STAMP
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_BRANCH
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_BUILD
 import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_CONFIGURATION
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_PROJECT
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_PROMOTION_LEVEL
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_PROMOTION_RUN
 import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_VALIDATION_RUN
 import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_VALIDATION_RUN_STATUS
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.NEW_VALIDATION_STAMP
 import net.nemerosa.ontrack.model.events.EventFactory.Companion.PROPERTY_CHANGE
 import net.nemerosa.ontrack.model.events.EventFactory.Companion.PROPERTY_DELETE
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.REORDER_PROMOTION_LEVEL
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.REORDER_VALIDATION_STAMP
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_BRANCH
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_BUILD
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_BUILD_DISPLAY_NAME
 import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_CONFIGURATION
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_PROJECT
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_PROMOTION_LEVEL
 import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_VALIDATION_RUN_STATUS_COMMENT
+import net.nemerosa.ontrack.model.events.EventFactory.Companion.UPDATE_VALIDATION_STAMP
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.Configuration
 import net.nemerosa.ontrack.model.support.NameValue
@@ -61,6 +63,7 @@ class EventFactoryImpl : EventFactory {
 
         register(NEW_BUILD)
         register(UPDATE_BUILD)
+        register(UPDATE_BUILD_DISPLAY_NAME)
         register(DELETE_BUILD)
 
         register(NEW_PROMOTION_LEVEL)
@@ -169,6 +172,13 @@ class EventFactoryImpl : EventFactory {
         return of(UPDATE_BUILD)
             .withBuild(build)
             .withNoSignature()
+            .build()
+    }
+
+    override fun updateBuildDisplayName(build: Build, displayName: String): Event {
+        return of(UPDATE_BUILD_DISPLAY_NAME)
+            .withBuild(build)
+            .with(DISPLAY_NAME, displayName)
             .build()
     }
 

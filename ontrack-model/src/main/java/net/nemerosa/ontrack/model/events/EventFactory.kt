@@ -45,6 +45,8 @@ interface EventFactory {
 
     fun updateBuild(build: Build): Event
 
+    fun updateBuildDisplayName(build: Build, displayName: String): Event
+
     fun deleteBuild(build: Build): Event
 
     fun newPromotionLevel(promotionLevel: PromotionLevel): Event
@@ -214,6 +216,17 @@ interface EventFactory {
                 eventProject("Build's project"),
                 eventBranch("Build's branch"),
                 eventBuild("Updated build"),
+            ),
+        )
+        val UPDATE_BUILD_DISPLAY_NAME: EventType = SimpleEventType(
+            id = "update_build_display_name",
+            template = "Display name of build \${build} for branch \${branch} in \${project} has been updated to \${DISPLAY_NAME}.",
+            description = "When a build display name is updated.",
+            context = eventContext(
+                eventProject("Build's project"),
+                eventBranch("Build's branch"),
+                eventBuild("Updated build"),
+                eventValue(DISPLAY_NAME, "New display name"),
             ),
         )
         val DELETE_BUILD: EventType = SimpleEventType(
@@ -439,5 +452,7 @@ interface EventFactory {
                 eventValue("CONFIGURATION", "Name of the configuration")
             ),
         )
+
+        const val DISPLAY_NAME = "DISPLAY_NAME"
     }
 }

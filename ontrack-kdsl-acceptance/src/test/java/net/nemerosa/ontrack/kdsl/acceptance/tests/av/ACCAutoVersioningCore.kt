@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.general.buildLinkDisplayUseLabel
-import net.nemerosa.ontrack.kdsl.spec.extension.general.label
+import net.nemerosa.ontrack.kdsl.spec.extension.general.release
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -1045,7 +1045,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         dependency.apply {
                             build(name = "1.1.0-1") {
-                                label = "1.1.0"
+                                release = "1.1.0"
                                 promote("IRON")
                             }
                         }
