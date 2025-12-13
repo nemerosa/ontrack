@@ -1,12 +1,14 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.BuildSearchForm
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
+@AsAdminTest
 class MetaInfoPropertyTypeIT : AbstractDSLTestSupport() {
 
     @Test

@@ -2,12 +2,14 @@ package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
+@AsAdminTest
 class BranchBuildsFilterQLIT : AbstractQLKTITSupport() {
 
     @Test

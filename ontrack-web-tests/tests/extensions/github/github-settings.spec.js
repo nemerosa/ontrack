@@ -1,11 +1,11 @@
-const {test, expect} = require('@playwright/test')
+const {expect} = require('@playwright/test')
+const {test} = require("../../fixtures/connection")
 const {login} = require("../../core/login");
-const {ontrack} = require("@ontrack/ontrack");
 const {SettingsPage} = require("../../core/settings/SettingsPage");
 
-test('saving existing GitHub Ingestion settings', async ({page}) => {
+test('saving existing GitHub Ingestion settings', async ({page, ontrack}) => {
     // Creating the GH Ingestion settings
-    await ontrack().settings.gitHubIngestion.saveSettings({
+    await ontrack.settings.gitHubIngestion.saveSettings({
         token: "some-secret",
         retentionDays: 14,
         orgProjectPrefix: false,
@@ -16,9 +16,9 @@ test('saving existing GitHub Ingestion settings', async ({page}) => {
         enabled: true,
     })
     // Login
-    await login(page)
+    await login(page, ontrack)
     // Going to the settings page
-    const settingsPage = new SettingsPage(page)
+    const settingsPage = new SettingsPage(page, ontrack)
     await settingsPage.goTo()
     // Selecting the GitHub Ingestion settings
     await settingsPage.selectSettings("GitHub ingestion")

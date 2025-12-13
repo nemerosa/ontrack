@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.PromotionLevelCreate
 import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
@@ -19,6 +20,7 @@ import kotlin.test.assertTrue
 /**
  * This class supersedes [StructureServiceIT], which cannot be replaced as yet.
  */
+@AsAdminTest
 class StructureServiceNewIT : AbstractDSLTestSupport() {
 
     @Test
@@ -152,8 +154,8 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
             }
         }
         asAdmin {
-            structureService.addBuildLink(source, target) // Once
-            structureService.addBuildLink(source, target) // Twice
+            structureService.createBuildLink(source, target) // Once
+            structureService.createBuildLink(source, target) // Twice
         }
     }
 

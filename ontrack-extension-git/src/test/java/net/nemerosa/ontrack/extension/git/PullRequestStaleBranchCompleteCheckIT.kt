@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurator
 import net.nemerosa.ontrack.extension.stale.StaleJobService
 import net.nemerosa.ontrack.extension.stale.StaleProperty
@@ -10,9 +9,10 @@ import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -21,7 +21,8 @@ import kotlin.test.assertTrue
 /**
  * Integration tests between the PR check and the normal branch check.
  */
-class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestJUnit4Support() {
+@WithGitPullRequestEnabled
+class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
 
     @Autowired
     private lateinit var gitMockingConfigurator: GitMockingConfigurator
@@ -29,7 +30,7 @@ class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestJUnit4Support() {
     @Autowired
     private lateinit var staleJobService: StaleJobService
 
-    @Before
+    @BeforeEach
     fun init() {
         gitMockingConfigurator.clearPullRequests()
     }
@@ -145,7 +146,6 @@ class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestJUnit4Support() {
     ) {
         infix fun returns(expectedResult: ExpectedResult) {
             val description = "${branchConfiguration.description} with ${buildConfiguration.description} expects to be ${expectedResult.description}"
-            logger.info("TEST $description")
             createRepo {
                 commits(1)
             } and { repo, _ ->

@@ -8,9 +8,12 @@ import net.nemerosa.ontrack.model.events.EventFactory;
 import net.nemerosa.ontrack.model.events.EventPostService;
 import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import net.nemerosa.ontrack.model.support.*;
+import net.nemerosa.ontrack.model.support.ConfigurationRepository;
+import net.nemerosa.ontrack.model.support.ConnectionResult;
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class GitLabConfigurationServiceImpl extends AbstractConfigurationService<GitLabConfiguration> implements GitLabConfigurationService {
 
+    private final Logger logger = LoggerFactory.getLogger(GitLabConfigurationServiceImpl.class);
+
     private final OntrackGitLabClientFactory gitLabClientFactory;
-    private final ApplicationLogService applicationLogService;
 
     @Autowired
     public GitLabConfigurationServiceImpl(
@@ -30,8 +34,8 @@ public class GitLabConfigurationServiceImpl extends AbstractConfigurationService
             EventPostService eventPostService,
             EventFactory eventFactory,
             OntrackGitLabClientFactory gitLabClientFactory,
-            OntrackConfigProperties ontrackConfigProperties,
-            ApplicationLogService applicationLogService) {
+            OntrackConfigProperties ontrackConfigProperties
+    ) {
         super(
                 GitLabConfiguration.class,
                 configurationRepository,
@@ -42,7 +46,6 @@ public class GitLabConfigurationServiceImpl extends AbstractConfigurationService
                 ontrackConfigProperties
         );
         this.gitLabClientFactory = gitLabClientFactory;
-        this.applicationLogService = applicationLogService;
     }
 
     @NotNull
@@ -61,14 +64,13 @@ public class GitLabConfigurationServiceImpl extends AbstractConfigurationService
             // OK
             return ConnectionResult.ok();
         } catch (Exception ex) {
-            applicationLogService.log(
-                    ApplicationLogEntry.error(
-                                    ex,
-                                    NameDescription.nd("gitlab", "GitLab connection issue"),
-                                    configuration.getUrl()
-                            )
-                            .withDetail("gitlab-config-name", configuration.getName())
-                            .withDetail("gitlab-config-url", configuration.getUrl())
+            logger.error(
+                    String.format(
+                            "Cannot validate GitLab configuration: remote: %s, name: %s",
+                            configuration.getUrl(),
+                            configuration.getName()
+                    ),
+                    ex
             );
             return ConnectionResult.error(ex.getMessage());
         }

@@ -22,10 +22,10 @@ class JsonPropertyAccessor : PropertyAccessor {
     override fun write(context: EvaluationContext, target: Any?, name: String, newValue: Any?) {
         if (target is ObjectNode) {
             when (newValue) {
-                is Int -> target.set(name, IntNode(newValue))
-                is Long -> target.set(name, LongNode(newValue))
-                is Boolean -> target.set(name, BooleanNode.valueOf(newValue))
-                is String -> target.set(name, TextNode(newValue))
+                is Int -> target.set(name, IntNode(newValue)) as ObjectNode
+                is Long -> target.set(name, LongNode(newValue)) as ObjectNode
+                is Boolean -> target.set(name, BooleanNode.valueOf(newValue)) as ObjectNode
+                is String -> target.set(name, TextNode(newValue)) as ObjectNode
                 else -> throw AccessException("Cannot set value for field $name on $target")
             }
         } else {

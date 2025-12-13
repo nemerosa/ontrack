@@ -26,7 +26,7 @@ class SCMBranchInfoBranchGraphQLFieldContributor(
                     .description("SCM information about the branch")
                     .type(gqlTypeSCMBranchInfo.typeRef)
                     .dataFetcher { env ->
-                        val branch: Branch = env.getSource()
+                        val branch: Branch = env.getSource()!!
                         getSCMBranchInfo(branch)
                     }
                     .build()

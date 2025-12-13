@@ -1,21 +1,21 @@
 package net.nemerosa.ontrack.extension.scm.catalog
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.StorageService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
 class SCMCatalogImpl(
-        private val storageService: StorageService,
-        private val scmCatalogProviders: List<SCMCatalogProvider>,
-        private val applicationLogService: ApplicationLogService
+    private val storageService: StorageService,
+    private val scmCatalogProviders: List<SCMCatalogProvider>,
 ) : SCMCatalog {
+
+    private val logger: Logger = LoggerFactory.getLogger(javaClass)
+
     override fun collectSCMCatalog(logger: (String) -> Unit) {
 
         // Gets existing keys
@@ -27,33 +27,30 @@ class SCMCatalogImpl(
             val entries = try {
                 provider.entries
             } catch (ex: Exception) {
-                applicationLogService.log(
-                        ApplicationLogEntry.error(
-                                ex,
-                                NameDescription.nd("scm-provider-access", "Cannot access SCM provider"),
-                                "Cannot get SCM entries from ${provider.id}"
-                        ).withDetail("provider", provider.id)
+                this.logger.error(
+                    "Cannot get SCM entries from ${provider.id}",
+                    ex
                 )
-                emptyList<SCMCatalogSource>()
+                emptyList()
             }
             entries.forEach { source ->
                 logger("SCM Catalog entry: $source")
                 // As entry
                 val entry = SCMCatalogEntry(
-                        scm = provider.id,
-                        config = source.config,
-                        repository = source.repository,
-                        repositoryPage = source.repositoryPage,
-                        lastActivity = source.lastActivity,
-                        createdAt = source.createdAt,
-                        timestamp = Time.now(),
-                        teams = source.teams
+                    scm = provider.id,
+                    config = source.config,
+                    repository = source.repository,
+                    repositoryPage = source.repositoryPage,
+                    lastActivity = source.lastActivity,
+                    createdAt = source.createdAt,
+                    timestamp = Time.now(),
+                    teams = source.teams
                 )
                 // Stores the entry
                 storageService.store(
-                        SCM_CATALOG_STORE,
-                        entry.key,
-                        entry
+                    SCM_CATALOG_STORE,
+                    entry.key,
+                    entry
                 )
                 // Stored
                 keys.remove(entry.key)
@@ -70,7 +67,7 @@ class SCMCatalogImpl(
         get() = storageService.getData(SCM_CATALOG_STORE, SCMCatalogEntry::class.java).values.asSequence()
 
     override fun getCatalogEntry(key: String): SCMCatalogEntry? =
-            storageService.retrieve(SCM_CATALOG_STORE, key, SCMCatalogEntry::class.java).getOrNull()
+        storageService.find(SCM_CATALOG_STORE, key, SCMCatalogEntry::class)
 
 }
 

@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.environments
 
-import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.CreateSlotMutation
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.DeleteEnvironmentMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateSlotMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.DeleteEnvironmentMutation
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.spec.Project
 import net.nemerosa.ontrack.kdsl.spec.Resource
@@ -27,15 +27,15 @@ class Environment(
             CreateSlotMutation(
                 this.id,
                 project.id.toInt(),
-                qualifier,
-                Input.optional(description)
+                Optional.presentIfNotNull(qualifier),
+                Optional.presentIfNotNull(description)
             )
-        ) { it?.createSlots()?.fragments()?.payloadUserErrors()?.convert() }
-            ?.createSlots()?.slots()?.slots()?.firstOrNull()
+        ) { it?.createSlots?.payloadUserErrors?.convert() }
+            ?.createSlots?.slots?.slots?.firstOrNull()
             ?: error("Cannot get created slot")
         return Slot(
             connector = connector,
-            id = slot.id(),
+            id = slot.id,
             environment = this,
             project = project,
             qualifier = qualifier,
@@ -46,7 +46,7 @@ class Environment(
     fun delete() {
         graphqlConnector.mutate(
             DeleteEnvironmentMutation(id)
-        ) { it?.deleteEnvironment()?.fragments()?.payloadUserErrors()?.convert() }
+        ) { it?.deleteEnvironment?.payloadUserErrors?.convert() }
     }
 
 }

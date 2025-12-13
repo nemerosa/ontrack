@@ -1,12 +1,6 @@
 package net.nemerosa.ontrack.extension.gitlab.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
-import net.nemerosa.ontrack.model.form.Password
-import net.nemerosa.ontrack.model.form.Text
-import net.nemerosa.ontrack.model.form.YesNo
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 
 /**
@@ -21,11 +15,6 @@ open class GitLabConfiguration(
     val isIgnoreSslCertificate: Boolean
 ) : UserPasswordConfiguration<GitLabConfiguration>(name, user, password) {
 
-    override val descriptor = ConfigurationDescriptor(
-        name,
-        "$name ($url)"
-    )
-
     override fun obfuscate(): GitLabConfiguration {
         return this.withPassword("")
     }
@@ -38,15 +27,6 @@ open class GitLabConfiguration(
             password,
             isIgnoreSslCertificate
         )
-    }
-
-
-    fun asForm(): Form {
-        return form()
-            .with(defaultNameField().readOnly().value(name))
-            .fill("url", url)
-            .fill("user", user)
-            .fill("ignoreSslCertificate", isIgnoreSslCertificate)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -73,32 +53,4 @@ open class GitLabConfiguration(
         return result
     }
 
-    companion object {
-
-        @JvmStatic
-        fun form(): Form {
-            return Form.create()
-                .with(defaultNameField())
-                .with(
-                    Text.of("url")
-                        .label("URL")
-                        .length(250)
-                        .help("URL of the GitLab engine.")
-                )
-                .with(
-                    Text.of("user")
-                        .label("User")
-                        .length(16)
-                )
-                .with(
-                    Password.of("password")
-                        .label("Personal Access Token")
-                        .length(50)
-                )
-                .with(
-                    YesNo.of("ignoreSslCertificate")
-                        .label("Ignore SSL certificate")
-                )
-        }
-    }
 }

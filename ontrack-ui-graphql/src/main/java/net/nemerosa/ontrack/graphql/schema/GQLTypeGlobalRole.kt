@@ -29,7 +29,7 @@ class GQLTypeGlobalRole(
                             .description("List of groups having this role")
                             .type(listType(GQLTypeAccountGroup.ACCOUNT_GROUP))
                             .dataFetcher { env ->
-                                val globalRole: GlobalRole = env.getSource()
+                                val globalRole: GlobalRole = env.getSource()!!
                                 accountService.findAccountGroupsByGlobalRole(globalRole)
                             }
                 }
@@ -38,7 +38,7 @@ class GQLTypeGlobalRole(
                             .description("List of accounts having this role")
                             .type(listType(GraphQLTypeReference(GQLTypeAccount.ACCOUNT)))
                             .dataFetcher { env ->
-                                val globalRole: GlobalRole = env.getSource()
+                                val globalRole: GlobalRole = env.getSource()!!
                                 accountService.findAccountsByGlobalRole(globalRole)
                             }
                 }

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.casc.context.settings
 
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -25,8 +24,6 @@ class SampleDurationSettingsManager(
             settings.duration.toString()
         )
     }
-
-    override fun getSettingsForm(settings: SampleDurationSettings): Form = Form.create()
 
     override fun getId(): String = "sample-duration"
 

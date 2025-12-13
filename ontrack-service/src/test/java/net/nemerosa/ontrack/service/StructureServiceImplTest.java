@@ -59,7 +59,6 @@ public class StructureServiceImplTest {
                 propertyService,
                 predefinedPromotionLevelService,
                 predefinedValidationStampService,
-                decorationService,
                 promotionRunCheckService,
                 statsRepository,
                 mock(BuildLinkListenerService.class),

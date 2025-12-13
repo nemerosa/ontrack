@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getIntField
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
 import kotlin.test.assertEquals
@@ -12,7 +12,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 @Transactional
-class StorageJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
+class StorageJdbcRepositoryIT : AbstractRepositoryTestSupport() {
 
     @Autowired
     private lateinit var repository: StorageRepository

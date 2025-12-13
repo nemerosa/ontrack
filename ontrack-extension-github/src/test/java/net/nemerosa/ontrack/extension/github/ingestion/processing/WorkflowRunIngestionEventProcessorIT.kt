@@ -1,15 +1,16 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
+import net.nemerosa.ontrack.extension.github.client.UseGitHubClientMock
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigWorkflows
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderServiceITMockConfig
 import net.nemerosa.ontrack.extension.github.ingestion.processing.events.*
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.*
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
@@ -23,9 +24,11 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import java.time.LocalDateTime
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.*
 
 @ContextConfiguration(classes = [ConfigLoaderServiceITMockConfig::class])
+@UseGitHubClientMock
 class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
 
     @Autowired
@@ -706,7 +709,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                             getProperty(
                                 build,
                                 BuildGitHubWorkflowRunPropertyType::class.java
-                            )?.workflows?.firstOrNull(),
+                            ).workflows.firstOrNull(),
                             "GitHub workflow run URL"
                         ) {
                             assertEquals(htmlUrl, it.url)

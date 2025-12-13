@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscript
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionFilter
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.structure.Branch
@@ -21,6 +22,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@AsAdminTest
 internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTestSupport() {
 
     @Autowired

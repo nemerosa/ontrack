@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.general.validation
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.IntNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.NumericValidationDataType
 import org.springframework.stereotype.Component
 
@@ -22,22 +21,12 @@ class ThresholdNumberValidationDataType(
             else -> null
         }
 
-    override fun getForm(data: Int?): Form = Form.create()
-        .with(
-            net.nemerosa.ontrack.model.form.Int
-                .of("value")
-                .label("Value")
-                .value(data)
-                .optional()
-        )
-
-    override fun fromForm(node: JsonNode?): Int? {
+    override fun fromForm(node: JsonNode?): Int? =
         if (node != null && node.has("value")) {
-            return node.get("value").asInt()
+            node.get("value").asInt()
         } else {
-            return null
+            null
         }
-    }
 
     override fun toIntValue(data: Int) = data
 

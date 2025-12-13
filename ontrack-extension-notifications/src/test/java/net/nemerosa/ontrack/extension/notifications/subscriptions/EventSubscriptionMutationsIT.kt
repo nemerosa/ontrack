@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredBooleanField
 import net.nemerosa.ontrack.json.getRequiredJsonField
@@ -12,6 +13,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import kotlin.test.*
 
+@AsAdminTest
 class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
 
     @Test
@@ -497,7 +499,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 """
                     mutation {
                         disableSubscription(input: {
-                            id: "$name"
+                            name: "$name"
                         }) {
                             errors {
                                 message
@@ -523,7 +525,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 """
                     mutation {
                         enableSubscription(input: {
-                            id: "$name"
+                            name: "$name"
                         }) {
                             errors {
                                 message

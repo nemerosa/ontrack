@@ -14,7 +14,7 @@ class GlobalSubscriptionsAuthorizationContributor(
 
     override fun appliesTo(context: Any): Boolean = context is GlobalAuthorizationContext
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> {
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> {
         return listOf(
             Authorization(
                 SUBSCRIPTIONS,

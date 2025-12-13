@@ -5,18 +5,18 @@ import net.nemerosa.ontrack.job.JobKey
 import net.nemerosa.ontrack.job.JobListener
 import net.nemerosa.ontrack.job.JobRunProgress
 import net.nemerosa.ontrack.job.JobStatus
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.SettingsRepository
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.transaction.annotation.Transactional
 import java.util.concurrent.TimeUnit
 
 open class DefaultJobListener(
-        private val logService: ApplicationLogService,
-        private val meterRegistry: MeterRegistry,
-        private val settingsRepository: SettingsRepository
+    private val meterRegistry: MeterRegistry,
+    private val settingsRepository: SettingsRepository
 ) : JobListener {
+
+    private val logger: Logger = LoggerFactory.getLogger(DefaultJobListener::class.java)
 
     override fun onJobStart(key: JobKey) {
     }
@@ -39,16 +39,9 @@ open class DefaultJobListener(
     override fun onJobError(status: JobStatus, ex: Exception) {
         val key = status.key
         meterRegistry.counter("ontrack_job_errors", key.metricTags).increment()
-        logService.log(
-                ApplicationLogEntry.error(
-                        ex,
-                        NameDescription.nd(
-                                key.type.toString(),
-                                key.type.name
-                        ),
-                        status.description
-                ).withDetail("job.key", key.id)
-                        .withDetail("job.progress", status.progressText)
+        logger.error(
+            "${status.description}, key=${key.id}, progress=${status.progressText}",
+            ex
         )
     }
 
@@ -59,9 +52,9 @@ open class DefaultJobListener(
 
     override fun isPausedAtStartup(key: JobKey): Boolean {
         return settingsRepository.getBoolean(
-                JobListener::class.java,
-                key.toString(),
-                false
+            JobListener::class.java,
+            key.toString(),
+            false
         )
     }
 }

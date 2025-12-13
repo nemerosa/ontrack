@@ -3,16 +3,9 @@ package net.nemerosa.ontrack.repository
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountGroup
-import net.nemerosa.ontrack.model.security.AuthenticationSource
 import net.nemerosa.ontrack.model.structure.ID
 
 interface AccountRepository {
-
-    /**
-     * Gets a built-in if it exists. The criteria is based on the [username] and on the [mode][Account.authenticationSource]
-     * being stored.
-     */
-    fun findBuiltinAccount(username: String): BuiltinAccount?
 
     /**
      * Gets the list of all accounts
@@ -35,11 +28,6 @@ interface AccountRepository {
     fun deleteAccount(accountId: ID): Ack
 
     /**
-     * Changes the password of an account
-     */
-    fun setPassword(accountId: Int, encodedPassword: String)
-
-    /**
      * Loads an account by ID
      */
     fun getAccount(accountId: ID): Account
@@ -60,7 +48,7 @@ interface AccountRepository {
     /**
      * Finds an account using its name only.
      */
-    fun findAccountByName(username: String): Account?
+    fun findAccountByName(email: String): Account?
 
     /**
      * Checks if an account ID exists
@@ -68,19 +56,7 @@ interface AccountRepository {
     fun doesAccountIdExist(id: ID): Boolean
 
     /**
-     * Deletes all accounts having the given source.
-     *
-     * @param source Source to delete accounts from
+     * Finds or create the account
      */
-    fun deleteAccountBySource(source: AuthenticationSource)
-
-    /**
-     * Disabled / enables an account
-     */
-    fun setAccountDisabled(id: ID, disabled: Boolean)
-
-    /**
-     * Locks / unlocks an account
-     */
-    fun setAccountLocked(id: ID, locked: Boolean)
+    fun findOrCreateAccount(account: Account): Account
 }

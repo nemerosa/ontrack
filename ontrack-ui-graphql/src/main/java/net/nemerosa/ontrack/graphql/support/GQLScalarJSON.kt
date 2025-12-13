@@ -110,7 +110,7 @@ object GQLScalarJSON {
                                         }
                                     }
                                     .associate { (name: String, value: JsonNode?) ->
-                                        name to value.obfuscate()
+                                        name to value?.obfuscate()
                                     }
                             )
                         // No transformation for an end element

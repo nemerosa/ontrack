@@ -1,12 +1,12 @@
 // @ts-check
-const {test, expect} = require('@playwright/test');
 const {login, logout} = require("./login");
+const {test} = require("../fixtures/connection");
 
-test('login', async ({page}) => {
-    await login(page)
+test('login', {tag: "@auth"}, async ({page, ontrack}) => {
+    await login(page, ontrack)
 })
 
-// TODO test('login and logout', async ({page}) => {
-//     await login(page)
-//     await logout(page)
-// })
+test('login and logout', {tag: "@auth"}, async ({page, ontrack}) => {
+    await login(page, ontrack)
+    await logout(page)
+})

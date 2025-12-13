@@ -21,9 +21,9 @@ import org.springframework.stereotype.Component
  */
 @Component
 class GQLContributorRecordings(
-        private val extensionManager: ExtensionManager,
-        private val gqlPaginatedListFactory: GQLPaginatedListFactory,
-        private val recordingsQueryService: RecordingsQueryService,
+    private val extensionManager: ExtensionManager,
+    private val gqlPaginatedListFactory: GQLPaginatedListFactory,
+    private val recordingsQueryService: RecordingsQueryService,
 ) : GQLContributor, GQLRootQueries {
 
     override fun contribute(cache: GQLTypeCache, dictionary: MutableSet<GraphQLType>): Set<GraphQLType> {
@@ -40,23 +40,23 @@ class GQLContributorRecordings(
         }
 
     private fun <R : Recording, F : Any> RecordingsExtension<R, F>.createRootQuery(): GraphQLFieldDefinition =
-            gqlPaginatedListFactory.createPaginatedField<Any?, R>(
-                    cache = GQLTypeCache(),
-                    fieldName = "${graphQLPrefix.replaceFirstChar { it.lowercase() }}Recordings",
-                    fieldDescription = "List of recordings for $lowerDisplayName",
-                    itemType = "${graphQLPrefix}Recording",
-                    itemPaginatedListProvider = { env, _, offset, size ->
-                        getPaginatedList(env, offset, size)
-                    },
-                    arguments = listOf(
-                            typedArgument(ARG_FILTER, "${graphQLPrefix}RecordingFilterInput", "Filter", nullable = true)
-                    )
+        gqlPaginatedListFactory.createRootPaginatedField(
+            cache = GQLTypeCache(),
+            fieldName = "${graphQLPrefix.replaceFirstChar { it.lowercase() }}Recordings",
+            fieldDescription = "List of recordings for $lowerDisplayName",
+            itemType = "${graphQLPrefix}Recording",
+            itemPaginatedListProvider = { env, offset, size ->
+                getPaginatedList(env, offset, size)
+            },
+            arguments = listOf(
+                typedArgument(ARG_FILTER, "${graphQLPrefix}RecordingFilterInput", "Filter", nullable = true)
             )
+        )
 
     private fun <R : Recording, F : Any> RecordingsExtension<R, F>.getPaginatedList(
-            environment: DataFetchingEnvironment,
-            offset: Int,
-            size: Int
+        environment: DataFetchingEnvironment,
+        offset: Int,
+        size: Int
     ): PaginatedList<R> {
         // Parsing of the filter
         val filterJson = environment.getArgument<Any?>(ARG_FILTER)?.asJson()
@@ -65,31 +65,34 @@ class GQLContributorRecordings(
         return recordingsQueryService.findByFilter(this, filter, offset, size)
     }
 
-    private fun <R : Recording, F : Any> RecordingsExtension<R, F>.contribute(cache: GQLTypeCache, dictionary: MutableSet<GraphQLType>): Set<GraphQLType> =
-            graphQLContributions + setOf(
-                    // Record
-                    createRecordType(cache),
-                    // Filter input
-                    createFilterInput(dictionary),
-            )
+    private fun <R : Recording, F : Any> RecordingsExtension<R, F>.contribute(
+        cache: GQLTypeCache,
+        dictionary: MutableSet<GraphQLType>
+    ): Set<GraphQLType> =
+        graphQLContributions + setOf(
+            // Record
+            createRecordType(cache),
+            // Filter input
+            createFilterInput(dictionary),
+        )
 
     private fun <R : Recording, F : Any> RecordingsExtension<R, F>.createFilterInput(dictionary: MutableSet<GraphQLType>): GraphQLInputObjectType =
-            GraphQLInputObjectType.newInputObject()
-                    .name("${graphQLPrefix}RecordingFilterInput")
-                    .description("Recording filter input for $lowerDisplayName")
-                    .fields(GraphQLBeanConverter.asInputFields(filterType, dictionary))
-                    .build()
+        GraphQLInputObjectType.newInputObject()
+            .name("${graphQLPrefix}RecordingFilterInput")
+            .description("Recording filter input for $lowerDisplayName")
+            .fields(GraphQLBeanConverter.asInputFields(filterType, dictionary))
+            .build()
 
     private fun <R : Recording, F : Any> RecordingsExtension<R, F>.createRecordType(cache: GQLTypeCache): GraphQLObjectType =
-            GraphQLObjectType.newObject()
-                    .name("${graphQLPrefix}Recording")
-                    .description("Recording for $lowerDisplayName")
-                    // Common fields
-                    .fields(GraphQLBeanConverter.asObjectFields(Recording::class, cache))
-                    // Specific fields
-                    .fields(graphQLRecordFields(cache))
-                    // Ok
-                    .build()
+        GraphQLObjectType.newObject()
+            .name("${graphQLPrefix}Recording")
+            .description("Recording for $lowerDisplayName")
+            // Common fields
+            .fields(GraphQLBeanConverter.asObjectFields(Recording::class, cache))
+            // Specific fields
+            .fields(graphQLRecordFields(cache))
+            // Ok
+            .build()
 
     private val <R : Recording, F : Any> RecordingsExtension<R, F>.lowerDisplayName: String get() = displayName.replaceFirstChar { it.lowercase() }
 

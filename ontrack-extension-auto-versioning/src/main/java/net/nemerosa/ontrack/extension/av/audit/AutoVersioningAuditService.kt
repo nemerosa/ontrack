@@ -22,18 +22,36 @@ import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
 interface AutoVersioningAuditService {
 
     /**
-     * Cancelling all current orders whose processing has not started yet. Only requests
-     * targeting the exact same [branch][AutoVersioningOrder.branch] are cancelled.
+     * Cancels all orders whose processing has not started yet.
+     *
+     * Only the requests having the same:
+     *
+     * * source project
+     * * qualifier
+     * * target branch
+     * * list of paths
+     *
+     * as the [order] are considered.
+     *
+     * @param order Order used to identify the requests to cancel
+     * @return Number of requests canceled
      */
-    fun cancelQueuedOrders(order: AutoVersioningOrder)
+    fun throttling(order: AutoVersioningOrder): Int
 
     /**
-     * The [order] was just queued. It's the first event in the story of this auto versioning order.
+     * The [order] was just created. It's the first event in the story of this auto versioning order.
+     *
+     * @param order Auto versioning order
+     */
+    fun onCreated(order: AutoVersioningOrder): AutoVersioningAuditEntry
+
+    /**
+     * The [order] was just scheduled.
      *
      * @param order Auto versioning order
      * @param routing Queue routing key being used
      */
-    fun onQueuing(order: AutoVersioningOrder, routing: String)
+    fun onScheduled(order: AutoVersioningOrder, routing: String)
 
     /**
      * The [order] was received on the queue and is ready for processing

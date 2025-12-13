@@ -13,6 +13,8 @@ import AutoVersioningApproval from "@components/extension/auto-versioning/AutoVe
 import Link from "next/link";
 import DefaultPromotionRunLink from "@components/promotionRuns/DefaultPromotionRunLink";
 import AutoVersioningAdditionalPaths from "@components/extension/auto-versioning/AutoVersioningAdditionalPaths";
+import AutoVersioningAuditEntryReschedule
+    from "@components/extension/auto-versioning/AutoVersioningAuditEntryReschedule";
 
 export default function AutoVersioningAuditEntry({entry}) {
 
@@ -61,6 +63,11 @@ export default function AutoVersioningAuditEntry({entry}) {
             children: <Typography.Paragraph code>
                 {JSON.stringify(entry.order.postProcessingConfig)}
             </Typography.Paragraph>,
+        },
+        {
+            key: 'schedule',
+            label: "Schedule",
+            children: entry.order.schedule,
         },
         {
             key: 'routing',
@@ -130,9 +137,9 @@ export default function AutoVersioningAuditEntry({entry}) {
         },
     ]
 
-    const history = entry.audit.map(item => (
+    const history = entry.audit.map((item, index) => (
         {
-            children: <AutoVersioningAuditEntryState status={item}/>,
+            children: <AutoVersioningAuditEntryState status={item} id={`audit-state-${index}`}/>,
             label: <Space>
                 <TimestampText
                     value={item.creation.time}
@@ -183,9 +190,10 @@ export default function AutoVersioningAuditEntry({entry}) {
                             mode="right"
                         />
                         <Flex justify="center">
-                            <div>
+                            <Space>
                                 <AutoRefreshButton/>
-                            </div>
+                                <AutoVersioningAuditEntryReschedule entry={entry}/>
+                            </Space>
                         </Flex>
                     </Space>
                 </Col>
@@ -195,7 +203,7 @@ export default function AutoVersioningAuditEntry({entry}) {
                         size="small"
                         title={
                             <Space>
-                                <Typography.Text>Auto versioning audit entry</Typography.Text>
+                                <Typography.Text>Auto-versioning audit entry</Typography.Text>
                                 <Typography.Text code>{entry.order.uuid}</Typography.Text>
                             </Space>
                         }

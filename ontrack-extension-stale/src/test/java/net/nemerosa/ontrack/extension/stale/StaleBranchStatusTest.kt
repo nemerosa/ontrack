@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.stale
 
 import net.nemerosa.ontrack.extension.stale.StaleBranchStatus.Companion.min
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class StaleBranchStatusTest {

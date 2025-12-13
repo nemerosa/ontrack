@@ -4,9 +4,8 @@ import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.StructureService;
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 
-public abstract class AbstractProjectEntityController extends AbstractResourceController {
+public abstract class AbstractProjectEntityController {
 
     protected final StructureService structureService;
 

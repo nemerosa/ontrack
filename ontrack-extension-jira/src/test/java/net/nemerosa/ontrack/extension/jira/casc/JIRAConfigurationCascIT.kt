@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class JIRAConfigurationCascIT : AbstractCascTestSupport() {
 
@@ -31,6 +32,10 @@ class JIRAConfigurationCascIT : AbstractCascTestSupport() {
                     "title": "JIRAConfiguration",
                     "description": null,
                     "properties": {
+                      "apiUrl":{
+                        "description":"Optional alternative URL for the JIRA API",
+                        "type":"string"
+                      },
                       "exclude": {
                         "items": {
                           "description": "exclude field",
@@ -104,6 +109,71 @@ class JIRAConfigurationCascIT : AbstractCascTestSupport() {
             assertEquals("https://jira.nemerosa.com", configuration.url)
             assertEquals("my-user", configuration.user)
             assertEquals("my-secret-token", configuration.password)
+        }
+    }
+
+    @Test
+    fun `Reloading a JIRA configuration`() {
+        asAdmin {
+            val name = TestUtils.uid("J")
+            withDisabledConfigurationTest {
+                casc(
+                    """
+                        ontrack:
+                            config:
+                                jira:
+                                    - name: $name
+                                      url: https://jira.nemerosa.com
+                                      user: my-user
+                                      password: my-secret-token
+                    """.trimIndent()
+                )
+                assertNotNull(jiraConfigurationService.findConfiguration(name)) {
+                    assertEquals("my-user", it.user)
+                    assertEquals("my-secret-token", it.password)
+                }
+
+                // Reloading
+                casc(
+                    """
+                        ontrack:
+                            config:
+                                jira:
+                                    - name: $name
+                                      url: https://jira.nemerosa.com
+                                      user: my-other-user
+                                      password: my-super-secret-token
+                    """.trimIndent()
+                )
+                assertNotNull(jiraConfigurationService.findConfiguration(name)) {
+                    assertEquals("my-other-user", it.user)
+                    assertEquals("my-super-secret-token", it.password)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Specifying the API URL`() {
+        asAdmin {
+            val name = TestUtils.uid("J")
+            withDisabledConfigurationTest {
+                casc(
+                    """
+                        ontrack:
+                            config:
+                                jira:
+                                    - name: $name
+                                      url: https://jira.nemerosa.com
+                                      apiUrl: https://api.atlassian.com/nemerosa
+                                      user: my-user
+                                      password: my-secret-token
+                    """.trimIndent()
+                )
+                assertNotNull(jiraConfigurationService.findConfiguration(name)) {
+                    assertEquals("https://api.atlassian.com/nemerosa", it.apiUrl)
+                }
+            }
         }
     }
 

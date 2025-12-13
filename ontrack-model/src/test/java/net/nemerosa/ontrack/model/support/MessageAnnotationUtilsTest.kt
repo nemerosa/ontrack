@@ -7,7 +7,7 @@ import org.junit.Test
 class MessageAnnotationUtilsTest {
 
     private val linkFreeTextAnnotatorContributor =
-        LegacyRegexMessageAnnotator("((https?://|ftp://|www\\.)\\S+)") { link ->
+        RegexMessageAnnotator("((https?://|ftp://|www\\.)\\S+)".toRegex()) { link ->
             MessageAnnotation.of("a")
                 .attr("href", link)
                 .attr("target", "_blank")
@@ -15,18 +15,18 @@ class MessageAnnotationUtilsTest {
         }
 
     private val jiraIssueMessageAnnotator =
-        LegacyRegexMessageAnnotator("([A-Z]+-\\d+)") { match ->
+        RegexMessageAnnotator("([A-Z]+-\\d+)".toRegex()) { match ->
             MessageAnnotation.of("a").attr("href", "http://jira/browse/$match").text(match)
         }
 
     private val issueMessageAnnotator =
-        LegacyRegexMessageAnnotator("(#\\d+)") { match ->
+        RegexMessageAnnotator("(#\\d+)".toRegex()) { match ->
             val id = match.substring(1)
             MessageAnnotation.of("link").attr("url", "http://test/id/$id").text(match)
         }
 
     private val numberMessageAnnotator =
-        LegacyRegexMessageAnnotator("(\\d+)") { match ->
+        RegexMessageAnnotator("(\\d+)".toRegex()) { match ->
             MessageAnnotation.of("emphasis").text(match)
         }
 

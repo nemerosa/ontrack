@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class PromotionRunGraphQLIT : AbstractQLKTITSupport() {
 
     @Test

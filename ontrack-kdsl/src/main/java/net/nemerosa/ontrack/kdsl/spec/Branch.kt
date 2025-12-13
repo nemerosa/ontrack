@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec
 
-import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
@@ -50,10 +50,10 @@ class Branch(
                 description
             )
         ) {
-            it?.createPromotionLevelById()?.fragments()?.payloadUserErrors()?.convert()
+            it?.createPromotionLevelById?.payloadUserErrors?.convert()
         }
-            ?.checkData { it.createPromotionLevelById()?.promotionLevel() }
-            ?.fragments()?.promotionLevelFragment()?.toPromotionLevel(this)
+            ?.checkData { it.createPromotionLevelById?.promotionLevel }
+            ?.promotionLevelFragment?.toPromotionLevel(this)
             ?: throw GraphQLMissingDataException("Did not get back the created promotion level")
 
     /**
@@ -71,17 +71,17 @@ class Branch(
     ): ValidationStamp =
         graphqlConnector.mutate(
             CreateValidationStampMutation(
-                id.toInt(),
-                name,
-                description,
-                Input.fromNullable(dataType),
-                Input.fromNullable(dataTypeConfig?.asJson())
+                branchId = id.toInt(),
+                name = name,
+                description = description,
+                dataType = Optional.presentIfNotNull(dataType),
+                dataTypeConfig = Optional.presentIfNotNull(dataTypeConfig?.asJson())
             )
         ) {
-            it?.createValidationStampById()?.fragments()?.payloadUserErrors()?.convert()
+            it?.createValidationStampById?.payloadUserErrors?.convert()
         }
-            ?.checkData { it.createValidationStampById()?.validationStamp() }
-            ?.fragments()?.validationStampFragment()?.toValidationStamp(this)
+            ?.checkData { it.createValidationStampById?.validationStamp }
+            ?.validationStampFragment?.toValidationStamp(this)
             ?: throw GraphQLMissingDataException("Did not get back the created validation stamp")
 
     /**
@@ -99,22 +99,22 @@ class Branch(
     ): Build =
         graphqlConnector.mutate(
             CreateBuildMutation(
-                id.toInt(),
-                name,
-                description,
-                Input.fromNullable(
+                branchId = id.toInt(),
+                name = name,
+                description = description,
+                runInfo = Optional.presentIfNotNull(
                     runTime?.let {
-                        RunInfoInput.builder()
-                            .runTime(it)
-                            .build()
+                        RunInfoInput(
+                            runTime = Optional.presentIfNotNull(it),
+                        )
                     }
                 )
             )
         ) {
-            it?.createBuild()?.fragments()?.payloadUserErrors()?.convert()
+            it?.createBuild?.payloadUserErrors?.convert()
         }
-            ?.checkData { it.createBuild()?.build() }
-            ?.fragments()?.buildFragment()?.toBuild(this)
+            ?.checkData { it.createBuild?.build }
+            ?.buildFragment?.toBuild(this)
             ?: throw GraphQLMissingDataException("Did not get back the created build")
 
 }

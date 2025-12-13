@@ -28,13 +28,11 @@ class JdbcConfidentialStore(
     }
 
     override fun load(key: String): ByteArray? {
-        return storageService.retrieve(
+        return storageService.find(
                 JdbcConfidentialStore::class.java.simpleName,
                 key,
-                Key::class.java
-        )
-                .map { obj: Key -> obj.payload }
-                .orElse(null)
+                Key::class
+        )?.payload
     }
 
     class Key(

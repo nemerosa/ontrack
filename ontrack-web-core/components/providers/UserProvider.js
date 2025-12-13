@@ -1,63 +1,109 @@
 import {createContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {useGraphQLClient, useRestClient} from "@components/providers/ConnectionContextProvider";
+import {useQuery} from "@components/services/GraphQL";
 
-export const UserContext = createContext({authorizations: {}, userMenuGroups: []});
+export const UserContext = createContext({
+    name: '',
+    fullName: '',
+    email: '',
+    authorizations: {},
+    userMenuGroups: [],
+    profile: {
+        auth: {
+            account: {
+                url: ''
+            }
+        }
+    }
+})
 
-const UserContextProvider = ({children}) => {
+export default function UserContextProvider({children}) {
 
-    const gqlClient = useGraphQLClient()
-    const restClient = useRestClient()
+    const [user, setUser] = useState({
+        name: '',
+        fullName: '',
+        email: '',
+        authorizations: {},
+        userMenuGroups: [],
+        profile: {
+            auth: {
+                account: {
+                    url: ''
+                }
+            }
+        }
+    })
 
-    const [user, setUser] = useState({authorizations: {}, userMenuGroups: []});
+    const {data, loading, error, finished} = useQuery(
+        gql`
+            query UserContext {
+                user {
+                    account {
+                        name
+                        fullName
+                        email
+                    }
+                }
+                userMenuItems {
+                    id
+                    name
+                    items {
+                        extension
+                        id
+                        name
+                    }
+                }
+                authorizations {
+                    name
+                    action
+                    authorized
+                }
+            }
+        `
+    )
 
-    let tmpUser = {}
+    const [profile, setProfile] = useState()
 
     useEffect(() => {
-        if (restClient && gqlClient) {
-            restClient.get("/rest/user").then(data => {
-                tmpUser = data
-                return gqlClient.request(
-                    gql`
-                        query User {
-                            userMenuItems {
-                                id
-                                name
-                                items {
-                                    extension
-                                    id
-                                    name
-                                }
-                            }
-                            authorizations {
-                                name
-                                action
-                                authorized
-                            }
-                        }
-                    `
-                )
-            }).then(data => {
-                // Groups
-                tmpUser.userMenuGroups = data.userMenuItems
-                // Indexing of authorizations
-                const authorizations = data.authorizations
-                tmpUser.authorizations = {}
-                authorizations.forEach(authorization => {
-                    let domain = tmpUser.authorizations[authorization.name]
-                    if (!domain) {
-                        domain = {}
-                        tmpUser.authorizations[authorization.name] = domain
-                    }
-                    domain[authorization.action] = authorization.authorized
-                })
-                // We're done
-                setUser(tmpUser)
+        fetch('/api/protected/profile')
+            .then(data => data.json())
+            .then(profile => setProfile(profile))
+    }, [])
+
+    useEffect(() => {
+        if (data && profile && finished) {
+            const tmpUser = {
+                name: data?.user?.account?.name,
+                fullName: data?.user?.account?.fullName,
+                email: data?.user?.account?.email,
+            }
+            // Groups
+            tmpUser.userMenuGroups = data.userMenuItems
+            // Indexing of authorizations
+            const authorizations = data.authorizations
+            tmpUser.authorizations = {}
+            authorizations.forEach(authorization => {
+                let domain = tmpUser.authorizations[authorization.name]
+                if (!domain) {
+                    domain = {}
+                    tmpUser.authorizations[authorization.name] = domain
+                }
+                domain[authorization.action] = authorization.authorized
             })
+            // Profile
+            tmpUser.profile = profile
+            // We're done
+            setUser(tmpUser)
         }
-    }, [gqlClient, restClient])
+    }, [data, profile, finished])
 
-    return <UserContext.Provider value={user}>{children}</UserContext.Provider>
-};
+    return (
+        <>
+            {
+                !loading && user?.name &&
+                <UserContext.Provider value={user}>{children}</UserContext.Provider>
+            }
+        </>
+    )
 
-export default UserContextProvider;
+}

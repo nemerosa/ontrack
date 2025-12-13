@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.notifications.channels
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.model.events.Event
-import net.nemerosa.ontrack.model.form.Form
 
 /**
  * Makes the link between an event to be sent and an actual notification backend.
@@ -54,16 +53,13 @@ interface NotificationChannel<C, R> {
     fun toSearchCriteria(text: String): JsonNode
 
     /**
-     * Given a configuration, returns a display text for it
+     * Merges two configurations.
+     *
+     * @param a First configuration, where to merge the [changes]
+     * @param changes JSON containing the changes to apply to the [a] configuration
+     * @return Merged configuration
      */
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    fun toText(config: C): String
-
-    /**
-     * Gets the form for the channel's configuration
-     */
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    fun getForm(c: C?): Form
+    fun mergeConfig(a: C, changes: JsonNode): C
 
     /**
      * Type of the channel, used as an identifier for the serialization of the subscriptions.

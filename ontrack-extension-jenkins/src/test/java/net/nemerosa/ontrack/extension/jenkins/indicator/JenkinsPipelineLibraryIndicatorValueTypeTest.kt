@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.json.asJson
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -21,15 +20,6 @@ class JenkinsPipelineLibraryIndicatorValueTypeTest {
             SCMExtensionFeature()
         )
     )
-
-    @Test
-    fun `Form with value`() {
-        val form = type.form(config(), version("1.0.0"))
-        val field = form.getField("version")
-        assertNotNull(field) {
-            assertEquals("1.0.0", it.value)
-        }
-    }
 
     @Test
     fun `To client JSON`() {
@@ -71,16 +61,6 @@ class JenkinsPipelineLibraryIndicatorValueTypeTest {
             "1.0.1".asJson(),
             type.toStoredJson(config(), version("1.0.1"))
         )
-    }
-
-    @Test
-    fun `Config form`() {
-        val form = type.configForm(config(true, "1.0.1"))
-        assertEquals("library", form.getField("library")?.value)
-        assertEquals(true, form.getField("required")?.value)
-        assertEquals("1.0.1", form.getField("lastSupported")?.value)
-        assertEquals(null, form.getField("lastDeprecated")?.value)
-        assertEquals(null, form.getField("lastUnsupported")?.value)
     }
 
     @Test

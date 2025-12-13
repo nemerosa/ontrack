@@ -15,7 +15,7 @@ class ValidationStampAuthorizationContributor(
 
     override fun appliesTo(context: Any): Boolean = context is ValidationStamp
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> = listOf(
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> = listOf(
         Authorization(
             VALIDATION_STAMP,
             Authorization.EDIT,

@@ -38,7 +38,7 @@ class GQLTypeIndicatorCategoryReport(
                     .rateArgument()
                     .type(listType(indicatorCategoryReportProject.typeRef))
                     .dataFetcher { env ->
-                        val indicatorCategoryReport = env.getSource<IndicatorCategoryReport>()
+                        val indicatorCategoryReport = env.getSource<IndicatorCategoryReport>()!!
                         indicatorCategoryReport.getProjectReport(env)
                     }
             }

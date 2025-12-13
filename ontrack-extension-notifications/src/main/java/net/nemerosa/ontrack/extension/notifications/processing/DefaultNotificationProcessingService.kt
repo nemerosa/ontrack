@@ -41,7 +41,7 @@ class DefaultNotificationProcessingService(
     ): NotificationProcessingResult<*>? {
         logger.debug(
             "Processing notification (user={}) {}",
-            securityService.currentAccount?.account?.name,
+            securityService.currentUser?.name,
             item
         )
         meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_started, item)
@@ -139,6 +139,7 @@ class DefaultNotificationProcessingService(
             )
             result
         } catch (any: Throwable) {
+            logger.error("Error processing notification", any)
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_error, item)
             recordError(
                 recordId = recordId,

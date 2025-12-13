@@ -23,7 +23,7 @@ class AutoVersioningTrailGQLPromotionRunFieldContributor(
                 .description("List of branches targeted for auto-versioning based on this promotion run or with their reason for rejection")
                 .type(gqlTypeAutoVersioningTrail.typeRef)
                 .dataFetcher { env ->
-                    val run: PromotionRun = env.getSource()
+                    val run: PromotionRun = env.getSource()!!
                     autoVersioningTrackingService.getTrail(run)
                 }
                 .build(),

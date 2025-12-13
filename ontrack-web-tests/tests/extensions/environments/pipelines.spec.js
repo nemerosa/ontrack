@@ -1,19 +1,19 @@
-import {expect, test} from "@playwright/test";
+import {expect} from "@playwright/test";
 import {manualApprovalInPipelinePage} from "./manualApprovalFixtures";
 import {createSlot} from "./slotFixtures";
-import {ontrack} from "@ontrack/ontrack";
 import {createPipeline} from "./pipelineFixtures";
 import {PipelinePage} from "./PipelinePage";
 import {login} from "../../core/login";
 import {SlotPage} from "./SlotPage";
 import {addSlotWorkflow} from "@ontrack/extensions/environments/workflows";
+import {test} from "../../fixtures/connection";
 
-test('pipeline status refreshed when inputs completed', async ({page}) => {
-    await manualApprovalInPipelinePage(page)
+test('pipeline status refreshed when inputs completed', async ({page, ontrack}) => {
+    await manualApprovalInPipelinePage(page, ontrack)
 })
 
-test('pipeline marked as running after manual approval', async ({page}) => {
-    const {pipelinePage} = await manualApprovalInPipelinePage(page)
+test('pipeline marked as running after manual approval', async ({page, ontrack}) => {
+    const {pipelinePage} = await manualApprovalInPipelinePage(page, ontrack)
     // Pipeline is now ready to be set in "deploying" mode
     await pipelinePage.checkRunAction({disabled: false})
     await pipelinePage.running()
@@ -24,12 +24,12 @@ test('pipeline marked as running after manual approval', async ({page}) => {
     await pipelinePage.checkFinishAction({visible: false})
 })
 
-test('pipeline lifecycle', async ({page}) => {
-    const {slot, project} = await createSlot(ontrack())
+test('pipeline lifecycle', async ({page, ontrack}) => {
+    const {slot, project} = await createSlot(ontrack)
     const {pipeline} = await createPipeline({project, slot})
 
-    await login(page)
-    const pipelinePage = new PipelinePage(page, pipeline)
+    await login(page, ontrack)
+    const pipelinePage = new PipelinePage(page, pipeline, ontrack)
     await pipelinePage.goTo()
 
     await pipelinePage.checkRunAction({})
@@ -41,11 +41,11 @@ test('pipeline lifecycle', async ({page}) => {
     await pipelinePage.checkFinishAction({visible: false})
 })
 
-test('pipeline lifecycle from the slot page', async ({page}) => {
-    const {slot, project} = await createSlot(ontrack())
+test('pipeline lifecycle from the slot page', async ({page, ontrack}) => {
+    const {slot, project} = await createSlot(ontrack)
     const {pipeline} = await createPipeline({project, slot})
 
-    await login(page)
+    await login(page, ontrack)
     const slotPage = new SlotPage(page, slot)
     await slotPage.goTo()
 
@@ -62,7 +62,7 @@ test('pipeline lifecycle from the slot page', async ({page}) => {
 
 })
 
-test('starting a pipeline in forced DONE', async ({page}) => {
+test('starting a pipeline in forced DONE', async ({page, ontrack}) => {
     const {
         slot,
         project,
@@ -70,7 +70,7 @@ test('starting a pipeline in forced DONE', async ({page}) => {
         candidateWorkflow,
         doneWorkflow,
         runningWorkflow
-    } = await preparePipelineForForcedDeployment()
+    } = await preparePipelineForForcedDeployment(ontrack)
 
     // Creating a pipeline in DONE state
     const {pipeline} = await createPipeline({
@@ -86,8 +86,8 @@ test('starting a pipeline in forced DONE', async ({page}) => {
     await expect(pipeline).not.toBeNull()
 
     // Going to the pipeline page
-    await login(page)
-    const pipelinePage = new PipelinePage(page, pipeline)
+    await login(page, ontrack)
+    const pipelinePage = new PipelinePage(page, pipeline, ontrack)
     await pipelinePage.goTo()
 
     // Checks the pipeline is marked as DONE
@@ -101,14 +101,14 @@ test('starting a pipeline in forced DONE', async ({page}) => {
     })
 })
 
-test('forcing a pipeline in forced DONE', async ({page}) => {
+test('forcing a pipeline in forced DONE', async ({page, ontrack}) => {
     const {
         slot,
         project,
         promotionRuleId,
         doneWorkflow,
         runningWorkflow
-    } = await preparePipelineForForcedDeployment()
+    } = await preparePipelineForForcedDeployment(ontrack)
 
     // Creating a pipeline in normal state
     const {pipeline} = await createPipeline({
@@ -122,8 +122,8 @@ test('forcing a pipeline in forced DONE', async ({page}) => {
     await expect(pipeline).not.toBeNull()
 
     // Going to the pipeline page
-    await login(page)
-    const pipelinePage = new PipelinePage(page, pipeline)
+    await login(page, ontrack)
+    const pipelinePage = new PipelinePage(page, pipeline, ontrack)
     await pipelinePage.goTo()
 
     // Forcing the pipeline as DONE
@@ -142,10 +142,10 @@ test('forcing a pipeline in forced DONE', async ({page}) => {
     })
 })
 
-const preparePipelineForForcedDeployment = async () => {
-    const {slot, project} = await createSlot(ontrack())
+const preparePipelineForForcedDeployment = async (ontrack) => {
+    const {slot, project} = await createSlot(ontrack)
 
-    const promotionRuleId = await ontrack().environments.addPromotionRule({slot, promotion: "BRONZE"})
+    const promotionRuleId = await ontrack.environments.addPromotionRule({slot, promotion: "BRONZE"})
 
     const candidateWorkflow = await addSlotWorkflow({
         slot,

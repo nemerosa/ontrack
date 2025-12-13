@@ -30,6 +30,7 @@ export default function FavouriteBranchesWidget({project}) {
                             latestBuild: builds(count: 1) {
                                 id
                                 name
+                                displayName
                             }
                             promotionLevels {
                                 id
@@ -39,6 +40,7 @@ export default function FavouriteBranchesWidget({project}) {
                                     build {
                                         id
                                         name
+                                        displayName
                                     }
                                 }
                             }

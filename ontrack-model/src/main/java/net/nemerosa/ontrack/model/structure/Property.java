@@ -84,7 +84,4 @@ public class Property<T> {
         return new Property<>(type, value, false, decorations);
     }
 
-    public boolean containsValue(String propertyValue) {
-        return value != null && type.containsValue(value, propertyValue);
-    }
 }

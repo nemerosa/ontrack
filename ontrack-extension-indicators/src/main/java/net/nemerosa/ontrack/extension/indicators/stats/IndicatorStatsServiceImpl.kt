@@ -38,19 +38,6 @@ class IndicatorStatsServiceImpl(
         }
     }
 
-    override fun getGlobalStats(portfolio: IndicatorPortfolio, previous: Duration?): List<IndicatorCategoryStats> {
-        // Gets the global categories
-        val categories = indicatorPortfolioService.getPortfolioOfPortfolios().categories.mapNotNull {
-            indicatorCategoryService.findCategoryById(it)
-        }
-        // Gets the projects for this portfolio
-        val projects = indicatorPortfolioService.getPortfolioProjects(portfolio)
-        // For each category
-        return categories.map { category ->
-            indicatorCategoryStats(category, projects, previous)
-        }
-    }
-
     override fun getPortfolioViewStats(
         portfolio: IndicatorPortfolio,
         indicatorView: IndicatorView?,

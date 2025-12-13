@@ -1,6 +1,6 @@
 import {Button, Popover, Spin} from "antd";
 
-export default function InlineCommand({title, icon, onClick, className, loading}) {
+export default function InlineCommand({title, icon, onClick, href, className, loading}) {
     return (
         <>
             <Popover
@@ -13,6 +13,7 @@ export default function InlineCommand({title, icon, onClick, className, loading}
                         type="text"
                         icon={icon}
                         onClick={onClick}
+                        href={href}
                     />
                 }
                 {

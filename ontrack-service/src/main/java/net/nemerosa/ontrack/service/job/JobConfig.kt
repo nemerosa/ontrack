@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.job.JobListener
 import net.nemerosa.ontrack.job.JobScheduler
 import net.nemerosa.ontrack.job.support.DefaultJobScheduler
 import net.nemerosa.ontrack.job.support.TaskExecutor
-import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
@@ -23,15 +22,13 @@ import java.util.concurrent.ScheduledFuture
 class JobConfig(
     private val ontrackConfigProperties: OntrackConfigProperties,
     private val jobDecorator: DefaultJobDecorator,
-    private val logService: ApplicationLogService,
     private val meterRegistry: MeterRegistry,
     private val settingsRepository: SettingsRepository,
 ) {
     @Bean
     fun jobListener(): JobListener = DefaultJobListener(
-        logService,
-        meterRegistry,
-        settingsRepository
+        meterRegistry = meterRegistry,
+        settingsRepository = settingsRepository
     )
 
     private fun jobTaskScheduler(): TaskScheduler = ThreadPoolTaskScheduler().apply {

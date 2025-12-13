@@ -34,7 +34,7 @@ class GQLTypeEnvironment(
                     .dataFetcher { env ->
                         val projectNames: List<String> = env.getArgument("projects") ?: emptyList()
                         val projectNamesIndex = projectNames.toSet()
-                        val environment: Environment = env.getSource()
+                        val environment: Environment = env.getSource()!!
                         slotService.findSlotsByEnvironment(environment)
                             .filter {
                                 projectNamesIndex.isEmpty() || it.project.name in projectNamesIndex

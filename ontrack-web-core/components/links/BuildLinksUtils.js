@@ -23,7 +23,6 @@ const gqlBuildMinInfo = gql`
                 description
                 name
                 image
-                _image
             }
         }
     }
@@ -129,6 +128,6 @@ function buildDownstreamTreeData(build, qualifier) {
 }
 
 export async function collectDownstreamNodesAsTreeData(client, build) {
-    const data = await client.request(buildQueryDownstreamOnly, {buildId: build.id})
+    const data = await client.request(buildQueryDownstreamOnly, {buildId: Number(build.id)})
     return buildDownstreamTreeData(data.build)
 }

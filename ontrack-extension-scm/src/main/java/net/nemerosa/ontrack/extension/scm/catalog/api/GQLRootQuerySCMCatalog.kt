@@ -20,13 +20,13 @@ class GQLRootQuerySCMCatalog(
         private val scmCatalogFilterService: SCMCatalogFilterService
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
-            paginatedListFactory.createPaginatedField<Any?, SCMCatalogEntryOrProject>(
+            paginatedListFactory.createRootPaginatedField(
                     cache = GQLTypeCache(),
                     fieldName = "scmCatalog",
                     fieldDescription = "List of SCM catalog entries and/or orphan projects",
                     itemType = scmCatalogEntry.typeName,
-                    itemListCounter = { env, _ -> loadSCMCatalogEntries(env, 0, Int.MAX_VALUE).size },
-                    itemListProvider = { env, _, offset, size -> loadSCMCatalogEntries(env, offset, size) },
+                    itemListCounter = { env, -> loadSCMCatalogEntries(env, 0, Int.MAX_VALUE).size },
+                    itemListProvider = { env, offset, size -> loadSCMCatalogEntries(env, offset, size) },
                     arguments = listOf(
                             GraphQLArgument.newArgument().name(ARG_SCM)
                                     .description("Filters on SCM type (exact match)")
@@ -49,7 +49,7 @@ class GQLRootQuerySCMCatalog(
                                     .type(GraphQLString)
                                     .build(),
                             GraphQLArgument.newArgument().name(ARG_SORT_ON)
-                                    .description("Property to sort on. Supported: ${SCMCatalogProjectFilterSort.values().joinToString(", ")}")
+                                    .description("Property to sort on. Supported: ${SCMCatalogProjectFilterSort.entries.joinToString(", ")}")
                                     .type(GraphQLString)
                                     .build(),
                             GraphQLArgument.newArgument().name(ARG_SORT_ASCENDING)

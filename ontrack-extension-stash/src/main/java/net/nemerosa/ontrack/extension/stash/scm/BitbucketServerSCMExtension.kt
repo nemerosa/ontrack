@@ -5,7 +5,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyTypeUtils
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
@@ -205,8 +207,22 @@ class BitbucketServerSCMExtension(
                 }
         }
 
+        override fun getCommit(id: String): SCMCommit? =
+            client.getCommit(repo, id)?.let {
+                BitbucketServerSCMCommit(
+                    root = configuration.url,
+                    repo = repo,
+                    commit = it
+                )
+            }
+
         override fun getConfiguredIssueService(): ConfiguredIssueService? =
             issueServiceConfigurationIdentifier?.let { issueServiceRegistry.getConfiguredIssueService(it) }
+
+        override val issueRepositoryContext = IssueRepositoryContext(
+            repositoryType = "stash",
+            repositoryName = repositoryName,
+        )
 
         override fun findBuildByCommit(project: Project, id: String): Build? =
             propertyService.findByEntityTypeAndSearchArguments(
@@ -218,6 +234,20 @@ class BitbucketServerSCMExtension(
             }.firstOrNull { build ->
                 build.project.id == project.id
             }
+
+        override fun findBranchFromScmBranchName(
+            project: Project,
+            scmBranch: String
+        ): Branch? =
+            GitBranchConfigurationPropertyTypeUtils.findBranchFromScmBranchName(
+                propertyService = propertyService,
+                structureService = structureService,
+                project = project,
+                scmBranch = scmBranch,
+            )
+
+        override fun getBranchesForCommit(project: Project, commit: String): List<String> =
+            client.getBranchesForCommit(repo, commit)
 
         private fun waitAndMerge(prId: Int, from: String, message: String): Boolean {
             // Waits for the PR checks to be OK

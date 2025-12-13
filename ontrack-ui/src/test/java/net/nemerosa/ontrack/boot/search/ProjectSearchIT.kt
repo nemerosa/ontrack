@@ -5,20 +5,25 @@ import net.nemerosa.ontrack.boot.PROJECT_SEARCH_RESULT_TYPE
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
  * Search indexation for projects
  */
-class ProjectSearchIT : AbstractSearchJUnit4TestSupport() {
+class ProjectSearchIT : AbstractSearchTestSupport() {
+
+    private fun searchRequest(name: String) = SearchRequest(
+        token = name,
+        type = PROJECT_SEARCH_RESULT_TYPE,
+    )
 
     @Test
     fun `Searching for a project after its creation`() {
         val candidate = project {}
         // Searches for the candidate project
-        val results = asUser { searchService.paginatedSearch(SearchRequest(candidate.name)).items }
+        val results = asUser { searchService.paginatedSearch(searchRequest(candidate.name)).items }
         assertTrue(results.isNotEmpty(), "At least one result")
         results[0].apply {
             assertEquals(candidate.entityDisplayName, title)
@@ -33,17 +38,21 @@ class ProjectSearchIT : AbstractSearchJUnit4TestSupport() {
             project(name = NameDescription.nd("$commonPart-${uid("X")}", ""))
         }
         // Searches for the candidate projects
-        val results = asUser { searchService.paginatedSearch(SearchRequest(
-                token = commonPart,
-                type = PROJECT_SEARCH_RESULT_TYPE,
-                size = 50
-        )).items }
+        val results = asUser {
+            searchService.paginatedSearch(
+                SearchRequest(
+                    token = commonPart,
+                    type = PROJECT_SEARCH_RESULT_TYPE,
+                    size = 50
+                )
+            ).items
+        }
         val foundNames = results.map { it.title }
         val candidateNames = candidates.map { it.entityDisplayName }
         // Checks that all candidates have been found
         assertTrue(
-                foundNames.containsAll(candidateNames),
-                "All candidates have been found"
+            foundNames.containsAll(candidateNames),
+            "All candidates have been found"
         )
     }
 
@@ -55,7 +64,7 @@ class ProjectSearchIT : AbstractSearchJUnit4TestSupport() {
         // Launching indexation for the projects
         index(PROJECT_SEARCH_INDEX)
         // Searches for the candidate project
-        val results = asUser { searchService.paginatedSearch(SearchRequest(candidate.name)).items }
+        val results = asUser { searchService.paginatedSearch(searchRequest(candidate.name)).items }
         assertEquals(1, results.size)
         val result = results.first()
         result.apply {
@@ -78,14 +87,17 @@ class ProjectSearchIT : AbstractSearchJUnit4TestSupport() {
             // Performing a search using the prefix and being authorised only for the first project
             projects[0].asUserWithView {
                 // Launching the search
-                val results = searchService.paginatedSearch(SearchRequest(prefix)).items
+                val results = searchService.paginatedSearch(searchRequest(prefix)).items
                 // Names of projects
                 val foundNames = results.map { it.title }
                 // Checks that authorized project is found
                 assertTrue(projects[0].entityDisplayName in foundNames, "Authorized project must be found")
                 // Checks that unauthorized projects are NOT found
                 (1..3).forEach {
-                    assertTrue(projects[it].entityDisplayName !in foundNames, "Not authorized projects must be filtered out")
+                    assertTrue(
+                        projects[it].entityDisplayName !in foundNames,
+                        "Not authorized projects must be filtered out"
+                    )
                 }
             }
         }

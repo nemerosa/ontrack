@@ -34,7 +34,7 @@ export default function AutoVersioningAuditProjectTargetPage() {
 
                     ${gqlProjectCommonFragment}
                 `,
-                {id}
+                {id: Number(id)}
             ).then(data => {
                 const project = data.projects[0];
                 setProject(project)

@@ -7,11 +7,11 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils.uid
-import net.nemerosa.ontrack.test.assertNotPresent
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class BitbucketCloudConfigurationCascContextIT : AbstractCascTestSupport() {
 
@@ -149,8 +149,8 @@ class BitbucketCloudConfigurationCascContextIT : AbstractCascTestSupport() {
                 """.trimIndent()
             )
             asAdmin {
-                val oldConfig = bitbucketCloudConfigurationService.getOptionalConfiguration(config1.name)
-                assertNotPresent(oldConfig, "Old config has been removed")
+                val oldConfig = bitbucketCloudConfigurationService.findConfiguration(config1.name)
+                assertNull(oldConfig, "Old config has been removed")
                 val savedConfig = bitbucketCloudConfigurationService.getConfiguration(config2.name)
                 assertEquals(config2.workspace, savedConfig.workspace)
                 assertEquals(config2.user, savedConfig.user)

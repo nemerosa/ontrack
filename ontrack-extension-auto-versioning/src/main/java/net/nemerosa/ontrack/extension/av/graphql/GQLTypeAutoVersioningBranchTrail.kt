@@ -33,7 +33,7 @@ class GQLTypeAutoVersioningBranchTrail(
                     .description("Associated auto-versioning audit entry if any")
                     .type(gqlTypeAutoVersioningAuditEntry.typeRef)
                     .dataFetcher { env ->
-                        val branchTrail: AutoVersioningBranchTrail = env.getSource()
+                        val branchTrail: AutoVersioningBranchTrail = env.getSource()!!
                         branchTrail.orderId?.let { orderId ->
                             autoVersioningAuditQueryService.findByUUID(
                                 branch = branchTrail.branch,

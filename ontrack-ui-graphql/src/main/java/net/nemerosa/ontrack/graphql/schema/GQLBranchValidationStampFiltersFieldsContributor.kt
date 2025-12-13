@@ -26,7 +26,7 @@ class GQLBranchValidationStampFiltersFieldsContributor(
                                 )
                                 .type(listType(gqlTypeValidationStampFilter.typeRef))
                                 .dataFetcher { env ->
-                                    val branch: Branch = env.getSource()
+                                    val branch: Branch = env.getSource()!!
                                     val all = env.getArgument<Boolean>(ARG_ALL) ?: true
                                     validationStampFilterService.getBranchValidationStampFilters(branch, all)
                                 }

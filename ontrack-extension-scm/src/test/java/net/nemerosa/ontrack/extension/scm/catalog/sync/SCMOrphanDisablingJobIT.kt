@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.scm.catalog.sync
 
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertFalse
@@ -10,6 +13,19 @@ class SCMOrphanDisablingJobIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var scmOrphanDisablingJob: SCMOrphanDisablingJob
+
+    @Autowired
+    private lateinit var scmExtensionConfigProperties: SCMExtensionConfigProperties
+
+    @BeforeEach
+    fun before() {
+        scmExtensionConfigProperties.catalog.enabled = true
+    }
+
+    @AfterEach
+    fun after() {
+        scmExtensionConfigProperties.catalog.enabled = false
+    }
 
     @Test
     fun `Checking that the state of the job depends on the settings`() {

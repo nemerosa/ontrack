@@ -1,17 +1,19 @@
 package net.nemerosa.ontrack.boot
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.CoreExtensionFeature
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventListener
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 
 @Component
 class BranchSearchProvider(
-    private val uriBuilder: EntityURIBuilder,
     private val structureService: StructureService,
     private val searchIndexService: SearchIndexService
 ) : SearchIndexer<BranchSearchItem>, EventListener {
@@ -28,10 +30,31 @@ class BranchSearchProvider(
 
     override val indexName: String = BRANCH_SEARCH_INDEX
 
-    override val indexMapping: SearchIndexMapping = indexMappings<BranchSearchItem> {
-        +BranchSearchItem::name to keyword { scoreBoost = 3.0 } to text()
-        +BranchSearchItem::description to text()
-        +BranchSearchItem::project to keyword()
+    override fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder =
+        builder.run {
+            autoCompleteSettings()
+        }.run {
+            mappings { mappings ->
+                mappings
+                    .autoCompleteText(BranchSearchItem::name)
+                    .autoCompleteText(BranchSearchItem::project)
+                    .text(BranchSearchItem::description)
+            }
+        }
+
+    override fun buildQuery(
+        q: Query.Builder,
+        token: String
+    ): ObjectBuilder<Query> {
+        return q.multiMatch { m ->
+            m.query(token)
+                .type(TextQueryType.BestFields)
+                .fields(
+                    BranchSearchItem::name to 5.0,
+                    BranchSearchItem::project to 3.0,
+                    BranchSearchItem::description to 1.0,
+                )
+        }
     }
 
     override fun indexAll(processor: (BranchSearchItem) -> Unit) {
@@ -47,8 +70,6 @@ class BranchSearchProvider(
             SearchResult(
                 title = entityDisplayName,
                 description = description ?: "",
-                uri = uriBuilder.getEntityURI(this),
-                page = uriBuilder.getEntityPage(this),
                 accuracy = score,
                 type = searchResultType,
                 data = mapOf(

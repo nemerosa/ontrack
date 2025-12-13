@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.general
 
-import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.ValidateWithTestSummaryMutation
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
@@ -14,16 +14,16 @@ fun Build.validateWithTestSummary(
 ) {
     graphqlConnector.mutate(
         ValidateWithTestSummaryMutation(
-            id.toInt(),
-            Input.fromNullable(description),
-            validation,
-            Input.fromNullable(status),
-            testSummary.passed,
-            testSummary.skipped,
-            testSummary.failed,
+            buildId = id.toInt(),
+            description = Optional.presentIfNotNull(description),
+            validation = validation,
+            status = Optional.presentIfNotNull(status),
+            passed = testSummary.passed,
+            skipped = testSummary.skipped,
+            failed = testSummary.failed,
         )
     ) {
-        it?.validateBuildByIdWithTests()?.fragments()?.payloadUserErrors()?.convert()
+        it?.validateBuildByIdWithTests?.payloadUserErrors?.convert()
     }
 }
 

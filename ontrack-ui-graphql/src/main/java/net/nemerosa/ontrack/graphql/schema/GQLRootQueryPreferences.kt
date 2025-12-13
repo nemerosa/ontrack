@@ -19,7 +19,7 @@ class GQLRootQueryPreferences(
             .type(gqlTypePreferences.typeRef.toNotNull())
             .dataFetcher {
                 // Gets the current account
-                val account = securityService.currentAccount?.account ?: error("Authentication is required.")
+                val account = securityService.currentUser?.account ?: error("Authentication is required.")
                 // Gets the current preferences
                 preferencesService.getPreferences(account)
             }

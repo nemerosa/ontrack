@@ -8,22 +8,18 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.extension.api.ExtensionManager
-import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
-import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
-import net.nemerosa.ontrack.graphql.support.booleanArgument
-import net.nemerosa.ontrack.graphql.support.disabledField
-import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class GQLTypeProject(
-    private val uiActionsGraphQLService: UIActionsGraphQLService,
     private val structureService: StructureService,
     private val projectLabelManagementService: ProjectLabelManagementService,
     creation: GQLTypeCreation,
@@ -58,8 +54,6 @@ class GQLTypeProject(
                 .withInterface(projectEntityInterface.typeRef)
                 .fields(projectEntityInterfaceFields())
                 .field(disabledField())
-                // Actions
-                .actions(uiActionsGraphQLService, Project::class)
                 // Authorizations
                 .apply {
                     gqlInterfaceAuthorizableService.apply(this, Project::class)
@@ -70,10 +64,22 @@ class GQLTypeProject(
                             .description("Is this project a favourite of the current user?")
                             .type(GraphQLBoolean)
                             .dataFetcher { env ->
-                                val project: Project = env.getSource()
+                                val project: Project = env.getSource()!!
                                 projectFavouriteService.isProjectFavourite(project)
                             }
                 }
+                // Branch by name
+                .field(
+                    newFieldDefinition()
+                        .name("branch")
+                        .argument(stringArgument("name", "Name of the branch to look for", nullable = false))
+                        .type(branch.typeRef.toNotNull())
+                        .dataFetcher { env ->
+                            val project: Project = env.getSource()!!
+                            val name: String = env.getArgument("name")!!
+                            structureService.findBranchByName(project.name, name).getOrNull()
+                        }
+                )
                 // Branches
                 .field(
                         newFieldDefinition()
@@ -116,7 +122,7 @@ class GQLTypeProject(
                             .description("Labels for this project")
                             .type(listType(label.typeRef))
                             .dataFetcher { environment ->
-                                val project: Project = environment.getSource()
+                                val project: Project = environment.getSource()!!
                                 projectLabelManagementService.getLabelsForProject(project)
                             }
                 }

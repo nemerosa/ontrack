@@ -8,6 +8,6 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.fragment.PromotionRunF
  */
 fun PromotionRunFragment.toPromotionRun(connected: Connected) = PromotionRun(
     connector = connected.connector,
-    id = id().toUInt(),
-    description = description(),
+    id = id.toUInt(),
+    description = description,
 )

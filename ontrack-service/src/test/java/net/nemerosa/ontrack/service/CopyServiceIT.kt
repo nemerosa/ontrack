@@ -2,18 +2,20 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.extension.api.support.TestProperty
 import net.nemerosa.ontrack.extension.api.support.TestPropertyType
-import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.BranchCloneRequest
 import net.nemerosa.ontrack.model.structure.CopyService
 import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class CopyServiceIT : AbstractServiceTestJUnit4Support() {
+@AsAdminTest
+class CopyServiceIT : AbstractServiceTestSupport() {
 
     @Autowired
     private lateinit var copyService: CopyService
@@ -31,7 +33,7 @@ class CopyServiceIT : AbstractServiceTestJUnit4Support() {
                 TestProperty.of("Test")
             )
         }
-        assertTrue(ack.isSuccess)
+        assertTrue(ack.success)
 
         // Clones the branch
         val clonedBranchName = TestUtils.uid("B")

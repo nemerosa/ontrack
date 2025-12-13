@@ -1,3 +1,9 @@
 /generated
+/properties
+/configurations
+/templating
+/workflow-node-executors
+/notifications
+/events
 *.png
 *.svg

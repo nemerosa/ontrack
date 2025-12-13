@@ -6,15 +6,14 @@ import net.nemerosa.ontrack.extension.github.model.GitHubLabel
 import net.nemerosa.ontrack.extension.github.property.GitHubGitConfiguration
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
 import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
-import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
+import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
 import org.springframework.stereotype.Component
-import java.util.*
 import java.util.regex.Pattern
 import java.util.stream.Collectors
 
@@ -23,12 +22,10 @@ class GitHubIssueServiceExtension(
     extensionFeature: GitHubExtensionFeature,
     private val configurationService: GitHubConfigurationService,
     private val gitHubClientFactory: OntrackGitHubClientFactory,
-    issueExportServiceFactory: IssueExportServiceFactory,
 ) : AbstractIssueServiceExtension(
     extensionFeature,
     GITHUB_SERVICE_ID,
     "GitHub",
-    issueExportServiceFactory,
 ) {
 
     /**
@@ -63,14 +60,14 @@ class GitHubIssueServiceExtension(
 
     override fun extractIssueKeysFromMessage(
         issueServiceConfiguration: IssueServiceConfiguration,
-        message: String
+        message: String?
     ): Set<String> {
         val result: MutableSet<String> = HashSet()
-        if (message.isNotBlank()) {
+        if (!message.isNullOrBlank()) {
             val matcher = Pattern.compile(GITHUB_ISSUE_PATTERN).matcher(message)
             while (matcher.find()) {
                 // Gets the issue
-                val issueKey = matcher.group(1)
+                val issueKey = matcher.group(2)
                 // Adds to the result
                 result.add(issueKey)
             }
@@ -81,18 +78,13 @@ class GitHubIssueServiceExtension(
 
     override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator {
         val configuration = issueServiceConfiguration as GitHubIssueServiceConfiguration
-        return LegacyRegexMessageAnnotator(
-            GITHUB_ISSUE_PATTERN
+        return RegexMessageAnnotator(
+            GITHUB_ISSUE_PATTERN.toRegex(),
         ) { key: String ->
             of("a")
                 .attr(
                     "href",
-                    String.format(
-                        "%s/%s/issues/%s",
-                        configuration.configuration.url,
-                        configuration.repository,
-                        key.substring(1)
-                    )
+                    "${configuration.configuration.url}/${configuration.repository}/issues/${key.substring(1)}"
                 )
                 .text(key)
         }
@@ -109,8 +101,8 @@ class GitHubIssueServiceExtension(
         )
     }
 
-    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String): String? {
-        return if (token.toIntOrNull() != null || validIssueToken(token)) {
+    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String?): String? {
+        return if (token != null && (token.toIntOrNull() != null || validIssueToken(token))) {
             getIssueId(token).toString()
         } else {
             null
@@ -134,8 +126,21 @@ class GitHubIssueServiceExtension(
         return gitHubIssue.labels.stream().map(GitHubLabel::name).collect(Collectors.toSet())
     }
 
+    override fun getLastCommit(
+        issueServiceConfiguration: IssueServiceConfiguration,
+        repositoryContext: IssueRepositoryContext,
+        key: String
+    ): String? {
+        val numericKey = getIssueId(key)
+        val configuration = issueServiceConfiguration as GitHubIssueServiceConfiguration
+        val client = gitHubClientFactory.create(
+            configuration.configuration
+        )
+        return client.getIssueLastCommit(configuration.repository, numericKey)
+    }
+
     companion object {
         const val GITHUB_SERVICE_ID: String = "github"
-        const val GITHUB_ISSUE_PATTERN: String = "#(\\d+)"
+        const val GITHUB_ISSUE_PATTERN: String = "(#(\\d+))"
     }
 }

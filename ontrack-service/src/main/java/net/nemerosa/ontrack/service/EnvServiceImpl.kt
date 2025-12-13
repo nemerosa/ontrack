@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service
 
+import jakarta.annotation.PostConstruct
 import net.nemerosa.ontrack.model.exceptions.CannotCreateWorkingDirException
 import net.nemerosa.ontrack.model.structure.VersionInfo
 import net.nemerosa.ontrack.model.support.EnvService
@@ -11,7 +12,6 @@ import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import java.io.File
 import java.io.IOException
-import javax.annotation.PostConstruct
 
 @Service
 class EnvServiceImpl(

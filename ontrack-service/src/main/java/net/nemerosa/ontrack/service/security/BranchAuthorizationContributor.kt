@@ -11,7 +11,7 @@ class BranchAuthorizationContributor(
 
     override fun appliesTo(context: Any): Boolean = context is Branch
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> =
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> =
         (context as Branch).let { branch ->
             listOf(
                 Authorization(

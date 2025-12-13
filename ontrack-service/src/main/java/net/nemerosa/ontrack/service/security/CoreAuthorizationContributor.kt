@@ -8,7 +8,8 @@ class CoreAuthorizationContributor : AuthorizationContributor {
 
     companion object {
         const val GLOBAL = "global"
-        const val USER = "user"
+        const val ACCOUNTS = "accounts"
+        const val ACCOUNT_GROUPS = "account_groups"
         const val PROJECT = "project"
         const val BRANCH = "branch"
         const val PROMOTION_LEVEL = "promotion_level"
@@ -18,19 +19,24 @@ class CoreAuthorizationContributor : AuthorizationContributor {
 
     override fun appliesTo(context: Any): Boolean = context is GlobalAuthorizationContext
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> =
-        listOf(
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> {
+        return listOf(
             // Global settings
             Authorization(
                 GLOBAL,
                 Authorization.SETTINGS,
                 user.isGranted(GlobalSettings::class.java)
             ),
-            // User
+            // Account management
             Authorization(
-                USER,
-                "changePassword",
-                !user.account.locked && user.account.authenticationSource.isAllowingPasswordChange
+                name = ACCOUNTS,
+                action = Authorization.CONFIG,
+                authorized = user.isGranted(AccountManagement::class.java)
+            ),
+            Authorization(
+                name = ACCOUNT_GROUPS,
+                action = Authorization.CONFIG,
+                authorized = user.isGranted(AccountGroupManagement::class.java)
             ),
             // Project
             Authorization(
@@ -51,5 +57,6 @@ class CoreAuthorizationContributor : AuthorizationContributor {
                 user.isGranted(GlobalSettings::class.java)
             ),
         )
+    }
 
 }

@@ -1,15 +1,14 @@
 import {expect} from "@playwright/test";
-import {ontrack} from "@ontrack/ontrack";
-import {ui} from "@ontrack/connection";
 
 export class EnvironmentsPage {
 
-    constructor(page) {
+    constructor(page, ontrack) {
         this.page = page
+        this.ontrack = ontrack
     }
 
     async goTo() {
-        await this.page.goto(`${ui()}/extension/environments/environments`)
+        await this.page.goto(`${this.ontrack.connection.ui}/extension/environments/environments`)
         await expect(this.page.getByRole('button', {name: 'New environment'})).toBeVisible()
     }
 
@@ -32,7 +31,7 @@ export class EnvironmentsPage {
         let environmentId = null
         await expect.poll(async () => {
             console.log(`Getting env with name ${name}`)
-            const environment = await ontrack().environments.findEnvironmentByName(name)
+            const environment = await this.ontrack.environments.findEnvironmentByName(name)
             environmentId = environment?.id
             return environmentId
         }).toBeDefined()

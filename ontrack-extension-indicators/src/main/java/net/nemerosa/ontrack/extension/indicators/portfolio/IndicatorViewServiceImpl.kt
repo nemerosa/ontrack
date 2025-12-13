@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.indicators.portfolio
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorViewManagement
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -62,7 +61,7 @@ class IndicatorViewServiceImpl(
     }
 
     override fun findIndicatorViewById(id: String): IndicatorView? =
-        storageService.retrieve(STORE_INDICATOR_VIEWS, id, IndicatorView::class.java).getOrNull()
+        storageService.find(STORE_INDICATOR_VIEWS, id, IndicatorView::class)
 
     override fun findIndicatorViewByName(name: String): IndicatorView? =
         getIndicatorViews().findLast { it.name == name }

@@ -13,6 +13,20 @@ class AutoVersioningMetricsServiceImpl(
     private val meterRegistry: MeterRegistry,
 ) : AutoVersioningMetricsService {
 
+    override fun onScheduled(order: AutoVersioningOrder) {
+        meterRegistry.increment(
+            order,
+            AutoVersioningMetrics.Scheduling.scheduledCount,
+        )
+    }
+
+    override fun onScheduledCancelled(order: AutoVersioningOrder) {
+        meterRegistry.increment(
+            order,
+            AutoVersioningMetrics.Scheduling.schedulingCancelledCount,
+        )
+    }
+
     override fun onQueuing(order: AutoVersioningOrder, routingKey: String) {
         meterRegistry.increment(
             order,

@@ -18,7 +18,7 @@ class GQLRootQueryValidationStampNames(
         .argument(stringArgument(ARG_TOKEN, "Part of the name to look for", nullable = false))
         .type(listType(GraphQLString))
         .dataFetcher { env ->
-            val token: String = env.getArgument(ARG_TOKEN)
+            val token: String = env.getArgument(ARG_TOKEN)!!
             validationStampService.findValidationStampNames(token)
         }
         .build()

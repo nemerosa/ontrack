@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.client
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.format.DateTimeFormatter

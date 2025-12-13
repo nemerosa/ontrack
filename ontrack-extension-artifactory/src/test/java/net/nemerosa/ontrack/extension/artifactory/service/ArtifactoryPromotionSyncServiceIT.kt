@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.artifactory.service
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import io.mockk.every
+import io.mockk.mockk
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.artifactory.ArtifactoryConfProperties
@@ -13,22 +13,22 @@ import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
-import kotlin.streams.toList
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
@@ -44,34 +44,40 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
     private lateinit var artifactoryClient: ArtifactoryClient
 
     @Configuration
-    @Profile(RunProfile.UNIT_TEST)
+    @Profile(RunProfile.DEV)
     class ArtifactoryPromotionSyncServiceITConfiguration {
 
         /**
          * Client mock
          */
         @Bean
-        fun artifactoryClient() = mock<ArtifactoryClient>()
+        fun artifactoryClient() = mockk<ArtifactoryClient>(relaxed = true)
 
         /**
          * Factory
          */
         @Bean
         @Primary
-        fun artifactoryClientFactory(client: ArtifactoryClient) = ArtifactoryClientFactory { client }
+        fun artifactoryClientFactory(client: ArtifactoryClient) = object : ArtifactoryClientFactory {
+            override fun getClient(configuration: ArtifactoryConfiguration): ArtifactoryClient {
+                return client
+            }
+        }
 
     }
 
     @BeforeEach
     fun setup() {
         // Existing promotions
-        whenever(artifactoryClient.getStatuses(ArgumentMatchers.any())).thenReturn(listOf(
+        every {
+            artifactoryClient.getStatuses(any())
+        } returns listOf(
             ArtifactoryStatus(
                 "COPPER",
                 "x",
                 Time.now()
             )
-        ))
+        )
     }
 
     @Test
@@ -102,9 +108,11 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
                 // Sync with Artifactory
                 service.syncBuild(this, "1.0.0", "1.0.0", artifactoryClient, JobRunListener.out())
                 // Checks that a promotion has been created
-                val promotions = structureService.getPromotionRunsForBuild(build.id)
-                    .filter { it.promotionLevel.id() == copper.id() }.size
-                assertEquals(1, promotions, "A promotion has been created")
+                val promotionsNumber = structureService
+                    .getPromotionRunsForBuild(build.id)
+                    .filter { it.promotionLevel.id() == copper.id() }
+                    .size
+                assertEquals(1, promotionsNumber, "A promotion has been created")
             }
         }
     }
@@ -121,15 +129,17 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
 
             // Configured branch
             branch branch@{
-                setProperty(this, ArtifactoryPromotionSyncPropertyType::class.java, ArtifactoryPromotionSyncProperty(
-                    configuration,
-                    "project",
-                    "1.0.*",
-                    30
-                ))
+                setProperty(
+                    this, ArtifactoryPromotionSyncPropertyType::class.java, ArtifactoryPromotionSyncProperty(
+                        configuration,
+                        "project",
+                        "1.0.*",
+                        30
+                    )
+                )
                 // Gets the list of jobs
                 assertIs<JobOrchestratorSupplier>(service) {
-                    val jobs = it.collectJobRegistrations().toList()
+                    val jobs = it.jobRegistrations.toList()
                     // Unconfigured branch
                     assertTrue(jobs.none { j ->
                         j.job.key.type.category.key == "artifactory" &&
@@ -156,22 +166,24 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
         }
         project {
             // Unconfigured branch
-            val unconfiguredBranch = branch()
+            branch()
 
             // Configured branch
             branch branch@{
-                setProperty(this, ArtifactoryPromotionSyncPropertyType::class.java, ArtifactoryPromotionSyncProperty(
-                    configuration,
-                    "project",
-                    "1.0.*",
-                    30
-                ))
+                setProperty(
+                    this, ArtifactoryPromotionSyncPropertyType::class.java, ArtifactoryPromotionSyncProperty(
+                        configuration,
+                        "project",
+                        "1.0.*",
+                        30
+                    )
+                )
                 // Gets the list of jobs
                 assertIs<JobOrchestratorSupplier>(service) {
                     val oldState = artifactoryConfProperties.buildSyncDisabled
                     try {
                         artifactoryConfProperties.buildSyncDisabled = true
-                        val jobs = it.collectJobRegistrations().toList()
+                        val jobs = it.jobRegistrations.toList()
                         // No job at all
                         assertTrue(jobs.isEmpty(), "No job is created")
                     } finally {
@@ -190,16 +202,18 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
         }
         project {
             // Unconfigured branch
-            val unconfiguredBranch = branch()
+            branch()
 
             // Configured branch
             branch branch@{
-                setProperty(this, ArtifactoryPromotionSyncPropertyType::class.java, ArtifactoryPromotionSyncProperty(
-                    configuration,
-                    "project",
-                    "1.0.*",
-                    30
-                ))
+                setProperty(
+                    this, ArtifactoryPromotionSyncPropertyType::class.java, ArtifactoryPromotionSyncProperty(
+                        configuration,
+                        "project",
+                        "1.0.*",
+                        30
+                    )
+                )
                 // Gets the list of jobs
                 assertIs<JobOrchestratorSupplier>(service) {
                     // Deleting all configurations before checking
@@ -208,7 +222,7 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
                             configurationService.deleteConfiguration(conf.name)
                         }
                     }
-                    val jobs = it.collectJobRegistrations().toList()
+                    val jobs = it.jobRegistrations.toList()
                     // No job at all
                     assertTrue(jobs.isEmpty(), "No job is created")
                 }

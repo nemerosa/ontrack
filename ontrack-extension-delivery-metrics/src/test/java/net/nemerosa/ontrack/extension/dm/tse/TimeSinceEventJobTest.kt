@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.dm.tse
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import net.nemerosa.ontrack.extension.git.branching.BranchingModelPropertyType
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelPropertyType
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.concurrent.TimeUnit
-import kotlin.streams.toList
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull

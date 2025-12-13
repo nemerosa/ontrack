@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 import net.nemerosa.ontrack.extension.general.ReleaseValidationPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
@@ -8,16 +7,14 @@ import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfig
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigCascSetup
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigSetup
-import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigSteps
 import net.nemerosa.ontrack.extension.github.ingestion.config.parser.ConfigParsingException
-import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionCascBranchConfig
-import net.nemerosa.ontrack.extension.github.ingestion.config.parser.old.OldIngestionCascConfig
 import net.nemerosa.ontrack.extension.stale.StalePropertyType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull

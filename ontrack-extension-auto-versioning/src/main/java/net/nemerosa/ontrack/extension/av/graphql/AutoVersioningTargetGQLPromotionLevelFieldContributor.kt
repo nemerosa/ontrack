@@ -27,7 +27,7 @@ class AutoVersioningTargetGQLPromotionLevelFieldContributor(
                 .description("List of branches targeted for auto-versioning based on this promotion level")
                 .type(listType(gqlTypeAutoVersioningConfiguredBranch.typeName))
                 .dataFetcher { env ->
-                    val pl: PromotionLevel = env.getSource()
+                    val pl: PromotionLevel = env.getSource()!!
                     val tracking = autoVersioningTrackingService.startInMemoryTrail()
                     autoVersioningPromotionListenerService.getConfiguredBranches(pl, tracking)
                     tracking.trail?.branches

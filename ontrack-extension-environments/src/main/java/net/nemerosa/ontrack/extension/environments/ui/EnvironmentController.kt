@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.environments.ui
 
+import jakarta.servlet.http.HttpServletResponse
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.environments.service.EnvironmentService
 import net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.util.*
-import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/rest/extension/environments")

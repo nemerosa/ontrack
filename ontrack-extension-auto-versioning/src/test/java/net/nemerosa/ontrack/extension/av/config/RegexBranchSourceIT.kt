@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.extension.av.config
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
+@AsAdminTest
 class RegexBranchSourceIT : AbstractDSLTestSupport() {
 
     @Autowired

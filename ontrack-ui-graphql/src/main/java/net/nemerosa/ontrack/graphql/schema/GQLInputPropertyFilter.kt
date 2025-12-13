@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter.asInputType
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter.asObject
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.PropertyService
-import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.util.function.Predicate
 
@@ -39,9 +38,10 @@ class GQLInputPropertyFilter(
     private fun <T> matchProperty(e: ProjectEntity, filter: PropertyFilter): Boolean {
         val type = propertyService.getPropertyTypeByName<T>(filter.type!!)
         val property = propertyService.getProperty<T>(e, filter.type!!)
+        val filterValue = filter.value
         return !property.isEmpty &&
-                (StringUtils.isBlank(filter.value) ||
-                        type.containsValue(property.value, filter.value))
+                (filterValue.isNullOrBlank() ||
+                        type.containsValue(property.value, filterValue))
     }
 
     companion object {

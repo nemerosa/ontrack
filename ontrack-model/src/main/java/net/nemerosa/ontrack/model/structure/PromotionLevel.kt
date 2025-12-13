@@ -3,14 +3,13 @@ package net.nemerosa.ontrack.model.structure
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.fasterxml.jackson.annotation.JsonView
-import net.nemerosa.ontrack.model.form.Form
 
 @JsonPropertyOrder(value = ["id", "name", "description", "branch", "image"])
 data class PromotionLevel(
         override val id: ID,
         val name: String,
         override val description: String?,
-        @JsonView(value = [PromotionLevel::class, PromotionView::class, PromotionRunView::class])
+        @JsonView(PromotionLevel::class)
         val branch: Branch,
         @JsonProperty("image")
         val isImage: Boolean,
@@ -32,8 +31,6 @@ data class PromotionLevel(
             )
         }
 
-        @JvmStatic
-        fun form(): Form = Form.nameAndDescription()
     }
 
     override val project: Project
@@ -53,10 +50,6 @@ data class PromotionLevel(
     fun withId(id: ID) = PromotionLevel(id, name, description, branch, isImage, signature)
 
     fun withImage(isImage: Boolean) = PromotionLevel(id, name, description, branch, isImage, signature)
-
-    fun asForm(): Form = form()
-            .fill("name", name)
-            .fill("description", description)
 
     fun update(nameDescription: NameDescription): PromotionLevel = PromotionLevel(
             id,

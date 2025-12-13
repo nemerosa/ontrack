@@ -14,7 +14,7 @@ interface RestTemplateProvider {
     @Deprecated("Will be removed in V5. Use the method with the configuration block.")
     fun createRestTemplate(
         rootUri: String,
-        basicAuthentication: RestTemplateBasicAuthentication
+        configuration: RestTemplateBuilder.() -> RestTemplateBuilder,
     ): RestTemplate
 
     /**

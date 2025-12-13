@@ -1,3 +1,0 @@
-This method returns the URL of the Web page which displays this resource.
-
-This is equivalent to calling `link('page')`.

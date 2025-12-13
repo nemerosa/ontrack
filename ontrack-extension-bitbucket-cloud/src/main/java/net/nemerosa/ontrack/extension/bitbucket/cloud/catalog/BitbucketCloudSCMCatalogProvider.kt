@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.catalog
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.bitbucket.cloud.client.BitbucketCloudClientFactory
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfigurationService
 import net.nemerosa.ontrack.extension.bitbucket.cloud.property.BitbucketCloudProjectConfigurationProperty
@@ -58,7 +57,7 @@ class BitbucketCloudSCMCatalogProvider(
         scmRepository.substringAfter("/")
 
     override fun linkProjectToSCM(project: Project, entry: SCMCatalogEntry): Boolean {
-        val config = bitbucketCloudConfigurationService.getOptionalConfiguration(entry.config).getOrNull() ?: return false
+        val config = bitbucketCloudConfigurationService.findConfiguration(entry.config) ?: return false
         propertyService.editProperty(
             project,
             BitbucketCloudProjectConfigurationPropertyType::class.java,

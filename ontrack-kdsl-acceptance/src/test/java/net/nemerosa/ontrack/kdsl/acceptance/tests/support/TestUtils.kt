@@ -26,6 +26,14 @@ fun uid(prefix: String): String =
     prefix + SimpleDateFormat("mmssSSS").format(Date()) + counter.incrementAndGet()
 
 /**
+ * Generates a unique email
+ */
+fun email(
+    name: String = uid("u-"),
+    domain: String = "@ontrack.local"
+) = "$name@$domain"
+
+/**
  * Waiting until a condition is met.
  */
 fun waitUntil(

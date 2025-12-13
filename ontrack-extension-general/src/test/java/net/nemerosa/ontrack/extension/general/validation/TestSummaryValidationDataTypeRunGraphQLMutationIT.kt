@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.general.validation
 
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.config
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 

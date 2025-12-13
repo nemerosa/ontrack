@@ -104,7 +104,7 @@ export class EnvironmentsExtension {
                 ${gqlSlotData}
             `,
             {
-                projectId: project.id,
+                projectId: Number(project.id),
                 qualifier: qualifier,
                 description: "",
                 environmentId: environment.id,
@@ -143,7 +143,7 @@ export class EnvironmentsExtension {
             `,
             {
                 slotId: slot.id,
-                buildId: build.id,
+                buildId: Number(build.id),
             }
         )
 

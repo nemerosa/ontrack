@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.scm.graphql
 import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.extension.scm.service.SCMFileChangeFilterService
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
-import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.toNotNull
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -26,7 +25,7 @@ class SCMFileChangeFiltersProjectGraphQLFieldContributor(
                     .description("List of saved SCM file filters for the project")
                     .type(gqlTypeSCMFileChangeFilters.typeRef.toNotNull())
                     .dataFetcher { env ->
-                        val project: Project = env.getSource()
+                        val project: Project = env.getSource()!!
                         GQLTypeSCMFileChangeFilters.SCMFileChangeFiltersWithProject(
                             project = project,
                             filters = scmFileChangeFilterService.loadSCMFileChangeFilters(project),

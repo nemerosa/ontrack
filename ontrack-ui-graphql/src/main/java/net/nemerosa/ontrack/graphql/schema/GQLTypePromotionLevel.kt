@@ -107,8 +107,8 @@ class GQLTypePromotionLevel(
                                 if (!version.isNullOrBlank()) {
                                     val r = version.toRegex()
                                     filter = filter and { run ->
-                                        val buildVersion = buildDisplayNameService.getBuildDisplayName(run.build)
-                                        buildVersion.matches(r)
+                                        val buildVersion = buildDisplayNameService.getFirstBuildDisplayName(run.build)
+                                        buildVersion != null && buildVersion.matches(r)
                                     }
                                 }
                                 // Gets the filtered list of promotion runs
@@ -124,7 +124,7 @@ class GQLTypePromotionLevel(
 
     private fun promotionLevelPromotionRunsFetcher(): DataFetcher<List<PromotionRun>> =
             DataFetcher { environment: DataFetchingEnvironment ->
-                val promotionLevel = environment.getSource<PromotionLevel>()
+                val promotionLevel = environment.getSource<PromotionLevel>()!!
                 // Gets all the promotion runs
                 val promotionRuns = structureService.getPromotionRunsForPromotionLevel(promotionLevel.id)
                 // Filters according to the arguments

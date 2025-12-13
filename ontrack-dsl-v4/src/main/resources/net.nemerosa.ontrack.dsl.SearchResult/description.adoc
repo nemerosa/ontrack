@@ -1,1 +1,0 @@
-The `SearchResult` class is used for listing the results of a <<dsl-ontrack-search,search>>.

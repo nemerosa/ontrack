@@ -9,5 +9,5 @@ class UILocationsImpl(
 ) : UILocations {
 
     override fun page(relativeURI: String): String =
-        "${ontrackConfigProperties.ui.uri}/${relativeURI.trimStart('/')}"
+        "${ontrackConfigProperties.url}/${relativeURI.trimStart('/')}"
 }

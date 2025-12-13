@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.extension.git
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.extension.git.service.GitService
@@ -9,17 +13,14 @@ import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @Component
 class GitIssueSearchExtension(
     extensionFeature: GitExtensionFeature,
     private val gitService: GitService,
-    private val uriBuilder: EntityURIBuilder,
     private val structureService: StructureService,
     private val ontrackConfigProperties: OntrackConfigProperties,
     private val searchIndexService: SearchIndexService
@@ -41,10 +42,28 @@ class GitIssueSearchExtension(
 
     override val isIndexationDisabled: Boolean = true
 
-    override val indexMapping: SearchIndexMapping? = indexMappings<GitIssueSearchItem> {
-        +GitIssueSearchItem::projectId to id { index = false }
-        +GitIssueSearchItem::key to keyword { index = false }
-        +GitIssueSearchItem::displayKey to keyword { scoreBoost = 3.0 }
+    override fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder =
+        builder.run {
+            mappings { mappings ->
+                mappings
+                    .id(GitIssueSearchItem::projectId)
+                    .keyword(GitIssueSearchItem::key)
+                    .keyword(GitIssueSearchItem::displayKey)
+            }
+        }
+
+    override fun buildQuery(
+        q: Query.Builder,
+        token: String
+    ): ObjectBuilder<Query> {
+        return q.multiMatch { m ->
+            m.query(token)
+                .type(TextQueryType.BestFields)
+                .fields(
+                    GitIssueSearchItem::displayKey to 3.0,
+                    GitIssueSearchItem::key to 2.0,
+                )
+        }
     }
 
     /**
@@ -97,8 +116,6 @@ class GitIssueSearchExtension(
             SearchResult(
                 title = "Issue ${item.displayKey}",
                 description = "Issue ${item.displayKey} found in project ${project.name}",
-                uri = uriBuilder.build(on(GitController::class.java).issueProjectInfo(project.id, item.key)),
-                page = uriBuilder.page("extension/git/${project.id}/issue/${item.key}"),
                 accuracy = score,
                 type = searchResultType,
                 data = mapOf(

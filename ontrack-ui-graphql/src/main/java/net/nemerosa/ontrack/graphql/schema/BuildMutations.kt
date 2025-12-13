@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
@@ -11,8 +13,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Pattern
 import kotlin.jvm.optionals.getOrNull
 
 @Component

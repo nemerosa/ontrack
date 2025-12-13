@@ -1,8 +1,9 @@
 package net.nemerosa.ontrack.extension.jira.tx
 
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
-import net.nemerosa.ontrack.extension.jira.JIRAConfigurationProperties
 import net.nemerosa.ontrack.extension.jira.client.JIRAClient
+import net.nemerosa.ontrack.extension.jira.client.JIRAClient.Companion.PROPERTY_JIRA_CLIENT_TYPE
+import net.nemerosa.ontrack.extension.jira.client.JIRAClient.Companion.PROPERTY_JIRA_CLIENT_TYPE_DEFAULT
 import net.nemerosa.ontrack.extension.jira.client.JIRAClientImpl
 import net.nemerosa.ontrack.extension.support.client.RestTemplateProvider
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -11,10 +12,9 @@ import org.springframework.stereotype.Component
 
 @Component
 @ConditionalOnProperty(
-    prefix = JIRAConfigurationProperties.JIRA_MOCK_PREFIX,
-    name = [JIRAConfigurationProperties.JIRA_MOCK_ENABLED],
-    havingValue = "false",
-    matchIfMissing = true
+    name = [PROPERTY_JIRA_CLIENT_TYPE],
+    havingValue = PROPERTY_JIRA_CLIENT_TYPE_DEFAULT,
+    matchIfMissing = true,
 )
 class JIRASessionFactoryImpl(
     private val restTemplateProvider: RestTemplateProvider,
@@ -24,7 +24,9 @@ class JIRASessionFactoryImpl(
 
         // Creates an HTTP client
         val template = restTemplateProvider.createRestTemplate(
-            rootUri = configuration.url
+            rootUri = configuration.apiUrl
+                ?.takeIf { it.isNotBlank() }
+                ?: configuration.url
         ) {
             if (configuration.user.isNullOrBlank()) {
                 if (configuration.password.isNullOrBlank()) {

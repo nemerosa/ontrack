@@ -80,9 +80,10 @@ class AutoVersioningValidationServiceImpl(
             )
             // Creation of the build link
             val settings = cachedSettingsService.getCachedSettings(AutoVersioningSettings::class.java)
+            val buildLinkCreation = config.buildLinkCreation
             if (settings.buildLinks
                 && current != null
-                && (config.buildLinkCreation == null || config.buildLinkCreation)
+                && (buildLinkCreation == null || buildLinkCreation)
             ) {
                 val links = structureService.getQualifiedBuildsUsedBy(build)
                 val existingLink = links.pageItems.find {

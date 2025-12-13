@@ -10,7 +10,8 @@ import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTyp
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
 import net.nemerosa.ontrack.extension.indicators.values.IntegerIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.PercentageIndicatorValueType
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -20,7 +21,8 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-abstract class AbstractIndicatorsTestSupport : AbstractQLKTITJUnit4Support() {
+@AsAdminTest
+abstract class AbstractIndicatorsTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     protected lateinit var booleanIndicatorValueType: BooleanIndicatorValueType

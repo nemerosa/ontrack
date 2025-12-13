@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.repository
 
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.structure.Token
-import net.nemerosa.ontrack.model.structure.TokenScope
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -33,17 +32,15 @@ class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
         id: Int,
         name: String,
         token: String,
-        scope: TokenScope,
         time: LocalDateTime,
         until: LocalDateTime?
     ) {
         invalidate(id, name)
         namedParameterJdbcTemplate!!.update(
-            "INSERT INTO TOKENS (ACCOUNT, NAME, VALUE, SCOPE, CREATION, VALID_UNTIL) VALUES (:id, :name, :token, :scope, :creation, :until)",
+            "INSERT INTO TOKENS (ACCOUNT, NAME, VALUE, CREATION, VALID_UNTIL) VALUES (:id, :name, :token, :creation, :until)",
             params("id", id)
                 .addValue("name", name)
                 .addValue("token", token)
-                .addValue("scope", scope.name)
                 .addValue("creation", dateTimeForDB(time))
                 .addValue("until", dateTimeForDB(until))
         )
@@ -121,7 +118,6 @@ class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
         return Token(
             name = rs.getString("NAME"),
             value = rs.getString("VALUE"),
-            scope = TokenScope.valueOf(rs.getString("SCOPE")),
             creation = dateTimeFromDB(rs.getString("CREATION"))!!,
             validUntil = dateTimeFromDB(rs.getString("VALID_UNTIL")),
             lastUsed = dateTimeFromDB(rs.getString("LAST_USED")),

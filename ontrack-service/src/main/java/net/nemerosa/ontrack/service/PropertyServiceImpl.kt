@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException
 import net.nemerosa.ontrack.model.exceptions.PropertyUnsupportedEntityTypeException
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.repository.PropertyRepository
@@ -16,7 +15,6 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.function.BiFunction
-import java.util.function.Function
 import java.util.function.Predicate
 import kotlin.reflect.KClass
 
@@ -105,7 +103,7 @@ class PropertyServiceImpl(
         // If existing, deletes it
         return if (value != null) {
             val ack = propertyRepository.deleteProperty(propertyType.javaClass.name, entity.projectEntityType, entity.id)
-            if (ack.isSuccess) {
+            if (ack.success) {
                 // Property deletion event
                 eventPostService.post(eventFactory.propertyDelete(entity, propertyType))
                 // Listener
@@ -178,13 +176,6 @@ class PropertyServiceImpl(
         // If null, returns null
         // Converts the stored value into an actual value
         return type.fromStorage(t.json)
-    }
-
-    override fun getPropertyEditionForm(entity: ProjectEntity, propertyTypeName: String): Form {
-        // Gets the property using its fully qualified type name
-        val propertyType: PropertyType<*> = getPropertyTypeByName<Any>(propertyTypeName)
-        // Gets the edition form for this type
-        return getPropertyEditionForm(entity, propertyType)
     }
 
     override fun <T> searchWithPropertyValue(
@@ -266,22 +257,11 @@ class PropertyServiceImpl(
         )
     }
 
-    override fun <T> copyProperty(sourceEntity: ProjectEntity, property: Property<T>, targetEntity: ProjectEntity, replacementFn: Function<String, String>) {
+    override fun <T> copyProperty(sourceEntity: ProjectEntity, property: Property<T>, targetEntity: ProjectEntity, replacementFn: (String) -> String) {
         // Property copy
         val data = property.type.copy(sourceEntity, property.value, targetEntity, replacementFn)
         // Direct edition
         editProperty(targetEntity, property.type, data)
-    }
-
-    protected fun <T> getPropertyEditionForm(entity: ProjectEntity, propertyType: PropertyType<T>): Form {
-        // Checks for edition
-        if (!propertyType.canEdit(entity, securityService)) {
-            throw AccessDeniedException("Property is not opened for edition.")
-        }
-        // Gets the value for this property
-        val value: T? = getPropertyValue(propertyType, entity)
-        // Gets the form
-        return propertyType.getEditionForm(entity, value)
     }
 
 }

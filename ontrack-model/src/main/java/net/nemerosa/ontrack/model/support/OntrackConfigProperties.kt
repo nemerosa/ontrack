@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.model.support
 
+import jakarta.annotation.PostConstruct
+import jakarta.validation.Valid
+import jakarta.validation.constraints.Min
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
 import org.slf4j.Logger
@@ -13,9 +16,6 @@ import org.springframework.util.unit.DataUnit
 import org.springframework.validation.annotation.Validated
 import java.time.Duration
 import java.time.temporal.ChronoUnit
-import javax.annotation.PostConstruct
-import javax.validation.Valid
-import javax.validation.constraints.Min
 
 
 /**
@@ -31,22 +31,7 @@ class OntrackConfigProperties {
     private val logger: Logger = LoggerFactory.getLogger(OntrackConfigProperties::class.java)
 
     @APIDescription("Root URL for this Ontrack installation, used for notifications")
-    var url: String = "http://localhost:8080"
-
-    @APIDescription("Maximum number of days to keep the log entries")
-    var applicationLogRetentionDays = 7
-
-    @APIDescription("Disabling the collection of log entries in the application")
-    var applicationLogEnabled = true
-
-    /**
-     * Number of fatal errors to notify into the GUI.
-     *
-     * @see ApplicationLogEntryLevel.FATAL
-     */
-    @Min(1)
-    @APIDescription("Maximum number of errors to display as notifications in the GUI")
-    var applicationLogInfoMax = 10
+    var url: String = "http://localhost:3000"
 
     @Min(1)
     @APIDescription("# Maximum number of builds which can be returned by a build filter. Any number above is truncated down to this value")
@@ -88,11 +73,6 @@ class OntrackConfigProperties {
     var fileKeyStore = FileKeyStoreProperties()
 
     /**
-     * Next UI properties
-     */
-    var ui = UIProperties()
-
-    /**
      * Templating settings
      */
     var templating = TemplatingProperties()
@@ -115,24 +95,70 @@ class OntrackConfigProperties {
         logger.info("[search] Index batch tracing = ${search.index.tracing}")
         logger.info("[search] Index creation error ignoring = ${search.index.ignoreExisting}")
         logger.info("[document] Documents engine = ${documents.engine}")
-        logger.info("[ui] Next UI enabled = ${ui.enabled}")
-        logger.info("[ui] Next UI URI = ${ui.uri}")
         logger.info("[templating] Errors = ${templating.errors}")
     }
 
     /**
-     * Next UI properties
+     * Authorization settings
      */
-    class UIProperties {
+    class AuthorizationConfigProperties {
         /**
-         * Next UI enabled?
+         * Initial provisioning
          */
-        var enabled = false
+        var provisioning = true
+        /**
+         * Initial admin properties
+         */
+        var admin = AdminConfigProperties()
+        /**
+         * Custom JWT config
+         */
+        var jwt = JwtConfigProperties()
+    }
 
+    class JwtConfigProperties {
         /**
-         * Next UI URL
+         * Debugging
          */
-        var uri: String = "http://localhost:3000/ui"
+        var debug = false
+        /**
+         * Custom claims
+         */
+        var claims = JwtClaimsConfigProperties()
+        /**
+         * Custom JWT `typ`
+         */
+        var typ: String = ""
+    }
+
+    class JwtClaimsConfigProperties {
+        /**
+         * Custom claim for the email
+         */
+        var email: String = ""
+        /**
+         * Custom claim for the list of groups
+         */
+        val groups: String = ""
+    }
+
+    class AdminConfigProperties {
+        /**
+         * Email
+         */
+        var email = "admin@ontrack.local"
+        /**
+         * Full name
+         */
+        var fullName = "Administrator"
+        /**
+         * Name of the group to assign (must exists or must be blank)
+         */
+        var groupName = "Administrators"
+        /**
+         * Forcing the update of the admin account when already existing
+         */
+        var force = false
     }
 
     /**
@@ -223,6 +249,10 @@ class OntrackConfigProperties {
      */
     class SecurityProperties {
         /**
+         * Authorization settings
+         */
+        var authorization = AuthorizationConfigProperties()
+        /**
          * Security token settings
          */
         val tokens = TokensProperties()
@@ -242,55 +272,6 @@ class OntrackConfigProperties {
         @DurationUnit(ChronoUnit.DAYS)
         var validity: Duration = Duration.ofDays(0)
 
-        /**
-         * Default validity duration for the _transient_ tokens.
-         *
-         * If set to 0 or negative, the generated tokens do not expire.
-         *
-         * By default, the tokens do not expire.
-         */
-        @DurationUnit(ChronoUnit.MINUTES)
-        var transientValidity: Duration = DEFAULT_TRANSIENT_VALIDITY
-
-        /**
-         * Allows the token to be used as passwords.
-         */
-        var password: Boolean = true
-
-        /**
-         * Cache properties
-         */
-        var cache = TokensCacheProperties()
-
-        companion object {
-            /**
-             * Default duration for the transient tokens
-             */
-            val DEFAULT_TRANSIENT_VALIDITY: Duration = Duration.ofMinutes(30)
-        }
-    }
-
-    /**
-     * Token cache properties
-     */
-    @Deprecated("Will be removed in V5")
-    class TokensCacheProperties {
-        /**
-         * Is caching of the tokens enabled?
-         */
-        var enabled = true
-
-        /**
-         * Cache validity period
-         */
-        @DurationUnit(ChronoUnit.MINUTES)
-        var validity: Duration = Duration.ofDays(30)
-
-        /**
-         * Maximum number of items in the cache. Should be aligned with the
-         * number of sessions. Note that the objects stored in the cache are tiny.
-         */
-        var maxCount: Long = 1_000
     }
 
     companion object {

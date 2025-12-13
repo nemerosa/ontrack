@@ -1,9 +1,5 @@
 package net.nemerosa.ontrack.extension.casc.schema.json
 
-import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaProvider
 
-interface CascJsonSchemaService {
-
-    fun createCascJsonSchema(): JsonNode
-
-}
+interface CascJsonSchemaService : JsonSchemaProvider

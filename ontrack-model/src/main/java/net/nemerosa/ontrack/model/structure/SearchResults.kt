@@ -9,8 +9,12 @@ package net.nemerosa.ontrack.model.structure
  * @property message Any message associated with the search
  */
 class SearchResults(
-        val items: List<SearchResult>,
-        val offset: Int,
-        val total: Int,
-        val message: String?
-)
+    val items: List<SearchResult>,
+    val offset: Int,
+    val total: Int,
+    val message: String?
+) {
+    companion object {
+        val empty = SearchResults(emptyList(), 0, 0, null)
+    }
+}

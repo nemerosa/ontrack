@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.ingestion.extensions.validation
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.extension.general.ReleaseProperty
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
@@ -15,6 +14,7 @@ import net.nemerosa.ontrack.model.structure.config
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull

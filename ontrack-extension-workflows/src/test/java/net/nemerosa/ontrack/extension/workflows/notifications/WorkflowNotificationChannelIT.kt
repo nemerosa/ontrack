@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.extension.workflows.engine.getWorkflowInstance
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.MockEventType
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@AsAdminTest
 class WorkflowNotificationChannelIT : AbstractWorkflowTestSupport() {
 
     @Autowired

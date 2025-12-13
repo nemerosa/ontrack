@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.workflows.notifications
 
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannel
 import net.nemerosa.ontrack.extension.workflows.AbstractWorkflowTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.templating.TestTemplatingContextData
 import net.nemerosa.ontrack.model.templating.TestTemplatingContextHandler
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
+@AsAdminTest
 class WorkflowNotificationChannelNodeExecutorIT : AbstractWorkflowTestSupport() {
 
     @Autowired

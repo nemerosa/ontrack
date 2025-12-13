@@ -18,7 +18,7 @@ class BuildAuthorizationContributor(
 
     override fun appliesTo(context: Any): Boolean = context is Build
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> =
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> =
         (context as Build).let { build ->
             listOf(
                 Authorization(

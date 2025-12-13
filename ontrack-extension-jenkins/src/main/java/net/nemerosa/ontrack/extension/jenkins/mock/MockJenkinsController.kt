@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/extension/jenkins/mock")
-@Profile(RunProfile.ACC)
+@Profile(RunProfile.DEV)
 class MockJenkinsController(
     private val mockJenkinsClientFactory: MockJenkinsClientFactory,
 ) {

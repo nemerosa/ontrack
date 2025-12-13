@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.environments.workflows.executors
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.environments.EnvironmentsExtensionFeature
+import net.nemerosa.ontrack.extension.environments.EnvironmentsLicense
 import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.service.EnvironmentService
 import net.nemerosa.ontrack.extension.environments.service.SlotService
@@ -15,7 +16,6 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.SerializableEvent
-import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -28,9 +28,11 @@ class SlotPipelineCreationWorkflowNodeExecutor(
     extensionFeature: EnvironmentsExtensionFeature,
     private val slotService: SlotService,
     private val environmentService: EnvironmentService,
-    private val securityService: SecurityService,
     private val structureService: StructureService,
+    environmentsLicense: EnvironmentsLicense,
 ) : AbstractExtension(extensionFeature), WorkflowNodeExecutor {
+
+    override val enabled: Boolean = environmentsLicense.environmentFeatureEnabled
 
     override val id: String = "slot-pipeline-creation"
     override val displayName: String = "Pipeline creation"
@@ -49,41 +51,39 @@ class SlotPipelineCreationWorkflowNodeExecutor(
     ): WorkflowNodeExecutorResult {
         val (environment, configuredQualifier) = workflowInstance.workflow.getNode(workflowNodeId).data.parse<SlotPipelineCreationWorkflowNodeExecutorData>()
 
-        return securityService.asAdmin {
-            // Getting the target environment
-            val targetEnvironment = environmentService.findByName(environment)
-                ?: return@asAdmin WorkflowNodeExecutorResult.error(
-                    "Environment name not found: ${environment}",
-                    output = null
-                )
+        // Getting the target environment
+        val targetEnvironment = environmentService.findByName(environment)
+            ?: return WorkflowNodeExecutorResult.error(
+                "Environment name not found: $environment",
+                output = null
+            )
 
-            val (build, buildQualifier) = getBuildFromContext(workflowInstance.event)
-            // Finding the target slot for the same project
-            val qualifier = configuredQualifier ?: buildQualifier
-            val targetSlot = slotService.findSlotsByEnvironment(targetEnvironment).find {
-                it.project.id() == build.project.id() && it.qualifier == qualifier
-            }
-                ?: return@asAdmin WorkflowNodeExecutorResult.error(
-                    "Cannot find slot for environment = ${environment}, project = ${build.project.name}, qualifier = $qualifier",
-                    output = null,
-                )
-            // Is the build eligible for the target slot?
-            if (!slotService.isBuildEligible(targetSlot, build)) {
-                return@asAdmin WorkflowNodeExecutorResult.error(
-                    "Build is not eligible for target slot",
-                    output = null,
-                )
-            }
-            // Creating the pipeline
-            val targetPipeline = slotService.startPipeline(targetSlot, build)
-            // OK
-            WorkflowNodeExecutorResult.success(
-                output = SlotPipelineCreationWorkflowNodeExecutorOutput(
-                    targetPipelineId = targetPipeline.id,
-                ).asJson(),
-                event = workflowInstance.event.forSlotPipeline(targetPipeline),
+        val (build, buildQualifier) = getBuildFromContext(workflowInstance.event)
+        // Finding the target slot for the same project
+        val qualifier = configuredQualifier ?: buildQualifier
+        val targetSlot = slotService.findSlotsByEnvironment(targetEnvironment).find {
+            it.project.id() == build.project.id() && it.qualifier == qualifier
+        }
+            ?: return WorkflowNodeExecutorResult.error(
+                "Cannot find slot for environment = ${environment}, project = ${build.project.name}, qualifier = $qualifier",
+                output = null,
+            )
+        // Is the build eligible for the target slot?
+        if (!slotService.isBuildEligible(targetSlot, build)) {
+            return WorkflowNodeExecutorResult.error(
+                "Build is not eligible for target slot",
+                output = null,
             )
         }
+        // Creating the pipeline
+        val targetPipeline = slotService.startPipeline(targetSlot, build)
+        // OK
+        return WorkflowNodeExecutorResult.success(
+            output = SlotPipelineCreationWorkflowNodeExecutorOutput(
+                targetPipelineId = targetPipeline.id,
+            ).asJson(),
+            event = workflowInstance.event.forSlotPipeline(targetPipeline),
+        )
     }
 
     private fun getBuildFromContext(serializableEvent: SerializableEvent): QualifiedBuild {

@@ -1,24 +1,26 @@
 package net.nemerosa.ontrack.service.elasticsearch
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient
+import co.elastic.clients.elasticsearch._types.ElasticsearchException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.*
-import org.elasticsearch.client.RequestOptions
-import org.elasticsearch.client.RestHighLevelClient
-import org.elasticsearch.index.query.MultiMatchQueryBuilder
-import org.elasticsearch.search.builder.SearchSourceBuilder
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-typealias ESSearchRequest = org.elasticsearch.action.search.SearchRequest
+typealias ESSearchRequestBuilder = co.elastic.clients.elasticsearch.core.SearchRequest.Builder
 
 @Service
 @Transactional
 class ElasticSearchServiceImpl(
-    private val client: RestHighLevelClient,
+    private val client: ElasticsearchClient,
     private val searchIndexers: List<SearchIndexer<*>>,
     private val searchIndexService: SearchIndexService
 ) : SearchService {
+
+    private val logger: Logger = LoggerFactory.getLogger(ElasticSearchServiceImpl::class.java)
 
     val indexers: Map<String, SearchIndexer<*>> by lazy {
         searchIndexers.associateBy { it.indexName }
@@ -28,57 +30,84 @@ class ElasticSearchServiceImpl(
         searchIndexers.filter { it.searchResultType != null }.associateBy { it.searchResultType!!.id }
     }
 
-    override fun paginatedSearch(request: SearchRequest): SearchResults = rawSearch(
-        token = request.token,
-        indexName = request.type?.let { type ->
-            indexerByResultType[type]?.indexName
-        },
-        offset = request.offset,
-        size = request.size,
-    ).run {
-        SearchResults(
-            items = items.mapNotNull { toResult(it) },
-            offset = offset,
-            total = total,
-            message = message,
-        )
+    override fun paginatedSearch(request: SearchRequest): SearchResults {
+        val searchIndexer = indexerByResultType[request.type]
+            ?: return SearchResults.empty
+        return rawSearch(
+            token = request.token,
+            searchIndexer = searchIndexer,
+            offset = request.offset,
+            size = request.size,
+        ).run {
+            SearchResults(
+                items = items.mapNotNull { toResult(it) },
+                offset = offset,
+                total = total,
+                message = message,
+            )
+        }
     }
 
-    override fun rawSearch(
+    private fun rawSearch(
         token: String,
-        indexName: String?,
+        searchIndexer: SearchIndexer<*>,
         offset: Int,
         size: Int,
     ): SearchNodeResults {
-        val esRequest = ESSearchRequest().source(
-            SearchSourceBuilder().query(
-                MultiMatchQueryBuilder(token).type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
-            ).from(
-                offset
-            ).size(
-                size
+
+        // Not enabled, returning an empty result set
+        if (!searchIndexer.enabled) {
+            return SearchNodeResults(
+                items = emptyList(),
+                offset = 0,
+                total = 0,
+                message = "Search index '${searchIndexer.indexName}' is disabled."
             )
-        ).run {
-            indexName?.let {
-                indices(indexName)
-            } ?: this
         }
 
+        val searchRequest = ESSearchRequestBuilder().apply {
+            index(searchIndexer.indexName)
+            from(offset)
+            size(size)
+            // Allow partial search results even if some shards fail
+            allowPartialSearchResults(true)
+            query { q ->
+                searchIndexer.buildQuery(q, token)
+            }
+        }.build()
+
         // Getting the result of the search
-        val response = client.search(esRequest, RequestOptions.DEFAULT)
+        val response = try {
+            client.search(searchRequest, Map::class.java)
+        } catch (ex: ElasticsearchException) {
+            // If search fails (e.g., all shards failed on empty index), return empty results
+            logger.warn("Search failed for index '${searchIndexer.indexName}': ${ex.message}")
+            return SearchNodeResults(
+                items = emptyList(),
+                offset = 0,
+                total = 0,
+                message = "Search temporarily unavailable for this result type: ${searchIndexer.indexerId}"
+            )
+        }
 
         // Pagination information
-        val responseHits = response.hits
-        val totalHits = responseHits.totalHits?.value ?: 0
+        val responseHits = response.hits()
+        val totalHits = responseHits.total()?.value() ?: 0
 
         // Hits as JSON nodes
-        val hits = responseHits.hits.map {
-            SearchResultNode(
-                it.index,
-                it.id,
-                it.score.toDouble(),
-                it.sourceAsMap
-            )
+        @Suppress("UNCHECKED_CAST")
+        val hits = responseHits.hits().mapNotNull { hit ->
+            val id = hit.id()
+            if (id != null) {
+                SearchResultNode(
+                    index = hit.index(),
+                    id = id,
+                    score = hit.score() ?: 0.0,
+                    source = hit.source() as Map<String, Any?>
+                )
+            } else {
+                null
+            }
         }
 
         // Transforming into search results
@@ -96,6 +125,7 @@ class ElasticSearchServiceImpl(
     override val searchResultTypes: List<SearchResultType>
         get() =
             indexers
+                .filter { (_, indexer) -> indexer.enabled }
                 .mapNotNull { (_, indexer) -> indexer.searchResultType }
                 .sortedBy { it.order }
 

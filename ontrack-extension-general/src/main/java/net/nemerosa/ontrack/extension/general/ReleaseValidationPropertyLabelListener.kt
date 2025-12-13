@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class ReleaseValidationPropertyLabelListener(

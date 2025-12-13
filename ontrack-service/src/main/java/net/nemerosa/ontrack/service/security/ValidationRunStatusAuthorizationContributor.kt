@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.service.security
 
+import net.nemerosa.ontrack.model.security.AuthenticatedUser
 import net.nemerosa.ontrack.model.security.Authorization
 import net.nemerosa.ontrack.model.security.AuthorizationContributor
-import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.ValidationRunStatus
 import org.springframework.stereotype.Component
@@ -18,7 +18,7 @@ class ValidationRunStatusAuthorizationContributor(
 
     override fun appliesTo(context: Any): Boolean = context is ValidationRunStatus
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> {
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> {
         val status = context as ValidationRunStatus
         return listOf(
             Authorization(

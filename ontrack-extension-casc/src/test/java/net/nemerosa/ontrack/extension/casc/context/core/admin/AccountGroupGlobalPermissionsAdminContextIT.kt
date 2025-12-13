@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.casc.context.core.admin
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
@@ -12,6 +11,7 @@ import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 
 internal class AccountGroupGlobalPermissionsAdminContextIT : AbstractCascTestSupport() {

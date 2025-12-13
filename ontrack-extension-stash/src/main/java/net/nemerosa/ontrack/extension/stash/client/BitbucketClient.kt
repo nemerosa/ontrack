@@ -106,6 +106,18 @@ interface BitbucketClient {
     fun getCommits(repo: BitbucketRepository, fromCommit: String, toCommit: String): List<BitbucketServerCommit>
 
     /**
+     * Gets information about a commit
+     *
+     * @param repository Repository
+     * @param commit Commit SHA
+     * @return Commit information or null if not found
+     */
+    fun getCommit(
+        repository: BitbucketRepository,
+        commit: String,
+    ): BitbucketServerCommit?
+
+    /**
      * Deletes a branch.
      *
      * @param repo Repository where the PR is
@@ -129,5 +141,10 @@ interface BitbucketClient {
      * @return Commit hash if the branch exists, null otherwise.
      */
     fun geBranchLastCommit(repo: BitbucketRepository, branch: String): String?
+
+    /**
+     * Given a commit, returns the list of branches where this commit is present.
+     */
+    fun getBranchesForCommit(repo: BitbucketRepository, commit: String): List<String>
 
 }

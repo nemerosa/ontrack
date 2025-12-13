@@ -1,19 +1,10 @@
 rootProject.name = "ontrack"
 
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-    }
-}
-
 include(":ontrack-common")
 include(":ontrack-json")
 include(":ontrack-test-utils")
 include(":ontrack-model")
-include(":ontrack-client")
 include(":ontrack-job")
-include(":ontrack-dsl-v4")
-include(":ontrack-dsl-shell")
 include(":ontrack-git")
 include(":ontrack-extension-api")
 include(":ontrack-extension-support")
@@ -28,10 +19,8 @@ include(":ontrack-tx")
 include(":ontrack-ui")
 include(":ontrack-ui-graphql")
 include(":ontrack-ui-support")
-include(":ontrack-web")
 include(":ontrack-web-core")
 include(":ontrack-web-tests")
-include(":ontrack-acceptance")
 include(":ontrack-docs")
 
 // KDSL
@@ -39,12 +28,9 @@ include(":ontrack-kdsl")
 include(":ontrack-kdsl-acceptance")
 
 // Core extensions
-include(":ontrack-extension-ldap")
-include(":ontrack-extension-oidc")
 include(":ontrack-extension-artifactory")
 include(":ontrack-extension-general")
 include(":ontrack-extension-issues")
-include(":ontrack-extension-combined")
 include(":ontrack-extension-jenkins")
 include(":ontrack-extension-jira")
 include(":ontrack-extension-scm")
@@ -72,3 +58,4 @@ include(":ontrack-extension-hook")
 include(":ontrack-extension-queue")
 include(":ontrack-extension-workflows")
 include(":ontrack-extension-environments")
+include(":ontrack-extension-config")

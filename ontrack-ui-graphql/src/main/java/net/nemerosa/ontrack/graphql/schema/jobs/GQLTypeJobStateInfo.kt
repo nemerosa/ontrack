@@ -23,7 +23,7 @@ class GQLTypeJobStateInfo : GQLType {
                     .description("Name of the state")
                     .type(GraphQLString.toNotNull())
                     .dataFetcher { env ->
-                        val state: JobState = env.getSource()
+                        val state: JobState = env.getSource()!!
                         state.name
                     }
             }

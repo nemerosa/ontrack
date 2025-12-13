@@ -1,10 +1,9 @@
-import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
-
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
 
-apply<OntrackExtensionPlugin>()
+configurations.create("testRuntimeExport")
 
 dependencies {
     api(project(":ontrack-extension-scm"))
@@ -15,38 +14,26 @@ dependencies {
 
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-repository-support"))
+    implementation(project(":ontrack-extension-config"))
     implementation("org.springframework:spring-tx")
     implementation("commons-io:commons-io")
     implementation("org.apache.commons:commons-lang3")
     implementation("io.micrometer:micrometer-core")
 
     testImplementation(project(":ontrack-it-utils"))
-    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-issues", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
+    testImplementation(testFixtures(project(":ontrack-extension-api")))
+    testImplementation(testFixtures(project(":ontrack-extension-issues")))
+    testImplementation(testFixtures(project(":ontrack-ui-graphql")))
+
+    testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")
+    testFixturesImplementation(project(":ontrack-test-utils"))
+    testFixturesImplementation(project(":ontrack-it-utils"))
+    testFixturesImplementation(testFixtures(project(":ontrack-ui-graphql")))
+    testFixturesImplementation(testFixtures(project(":ontrack-extension-api")))
+    testFixturesImplementation(testFixtures(project(":ontrack-extension-issues")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
+
     testRuntimeOnly("org.springframework.boot:spring-boot-starter-web")
-}
-
-val testJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("tests")
-    from(sourceSets["test"].output)
-}
-
-configure<PublishingExtension> {
-    publications {
-        maybeCreate<MavenPublication>("mavenCustom").artifact(tasks["testJar"])
-    }
-}
-
-tasks["assemble"].dependsOn("testJar")
-
-val tests by configurations.creating
-
-artifacts {
-    add("tests", testJar)
 }

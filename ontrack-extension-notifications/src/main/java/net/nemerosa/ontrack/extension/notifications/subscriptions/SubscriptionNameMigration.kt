@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import net.nemerosa.ontrack.model.support.StartupService
 import net.nemerosa.ontrack.model.support.StorageService
-import net.nemerosa.ontrack.model.support.retrieve
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 

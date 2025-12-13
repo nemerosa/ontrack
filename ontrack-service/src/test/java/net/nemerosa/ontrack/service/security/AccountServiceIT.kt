@@ -1,119 +1,14 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.*
-import org.junit.Test
-import org.springframework.security.access.AccessDeniedException
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class AccountServiceIT : AbstractDSLTestJUnit4Support() {
-
-    @Test
-    fun `Creating a disabled account`() {
-        val account = doCreateAccount(disabled = true)
-        assertTrue(account.disabled, "Account is disabled")
-    }
-
-    @Test
-    fun `Creating a locked account`() {
-        val account = doCreateAccount(locked = true)
-        assertTrue(account.locked, "Account is locked")
-    }
-
-    @Test
-    fun `Disabling an account using update`() {
-        val account = doCreateAccount()
-        asUserWith<AccountManagement> {
-            accountService.updateAccount(account.id, AccountInput(
-                name = account.name,
-                fullName = account.fullName,
-                email = account.email,
-                password = "test",
-                groups = emptyList(),
-                disabled = true,
-                locked = false
-            )).let {
-                assertEquals(true, it.disabled, "Account is now disabled")
-            }
-        }
-    }
-
-    @Test
-    fun `Locking an account using update`() {
-        val account = doCreateAccount()
-        asUserWith<AccountManagement> {
-            accountService.updateAccount(account.id, AccountInput(
-                name = account.name,
-                fullName = account.fullName,
-                email = account.email,
-                password = "test",
-                groups = emptyList(),
-                disabled = false,
-                locked = true
-            )).let {
-                assertEquals(true, it.locked, "Account is now locked")
-            }
-        }
-    }
-
-    @Test
-    fun `Disabling an account`() {
-        val account = doCreateAccount()
-        assertFalse(account.disabled, "Accounts are enabled by default")
-        asAdmin {
-            accountService.setAccountDisabled(account.id, true)
-            assertTrue(accountService.getAccount(account.id).disabled, "Account is disabled")
-            accountService.setAccountDisabled(account.id, false)
-            assertFalse(accountService.getAccount(account.id).disabled, "Account is enabled")
-        }
-    }
-
-    @Test
-    fun `Locking an account`() {
-        val account = doCreateAccount()
-        assertFalse(account.locked, "Accounts are unlocked by default")
-        asAdmin {
-            accountService.setAccountLocked(account.id, true)
-            assertTrue(accountService.getAccount(account.id).locked, "Account is locked")
-            accountService.setAccountLocked(account.id, false)
-            assertFalse(accountService.getAccount(account.id).locked, "Account is unlocked")
-        }
-    }
-
-    @Test
-    fun `Disabling an account is granted to admin only`() {
-        val account = doCreateAccount()
-        asUserWith<AccountManagement> {
-            accountService.setAccountDisabled(account.id, true)
-        }
-        asUser {
-            assertFailsWith<AccessDeniedException> {
-                accountService.setAccountDisabled(account.id, false)
-            }
-        }
-        asAdmin {
-            assertTrue(accountService.getAccount(account.id).disabled, "Account is disabled")
-        }
-    }
-
-    @Test
-    fun `Locking an account is granted to admin only`() {
-        val account = doCreateAccount()
-        asUserWith<AccountManagement> {
-            accountService.setAccountLocked(account.id, true)
-        }
-        asUser {
-            assertFailsWith<AccessDeniedException> {
-                accountService.setAccountLocked(account.id, false)
-            }
-        }
-        asAdmin {
-            assertTrue(accountService.getAccount(account.id).locked, "Account is locked")
-        }
-    }
+class AccountServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Account groups can be created with any character`() {
@@ -129,6 +24,7 @@ class AccountServiceIT : AbstractDSLTestJUnit4Support() {
     }
 
     @Test
+    @AsAdminTest
     fun account_with_no_role() {
         project {
             asUser().call {
@@ -141,6 +37,7 @@ class AccountServiceIT : AbstractDSLTestJUnit4Support() {
     }
 
     @Test
+    @AsAdminTest
     fun account_with_global_role_controller() {
         project {
             asGlobalRole(Roles.GLOBAL_CONTROLLER) {
@@ -153,6 +50,7 @@ class AccountServiceIT : AbstractDSLTestJUnit4Support() {
     }
 
     @Test
+    @AsAdminTest
     fun account_with_global_role_controller_on_group() {
         // Setup
         val accountGroup = doCreateAccountGroupWithGlobalRole(Roles.GLOBAL_CONTROLLER)
@@ -173,6 +71,7 @@ class AccountServiceIT : AbstractDSLTestJUnit4Support() {
      * Regression test for #427
      */
     @Test
+    @AsAdminTest
     fun admin_can_delete_promotion_run() {
         project {
             asAdmin {

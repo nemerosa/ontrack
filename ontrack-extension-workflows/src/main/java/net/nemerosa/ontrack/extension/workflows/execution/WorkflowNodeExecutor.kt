@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.workflows.execution
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.extension.Extension
 
 /**
@@ -36,5 +37,8 @@ interface WorkflowNodeExecutor : Extension {
         workflowNodeId: String,
         workflowNodeExecutorResultFeedback: (output: JsonNode?) -> Unit,
     ): WorkflowNodeExecutorResult
+
+    @APIDescription("Checks if this node executor is enabled.")
+    val enabled: Boolean get() = true
 
 }

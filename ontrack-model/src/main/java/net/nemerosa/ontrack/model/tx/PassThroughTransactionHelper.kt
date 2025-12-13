@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
  * current transaction and does not create a new one.
  */
 @Component
-@Profile(RunProfile.UNIT_TEST)
+@Profile(RunProfile.DEV)
 class PassThroughTransactionHelper : TransactionHelper {
 
     override fun <T : Any> inNewTransaction(code: () -> T): T {

@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.model.form.MultiSelection
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.BranchCloneRequest
 import net.nemerosa.ontrack.model.structure.Build
@@ -15,6 +15,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class AutoPromotionPropertyIT : AbstractDSLTestSupport() {
 
     @Autowired
@@ -346,23 +347,6 @@ class AutoPromotionPropertyIT : AbstractDSLTestSupport() {
                             it.promotionLevels.map { pl -> pl.id }
                     )
                 }
-            }
-        }
-    }
-
-    @Test
-    fun `Auto promotion cannot use itself as a dependency`() {
-        project {
-            branch {
-                val iron = promotionLevel()
-                val silver = promotionLevel()
-                val gold = promotionLevel()
-                // Gets the edition form...
-                val form = autoPromotionPropertyType.getEditionForm(gold, null)
-                // ... and checks that all promotion levels are available but the one being configured
-                val field = form.getField("promotionLevels") as MultiSelection
-                val promotions = field.items.map { it.id }
-                assertEquals(listOf(iron.id().toString(), silver.id().toString()), promotions)
             }
         }
     }

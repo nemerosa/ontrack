@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.extension.av.config
 
+import net.nemerosa.ontrack.model.ordering.BranchOrderingService
 import net.nemerosa.ontrack.model.structure.*
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 /**
@@ -12,16 +11,19 @@ import org.springframework.stereotype.Component
 class RegexBranchSource(
     private val structureService: StructureService,
     private val branchDisplayNameService: BranchDisplayNameService,
+    private val branchOrderingService: BranchOrderingService,
 ) : AbstractBranchSource("regex") {
 
-    private val logger: Logger = LoggerFactory.getLogger(this.javaClass)
-
-    private val ordering = OptionalVersionBranchOrdering(branchDisplayNameService)
-
-    override fun getLatestBranch(config: String?, project: Project, targetBranch: Branch, promotion: String, includeDisabled: Boolean): Branch? {
+    override fun getLatestBranch(
+        config: String?,
+        project: Project,
+        targetBranch: Branch,
+        promotion: String,
+        includeDisabled: Boolean
+    ): Branch? {
         val sourceRegex = config?.toRegex() ?: throw BranchSourceMissingConfigurationException(id)
         // Version-based ordering
-        val versionComparator = ordering.getComparator(config)
+        val versionComparator = branchOrderingService.getRegexVersionComparator(sourceRegex)
         // Gets the list of branches for the source project
         val allBranches = structureService.getBranchesForProject(project.id)
         val filteredBranches = if (includeDisabled) {

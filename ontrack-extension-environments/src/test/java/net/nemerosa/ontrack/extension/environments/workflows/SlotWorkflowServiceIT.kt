@@ -9,11 +9,13 @@ import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.workflows.WorkflowTestSupport
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
 @QueueNoAsync
+@AsAdminTest
 class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
@@ -243,7 +245,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             assertEquals(WorkflowInstanceStatus.ERROR, overriddenInstance.workflowInstance.status)
             assertNotNull(overriddenInstance.override) {
                 assertEquals("The workflow failed, but we want to carry on", it.message)
-                assertEquals("admin", it.user)
+                assertEquals(securityService.currentUser?.name, it.user)
                 assertNotNull(it.timestamp, "Timestamp has been set")
             }
 

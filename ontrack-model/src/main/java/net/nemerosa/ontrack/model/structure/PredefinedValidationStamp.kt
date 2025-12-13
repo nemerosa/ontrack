@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import javax.validation.constraints.Size
+import jakarta.validation.constraints.Size
 
 /**
  * Validation stamp defined at global level, allowing some projects to create them automatically.

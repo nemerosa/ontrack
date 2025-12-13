@@ -1,14 +1,14 @@
-import {test} from "@playwright/test";
 import {createPipelineWithPromotionRule} from "./admissionRulesFixtures";
 import {login} from "../../core/login";
 import {PipelinePage} from "./PipelinePage";
+import {test} from "../../fixtures/connection";
 
-test('overriding a rule', async ({page}) => {
-    const {pipeline, ruleConfigId} = await createPipelineWithPromotionRule({})
+test('overriding a rule', async ({page, ontrack}) => {
+    const {pipeline, ruleConfigId} = await createPipelineWithPromotionRule(ontrack, {})
 
-    await login(page)
+    await login(page, ontrack)
 
-    const pipelinePage = new PipelinePage(page, pipeline)
+    const pipelinePage = new PipelinePage(page, pipeline, ontrack)
     await pipelinePage.goTo()
 
     // We cannot deploy because build is not promoted

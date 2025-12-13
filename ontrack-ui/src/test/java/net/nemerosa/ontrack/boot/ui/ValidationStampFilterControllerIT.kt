@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.ValidationStampFilter
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
@@ -24,8 +24,8 @@ class ValidationStampFilterControllerIT : AbstractWebTestSupport() {
                     validationStamp("VS$it")
                 }
                 // Creates a new validation stamp filter...
-                val filter: ValidationStampFilter = asUser().with(this, ProjectConfig::class.java).call {
-                    controller.createBranchValidationStampFilterForm(id, nd(name, ""))
+                val filter: ValidationStampFilter = asUser().withProjectFunction(this, ProjectConfig::class.java).call {
+                    controller.createBranchValidationStampFilterForm(id, nd(name, "")).body!!
                 }
                 // Checks that all validation stamps names are included
                 assertEquals(

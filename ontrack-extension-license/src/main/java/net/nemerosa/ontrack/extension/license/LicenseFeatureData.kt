@@ -6,4 +6,6 @@ data class LicenseFeatureData(
     val id: String,
     val enabled: Boolean,
     val data: List<NameValue>,
-)
+) {
+    fun findValue(name: String) = data.find { it.name == name }?.value
+}

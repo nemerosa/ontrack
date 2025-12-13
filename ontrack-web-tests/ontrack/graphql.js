@@ -11,12 +11,13 @@ export const graphQLCallMutation = async (connection, userNode, query, variables
 }
 
 export const graphQLCall = async (connection, query, variables = {}) => {
-    const username = connection.credentials.username
-    const password = connection.credentials.password
+    const token = connection.token
+    if (!token) {
+        throw new Error("No token is available in the connection.")
+    }
 
-    const token = btoa(`${username}:${password}`)
     const headers = {
-        Authorization: `Basic ${token}`,
+        'X-Ontrack-Token': token,
     }
 
     const client = new GraphQLClient(

@@ -60,7 +60,7 @@ class AutoVersioningWorkflowNodeExecutor(
         workflowNodeExecutorResultFeedback(output.asJson())
 
         // Starting the audit trail
-        autoVersioningAuditService.onQueuing(order, routing = "")
+        autoVersioningAuditService.onCreated(order)
 
         // Actual auto-versioning process
         val outcome = autoVersioningProcessingService.process(order)
@@ -121,6 +121,7 @@ class AutoVersioningWorkflowNodeExecutor(
             prBodyTemplate = resolvedData.prBodyTemplate,
             prBodyTemplateFormat = resolvedData.prBodyTemplateFormat,
             additionalPaths = resolvedData.additionalPaths,
+            schedule = null,
         )
     }
 

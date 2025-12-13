@@ -1,16 +1,18 @@
 import {Drawer, Menu, Typography} from "antd";
 import {useContext, useEffect, useState} from "react";
 import {UserContext} from "@components/providers/UserProvider";
-import {legacyGraphiQLUri} from "@components/common/Links";
 import {
     FaBars,
+    FaBitbucket,
     FaCertificate,
     FaCode,
     FaCog,
     FaCogs,
-    FaDoorOpen,
     FaExpandArrowsAlt,
+    FaFileDownload,
     FaGithub,
+    FaGitlab,
+    FaHeartbeat,
     FaInfo,
     FaJenkins,
     FaJira,
@@ -20,19 +22,23 @@ import {
     FaMedal,
     FaPaperPlane,
     FaProjectDiagram,
+    FaReceipt,
     FaServer,
     FaSignOutAlt,
     FaStamp,
     FaTag,
     FaUser,
+    FaUserCog,
+    FaUsers,
     FaWrench
 } from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
-import {useLogout} from "@components/providers/ConnectionContextProvider";
-import LegacyLink from "@components/common/LegacyLink";
 import UserMenuItemLink from "@components/layouts/UserMenuItemLink";
 import {useRefData} from "@components/providers/RefDataProvider";
 import SonarqubeIcon from "@components/extension/sonarqube/SonarqubeIcon";
+import {signOut} from "next-auth/react";
+import Link from "next/link";
+import TFCIcon from "@components/extension/tfc/TFCIcon";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -53,7 +59,7 @@ export const groupIcons = {
 
 export default function UserMenu({userMenu}) {
 
-    const logout = useLogout()
+    const logout = () => signOut()
 
     const {toggleExpansion} = useContext(MainLayoutContext)
     const {version} = useRefData()
@@ -68,8 +74,12 @@ export default function UserMenu({userMenu}) {
     const itemIcons = {
         'core/config/predefined-promotion-levels': <FaMedal/>,
         'core/config/predefined-validation-stamps': <FaStamp/>,
+        'core/admin/account-management': <FaUsers/>,
+        'core/admin/health': <FaHeartbeat/>,
         'core/admin/jobs': <FaCogs/>,
         'core/admin/settings': <FaWrench/>,
+        'core/admin/userProfile': <FaUserCog/>,
+        'core/ref/resources': <FaFileDownload/>,
         'extension/jenkins/configurations': <FaJenkins/>,
         'extension/github/configurations': <FaGithub/>,
         'extension/jira/configurations': <FaJira/>,
@@ -82,12 +92,19 @@ export default function UserMenu({userMenu}) {
         'extension/casc/casc': <FaCode/>,
         'extension/queue/records': <FaBars/>,
         'extension/sonarqube/configurations': <SonarqubeIcon/>,
+        'extension/stash/configurations': <FaBitbucket/>,
+        'extension/bitbucket-cloud/configurations': <FaBitbucket/>,
+        'extension/gitlab/configurations': <FaGitlab/>,
+        'extension/notifications/webhooks': <FaPaperPlane/>,
+        'extension/hook/hook-records': <FaReceipt/>,
+        'extension/tfc/configurations': <TFCIcon/>,
+        'extension/github/ingestion/hook-payloads': <FaGithub/>,
     }
 
     useEffect(() => {
         const menu = []
         // All groups
-        user.userMenuGroups.forEach(group => {
+        user?.userMenuGroups?.forEach(group => {
             menu.push({
                 key: group.id,
                 label: group.name,
@@ -105,19 +122,13 @@ export default function UserMenu({userMenu}) {
         // GraphiQL
         menu.push({
             key: 'graphiql',
-            label: <LegacyLink href={legacyGraphiQLUri()}>GraphiQL</LegacyLink>,
+            label: <Link href="/graphiql">GraphiQL</Link>,
             title: "GraphQL IDE",
             icon: <FaCode/>,
         })
         // Separator
         menu.push({
             type: 'divider',
-        })
-        // Adding predefined "Legacy UI"
-        menu.push({
-            key: 'legacy',
-            label: <LegacyLink href="/">Legacy UI</LegacyLink>,
-            icon: <FaDoorOpen/>,
         })
         // Full view toggle
         menu.push({
@@ -136,9 +147,7 @@ export default function UserMenu({userMenu}) {
             key: 'logout',
             label: "Sign out",
             icon: <FaSignOutAlt/>,
-            onClick: () => {
-                if (logout) logout.call()
-            },
+            onClick: logout,
         })
         // Version
         menu.push({

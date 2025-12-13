@@ -5,8 +5,8 @@ import {buildBreadcrumbs} from "@components/common/Breadcrumbs";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {CloseCommand, Command, LegacyLinkCommand} from "@components/common/Commands";
-import {branchUri, buildLegacyUri, buildLinksUri} from "@components/common/Links";
+import {CloseCommand, Command} from "@components/common/Commands";
+import {branchUri, buildLinksUri} from "@components/common/Links";
 import {
     gqlDecorationFragment,
     gqlInformationFragment,
@@ -27,6 +27,8 @@ import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import {useRefresh} from "@components/common/RefreshUtils";
 import BuildDeleteCommand from "@components/builds/BuildDeleteCommand";
 import {isAuthorized} from "@components/common/authorizations";
+import PreviousBuildCommand from "@components/builds/PreviousBuildCommand";
+import NextBuildCommand from "@components/builds/NextBuildCommand";
 
 export default function BuildView({id}) {
 
@@ -81,6 +83,16 @@ export default function BuildView({id}) {
                                 action
                                 authorized
                             }
+                            previousBuild {
+                                id
+                                name
+                                displayName
+                            }
+                            nextBuild {
+                                id
+                                name
+                                displayName
+                            }
                         }
                     }
 
@@ -89,11 +101,19 @@ export default function BuildView({id}) {
                     ${gqlInformationFragment}
                     ${gqlUserMenuActionFragment}
                 `,
-                {id}
+                {id: Number(id)}
             ).then(data => {
                 setBuild(data.build)
                 setLoadingBuild(false)
                 const commands = [
+                    <PreviousBuildCommand
+                        key="previous"
+                        previousBuild={data.build.previousBuild}
+                    />,
+                    <NextBuildCommand
+                        key="previous"
+                        nextBuild={data.build.nextBuild}
+                    />,
                     <UserMenuActions
                         key="tools"
                         actions={data.build.userMenuActions}
@@ -106,7 +126,7 @@ export default function BuildView({id}) {
                         title="Displays downstream and upstream dependencies"
                     />,
                 ]
-                if (isAuthorized(build, "build", "edit")) {
+                if (isAuthorized(data.build, "build", "edit")) {
                     commands.push(
                         <EditBuildCommand
                             build={data.build}
@@ -116,12 +136,6 @@ export default function BuildView({id}) {
                     )
                 }
                 commands.push(
-                    <LegacyLinkCommand
-                        key="legacy"
-                        href={buildLegacyUri(data.build)}
-                        text="Legacy build"
-                        title="Goes to the legacy build page"
-                    />,
                     <StoredGridLayoutResetCommand key="reset"/>,
                 )
                 if (isAuthorized(data.build, "build", "delete")) {

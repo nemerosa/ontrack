@@ -224,7 +224,7 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
                     what = "Pipeline message",
                     target = mockChannelTarget,
                     expectedMessage = """
-                        Build <a href="http://localhost:8080/#/build/${build.id}">${build.name}</a> has started its deployment at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
+                        Build <a href="http://localhost:3000/build/${build.id}">${build.name}</a> has started its deployment at <a href="http://localhost:3000/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
                     """.trimIndent().trim()
                 )
             }
@@ -329,10 +329,10 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
                 assertEquals(
                     listOf(
                         """
-                            Build <a href="http://localhost:8080/#/build/${build.id}">${build.name}</a> has started its deployment at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
+                            Build <a href="http://localhost:3000/build/${build.id}">${build.name}</a> has started its deployment at <a href="http://localhost:3000/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
                         """.trimIndent().trim(),
                         """
-                            Build <a href="http://localhost:8080/#/build/${build.id}">${build.name}</a> has been deployed at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
+                            Build <a href="http://localhost:3000/build/${build.id}">${build.name}</a> has been deployed at <a href="http://localhost:3000/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
                         """.trimIndent().trim(),
                     ),
                     messages.map { it.trim() }

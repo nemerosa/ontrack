@@ -12,6 +12,9 @@ import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project.Companion.of
 import net.nemerosa.ontrack.model.structure.PromotionRun.Companion.of
 import net.nemerosa.ontrack.model.structure.Signature.Companion.of
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.repository.AccountGroupRepository
+import net.nemerosa.ontrack.repository.AccountRepository
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.TestingAuthenticationToken
@@ -24,7 +27,16 @@ import java.util.concurrent.Callable
 abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     @Autowired
+    protected lateinit var ontrackConfigProperties: OntrackConfigProperties
+
+    @Autowired
     protected lateinit var accountService: AccountService
+
+    @Autowired
+    private lateinit var accountRepository: AccountRepository
+
+    @Autowired
+    private lateinit var accountGroupRepository: AccountGroupRepository
 
     @Autowired
     protected lateinit var structureService: StructureService
@@ -44,13 +56,18 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     @Autowired
     protected lateinit var rolesService: RolesService
 
-    protected fun doCreateAccountGroup(): AccountGroup {
-        return asUser().with(AccountGroupManagement::class.java).call {
-            val name = uid("G")
-            accountService.createGroup(
-                    AccountGroupInput(name, "")
-            )
-        }
+    @Autowired
+    protected lateinit var accountACLService: AccountACLService
+
+    @Autowired
+    private lateinit var securityTestSupport: SecurityTestSupport
+
+    protected fun doCreateAccountGroup(
+        name: String = uid("G"),
+    ): AccountGroup {
+        return accountService.createGroup(
+            AccountGroupInput(name, "")
+        )
     }
 
     protected fun doCreateAccount(accountGroup: AccountGroup): Account {
@@ -59,142 +76,119 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     protected fun doCreateAccount(
         accountGroups: List<AccountGroup> = emptyList(),
-        disabled: Boolean = false,
-        locked: Boolean = false,
+        email: String = "${uid("A")}@test.com",
     ): Account {
-        return asUser().with(AccountManagement::class.java).call {
-            val name = uid("A")
-            accountService.create(
-                    AccountInput(
-                            name,
-                            "Test $name",
-                            "$name@test.com",
-                            "test",
-                            accountGroups.map { it.id() },
-                            disabled = disabled,
-                            locked = locked,
-                    )
+        return accountService.create(
+            AccountInput(
+                "Test $email",
+                email,
+                accountGroups.map { it.id() },
             )
-        }
+        )
     }
 
     protected fun doCreateAccountWithGlobalRole(role: String): Account {
         val account = doCreateAccount()
-        return asUser().with(AccountManagement::class.java).call {
-            accountService.saveGlobalPermission(
-                    PermissionTargetType.ACCOUNT,
-                    account.id(),
-                    PermissionInput(role)
-            )
-            account
-        }
+        accountService.saveGlobalPermission(
+            PermissionTargetType.ACCOUNT,
+            account.id(),
+            PermissionInput(role)
+        )
+        return account
     }
 
     protected fun doCreateAccountWithProjectRole(project: Project, role: String): Account {
         val account = doCreateAccount()
-        return asUser().with(project, ProjectAuthorisationMgt::class.java).call {
-            accountService.saveProjectPermission(
-                    project.id,
-                    PermissionTargetType.ACCOUNT,
-                    account.id(),
-                    PermissionInput(role)
-            )
-            account
-        }
+        accountService.saveProjectPermission(
+            project.id,
+            PermissionTargetType.ACCOUNT,
+            account.id(),
+            PermissionInput(role)
+        )
+        return account
     }
 
     protected fun doCreateAccountGroupWithGlobalRole(role: String): AccountGroup {
         val group = doCreateAccountGroup()
-        return asUser().with(AccountGroupManagement::class.java).call {
-            accountService.saveGlobalPermission(
-                    PermissionTargetType.GROUP,
-                    group.id(),
-                    PermissionInput(role)
-            )
-            group
-        }
+        accountService.saveGlobalPermission(
+            PermissionTargetType.GROUP,
+            group.id(),
+            PermissionInput(role)
+        )
+        return group
     }
 
     fun <T> setProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>, data: T) {
-        asUser().with(projectEntity, ProjectEdit::class.java).execute(Runnable {
-            propertyService.editProperty(
-                    projectEntity,
-                    propertyTypeClass,
-                    data
-            )
-        }
+        propertyService.editProperty(
+            projectEntity,
+            propertyTypeClass,
+            data
         )
     }
 
-    protected fun <T> deleteProperty(projectEntity: ProjectEntity?, propertyTypeClass: Class<out PropertyType<T>>) {
-        asUser().with(projectEntity!!, ProjectEdit::class.java).execute(Runnable {
-            propertyService.deleteProperty(
-                    projectEntity,
-                    propertyTypeClass
-            )
-        }
+    protected fun <T> deleteProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>) {
+        propertyService.deleteProperty(
+            projectEntity,
+            propertyTypeClass
         )
     }
 
     protected fun <T> getProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): T {
-        return asUser().with(projectEntity, ProjectEdit::class.java).call {
-            propertyService.getProperty(
-                    projectEntity,
-                    propertyTypeClass
-            ).value
-        }
+        return propertyService.getProperty(
+            projectEntity,
+            propertyTypeClass
+        ).value
     }
 
     @JvmOverloads
     protected fun doCreateProject(nameDescription: NameDescription = nameDescription()): Project {
-        return asUser().with(ProjectCreation::class.java).call {
-            structureService.newProject(
-                    of(nameDescription)
-            )
-        }
+        return structureService.newProject(
+            of(nameDescription)
+        )
     }
 
     @JvmOverloads
-    protected fun doCreateBranch(project: Project = doCreateProject(), nameDescription: NameDescription = nameDescription()): Branch {
-        return asUser().with(project.id(), BranchCreate::class.java).call {
-            structureService.newBranch(
-                    of(project, nameDescription)
-            )
-        }
+    protected fun doCreateBranch(
+        project: Project = doCreateProject(),
+        nameDescription: NameDescription = nameDescription()
+    ): Branch {
+        return structureService.newBranch(
+            of(project, nameDescription)
+        )
     }
 
     @JvmOverloads
-    fun doCreateBuild(branch: Branch = doCreateBranch(), nameDescription: NameDescription = nameDescription(), signature: Signature = of("test")): Build {
-        return asUser().with(branch.projectId(), BuildCreate::class.java).call {
-            structureService.newBuild(
-                    of(
-                            branch,
-                            nameDescription,
-                            signature
-                    )
+    fun doCreateBuild(
+        branch: Branch = doCreateBranch(),
+        nameDescription: NameDescription = nameDescription(),
+        signature: Signature = of("test")
+    ): Build {
+        return structureService.newBuild(
+            of(
+                branch,
+                nameDescription,
+                signature
             )
-        }
+        )
     }
 
     @JvmOverloads
     fun doValidateBuild(
-            build: Build,
-            vs: ValidationStamp,
-            statusId: ValidationRunStatusID?,
-            runData: ValidationRunData<*>? = null
+        build: Build,
+        vs: ValidationStamp,
+        statusId: ValidationRunStatusID?,
+        runData: ValidationRunData<*>? = null
     ): ValidationRun {
-        return asUser().withView(build).with(build, ValidationRunCreate::class.java).call {
-            structureService.newValidationRun(
-                    build,
-                    ValidationRunRequest(
-                            vs.name,
-                            statusId,
-                            runData?.descriptor?.id,
-                            runData?.data,
-                            null
-                    )
+        return structureService.newValidationRun(
+            build,
+            ValidationRunRequest(
+                vs.name,
+                statusId,
+                runData?.descriptor?.id,
+                runData?.data,
+                null
             )
-        }
+        )
     }
 
     fun doValidateBuild(build: Build, vsName: String, statusId: ValidationRunStatusID): ValidationRun {
@@ -203,15 +197,16 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     @JvmOverloads
-    protected fun doCreatePromotionLevel(branch: Branch = doCreateBranch(), nameDescription: NameDescription = nameDescription()): PromotionLevel {
-        return asUser().with(branch.projectId(), PromotionLevelCreate::class.java).call {
-            structureService.newPromotionLevel(
-                    PromotionLevel.of(
-                            branch,
-                            nameDescription,
-                    )
+    protected fun doCreatePromotionLevel(
+        branch: Branch = doCreateBranch(),
+        nameDescription: NameDescription = nameDescription()
+    ): PromotionLevel {
+        return structureService.newPromotionLevel(
+            PromotionLevel.of(
+                branch,
+                nameDescription,
             )
-        }
+        )
     }
 
     protected fun doCreateValidationStamp(): ValidationStamp {
@@ -223,49 +218,49 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     @JvmOverloads
-    fun doCreateValidationStamp(branch: Branch, nameDescription: NameDescription, config: ValidationDataTypeConfig<*>? = null): ValidationStamp {
-        return asUser().with(branch.project.id(), ValidationStampCreate::class.java).call {
-            structureService.newValidationStamp(
-                    ValidationStamp.of(
-                            branch,
-                            nameDescription
-                    ).withDataType(config)
-            )
-        }
+    fun doCreateValidationStamp(
+        branch: Branch,
+        nameDescription: NameDescription,
+        config: ValidationDataTypeConfig<*>? = null
+    ): ValidationStamp {
+        return structureService.newValidationStamp(
+            ValidationStamp.of(
+                branch,
+                nameDescription
+            ).withDataType(config)
+        )
     }
 
     @JvmOverloads
-    protected fun doPromote(build: Build, promotionLevel: PromotionLevel, description: String?, signature: Signature = of("test")): PromotionRun {
-        return asUser()
-            .with(build.projectId(), PromotionRunCreate::class.java)
-            .with(build.projectId(), ProjectView::class.java)
-            .call {
-                structureService.newPromotionRun(
-                        of(
-                                build,
-                                promotionLevel,
-                                signature,
-                                description
-                        )
-                )
-            }
+    protected fun doPromote(
+        build: Build,
+        promotionLevel: PromotionLevel,
+        description: String?,
+        signature: Signature = of("test")
+    ): PromotionRun {
+        return structureService.newPromotionRun(
+            of(
+                build,
+                promotionLevel,
+                signature,
+                description
+            )
+        )
     }
 
     protected fun <T> doSetProperty(entity: ProjectEntity, propertyType: Class<out PropertyType<T>>, data: T) {
-        asUser().with(entity, ProjectEdit::class.java).call {
-            propertyService.editProperty(
-                    entity,
-                    propertyType,
-                    data
-            )
-        }
+        propertyService.editProperty(
+            entity,
+            propertyType,
+            data
+        )
     }
 
-    protected fun asUser(name: String = uid("U")): UserCall = UserCall(name = name)
+    protected fun asUser(email: String = uid("u-") + "@ontrack.local"): UserCall = UserCall(email = email)
 
-    protected fun asUserWithAuthenticationSource(authenticationSource: AuthenticationSource): UserCall = UserCall(authenticationSource = authenticationSource)
-
-    protected fun asAdmin(): AdminCall = AdminCall()
+    protected fun asAdmin() = FixedAccountCall(
+        account = securityTestSupport.createAdminAccount(),
+    )
 
     protected fun asAnonymous(): AnonymousCall {
         return AnonymousCall()
@@ -302,40 +297,46 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     /**
      * This must always be called from [withGrantViewToAll] or [withNoGrantViewToAll].
      */
-    private fun securitySettings(settings: SecuritySettings): SecuritySettings = asUser().with(GlobalSettings::class.java).call {
+    private fun securitySettings(settings: SecuritySettings): SecuritySettings {
         val old = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
         settingsManagerService.saveSettings(settings)
-        old
+        return old
     }
 
     private fun <T> withSettings(grantViewToAll: Boolean, grantParticipationToAll: Boolean = true, task: () -> T): T {
-        val old = securitySettings(SecuritySettings(
-                isGrantProjectViewToAll = grantViewToAll,
-                isGrantProjectParticipationToAll = grantParticipationToAll
-        ))
+        val old = asAdmin().call {
+            securitySettings(
+                SecuritySettings(
+                    isGrantProjectViewToAll = grantViewToAll,
+                    isGrantProjectParticipationToAll = grantParticipationToAll
+                )
+            )
+        }
         return try {
             task()
         } finally {
-            securitySettings(old)
+            asAdmin().call {
+                securitySettings(old)
+            }
         }
     }
 
     protected fun <T> withGrantViewToAll(task: () -> T): T = withSettings(
-            grantViewToAll = true,
-            grantParticipationToAll = true,
-            task = task
+        grantViewToAll = true,
+        grantParticipationToAll = true,
+        task = task
     )
 
     protected fun <T> withGrantViewAndNOParticipationToAll(task: () -> T): T = withSettings(
-            grantViewToAll = true,
-            grantParticipationToAll = false,
-            task = task
+        grantViewToAll = true,
+        grantParticipationToAll = false,
+        task = task
     )
 
     protected fun <T> withNoGrantViewToAll(task: () -> T): T = withSettings(
-            grantViewToAll = false,
-            grantParticipationToAll = true,
-            task = task
+        grantViewToAll = false,
+        grantParticipationToAll = true,
+        task = task
     )
 
     protected interface ContextCall {
@@ -377,31 +378,32 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         }
     }
 
-    open inner class AccountCall<T : AccountCall<T>>(
-            protected val account: Account
-    ) : AbstractContextCall() {
+    abstract inner class AuthenticatedUserCall : AbstractContextCall() {
 
         override fun contextSetup() {
-            val context: SecurityContext = SecurityContextImpl()
-            val ontrackAuthenticatedUser = createOntrackAuthenticatedUser()
-            val authentication = TestingAuthenticationToken(
-                    ontrackAuthenticatedUser,
-                    "",
-                    account.role.name
-            )
-            context.authentication = authentication
-            SecurityContextHolder.setContext(context)
+            val user = createOntrackAuthenticatedUser()
+            securityTestSupport.setupSecurityContext(user, securityRole)
         }
 
-        protected open fun createOntrackAuthenticatedUser(): OntrackAuthenticatedUser =
-                accountService.withACL(TestOntrackUser(account))
+        protected open val securityRole: SecurityRole = SecurityRole.USER
+
+        protected abstract fun createOntrackAuthenticatedUser(): AuthenticatedUser
+
+    }
+
+    open inner class AccountCall<T : AccountCall<T>>(
+        protected val account: Account
+    ) : AuthenticatedUserCall() {
+
+        override fun createOntrackAuthenticatedUser(): AuthenticatedUser =
+            securityTestSupport.createOntrackAuthenticatedUser(account = account)
 
     }
 
     protected inner class FixedAccountCall(account: Account) : AccountCall<FixedAccountCall>(account)
 
     open inner class ConfigurableAccountCall(
-            account: Account
+        account: Account
     ) : AccountCall<ConfigurableAccountCall>(account) {
 
         /**
@@ -451,38 +453,38 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
          * Grants the [ProjectView] function to this account and the project designated by the [entity][e].
          */
         fun withView(e: ProjectEntity): ConfigurableAccountCall {
-            return with(e, ProjectView::class.java)
+            return withProjectFunction(e, ProjectView::class.java)
         }
 
         override fun contextSetup() {
             val context: SecurityContext = SecurityContextImpl()
             val ontrackAuthenticatedUser = createOntrackAuthenticatedUser()
             val authentication = TestingAuthenticationToken(
-                    ontrackAuthenticatedUser,
-                    "",
-                    account.role.name
+                ontrackAuthenticatedUser,
+                "",
+                account.role.name
             )
             context.authentication = authentication
             SecurityContextHolder.setContext(context)
         }
 
-        override fun createOntrackAuthenticatedUser(): OntrackAuthenticatedUser {
+        override fun createOntrackAuthenticatedUser(): AuthenticatedUser {
             // Configures the account
             securityService.asAdmin {
                 // Creating a global role if some global functions are required
                 if (globalFunctions.isNotEmpty()) {
                     val globalRoleId = uid("GR")
                     rolesService.registerGlobalRole(
-                            id = globalRoleId,
-                            name = "Test role $globalRoleId",
-                            description = "Test role $globalRoleId",
-                            globalFunctions = globalFunctions.toList(),
-                            projectFunctions = emptyList()
+                        id = globalRoleId,
+                        name = "Test role $globalRoleId",
+                        description = "Test role $globalRoleId",
+                        globalFunctions = globalFunctions.toList(),
+                        projectFunctions = emptyList()
                     )
                     accountService.saveGlobalPermission(
-                            PermissionTargetType.ACCOUNT,
-                            account.id(),
-                            PermissionInput(globalRoleId)
+                        PermissionTargetType.ACCOUNT,
+                        account.id(),
+                        PermissionInput(globalRoleId)
                     )
                 }
                 // Project permissions
@@ -490,16 +492,16 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
                     if (functions.isNotEmpty()) {
                         val projectRoleId = uid("PR")
                         rolesService.registerProjectRole(
-                                id = projectRoleId,
-                                name = "Test role $projectRoleId",
-                                description = "Test role $projectRoleId",
-                                projectFunctions = functions.toList()
+                            id = projectRoleId,
+                            name = "Test role $projectRoleId",
+                            description = "Test role $projectRoleId",
+                            projectFunctions = functions.toList()
                         )
                         accountService.saveProjectPermission(
-                                of(projectId),
-                                PermissionTargetType.ACCOUNT,
-                                account.id(),
-                                PermissionInput(projectRoleId)
+                            of(projectId),
+                            PermissionTargetType.ACCOUNT,
+                            account.id(),
+                            PermissionInput(projectRoleId)
                         )
                     }
                 }
@@ -510,32 +512,16 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     protected inner class UserCall(
-        name: String = uid("U"),
-        authenticationSource: AuthenticationSource? = null,
+        email: String = uid("u-") + "@ontrack.local",
     ) : ConfigurableAccountCall(
-            securityService.asAdmin {
-                val accountInput = AccountInput(
-                    name,
-                    "$name von Test",
-                    "$name@test.com",
-                    "xxx",
-                    emptyList(),
-                    disabled = false,
-                    locked = false,
-                )
-                if (authenticationSource != null) {
-                    accountService.create(accountInput, authenticationSource)
-                } else {
-                    accountService.create(accountInput)
-                }
-            }
-    )
-
-    protected inner class AdminCall : AccountCall<AdminCall>(
-            // Loading the predefined admin account
-            securityService.asAdmin {
-                accountService.getAccount(of(1))
-            }
+        securityService.asAdmin {
+            val accountInput = AccountInput(
+                "$email von Test",
+                email,
+                emptyList(),
+            )
+            accountService.create(accountInput)
+        }
     )
 }
 

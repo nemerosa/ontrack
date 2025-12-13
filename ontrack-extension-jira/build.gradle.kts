@@ -1,10 +1,6 @@
-import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
-
 plugins {
     `java-library`
 }
-
-apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-issues"))
@@ -18,15 +14,13 @@ dependencies {
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(":ontrack-extension-scm"))
     testImplementation(project(":ontrack-extension-recordings"))
-    testImplementation(project(path = ":ontrack-extension-support", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation("com.networknt:json-schema-validator")
-    testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-notifications", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-recordings", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
+    testImplementation(testFixtures(project(":ontrack-ui-graphql")))
+    testImplementation(testFixtures(project(":ontrack-extension-casc")))
+    testImplementation(testFixtures(project(":ontrack-extension-notifications")))
+    testImplementation(testFixtures(project(":ontrack-extension-queue")))
+    testImplementation(testFixtures(project(":ontrack-extension-scm")))
+    testImplementation(testFixtures(project(":ontrack-extension-support")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

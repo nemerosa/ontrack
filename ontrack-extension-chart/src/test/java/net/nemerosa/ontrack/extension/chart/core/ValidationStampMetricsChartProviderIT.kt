@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.chart.GetChartOptions
 import net.nemerosa.ontrack.extension.general.validation.MetricsValidationData
 import net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.jupiter.api.Test
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@AsAdminTest
 class ValidationStampMetricsChartProviderIT : AbstractDSLTestSupport() {
 
     @Autowired

@@ -3,37 +3,36 @@ package net.nemerosa.ontrack.extension.general
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.MultiSelection
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import net.nemerosa.ontrack.model.structure.PromotionLevel
-import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.model.support.SelectableItem
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 /**
  * Definition of the "Promotion dependencies" property type.
  */
 @Component
 class PromotionDependenciesPropertyType(
-        extensionFeature: GeneralExtensionFeature,
-        private val structureService: StructureService
+        extensionFeature: GeneralExtensionFeature
 ) : AbstractPropertyType<PromotionDependenciesProperty>(extensionFeature) {
 
-    override fun getName(): String = "Promotion dependencies"
+    override val name: String = "Promotion dependencies"
 
-    override fun getDescription(): String =
+    override val description: String =
             "List of promotions a promotion depends on before being applied."
 
     /**
      * Only for promotions
      */
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> =
+    override val supportedEntityTypes: Set<ProjectEntityType> =
             setOf(ProjectEntityType.PROMOTION_LEVEL)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(PromotionDependenciesProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
             securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
@@ -41,34 +40,10 @@ class PromotionDependenciesPropertyType(
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean =
             true
 
-    override fun getEditionForm(entity: ProjectEntity, value: PromotionDependenciesProperty?): Form {
-        val promotion = entity as PromotionLevel
-        val promotions = structureService.getPromotionLevelListForBranch(
-                promotion.branch.id
-        )
-        return Form.create()
-                .with(
-                        MultiSelection.of("dependencies")
-                                .label("Dependencies")
-                                .help("List of promotions this promotion depends on.")
-                                .items(
-                                        promotions.filter {
-                                            it.id != promotion.id
-                                        }.map {
-                                            SelectableItem(
-                                                    it.name in (value?.dependencies ?: emptyList()),
-                                                    it.name,
-                                                    it.name
-                                            )
-                                        }
-                                )
-                )
-    }
-
     override fun fromClient(node: JsonNode): PromotionDependenciesProperty = fromStorage(node)
 
     override fun fromStorage(node: JsonNode): PromotionDependenciesProperty = node.parse()
 
-    override fun replaceValue(value: PromotionDependenciesProperty, replacementFunction: Function<String, String>): PromotionDependenciesProperty =
+    override fun replaceValue(value: PromotionDependenciesProperty, replacementFunction: (String) -> String): PromotionDependenciesProperty =
             value
 }

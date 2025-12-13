@@ -10,7 +10,7 @@ package net.nemerosa.ontrack.model.structure
  */
 class SearchRequest @JvmOverloads constructor(
         val token: String,
-        val type: String? = null,
+        val type: String,
         val offset: Int = 0,
         val size: Int = 10
 )

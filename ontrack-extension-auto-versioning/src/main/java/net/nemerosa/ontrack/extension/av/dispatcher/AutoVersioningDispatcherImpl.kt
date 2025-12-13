@@ -1,34 +1,30 @@
 package net.nemerosa.ontrack.extension.av.dispatcher
 
-import net.nemerosa.ontrack.extension.av.AutoVersioningConfigProperties
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditEntryUUIDNotFoundException
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditService
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditStore
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
-import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetricsService
-import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueuePayload
-import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueueProcessor
-import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueueSourceData
-import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueueSourceExtension
+import net.nemerosa.ontrack.extension.av.scheduler.AutoVersioningScheduler
+import net.nemerosa.ontrack.extension.av.scheduler.ScheduleService
+import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningBranchTrail
 import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTracking
-import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
-import net.nemerosa.ontrack.extension.queue.source.createQueueSource
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.PromotionRun
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 import java.util.*
 
 @Component
 class AutoVersioningDispatcherImpl(
     private val securityService: SecurityService,
-    private val queueDispatcher: QueueDispatcher,
-    private val queueProcessor: AutoVersioningQueueProcessor,
-    private val queueSourceExtension: AutoVersioningQueueSourceExtension,
     private val versionSourceFactory: VersionSourceFactory,
     private val autoVersioningAuditService: AutoVersioningAuditService,
-    private val autoVersioningConfigProperties: AutoVersioningConfigProperties,
-    private val metrics: AutoVersioningMetricsService,
+    private val scheduleService: ScheduleService,
+    private val autoVersioningScheduler: AutoVersioningScheduler,
+    private val autoVersioningAuditStore: AutoVersioningAuditStore,
 ) : AutoVersioningDispatcher {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningDispatcherImpl::class.java)
@@ -49,35 +45,7 @@ class AutoVersioningDispatcherImpl(
                         )
                         // Posts the event on the queue
                         if (order != null) {
-                            tracking.withTrail {
-                                it.withOrder(branchTrail, order)
-                            }
-
-                            // Cancelling any previous order
-                            if (autoVersioningConfigProperties.queue.cancelling) {
-                                autoVersioningAuditService.cancelQueuedOrders(order)
-                            }
-
-                            // Sending the request on the queue
-                            val result = queueDispatcher.dispatch(
-                                queueProcessor = queueProcessor,
-                                payload = AutoVersioningQueuePayload(
-                                    order = order,
-                                ),
-                                source = queueSourceExtension.createQueueSource(
-                                    AutoVersioningQueueSourceData(
-                                        orderUuid = order.uuid,
-                                    )
-                                ),
-                            )
-
-                            // Audit & metrics
-                            val routingKey = result.routingKey ?: "n/a"
-                            autoVersioningAuditService.onQueuing(
-                                order,
-                                routingKey,
-                            )
-                            metrics.onQueuing(order, routingKey)
+                            dispatchOrderWithTrail(tracking, branchTrail, order)
                         }
                     }
                 }
@@ -85,6 +53,52 @@ class AutoVersioningDispatcherImpl(
                 logger.error("Dispatching not possible because no trail was created (auto-versioning may not be enabled after all)")
             }
         }
+    }
+
+    private fun dispatchOrderWithTrail(
+        tracking: AutoVersioningTracking,
+        branchTrail: AutoVersioningBranchTrail,
+        order: AutoVersioningOrder
+    ) {
+        tracking.withTrail {
+            it.withOrder(branchTrail, order)
+        }
+
+        dispatchOrder(order)
+    }
+
+    private fun dispatchOrder(order: AutoVersioningOrder) {
+        // Throttling
+        autoVersioningAuditService.throttling(order)
+
+        // Starting the audit
+        val entry = autoVersioningAuditService.onCreated(order)
+
+        // Triggering the scheduler immediately when no schedule is planned
+        if (entry.order.schedule == null) {
+            autoVersioningScheduler.scheduleEntry(entry)
+        }
+    }
+
+    /**
+     * Reschedule an entry, without any schedule
+     */
+    override fun reschedule(branch: Branch, uuid: String): AutoVersioningOrder {
+        // Getting the entry to reschedule
+        val entry = autoVersioningAuditStore.findByUUID(branch, uuid)
+            ?: throw AutoVersioningAuditEntryUUIDNotFoundException(uuid)
+
+        // Copying the order
+        val order = entry.order.copy(
+            uuid = UUID.randomUUID().toString(),
+            schedule = null,
+        )
+
+        // Dispatching the order
+        dispatchOrder(order)
+
+        // OK
+        return order
     }
 
     private fun createAutoVersioningOrder(
@@ -121,6 +135,7 @@ class AutoVersioningDispatcherImpl(
                 prBodyTemplate = config.prBodyTemplate,
                 prBodyTemplateFormat = config.prBodyTemplateFormat,
                 additionalPaths = config.additionalPaths ?: emptyList(),
+                schedule = computeSchedule(config.cronSchedule),
             )
         } catch (ex: Exception) {
             // Logging the event
@@ -136,6 +151,13 @@ class AutoVersioningDispatcherImpl(
             return null
         }
     }
+
+    private fun computeSchedule(cronSchedule: String?): LocalDateTime? =
+        if (cronSchedule.isNullOrBlank()) {
+            null
+        } else {
+            scheduleService.nextExecutionTime(cronSchedule)
+        }
 
     private fun getBuildSourceVersion(promotionRun: PromotionRun, config: AutoVersioningSourceConfig): String {
         return versionSourceFactory.getBuildVersion(promotionRun.build, config)

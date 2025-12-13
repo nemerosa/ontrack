@@ -88,7 +88,7 @@ fun <P, T : Any> typedListField(
     description = description,
     nullable = nullable
 ) { env ->
-    val p: P = env.getSource()
+    val p: P = env.getSource()!!
     fetcher(p)
 }
 

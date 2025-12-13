@@ -1,0 +1,16 @@
+.login-pf body {
+    background: #F6F2F9 none;
+}
+
+/* Hiding the default Keycloak header */
+#kc-header {
+    margin: 0;
+    padding: 0;
+    max-height: 0;
+    height: 0;
+}
+
+.yontrack-header {
+    margin-top: 3em;
+    margin-bottom: 0;
+}

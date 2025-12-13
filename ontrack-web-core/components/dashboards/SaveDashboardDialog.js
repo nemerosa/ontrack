@@ -36,7 +36,7 @@ export default function SaveDashboardDialog({saveDashboardDialog}) {
             label: "Private use only"
         }
     ]
-    if (user.authorizations?.dashboard?.share) {
+    if (user?.authorizations?.dashboard?.share) {
         options.push({
             value: 'SHARED',
             label: "For all users"

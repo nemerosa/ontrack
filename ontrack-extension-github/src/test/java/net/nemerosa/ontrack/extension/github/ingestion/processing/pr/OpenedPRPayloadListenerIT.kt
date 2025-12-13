@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.pr
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 

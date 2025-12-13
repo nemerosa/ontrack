@@ -60,7 +60,7 @@ export default function SubscriptionView({title, breadcrumbs, entity, name, mana
                             }
                         `,
                         {
-                            entity,
+                            entity: {type: entity.type, id: Number(entity.id)},
                             name,
                         }
                     )

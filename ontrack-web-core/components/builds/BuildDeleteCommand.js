@@ -39,7 +39,7 @@ export default function BuildDeleteCommand({id}) {
                         }
                     `
                 }
-                gqlVariables={{id}}
+                gqlVariables={{id: Number(id)}}
                 gqlUserNode="deleteBuildById"
                 onSuccess={onSuccess}
             />

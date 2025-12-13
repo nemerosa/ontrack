@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.model.structure.PromotionLevel
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
 
-class PromotionRunDependenciesCheckExtensionIT : AbstractGeneralExtensionTestJUnit4Support() {
+class PromotionRunDependenciesCheckExtensionIT : AbstractGeneralExtensionTestSupport() {
 
     @Test
     fun `No promotion dependency check`() {

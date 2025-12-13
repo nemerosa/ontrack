@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.project
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaIgnore
 import java.time.LocalDateTime
 
 /**
@@ -16,5 +17,6 @@ data class AutoVersioningProjectProperty(
     @APIDescription("List of regular expressions. AV requests match if no regular expression is matched by the target branch name. If empty, the target branch is considered matching.")
     val branchExcludes: List<String>?,
     @APIDescription("If defined, any target branch whose last activity (last build creation) is before this date will be ignored by the auto-versioning")
+    @JsonSchemaIgnore
     val lastActivityDate: LocalDateTime?,
 )

@@ -4,12 +4,12 @@ import net.nemerosa.ontrack.extension.general.MessageProperty
 import net.nemerosa.ontrack.extension.general.MessagePropertyType
 import net.nemerosa.ontrack.extension.general.MessageType
 import net.nemerosa.ontrack.model.structure.*
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
+class PropertiesGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Getting a property by type for an entity`() {
@@ -17,16 +17,20 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
             project {
                 branch {
                     build {
-                        setProperty(this,
+                        setProperty(
+                            this,
                             MessagePropertyType::class.java,
-                            MessageProperty(MessageType.INFO, "My message"))
-                        run("""{
+                            MessageProperty(MessageType.INFO, "My message")
+                        )
+                        run(
+                            """{
                             builds(id: $id) {
                                 properties(type: "$testPropertyName") {
                                     value
                                 }
                             }
-                        }""").let { data ->
+                        }"""
+                        ).let { data ->
                             val property = data.path("builds").path(0).path("properties").path(0).path("value")
                             assertEquals("INFO", property.path("type").asText())
                             assertEquals("My message", property.path("text").asText())
@@ -43,16 +47,20 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
             project {
                 branch {
                     build {
-                        setProperty(this,
+                        setProperty(
+                            this,
                             MessagePropertyType::class.java,
-                            MessageProperty(MessageType.INFO, "My message"))
-                        run("""{
+                            MessageProperty(MessageType.INFO, "My message")
+                        )
+                        run(
+                            """{
                             builds(id: $id) {
                                 messageProperty {
                                     value
                                 }
                             }
-                        }""").let { data ->
+                        }"""
+                        ).let { data ->
                             val property = data.path("builds").path(0).path("messageProperty").path("value")
                             assertEquals("INFO", property.path("type").asText())
                             assertEquals("My message", property.path("text").asText())
@@ -106,7 +114,8 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
     }
 
     private fun ProjectEntity.testPropertyEditionById() {
-        run("""
+        run(
+            """
             mutation {
                 set${projectEntityType.typeName}PropertyById(input: {id: $id, property: "$testPropertyName", value: {type: "INFO", text: "My message"}}) {
                     ${projectEntityType.varName} {
@@ -117,7 +126,8 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
                     }
                 }
             }
-        """).let { data ->
+        """
+        ).let { data ->
             val nodeName = "set${projectEntityType.typeName}PropertyById"
             assertNoUserError(data, nodeName)
             val returnedEntityId = data.path(nodeName).path(projectEntityType.varName).path("id").asInt()
@@ -131,7 +141,8 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
         }
 
         // Deleting the property
-        run("""
+        run(
+            """
             mutation {
                 set${projectEntityType.typeName}PropertyById(input: {id: $id, property: "$testPropertyName", value: null}) {
                     ${projectEntityType.varName} {
@@ -142,7 +153,8 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
                     }
                 }
             }
-        """).let { data ->
+        """
+        ).let { data ->
             val nodeName = "set${projectEntityType.typeName}PropertyById"
             assertNoUserError(data, nodeName)
             val returnedEntityId = data.path(nodeName).path(projectEntityType.varName).path("id").asInt()
@@ -155,7 +167,8 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
 
     private fun ProjectEntity.testPropertyEditionByName() {
         val input = nameValues.map { (field, value) -> """$field: "$value"""" }.joinToString(", ")
-        run("""
+        run(
+            """
             mutation {
                 set${projectEntityType.typeName}Property(input: {$input, property: "$testPropertyName", value: {type: "INFO", text: "My message"}}) {
                     ${projectEntityType.varName} {
@@ -166,7 +179,8 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
                     }
                 }
             }
-        """).let { data ->
+        """
+        ).let { data ->
             val nodeName = "set${projectEntityType.typeName}Property"
             assertNoUserError(data, nodeName)
             val returnedEntityId = data.path(nodeName).path(projectEntityType.varName).path("id").asInt()
@@ -180,7 +194,8 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
         }
 
         // Deleting the property
-        run("""
+        run(
+            """
             mutation {
                 set${projectEntityType.typeName}Property(input: {$input, property: "$testPropertyName", value: null}) {
                     ${projectEntityType.varName} {
@@ -191,7 +206,8 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
                     }
                 }
             }
-        """).let { data ->
+        """
+        ).let { data ->
             val nodeName = "set${projectEntityType.typeName}Property"
             assertNoUserError(data, nodeName)
             val returnedEntityId = data.path(nodeName).path(projectEntityType.varName).path("id").asInt()
@@ -205,14 +221,16 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
     @Test
     fun `Properties for a project`() {
         asAdmin {
-            run("""{
+            run(
+                """{
                 properties(projectEntityType: PROJECT) {
                     typeName
                     name
                     description
                     supportedEntityTypes
                 }
-            }""").let { data ->
+            }"""
+            ).let { data ->
                 val properties = data.path("properties")
                 // Checks we find the message property
                 assertNotNull(properties.find {
@@ -220,11 +238,15 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
                 }) { property ->
                     assertEquals(
                         "net.nemerosa.ontrack.extension.general.MessagePropertyType",
-                        property.path("typeName").asText())
+                        property.path("typeName").asText()
+                    )
                     assertEquals("Message", property.path("name").asText())
-                    assertEquals("Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.", property.path("description").asText())
                     assertEquals(
-                        ProjectEntityType.values().map { it.name }.toSet(),
+                        "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.",
+                        property.path("description").asText()
+                    )
+                    assertEquals(
+                        ProjectEntityType.entries.map { it.name }.toSet(),
                         property.path("supportedEntityTypes").map { it.asText() }.toSet()
                     )
                 }
@@ -235,10 +257,13 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
                 }) { property ->
                     assertEquals(
                         "net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType",
-                        property.path("typeName").asText())
+                        property.path("typeName").asText()
+                    )
                     assertEquals("Build link display options", property.path("name").asText())
-                    assertEquals("Configuration of display options for the build links towards this project.",
-                        property.path("description").asText())
+                    assertEquals(
+                        "Configuration of display options for the build links towards this project.",
+                        property.path("description").asText()
+                    )
                     assertEquals(
                         setOf(ProjectEntityType.PROJECT.name),
                         property.path("supportedEntityTypes").map { it.asText() }.toSet()
@@ -256,23 +281,29 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
     @Test
     fun `Property by type`() {
         asAdmin {
-            run("""{
+            run(
+                """{
                 properties(type: "net.nemerosa.ontrack.extension.general.MessagePropertyType") {
                     typeName
                     name
                     description
                     supportedEntityTypes
                 }
-            }""").let { data ->
+            }"""
+            ).let { data ->
                 val properties = data.path("properties")
                 assertEquals(1, properties.size())
                 val property = properties.first()
                 // Checks we find the message property
                 assertEquals(
                     "net.nemerosa.ontrack.extension.general.MessagePropertyType",
-                    property.path("typeName").asText())
+                    property.path("typeName").asText()
+                )
                 assertEquals("Message", property.path("name").asText())
-                assertEquals("Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.", property.path("description").asText())
+                assertEquals(
+                    "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.",
+                    property.path("description").asText()
+                )
                 assertEquals(
                     ProjectEntityType.values().map { it.name }.toSet(),
                     property.path("supportedEntityTypes").map { it.asText() }.toSet()

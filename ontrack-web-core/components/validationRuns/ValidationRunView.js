@@ -200,6 +200,7 @@ export default function ValidationRunView({id}) {
                                 defaultLayout={defaultLayout}
                                 items={items}
                                 rowHeight={30}
+                                isDraggable={true}
                             />
                             <ValidationRunViewDrawer run={run}/>
                         </Space>

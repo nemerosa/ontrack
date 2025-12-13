@@ -13,12 +13,12 @@ import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import net.nemerosa.ontrack.model.tx.DefaultTransactionHelper
 import net.nemerosa.ontrack.model.tx.TransactionHelper
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.email
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.PlatformTransactionManager
@@ -30,9 +30,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
-
-    @Autowired
-    protected lateinit var ontrackConfigProperties: OntrackConfigProperties
 
     @Autowired
     protected lateinit var labelManagementService: LabelManagementService
@@ -131,7 +128,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Kotlin friendly user execution
      */
-    fun <T> asUser(name: String = uid("U"), code: () -> T): T = asUser(name = name).call(code)
+    fun <T> asUser(email: String = email(), code: () -> T): T = asUser(email = email).call(code)
 
     /**
      * Kotlin friendly account role execution
@@ -145,7 +142,9 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Kotlin friendly account role execution
      */
     fun <T> asAccountWithGlobalRole(role: String, code: () -> T): T {
-        val account = doCreateAccountWithGlobalRole(role)
+        val account = asAdmin {
+            doCreateAccountWithGlobalRole(role)
+        }
         return asFixedAccount(account).call(code)
     }
 
@@ -407,7 +406,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         signature: Signature? = null,
         duration: Int? = null,
     ): ValidationRun {
-        return asUser().withView(this).with(this, ValidationRunCreate::class.java).call {
+        return asUser().withView(this).withProjectFunction(this, ValidationRunCreate::class.java).call {
             val run = structureService.newValidationRun(
                 this,
                 ValidationRunRequest(
@@ -480,7 +479,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Change of status for a validation run
      */
     fun ValidationRun.validationStatus(status: ValidationRunStatusID, description: String): ValidationRun {
-        return asUser().with(this, ValidationRunStatusChange::class.java).call {
+        return asUser().withProjectFunction(this, ValidationRunStatusChange::class.java).call {
             structureService.newValidationRunStatus(
                 this,
                 ValidationRunStatus(
@@ -515,28 +514,26 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Creates a label
      */
     fun label(category: String? = uid("C"), name: String = uid("N"), checkForExisting: Boolean = true): Label {
-        return asUser().with(LabelManagement::class.java).call {
-            if (checkForExisting) {
-                val labels = labelManagementService.findLabels(category, name)
-                val existingLabel = labels.firstOrNull()
-                existingLabel ?: labelManagementService.newLabel(
-                    LabelForm(
-                        category = category,
-                        name = name,
-                        description = null,
-                        color = "#FF0000"
-                    )
+        return if (checkForExisting) {
+            val labels = labelManagementService.findLabels(category, name)
+            val existingLabel = labels.firstOrNull()
+            existingLabel ?: labelManagementService.newLabel(
+                LabelForm(
+                    category = category,
+                    name = name,
+                    description = null,
+                    color = "#FF0000"
                 )
-            } else {
-                labelManagementService.newLabel(
-                    LabelForm(
-                        category = category,
-                        name = name,
-                        description = null,
-                        color = "#FF0000"
-                    )
+            )
+        } else {
+            labelManagementService.newLabel(
+                LabelForm(
+                    category = category,
+                    name = name,
+                    description = null,
+                    color = "#FF0000"
                 )
-            }
+            )
         }
     }
 
@@ -548,7 +545,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             projectLabelManagementService.getLabelsForProject(this)
         }
         set(value) {
-            asUser().with(this, ProjectLabelManagement::class.java).execute {
+            asUser().withProjectFunction(this, ProjectLabelManagement::class.java).execute {
                 projectLabelManagementService.associateProjectToLabels(
                     this,
                     ProjectLabelForm(
@@ -638,30 +635,6 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             settingsManagerService.saveSettings(settings)
         }
     }
-
-    /**
-     * Saving current "main build links" settings, runs some code and restores the format settings
-     */
-    protected fun withMainBuildLinksSettings(code: () -> Unit) = withSettings<MainBuildLinksConfig>(code)
-
-    /**
-     * Settings "main build links" settings
-     */
-    protected fun setMainBuildLinksSettings(vararg labels: String) {
-        asAdmin().execute {
-            settingsManagerService.saveSettings(
-                MainBuildLinksConfig(
-                    labels.toList()
-                )
-            )
-        }
-    }
-
-    /**
-     * Getting "main build links" settings
-     */
-    protected val mainBuildLinksSettings: List<String>
-        get() = settingsService.getCachedSettings(MainBuildLinksConfig::class.java).labels
 
     protected fun Branch.assertBuildSearch(filterBuilder: (StandardFilterProviderDataBuilder) -> Unit): BuildSearchAssertion {
         val data = buildFilterService.standardFilterProviderData(10)

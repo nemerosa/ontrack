@@ -1,16 +1,13 @@
 import {Space} from "antd";
-import {useRestClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import ChangeImageDialog, {useChangeImageDialog} from "@components/common/ChangeImageDialog";
 import PredefinedValidationStampImage from "@components/core/config/PredefinedValidationStampImage";
 
 export const usePredefinedValidationStampChangeImageDialog = ({onChange}) => {
 
-    const restClient = useRestClient()
-
     return useChangeImageDialog({
         query: gql`
-            query ValidationStamp($id: Int!) {
+            query PredefinedValidationStamp($id: Int!) {
                 predefinedValidationStampById(id: $id) {
                     id
                     name
@@ -18,9 +15,12 @@ export const usePredefinedValidationStampChangeImageDialog = ({onChange}) => {
                 }
             }
         `,
-        queryUserNode: 'predefinedValidationStampByName',
+        queryUserNode: 'predefinedValidationStampById',
         imageCallback: (data, id) => {
-            restClient.put(`/rest/admin/predefinedValidationStamps/${id}/image`, data).then(() => {
+            fetch(`/api/protected/images/predefinedValidationStamps/${id}`, {
+                method: 'PUT',
+                body: data,
+            }).then(() => {
                 if (onChange) onChange()
             })
         }

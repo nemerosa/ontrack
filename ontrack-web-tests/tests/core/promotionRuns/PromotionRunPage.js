@@ -1,5 +1,5 @@
-import {ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
+import {confirmBox} from "../../support/confirm";
 
 export class PromotionRunPage {
 
@@ -9,7 +9,7 @@ export class PromotionRunPage {
     }
 
     async goTo() {
-        await this.page.goto(`${ui()}/promotionRun/${this.promotionRun.id}`)
+        await this.page.goto(`${this.promotionRun.ontrack.connection.ui}/promotionRun/${this.promotionRun.id}`)
         await expect(this.page.getByText("has been promoted")).toBeVisible()
     }
 
@@ -18,6 +18,13 @@ export class PromotionRunPage {
             this.page.locator("#promotion-run-notifications")
                 .getByText(text, {exact: true})
         ).toBeVisible()
+    }
+
+    async deletePromotionRun() {
+        const button = this.page.getByRole('button', {name: 'Delete'})
+        await expect(button).toBeVisible()
+        await button.click()
+        await confirmBox(this.page, "Removing this promotion run", {okText: "Confirm deletion"})
     }
 
 }

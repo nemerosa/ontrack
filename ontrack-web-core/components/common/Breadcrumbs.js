@@ -25,7 +25,7 @@ export function downToProjectBreadcrumbs({project}) {
 }
 
 export function branchBreadcrumbs(branch) {
-    return downToProjectBreadcrumbs(branch)
+    return branch ? downToProjectBreadcrumbs(branch) : []
 }
 
 export function downToBranchBreadcrumbs({branch, following = []}) {

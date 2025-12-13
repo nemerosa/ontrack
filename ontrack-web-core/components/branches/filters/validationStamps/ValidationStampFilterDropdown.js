@@ -1,20 +1,8 @@
 import {Button, Dropdown, Space, Typography} from "antd";
-import {FaCaretDown, FaCheckDouble, FaEdit, FaEraser, FaEyeSlash, FaFilter, FaPlus, FaTrashAlt} from "react-icons/fa";
+import {FaCaretDown, FaEdit, FaEraser, FaFilter, FaPlus} from "react-icons/fa";
 import {useContext, useEffect, useState} from "react";
-import CheckableMenuItem from "@components/common/CheckableMenuItem";
-import {gql} from "graphql-request";
 import SelectableMenuItem from "@components/common/SelectableMenuItem";
-import {getLocallySelectedValidationFilter, setLocallySelectedValidationStampFilter} from "@components/storage/local";
 import {isAuthorized} from "@components/common/authorizations";
-import NewValidationStampFilterDialog, {
-    useNewValidationStampFilterDialog
-} from "@components/branches/filters/validationStamps/NewValidationStampFilterDialog";
-import EditValidationStampFilterDialog, {
-    useEditValidationStampFilterDialog
-} from "@components/branches/filters/validationStamps/EditValidationStampFilterDialog";
-import {
-    gqlValidationStampFilterFragment
-} from "@components/branches/filters/validationStamps/ValidationStampFilterGraphQLFragments";
 import {ValidationStampFilterContext} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
 import InlineConfirmCommand from "@components/common/InlineConfirmCommand";
 

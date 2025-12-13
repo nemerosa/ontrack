@@ -6,9 +6,11 @@ import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.service.getPipelineAdmissionRuleChecks
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.email
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
@@ -22,6 +24,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     private lateinit var slotService: SlotService
 
     @Test
+    @AsAdminTest
     fun `Approval by a super admin`() {
         withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
             asAdmin {
@@ -37,7 +40,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 val state =
                     slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
                 assertNotNull(state, "Manual approval state stored") {
-                    assertEquals("admin", it.data?.user)
+                    assertEquals(securityService.currentUser?.name, it.data?.user)
                     assertEquals(
                         ManualApprovalSlotAdmissionRuleData(
                             approval = true,
@@ -51,6 +54,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Manual approval rejected by a super admin`() {
         withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
             asAdmin {
@@ -71,7 +75,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 val state =
                     slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
                 assertNotNull(state, "Manual approval state stored") {
-                    assertEquals("admin", it.data?.user)
+                    assertEquals(securityService.currentUser?.name, it.data?.user)
                     assertEquals(
                         ManualApprovalSlotAdmissionRuleData(
                             approval = false,
@@ -125,6 +129,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Manual rejected approval overridden by an admin`() {
         withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
             asAdmin {
@@ -151,14 +156,14 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 assertTrue(check.ok, "Manual approval rejected but overridden")
                 val ruleStatus = slotService.getPipelineAdmissionRuleStatuses(pipeline).first()
                 assertNotNull(ruleStatus.override, "Manual rejection overridden") {
-                    assertEquals("admin", it.user)
+                    assertEquals(securityService.currentUser?.name, it.user)
                     assertEquals("Because I want to", it.message)
                 }
 
                 val state =
                     slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
                 assertNotNull(state, "Manual approval state stored") {
-                    assertEquals("admin", it.data?.user)
+                    assertEquals(securityService.currentUser?.name, it.data?.user)
                     assertEquals(
                         ManualApprovalSlotAdmissionRuleData(
                             approval = false,
@@ -172,6 +177,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Manual approval by anybody`() {
         withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
             slotTestSupport.withSlotUser(pipeline.slot) {
@@ -188,13 +194,14 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Manual approval by an allowed user`() {
-        val name = uid("U")
+        val email = uid("u-") + "@ontrack.local"
         withManuallyApprovedPipeline(
-            users = listOf(name),
+            users = listOf(email),
         ) { pipeline, admissionRuleConfig ->
             slotTestSupport.withSlotUser(
-                name = name,
+                email = email,
                 slot = pipeline.slot,
             ) {
                 slotService.approve(pipeline, admissionRuleConfig)
@@ -210,19 +217,20 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                     admissionRuleConfig.id
                 )
             assertNotNull(state, "Manual approval state stored") {
-                assertEquals(name, it.data?.user)
+                assertEquals(email, it.data?.user)
             }
         }
     }
 
     @Test
+    @AsAdminTest
     fun `Manual approval not possible if not in the list of users`() {
-        val name = uid("U")
-        val otherName = uid("U")
+        val name = email()
+        val otherName = email()
         withManuallyApprovedPipeline(
             users = listOf(name),
         ) { pipeline, admissionRuleConfig ->
-            slotTestSupport.withSlotUser(name = otherName, slot = pipeline.slot) {
+            slotTestSupport.withSlotUser(email = otherName, slot = pipeline.slot) {
                 assertFailsWith<ManualApprovalSlotAdmissionRuleException> {
                     slotService.approve(pipeline, admissionRuleConfig)
                 }

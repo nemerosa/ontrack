@@ -10,12 +10,6 @@ import java.time.Duration
 interface IndicatorStatsService {
 
     /**
-     * Gets global stats for a portfolio
-     */
-    @Deprecated("Use indicator views. This method will be removed in V5.")
-    fun getGlobalStats(portfolio: IndicatorPortfolio, previous: Duration? = null): List<IndicatorCategoryStats>
-
-    /**
      * Gets the portfolio stats for a given indicator view.
      *
      * @param portfolio Portfolio to get starts about

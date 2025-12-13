@@ -3,11 +3,13 @@ package net.nemerosa.ontrack.extension.chart.core
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.chart.ChartDefinition
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
+@AsAdminTest
 internal class GQLValidationStampChartsFieldContributorIT : AbstractQLKTITSupport() {
 
     @Test

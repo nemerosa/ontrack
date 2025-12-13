@@ -18,7 +18,7 @@ class GQLRootQuerySlotPipelineById(
             .type(gqlTypeSlotPipeline.typeRef)
             .argument(stringArgument("id", "Pipeline ID", nullable = false))
             .dataFetcher { env ->
-                val id: String = env.getArgument("id")
+                val id: String = env.getArgument("id")!!
                 slotService.findPipelineById(id)
             }
             .build()

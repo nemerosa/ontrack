@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.indicators.compliance
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
@@ -13,6 +12,7 @@ import net.nemerosa.ontrack.extension.scm.service.SCMServiceDetector
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class RepositoryMustHaveAReadme(

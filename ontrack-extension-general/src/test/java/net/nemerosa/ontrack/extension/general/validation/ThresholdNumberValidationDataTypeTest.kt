@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.general.validation
 
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.json.jsonOf
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull

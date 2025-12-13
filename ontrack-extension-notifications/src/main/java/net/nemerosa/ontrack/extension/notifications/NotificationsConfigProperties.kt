@@ -12,22 +12,12 @@ import org.springframework.stereotype.Component
 class NotificationsConfigProperties {
 
     @APIDescription("Are the notifications enabled?")
-    var enabled: Boolean = false
-
-    /**
-     * In-memory channel?
-     */
-    var inMemory = InMemoryChannelProperties()
+    var enabled: Boolean = true
 
     /**
      * Processing configuration
      */
     var processing: ProcessingProperties = ProcessingProperties()
-
-    /**
-     * Webhook channel configuration
-     */
-    var webhook = WebhookChannelProperties()
 
     /**
      * Mail configuration
@@ -43,40 +33,6 @@ class NotificationsConfigProperties {
     }
 
     /**
-     * Webhook channel configuration
-     */
-    class WebhookChannelProperties {
-        /**
-         * Internal webhoook
-         */
-        var internal = WebhookInternalEndpointProperties()
-    }
-
-    /**
-     * Webhook internal channel configuration.
-     *
-     * To be used for test only.
-     */
-    class WebhookInternalEndpointProperties {
-        /**
-         * Enabled?
-         */
-        @APIDescription("Are internal webhooks enabled?")
-        var enabled = false
-    }
-
-    /**
-     * In-memory channel configuration
-     */
-    class InMemoryChannelProperties {
-        /**
-         * Enabled?
-         */
-        @APIDescription("Is the in-memory notification channel enabled? Used for testing only.")
-        var enabled = false
-    }
-
-    /**
      * Processing configuration
      */
     class ProcessingProperties {
@@ -89,24 +45,18 @@ class NotificationsConfigProperties {
     /**
      * Configuration for queuing
      */
-    abstract class AbstractQueuingProperties {
+    class ProcessingQueuingProperties {
         /**
-         * Async processing enabled?
+         * Default number of queues for the event listener
          */
-        @APIDescription("Is asynchronous processing of notifications enabled?")
-        var async: Boolean = true
+        @APIDescription("Default number of queues for the event listener")
+        var listenerQueues: Int = 5
+        /**
+         * Default number of queues for the processing
+         */
+        @APIDescription("Default number of queues for the processing")
+        var processingQueues: Int = 5
     }
-
-    /**
-     * Configuration for processing queuing
-     */
-    class ProcessingQueuingProperties(
-        /**
-         * Maximum parallel processing of queues
-         */
-        @APIDescription("Maximum parallel processing of queues")
-        var concurrency: Int = 10
-    ) : AbstractQueuingProperties()
 
     companion object {
         /**

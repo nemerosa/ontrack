@@ -6,12 +6,10 @@ import {pageTitle} from "@components/common/Titles";
 import {FaCheck, FaRegCopy} from "react-icons/fa";
 import copy from "copy-to-clipboard";
 import {useRouter} from "next/router";
-import {useConnection} from "@components/providers/ConnectionContextProvider";
 
 export default function DashboardPageTitle({title}) {
 
     const router = useRouter()
-    const {environment} = useConnection()
     const {dashboard} = useContext(DashboardContext)
 
     const [copied, setCopied] = useState(false)
@@ -21,7 +19,7 @@ export default function DashboardPageTitle({title}) {
     }, [dashboard?.uuid])
 
     const copyDashboardLink = () => {
-        const link = `${environment.ontrack.ui.url}${router.pathname}?dashboard=${dashboard.uuid}`
+        const link = `${window.location.origin}${router.pathname}?dashboard=${dashboard.uuid}`
         setCopied(copy(link))
     }
 

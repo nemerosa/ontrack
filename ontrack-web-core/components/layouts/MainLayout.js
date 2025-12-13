@@ -32,6 +32,7 @@ export default function MainLayout({children}) {
                         <Header
                             style={{
                                 backgroundColor: "#3F3053",
+                                padding: '0 12px', // Aligned with padding of `MainPage`
                             }}
                         >
                             <NavBar/>

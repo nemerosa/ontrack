@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.av.graphql
 
+import net.nemerosa.ontrack.common.waitFor
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryService
 import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTrackingService
-import net.nemerosa.ontrack.it.waitFor
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals

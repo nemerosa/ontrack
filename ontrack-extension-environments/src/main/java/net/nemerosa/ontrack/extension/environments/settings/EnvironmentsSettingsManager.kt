@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.environments.settings
 
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -27,6 +26,4 @@ class EnvironmentsSettingsManager(
 
     override fun getTitle(): String = "Environments"
 
-    @Deprecated("Deprecated in Java")
-    override fun getSettingsForm(settings: EnvironmentsSettings?): Form = Form.create()
 }

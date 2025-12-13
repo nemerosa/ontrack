@@ -133,7 +133,7 @@ public class RoleJdbcRepository extends AbstractJdbcRepository implements RoleRe
                         "INNER JOIN GLOBAL_AUTHORIZATIONS A " +
                         "ON A.ACCOUNT = G.ID " +
                         "WHERE A.ROLE = :role " +
-                        "ORDER BY G.NAME",
+                        "ORDER BY G.EMAIL",
                 params("role", globalRole.getId()),
                 (rs, num) -> accountLoader.apply(id(rs))
         );
@@ -161,7 +161,7 @@ public class RoleJdbcRepository extends AbstractJdbcRepository implements RoleRe
                         "ON A.ACCOUNT = G.ID " +
                         "WHERE A.ROLE = :role " +
                         "AND A.PROJECT = :project " +
-                        "ORDER BY G.NAME",
+                        "ORDER BY G.EMAIL",
                 params("role", projectRole.getId()).addValue("project", project.id()),
                 (rs, num) -> accountLoader.apply(id(rs))
         );

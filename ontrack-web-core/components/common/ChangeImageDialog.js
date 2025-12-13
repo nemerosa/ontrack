@@ -2,9 +2,8 @@ import FormDialog, {useFormDialog} from "@components/form/FormDialog";
 import {Form, Space, Spin, Typography, Upload} from "antd";
 import {FaPlus} from "react-icons/fa";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import FormErrors from "@components/form/FormErrors";
-import {EventsContext} from "@components/common/EventsContext";
 import {formatFileSize, getBase64} from "@components/common/FileUtils";
 
 export const useChangeImageDialog = ({
@@ -17,8 +16,6 @@ export const useChangeImageDialog = ({
 
     const [imageContainer, setImageContainer] = useState()
     const [image, setImage] = useState()
-
-    const eventsContext = useContext(EventsContext)
 
     return useFormDialog({
         init: (form, {id}) => {

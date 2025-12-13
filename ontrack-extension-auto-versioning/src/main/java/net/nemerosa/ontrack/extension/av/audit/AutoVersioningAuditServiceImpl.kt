@@ -1,16 +1,15 @@
 package net.nemerosa.ontrack.extension.av.audit
 
-import net.nemerosa.ontrack.common.RunProfile
+import jakarta.annotation.PostConstruct
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
-import org.springframework.context.annotation.Profile
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import javax.annotation.PostConstruct
 
 @Service
-@Profile("!${RunProfile.UNIT_TEST}")
+@ConditionalOnWebApplication
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 class AutoVersioningAuditServiceImpl(
     store: AutoVersioningAuditStore
@@ -21,12 +20,17 @@ class AutoVersioningAuditServiceImpl(
         logger.info("[auto-versioning] Using production auto versioning audit service")
     }
 
-    override fun cancelQueuedOrders(order: AutoVersioningOrder) {
-        super.cancelQueuedOrders(order)
-    }
+    override fun throttling(order: AutoVersioningOrder): Int =
+        super.throttling(order)
 
-    override fun onQueuing(order: AutoVersioningOrder, routing: String) {
-        super.onQueuing(order, routing)
+    override fun onCreated(order: AutoVersioningOrder) =
+        super.onCreated(order)
+
+    override fun onScheduled(
+        order: AutoVersioningOrder,
+        routing: String
+    ) {
+        super.onScheduled(order, routing)
     }
 
     override fun onReceived(order: AutoVersioningOrder, queue: String) {

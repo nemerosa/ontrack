@@ -22,7 +22,7 @@ class SCMCatalogEntryGQLProjectEntityFieldContributor(
                                 .description("SCM catalog entry the project is linked with, if any")
                                 .type(scmCatalogEntry.typeRef)
                                 .dataFetcher { env ->
-                                    val project: Project = env.getSource()
+                                    val project: Project = env.getSource()!!
                                     catalogLinkService.getSCMCatalogEntry(project)
                                 }
                                 .build()

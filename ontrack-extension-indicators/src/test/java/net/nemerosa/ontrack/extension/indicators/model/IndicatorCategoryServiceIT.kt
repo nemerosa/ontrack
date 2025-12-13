@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.model
 
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.*
 
 class IndicatorCategoryServiceIT : AbstractIndicatorsTestSupport() {
@@ -11,7 +11,7 @@ class IndicatorCategoryServiceIT : AbstractIndicatorsTestSupport() {
     fun `Category cannot be deleted if there is a source and no deprecation reason`() {
         asAdmin {
             val category = category(source = source())
-            assertFalse(indicatorCategoryService.deleteCategory(category.id).isSuccess, "Category was not deleted")
+            assertFalse(indicatorCategoryService.deleteCategory(category.id).success, "Category was not deleted")
             assertNotNull(indicatorCategoryService.findCategoryById(category.id), "Category was not deleted")
         }
     }
@@ -20,7 +20,7 @@ class IndicatorCategoryServiceIT : AbstractIndicatorsTestSupport() {
     fun `Category cannot be deleted if there is a source and a blank deprecation reason`() {
         asAdmin {
             val category = category(source = source(), deprecated = "")
-            assertFalse(indicatorCategoryService.deleteCategory(category.id).isSuccess, "Category was not deleted")
+            assertFalse(indicatorCategoryService.deleteCategory(category.id).success, "Category was not deleted")
             assertNotNull(indicatorCategoryService.findCategoryById(category.id), "Category was not deleted")
         }
     }
@@ -29,7 +29,7 @@ class IndicatorCategoryServiceIT : AbstractIndicatorsTestSupport() {
     fun `Category can be deleted if there is a source but a deprecation reason`() {
         asAdmin {
             val category = category(source = source(), deprecated = "Because")
-            assertTrue(indicatorCategoryService.deleteCategory(category.id).isSuccess, "Category was deleted")
+            assertTrue(indicatorCategoryService.deleteCategory(category.id).success, "Category was deleted")
             assertNull(indicatorCategoryService.findCategoryById(category.id), "Category has been deleted")
         }
     }
@@ -38,7 +38,7 @@ class IndicatorCategoryServiceIT : AbstractIndicatorsTestSupport() {
     fun `Category can be deleted if there is no source`() {
         asAdmin {
             val category = category()
-            assertTrue(indicatorCategoryService.deleteCategory(category.id).isSuccess, "Category was deleted")
+            assertTrue(indicatorCategoryService.deleteCategory(category.id).success, "Category was deleted")
             assertNull(indicatorCategoryService.findCategoryById(category.id), "Category has been deleted")
         }
     }

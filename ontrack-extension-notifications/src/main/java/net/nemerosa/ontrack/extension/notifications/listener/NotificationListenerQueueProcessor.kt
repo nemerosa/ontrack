@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.listener
 
 import io.micrometer.core.instrument.MeterRegistry
+import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
 import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
 import net.nemerosa.ontrack.extension.notifications.metrics.incrementForEvent
 import net.nemerosa.ontrack.extension.queue.QueueMetadata
@@ -17,12 +18,15 @@ class NotificationListenerQueueProcessor(
     private val meterRegistry: MeterRegistry,
     private val serializableEventService: SerializableEventService,
     private val eventListeningService: EventListeningService,
+    notificationsConfigProperties: NotificationsConfigProperties,
 ) : QueueProcessor<NotificationListenerQueuePayload> {
 
     private val logger: Logger = LoggerFactory.getLogger(NotificationListenerQueueProcessor::class.java)
 
     override val id: String = "notification.listener"
     override val payloadType: KClass<NotificationListenerQueuePayload> = NotificationListenerQueuePayload::class
+
+    override val defaultScale: Int? = notificationsConfigProperties.processing.queue.listenerQueues
 
     override fun isCancelled(payload: NotificationListenerQueuePayload): String? = null
 

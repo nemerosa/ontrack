@@ -1,26 +1,18 @@
-const {ui} = require("@ontrack/connection");
+import {checkListContainsItemText} from "../../support/antd-list-support";
+
 const {expect} = require("@playwright/test");
 
 export class UserProfilePage {
 
-    constructor(page) {
+    constructor(page, ontrack) {
         this.page = page
+        this.ontrack = ontrack
     }
 
 
-    async goTo(expectChangePassword) {
-        await this.page.goto(`${ui()}/core/admin/userProfile`)
+    async goTo() {
+        await this.page.goto(`${this.ontrack.connection.ui}/core/admin/userProfile`)
         await expect(this.page.getByText("API tokens")).toBeVisible()
-        if (expectChangePassword) {
-            await expect(this.page.getByText("Change password")).toBeVisible()
-        }
-    }
-
-    async changePassword(oldPassword, newPassword) {
-        await this.page.getByLabel("Old password").fill(oldPassword)
-        await this.page.getByLabel("New password").fill(newPassword)
-        await this.page.getByLabel("Confirm password").fill(newPassword)
-        await this.page.getByText("Submit", {exact: true}).click()
     }
 
     async generateToken(tokenName) {
@@ -31,7 +23,27 @@ export class UserProfilePage {
         // await this.page.getByTitle("Copies the generated token into the clipboard.").click()
         // const text = await this.page.evaluate(() => navigator.clipboard.readText())
 
-        return this.page.getByTestId("generatedToken").inputValue()
+        return this.page.getByTestId("generatedToken").textContent()
     }
 
+    async checkGroups({assignedGroups, mappedGroups, idpGroups}) {
+        if (assignedGroups) {
+            const list = this.page.getByTestId("assigned-groups")
+            for (const group of assignedGroups) {
+                await checkListContainsItemText(list, group);
+            }
+        }
+        if (mappedGroups) {
+            const list = this.page.getByTestId("mapped-groups")
+            for (const group of mappedGroups) {
+                await checkListContainsItemText(list, group)
+            }
+        }
+        if (idpGroups) {
+            const list = this.page.getByTestId("idp-groups")
+            for (const group of idpGroups) {
+                await checkListContainsItemText(list, group)
+            }
+        }
+    }
 }

@@ -1,136 +1,144 @@
 package net.nemerosa.ontrack.graphql.schema.security
 
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
 import net.nemerosa.ontrack.graphql.schema.Mutation
+import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.security.Account
+import net.nemerosa.ontrack.model.security.AccountGroup
+import net.nemerosa.ontrack.model.security.AccountGroupInput
 import net.nemerosa.ontrack.model.security.AccountInput
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.structure.ID
 import org.springframework.stereotype.Component
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Pattern
-import javax.validation.constraints.Size
 
 @Component
 class AccountMutations(
     private val accountService: AccountService,
 ) : TypedMutationProvider() {
     override val mutations: List<Mutation> = listOf(
+
         /**
-         * Creating a built-in account
+         * Editing an account
          */
-        simpleMutation(
-            name = "createBuiltInAccount",
-            description = "Creates a built-in account",
-            deprecation = "Creation of accounts is deprecated and will be removed in V5",
-            input = CreateBuiltInAccountInput::class,
-            outputName = "account",
-            outputDescription = "Created account",
-            outputType = Account::class
+        unitMutation<EditAccountInput>(
+            name = "editAccount",
+            description = "Edits an account",
         ) { input ->
-            accountService.create(
+            val id = ID.of(input.id)
+            val existing = accountService.getAccount(id)
+            accountService.updateAccount(
+                id,
                 AccountInput(
-                    name = input.name,
-                    fullName = input.fullName,
-                    email = input.email,
-                    password = input.password,
-                    groups = emptyList(),
-                    disabled = false,
-                    locked = false,
+                    email = existing.email,
+                    fullName = input.fullName?.takeIf { it.isNotBlank() } ?: existing.fullName,
+                    groups = input.groups,
                 )
             )
         },
+
         /**
-         * Disabling an account
+         * Deleting an account
          */
-        simpleMutation(
-            name = "disableAccount",
-            description = "Disables an account",
-            deprecation = "Disabling of accounts is deprecated and will be removed in V5",
-            input = DisableAccountInput::class,
-            outputName = "account",
-            outputDescription = "Updated account",
-            outputType = Account::class
+        unitMutation<DeleteAccountInput>(
+            name = "deleteAccount",
+            description = "Deletes an account",
         ) { input ->
-            val id = ID.of(input.id)
-            accountService.setAccountDisabled(id, true)
-            accountService.getAccount(id)
+            val id = ID.of(input.accountId)
+            accountService.deleteAccount(id)
         },
+
         /**
-         * Enabling an account
+         * Creating an account group
          */
         simpleMutation(
-            name = "enableAccount",
-            description = "Enables an account",
-            deprecation = "Enabling of accounts is deprecated and will be removed in V5",
-            input = EnableAccountInput::class,
-            outputName = "account",
-            outputDescription = "Updated account",
-            outputType = Account::class
+            name = "createAccountGroup",
+            description = "Creates an account group",
+            input = CreateAccountGroupInput::class,
+            outputName = "accountGroup",
+            outputType = AccountGroup::class,
+            outputDescription = "Created account group",
         ) { input ->
-            val id = ID.of(input.id)
-            accountService.setAccountDisabled(id, false)
-            accountService.getAccount(id)
+            accountService.createGroup(
+                AccountGroupInput(
+                    name = input.name,
+                    description = input.description,
+                )
+            )
         },
+
         /**
-         * Locking an account
+         * Editing an account group
          */
-        simpleMutation(
-            name = "lockAccount",
-            description = "Locks an account",
-            deprecation = "Locking of accounts is deprecated and will be removed in V5",
-            input = LockAccountInput::class,
-            outputName = "account",
-            outputDescription = "Updated account",
-            outputType = Account::class
+        unitMutation<EditAccountGroupInput>(
+            name = "editAccountGroup",
+            description = "Edits an account group",
         ) { input ->
             val id = ID.of(input.id)
-            accountService.setAccountLocked(id, true)
-            accountService.getAccount(id)
+            accountService.updateGroup(
+                id,
+                AccountGroupInput(
+                    name = input.name,
+                    description = input.description,
+                )
+            )
         },
+
         /**
-         * Unlocking an account
+         * Deleting an account group
          */
-        simpleMutation(
-            name = "unlockAccount",
-            description = "Unlocks an account",
-            deprecation = "Unlocking of accounts is deprecated and will be removed in V5",
-            input = UnlockAccountInput::class,
-            outputName = "account",
-            outputDescription = "Updated account",
-            outputType = Account::class
+        unitMutation<DeleteAccountGroupInput>(
+            name = "deleteAccountGroup",
+            description = "Deletes an account group",
         ) { input ->
             val id = ID.of(input.id)
-            accountService.setAccountLocked(id, false)
-            accountService.getAccount(id)
+            accountService.deleteGroup(id)
         },
     )
 }
 
-abstract class AbstractAccountInput(
+data class EditAccountInput(
     @APIDescription("ID of the account")
     val id: Int,
-)
-
-class DisableAccountInput(id: Int) : AbstractAccountInput(id)
-class EnableAccountInput(id: Int) : AbstractAccountInput(id)
-class LockAccountInput(id: Int) : AbstractAccountInput(id)
-class UnlockAccountInput(id: Int) : AbstractAccountInput(id)
-
-data class CreateBuiltInAccountInput(
-    @get:NotNull(message = "The account name is required.")
-    @get:Pattern(
-        regexp = "[a-zA-Z0-9@_.-]+",
-        message = "The account name must contain only letters, digits, underscores, @, dashes and dots."
-    )
-    val name: String,
     @get:NotNull(message = "The account full name is required.")
     @get:Size(min = 1, max = 100, message = "The account full name must be between 1 and 100 long.")
-    val fullName: String,
-    @get:NotNull(message = "The account email is required.")
-    @get:Size(min = 1, max = 200, message = "The account email must be between 1 and 200 long.")
-    val email: String,
-    @get:NotNull(message = "The account password is required.")
-    val password: String,
+    @APIDescription("New full name for the account. If null, the full name is not changed.")
+    val fullName: String? = null,
+    @APIDescription("List of groups the account is a member of. If null, the groups are not changed.")
+    @ListRef
+    val groups: List<Int>? = null,
+)
+
+data class DeleteAccountInput(
+    @APIDescription("ID of the account")
+    val accountId: Int,
+)
+
+@APIDescription("Group to create")
+data class CreateAccountGroupInput(
+    @get:NotNull(message = "The group name is required.")
+    @get:Size(min = 1, max = 100, message = "The group name must be between 1 and 100 long.")
+    @APIDescription("Name of the group")
+    val name: String,
+    @get:Size(min = 0, max = 300, message = "The group description must be between 1 and 300 long.")
+    @APIDescription("Description of the group")
+    val description: String? = null,
+)
+
+data class EditAccountGroupInput(
+    @APIDescription("ID of the account group")
+    val id: Int,
+    @get:NotNull(message = "The group name is required.")
+    @get:Size(min = 1, max = 100, message = "The group name must be between 1 and 100 long.")
+    @APIDescription("Name of the group")
+    val name: String,
+    @get:Size(min = 0, max = 300, message = "The group description must be between 1 and 300 long.")
+    @APIDescription("Description of the group")
+    val description: String? = null,
+)
+
+data class DeleteAccountGroupInput(
+    @APIDescription("ID of the account group")
+    val id: Int,
 )

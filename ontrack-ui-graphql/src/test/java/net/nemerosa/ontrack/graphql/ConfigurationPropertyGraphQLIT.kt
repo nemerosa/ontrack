@@ -4,12 +4,14 @@ import net.nemerosa.ontrack.extension.api.support.TestConfiguration
 import net.nemerosa.ontrack.extension.api.support.TestConfigurationService
 import net.nemerosa.ontrack.extension.api.support.TestProperty
 import net.nemerosa.ontrack.extension.api.support.TestPropertyType
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
+@AsAdminTest
 class ConfigurationPropertyGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired

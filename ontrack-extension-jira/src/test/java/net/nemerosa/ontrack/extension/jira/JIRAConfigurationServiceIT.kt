@@ -21,7 +21,13 @@ class JIRAConfigurationServiceIT : AbstractDSLTestSupport() {
                     val name = uid("j-")
                     jiraConfigurationService.updateConfiguration(
                         uid("j-"),
-                        JIRAConfiguration(name, "https://host", "user", "", emptyList(), emptyList())
+                        JIRAConfiguration(
+                            name = name,
+                            url ="https://host",
+                            user = "user",
+                            password = "",
+                            include = emptyList(),
+                            exclude = emptyList())
                     )
                 }
             }

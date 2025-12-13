@@ -14,6 +14,11 @@ class GitCommitSearchExtensionIT : AbstractGitSearchTestSupport() {
     @Autowired
     protected lateinit var gitCommitSearchExtension: GitCommitSearchExtension
 
+    private fun searchRequest(commit: String) = SearchRequest(
+        token = commit,
+        type = GitCommitSearchExtension.GIT_COMMIT_SEARCH_RESULT_TYPE,
+    )
+
     @Test
     fun `Looking for a commit on a project when Git repo is not indexed yet`() {
         createRepo {
@@ -25,7 +30,7 @@ class GitCommitSearchExtensionIT : AbstractGitSearchTestSupport() {
                 searchIndexService.index(gitCommitSearchExtension)
                 // Looks for every commit, they must not be found
                 commits.forEach { (_, commit) ->
-                    val results = searchService.paginatedSearch(SearchRequest(commit)).items
+                    val results = searchService.paginatedSearch(searchRequest(commit)).items
                     val title = "$name $commit"
                     val result = results.find { it.title == title }
                     assertNull(result, "No commit is indexed yet")
@@ -47,7 +52,7 @@ class GitCommitSearchExtensionIT : AbstractGitSearchTestSupport() {
                 searchIndexService.index(gitCommitSearchExtension)
                 // Looks for every commit, they must not be found
                 commits.forEach { (_, commit) ->
-                    val results = searchService.paginatedSearch(SearchRequest(commit)).items
+                    val results = searchService.paginatedSearch(searchRequest(commit)).items
                     val title = "$name $commit"
                     val result = results.find { it.title == title }
                     assertNull(result, "No commit is indexed yet")
@@ -67,7 +72,7 @@ class GitCommitSearchExtensionIT : AbstractGitSearchTestSupport() {
                 searchIndexService.index(gitCommitSearchExtension)
                 // Looks for every commit
                 commits.forEach { (_, commit) ->
-                    val results = searchService.paginatedSearch(SearchRequest(commit)).items
+                    val results = searchService.paginatedSearch(searchRequest(commit)).items
                     val title = "$name $commit"
                     val result = results.find { it.title == title }
                     assertNotNull(result)
@@ -87,7 +92,7 @@ class GitCommitSearchExtensionIT : AbstractGitSearchTestSupport() {
                 searchIndexService.index(gitCommitSearchExtension)
                 // Looks for every commit
                 commits.forEach { (_, commit) ->
-                    val results = searchService.paginatedSearch(SearchRequest(commit)).items
+                    val results = searchService.paginatedSearch(searchRequest(commit)).items
                     val title = "$name $commit"
                     val result = results.find { it.title.startsWith(title) }
                     assertNotNull(result)
@@ -112,7 +117,7 @@ class GitCommitSearchExtensionIT : AbstractGitSearchTestSupport() {
             }
             // Looks for every commit
             commits.forEach { (_, commit) ->
-                val results = searchService.paginatedSearch(SearchRequest(commit)).items
+                val results = searchService.paginatedSearch(searchRequest(commit)).items
                 val title = "${project.name} $commit"
                 val result = results.find { it.title == title }
                 assertNull(result, "Cannot find commit after project is deleted")

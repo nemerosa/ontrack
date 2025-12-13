@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec.charts
 
-import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Optional
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GetChartQuery
@@ -21,9 +21,9 @@ fun Ontrack.getChart(
     graphqlConnector.query(
         GetChartQuery(
             name,
-            Input.optional(ref),
+            Optional.presentIfNotNull(ref),
             interval,
             period,
             parameters
         )
-    )?.chart ?: throw GraphQLMissingDataException("Did not get back the chart")
+    )?.getChart ?: throw GraphQLMissingDataException("Did not get back the chart")

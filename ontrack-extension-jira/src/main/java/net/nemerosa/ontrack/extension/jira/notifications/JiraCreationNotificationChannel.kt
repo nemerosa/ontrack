@@ -1,23 +1,19 @@
 package net.nemerosa.ontrack.extension.jira.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.mergeList
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
-import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.transform
+import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.multiStrings
-import net.nemerosa.ontrack.model.form.textField
-import net.nemerosa.ontrack.model.form.yesNoField
 import org.springframework.stereotype.Component
 
 @Component
@@ -41,6 +37,27 @@ class JiraCreationNotificationChannel(
                 ?: throw EventSubscriptionConfigException("Jira config configuration ${config.configName} does not exist")
         }
     }
+
+    override fun mergeConfig(
+        a: JiraCreationNotificationChannelConfig,
+        changes: JsonNode
+    ) = JiraCreationNotificationChannelConfig(
+        configName = patchString(changes, a::configName),
+        useExisting = patchBoolean(changes, a::useExisting),
+        projectName = patchString(changes, a::projectName),
+        issueType = patchString(changes, a::issueType),
+        labels = patchStringList(changes, a::labels),
+        fixVersion = patchNullableString(changes, a::fixVersion),
+        assignee = patchNullableString(changes, a::assignee),
+        titleTemplate = patchString(changes, a::titleTemplate),
+        customFields = if (changes.has(JiraCreationNotificationChannelConfig::customFields.name)) {
+            val customChanges = changes.path(JiraCreationNotificationChannelConfig::customFields.name)
+                .map { it.parse<JiraCustomField>() }
+            mergeList(a.customFields, customChanges, JiraCustomField::name) { e, _ -> e }
+        } else {
+            a.customFields
+        }
+    )
 
     override fun publish(
         recordId: String,
@@ -157,21 +174,5 @@ class JiraCreationNotificationChannel(
     override val displayName: String = "Jira ticket creation"
 
     override val enabled: Boolean = true
-
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun getForm(c: JiraCreationNotificationChannelConfig?): Form =
-        Form.create()
-            .textField(JiraCreationNotificationChannelConfig::configName, c?.configName)
-            .yesNoField(JiraCreationNotificationChannelConfig::useExisting, c?.useExisting)
-            .textField(JiraCreationNotificationChannelConfig::projectName, c?.projectName)
-            .textField(JiraCreationNotificationChannelConfig::issueType, c?.issueType)
-            .multiStrings(JiraCreationNotificationChannelConfig::labels, c?.labels)
-            .textField(JiraCreationNotificationChannelConfig::fixVersion, c?.fixVersion)
-            .textField(JiraCreationNotificationChannelConfig::assignee, c?.assignee)
-            .textField(JiraCreationNotificationChannelConfig::titleTemplate, c?.titleTemplate)
-
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: JiraCreationNotificationChannelConfig): String =
-        config.titleTemplate
 
 }

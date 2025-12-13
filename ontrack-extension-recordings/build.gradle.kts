@@ -1,10 +1,7 @@
-import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
-
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
-
-apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-support"))
@@ -18,29 +15,8 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
 
     testImplementation(project(":ontrack-it-utils"))
-    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation("com.networknt:json-schema-validator")
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
-}
-
-val testJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("tests")
-    from(sourceSets["test"].output)
-}
-
-configure<PublishingExtension> {
-    publications {
-        maybeCreate<MavenPublication>("mavenCustom").artifact(tasks["testJar"])
-    }
-}
-
-tasks["assemble"].dependsOn("testJar")
-
-val tests by configurations.creating
-
-artifacts {
-    add("tests", testJar)
 }

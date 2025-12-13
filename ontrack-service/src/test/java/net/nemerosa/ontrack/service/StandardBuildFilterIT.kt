@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.PromotionRun.Companion.of
@@ -12,6 +13,7 @@ import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class StandardBuildFilterIT : AbstractBuildFilterTestSupport() {
 
     /**
@@ -506,7 +508,7 @@ class StandardBuildFilterIT : AbstractBuildFilterTestSupport() {
         val otherPL = doCreatePromotionLevel(otherBranch, nd("PRODUCTION", ""))
         val otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""))
         val otherBuild2 = doCreateBuild(otherBranch, nd("2.0", ""))
-        asUser().with(otherBranch, PromotionRunCreate::class.java).execute {
+        asUser().withProjectFunction(otherBranch, PromotionRunCreate::class.java).execute {
             structureService.newPromotionRun(
                     of(
                             otherBuild2,
@@ -614,7 +616,7 @@ class StandardBuildFilterIT : AbstractBuildFilterTestSupport() {
         val otherPL = doCreatePromotionLevel(otherBranch, nd("PRODUCTION", ""))
         val otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""))
         val otherBuild2 = doCreateBuild(otherBranch, nd("2.0", ""))
-        asUser().with(otherBranch, PromotionRunCreate::class.java).execute {
+        asUser().withProjectFunction(otherBranch, PromotionRunCreate::class.java).execute {
             structureService.newPromotionRun(
                     of(
                             otherBuild2,

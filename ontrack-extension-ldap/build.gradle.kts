@@ -12,7 +12,6 @@ dependencies {
     implementation(project(":ontrack-extension-casc"))
     implementation("org.springframework.security:spring-security-ldap")
     implementation("org.apache.commons:commons-lang3")
-    implementation("javax.validation:validation-api")
 
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation("com.networknt:json-schema-validator")

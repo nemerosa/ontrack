@@ -66,5 +66,6 @@ class GQLGitHubIngestionHookPayload(
         .stringField(IngestionHookPayload::source)
         .stringField(IngestionHookPayload::routing)
         .stringField(IngestionHookPayload::queue)
+        .stringField(IngestionHookPayload::accountName)
         .build()
 }

@@ -18,7 +18,7 @@ class GQLRootQueryPredefinedPromotionLevelByName(
             .type(gqlTypePredefinedPromotionLevel.typeRef)
             .argument(stringArgument("name", "Name", nullable = false))
             .dataFetcher { env ->
-                val name: String = env.getArgument("name")
+                val name: String = env.getArgument("name")!!
                 predefinedPromotionLevelService.findPredefinedPromotionLevelByName(name)
             }
             .build()

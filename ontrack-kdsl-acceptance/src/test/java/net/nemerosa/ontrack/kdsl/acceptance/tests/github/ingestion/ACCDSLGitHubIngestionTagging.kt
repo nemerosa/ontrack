@@ -1,15 +1,17 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.github.ingestion
 
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsText
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
-import net.nemerosa.ontrack.kdsl.spec.extension.general.label
+import net.nemerosa.ontrack.kdsl.spec.extension.general.release
 import net.nemerosa.ontrack.kdsl.spec.extension.git.gitCommitProperty
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
 import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.setBranchGitHubIngestionConfig
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
+@TestOnGitHub
 class ACCDSLGitHubIngestionTagging : AbstractACCDSLGitHubIngestionTestSupport() {
 
     /**
@@ -54,7 +56,7 @@ class ACCDSLGitHubIngestionTagging : AbstractACCDSLGitHubIngestionTestSupport() 
         waitUntilPayloadIsProcessed(pushTagPayloadUuid)
 
         // Checks the promoted build is labelled with the tag
-        assertEquals("2.1.0", build.label)
+        assertEquals("2.1.0", build.release)
 
     }
 
@@ -116,8 +118,8 @@ class ACCDSLGitHubIngestionTagging : AbstractACCDSLGitHubIngestionTestSupport() 
         waitUntilPayloadIsProcessed(pushTagPayloadUuid)
 
         // Checks the promoted build is labelled with the tag
-        assertEquals("2.1.0", promoted.label)
-        assertEquals(null, annotated.label)
+        assertEquals("2.1.0", promoted.release)
+        assertEquals(null, annotated.release)
 
     }
 
@@ -177,8 +179,8 @@ class ACCDSLGitHubIngestionTagging : AbstractACCDSLGitHubIngestionTestSupport() 
         waitUntilPayloadIsProcessed(pushTagPayloadUuid)
 
         // Checks the promoted build is labelled with the tag
-        assertEquals("2.1.0", promoted.label)
-        assertEquals(null, newest.label)
+        assertEquals("2.1.0", promoted.release)
+        assertEquals(null, newest.release)
 
     }
 
@@ -239,8 +241,8 @@ class ACCDSLGitHubIngestionTagging : AbstractACCDSLGitHubIngestionTestSupport() 
         waitUntilPayloadIsProcessed(pushTagPayloadUuid)
 
         // Checks the promoted build is labelled with the tag
-        assertEquals("2.1.0", promoted.label)
-        assertEquals(null, newest.label)
+        assertEquals("2.1.0", promoted.release)
+        assertEquals(null, newest.release)
 
     }
 

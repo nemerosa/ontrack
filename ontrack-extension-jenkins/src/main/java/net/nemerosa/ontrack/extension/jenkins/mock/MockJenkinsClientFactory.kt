@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-@Profile(RunProfile.ACC)
+@Profile(RunProfile.DEV)
 class MockJenkinsClientFactory : JenkinsClientFactory {
 
     private val clients = mutableMapOf<String, MockJenkinsClient>()

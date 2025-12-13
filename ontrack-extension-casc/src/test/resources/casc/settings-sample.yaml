@@ -1,0 +1,6 @@
+ontrack:
+  config:
+    settings:
+      sample:
+        maxProjects: 200
+        enabled: true

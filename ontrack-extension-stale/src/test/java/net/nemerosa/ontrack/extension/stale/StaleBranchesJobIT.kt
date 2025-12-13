@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.stale
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.job.JobRunListener
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,6 +11,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class StaleBranchesJobIT : AbstractDSLTestSupport() {
 
     @Autowired

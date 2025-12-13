@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class GitHubEngineConfigurationTest {
 
@@ -481,61 +483,6 @@ class GitHubEngineConfigurationTest {
     }
 
     @Test
-    fun `Anonymous form does not contain any credentials`() {
-        GitHubEngineConfiguration("Test", null).asForm().apply {
-            assertEquals(null, getField("user")?.value)
-            assertEquals(null, getField("password")?.value)
-            assertEquals(null, getField("oauth2Token")?.value)
-            assertEquals(null, getField("appId")?.value)
-            assertEquals(null, getField("appPrivateKey")?.value)
-        }
-    }
-
-    @Test
-    fun `Password form does not contain any credentials`() {
-        GitHubEngineConfiguration(
-            "Test", null,
-            user = "user",
-            password = "xxxx"
-        ).asForm().apply {
-            assertEquals("user", getField("user")?.value)
-            assertEquals(null, getField("password")?.value)
-            assertEquals(null, getField("oauth2Token")?.value)
-            assertEquals(null, getField("appId")?.value)
-            assertEquals(null, getField("appPrivateKey")?.value)
-        }
-    }
-
-    @Test
-    fun `Token form does not contain any credentials`() {
-        GitHubEngineConfiguration(
-            "Test", null,
-            oauth2Token = "token",
-        ).asForm().apply {
-            assertEquals(null, getField("user")?.value)
-            assertEquals(null, getField("password")?.value)
-            assertEquals(null, getField("oauth2Token")?.value)
-            assertEquals(null, getField("appId")?.value)
-            assertEquals(null, getField("appPrivateKey")?.value)
-        }
-    }
-
-    @Test
-    fun `App form does not contain any credentials`() {
-        GitHubEngineConfiguration(
-            "Test", null,
-            appId = "123456",
-            appPrivateKey = "xxxxxxx"
-        ).asForm().apply {
-            assertEquals(null, getField("user")?.value)
-            assertEquals(null, getField("password")?.value)
-            assertEquals(null, getField("oauth2Token")?.value)
-            assertEquals("123456", getField("appId")?.value)
-            assertEquals(null, getField("appPrivateKey")?.value)
-        }
-    }
-
-    @Test
     fun `Anonymous mode`() {
         assertEquals(
             GitHubAuthenticationType.ANONYMOUS,
@@ -603,5 +550,19 @@ class GitHubEngineConfigurationTest {
                 appPrivateKey = "xxx",
             ).authenticationType
         )
+    }
+
+    @Test
+    fun `SCM URL matching the config URL`() {
+        val configUrl = "https://github.com"
+        val config = GitHubEngineConfiguration(
+            "Test",
+            configUrl,
+            oauth2Token = "xxx",
+        )
+        assertTrue(config.matchesUrl("https://github.com/nemerosa/yontrack.git"))
+        assertTrue(config.matchesUrl("git@github.com:nemerosa/ontrack.git"))
+        assertFalse(config.matchesUrl("https://github.dev.yontrack.com/nemerosa/yontrack.git"))
+        assertFalse(config.matchesUrl("git@github.dev.yontrack.com:nemerosa/ontrack.git"))
     }
 }

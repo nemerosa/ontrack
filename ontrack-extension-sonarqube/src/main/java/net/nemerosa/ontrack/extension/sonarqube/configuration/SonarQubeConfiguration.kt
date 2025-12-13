@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.sonarqube.configuration
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.CredentialsConfiguration
 
 /**
@@ -11,16 +10,12 @@ import net.nemerosa.ontrack.model.support.CredentialsConfiguration
  * @property url URL of the SonarQube server
  * @property password Connection token (called `password` for legacy reasons)
  */
-// TODO #532 Using `open` as a workaround
 @JsonIgnoreProperties(ignoreUnknown = true)
-open class SonarQubeConfiguration(
+class SonarQubeConfiguration(
     override val name: String,
     val url: String,
     val password: String?
 ) : CredentialsConfiguration<SonarQubeConfiguration> {
-
-    override val descriptor: ConfigurationDescriptor
-        get() = ConfigurationDescriptor(name, "$name ($url)")
 
     override fun obfuscate() = SonarQubeConfiguration(
         name,

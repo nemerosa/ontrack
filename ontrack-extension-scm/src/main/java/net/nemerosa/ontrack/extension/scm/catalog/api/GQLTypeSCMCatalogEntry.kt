@@ -64,7 +64,7 @@ class GQLTypeSCMCatalogEntry(
                                 .description("Flag to indicate if this SCM catalog entry is linked to a project")
                                 .type(GraphQLBoolean)
                                 .dataFetcher { env ->
-                                    val entry = env.getSource<SCMCatalogEntry>()
+                                    val entry = env.getSource<SCMCatalogEntry>()!!
                                     catalogLinkService.isLinked(entry)
                                 }
                     }
@@ -73,8 +73,8 @@ class GQLTypeSCMCatalogEntry(
                                 .description("Project linked to this SCM catalog entry. Might be null")
                                 .type(GraphQLTypeReference(GQLTypeProject.PROJECT))
                                 .dataFetcher { env ->
-                                    val entry = env.getSource<SCMCatalogEntry>()
-                                    catalogLinkService.getLinkedProject(entry)
+                                    val entry = env.getSource<SCMCatalogEntry>()!!
+                                    catalogLinkService.getLinkedProject(entry)!!
                                 }
                     }
                     .field {

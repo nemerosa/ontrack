@@ -38,7 +38,7 @@ export default function ValidationRunStatusChange({run, onStatusChanged}) {
                         }
                     }
                 `, {
-                    runId: run.id,
+                    runId: Number(run.id),
                     statusId: nextStatusId,
                     description,
                 }

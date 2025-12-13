@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.job.support
 
 import io.mockk.mockk
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.job.Schedule.Companion.everyMinutes
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
@@ -10,6 +9,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue

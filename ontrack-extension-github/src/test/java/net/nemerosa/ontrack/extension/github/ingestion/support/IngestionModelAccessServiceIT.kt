@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.*
@@ -12,6 +11,7 @@ import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfiguration
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.jvm.optionals.getOrNull
 import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -189,13 +189,15 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
 
     @Test
     fun `Creating a branch`() {
-        project {
-            val branch = ingestionModelAccessService.getOrCreateBranch(this, "release/1.0", null)
-            assertNotNull(
-                structureService.findBranchByName(project.name, "release-1.0").getOrNull(),
-                "Branch created"
-            ) {
-                assertEquals(branch.id, it.id, "Same branch")
+        asAdmin {
+            project {
+                val branch = ingestionModelAccessService.getOrCreateBranch(this, "release/1.0", null)
+                assertNotNull(
+                    structureService.findBranchByName(project.name, "release-1.0").getOrNull(),
+                    "Branch created"
+                ) {
+                    assertEquals(branch.id, it.id, "Same branch")
+                }
             }
         }
     }
@@ -211,10 +213,12 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
 
     @Test
     fun `Keeping a branch`() {
-        project {
-            branch("release-1.0") {
-                val branch = ingestionModelAccessService.getOrCreateBranch(project, "release/1.0", null)
-                assertEquals(this.id, branch.id, "Same branch")
+        asAdmin {
+            project {
+                branch("release-1.0") {
+                    val branch = ingestionModelAccessService.getOrCreateBranch(project, "release/1.0", null)
+                    assertEquals(this.id, branch.id, "Same branch")
+                }
             }
         }
     }

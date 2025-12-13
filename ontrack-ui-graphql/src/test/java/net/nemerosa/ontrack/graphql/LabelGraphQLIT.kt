@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.graphql
 
-import org.junit.Test
+import net.nemerosa.ontrack.it.AsAdminTest
+import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class LabelGraphQLIT : AbstractQLKTITJUnit4Support() {
+@AsAdminTest
+class LabelGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Schema OK`() {

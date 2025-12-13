@@ -1,11 +1,10 @@
 package net.nemerosa.ontrack.extension.av.audit
 
-import net.nemerosa.ontrack.common.RunProfile
-import org.springframework.context.annotation.Profile
+import jakarta.annotation.PostConstruct
+import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import javax.annotation.PostConstruct
 
 /**
  * Same code than for [AutoVersioningAuditServiceImpl] but uses the same transaction, which allows
@@ -14,7 +13,7 @@ import javax.annotation.PostConstruct
  * @see AutoVersioningAuditServiceImpl
  */
 @Service
-@Profile(RunProfile.UNIT_TEST)
+@ConditionalOnNotWebApplication
 @Transactional(propagation = Propagation.REQUIRED)
 class UntransactionalAutoVersioningAuditService(
     store: AutoVersioningAuditStore,

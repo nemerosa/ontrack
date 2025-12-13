@@ -1,13 +1,16 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.*
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.graphql.support.getMutationInputField
 import net.nemerosa.ontrack.graphql.support.getRequiredMutationInputField
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.ValidationDataTypeConfig
+import net.nemerosa.ontrack.model.structure.ValidationStamp
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * Utility class used to implement specific validation stamp mutations

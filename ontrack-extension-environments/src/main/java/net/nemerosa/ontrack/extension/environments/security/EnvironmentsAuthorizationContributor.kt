@@ -16,7 +16,7 @@ class EnvironmentsAuthorizationContributor(
 
     override fun appliesTo(context: Any): Boolean = context is GlobalAuthorizationContext
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> {
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> {
         val environmentFeatureEnabled = environmentsLicense.environmentFeatureEnabled
         return listOf(
             Authorization(

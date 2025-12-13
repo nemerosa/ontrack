@@ -1,16 +1,13 @@
 import {Space} from "antd";
-import {useRestClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import ChangeImageDialog, {useChangeImageDialog} from "@components/common/ChangeImageDialog";
 import PredefinedPromotionLevelImage from "@components/core/config/PredefinedPromotionLevelImage";
 
 export const usePredefinedPromotionLevelChangeImageDialog = ({onChange}) => {
 
-    const restClient = useRestClient()
-
     return useChangeImageDialog({
         query: gql`
-            query PromotionLevel($id: Int!) {
+            query PredefinedPromotionLevel($id: Int!) {
                 predefinedPromotionLevelById(id: $id) {
                     id
                     name
@@ -18,9 +15,12 @@ export const usePredefinedPromotionLevelChangeImageDialog = ({onChange}) => {
                 }
             }
         `,
-        queryUserNode: 'predefinedPromotionLevelByName',
+        queryUserNode: 'predefinedPromotionLevelById',
         imageCallback: (data, id) => {
-            restClient.put(`/rest/admin/predefinedPromotionLevels/${id}/image`, data).then(() => {
+            fetch(`/api/protected/images/predefinedPromotionLevels/${id}`, {
+                method: 'PUT',
+                body: data,
+            }).then(() => {
                 if (onChange) onChange()
             })
         }

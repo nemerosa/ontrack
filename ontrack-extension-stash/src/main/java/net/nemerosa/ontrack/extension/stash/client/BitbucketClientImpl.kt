@@ -106,6 +106,16 @@ class BitbucketClientImpl(
         return response.values.any { it.displayId == branch }
     }
 
+    override fun getBranchesForCommit(
+        repo: BitbucketRepository,
+        commit: String
+    ): List<String> {
+        val response = template.getForObject<BranchInfoCommitResponse>(
+            "/rest/branch-utils/1.0/projects/${repo.project}/repos/${repo.repository}/branches/info/${commit}"
+        )
+        return response.values.filter { it.type == "BRANCH" }.map { it.displayId }
+    }
+
     override fun geBranchLastCommit(repo: BitbucketRepository, branch: String): String? {
         if (isBranchExisting(repo, branch)) {
             val response = template.getForObject<GetBranchLastCommitResponse>(
@@ -124,7 +134,7 @@ class BitbucketClientImpl(
                 uri += "?at=$branch"
             }
             template.getForObject<ByteArray>(uri)
-        } catch (ignored: NotFound) {
+        } catch (_: NotFound) {
             null
         }
 
@@ -226,6 +236,18 @@ class BitbucketClientImpl(
             it.parse<BitbucketServerCommit>()
         }
 
+    override fun getCommit(
+        repository: BitbucketRepository,
+        commit: String
+    ): BitbucketServerCommit? =
+        try {
+            template.getForObject<JsonNode>(
+                "/rest/api/latest/projects/${repository.project}/repos/${repository.repository}/commits/${commit}"
+            ).parse<BitbucketServerCommit>()
+        } catch (_: NotFound) {
+            null
+        }
+
     private val template = RestTemplateBuilder()
         .rootUri(configuration.url)
         .basicAuthentication(
@@ -238,6 +260,15 @@ class BitbucketClientImpl(
         .rootUri(configuration.url)
         .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer $token")
         .build()
+
+    private class BranchInfoCommitResponse(
+        val values: List<BranchInfoCommit>,
+    )
+
+    private class BranchInfoCommit(
+        val displayId: String,
+        val type: String,
+    )
 
     private class PRResponse(
         val id: Int,

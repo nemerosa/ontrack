@@ -4,8 +4,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.common.BaseException
+import net.nemerosa.ontrack.extension.git.model.gitRepository
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyTypeUtils
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
 import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension
@@ -13,10 +15,12 @@ import net.nemerosa.ontrack.extension.github.catalog.GitHubSCMCatalogSettings
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
+import net.nemerosa.ontrack.extension.github.property.GitHubConfigurator
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
@@ -27,6 +31,7 @@ import net.nemerosa.ontrack.extension.scm.service.SCMExtension
 import net.nemerosa.ontrack.extension.scm.service.SCMPath
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
@@ -45,6 +50,8 @@ class GitHubSCMExtension(
     private val issueServiceRegistry: IssueServiceRegistry,
     private val issueServiceExtension: GitHubIssueServiceExtension,
     private val structureService: StructureService,
+    private val gitRepositoryClientFactory: GitRepositoryClientFactory,
+    private val gitHubConfigurator: GitHubConfigurator,
 ) : AbstractExtension(gitHubExtensionFeature), SCMExtension {
 
     override fun getSCM(project: Project): SCM? {
@@ -233,6 +240,11 @@ class GitHubSCMExtension(
             }
         }
 
+        override val issueRepositoryContext = IssueRepositoryContext(
+            repositoryType = "github",
+            repositoryName = repository,
+        )
+
         override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMCommit> {
             val commits = client.compareCommits(repository, fromCommit, toCommit)
                 .takeIf { it.isNotEmpty() }
@@ -241,6 +253,16 @@ class GitHubSCMExtension(
                 GitHubSCMCommit(commit)
             }
         }
+
+        override fun getCommit(
+            id: String
+        ): SCMCommit? =
+            client.getCommit(
+                repository = repository,
+                commit = id,
+            )?.let {
+                GitHubSCMCommit(it)
+            }
 
         override fun findBuildByCommit(project: Project, id: String): Build? =
             propertyService.findByEntityTypeAndSearchArguments(
@@ -252,6 +274,32 @@ class GitHubSCMExtension(
             }.firstOrNull { build ->
                 build.project.id == project.id
             }
+
+        override fun findBranchFromScmBranchName(
+            project: Project,
+            scmBranch: String
+        ): Branch? =
+            GitBranchConfigurationPropertyTypeUtils.findBranchFromScmBranchName(
+                propertyService = propertyService,
+                structureService = structureService,
+                project = project,
+                scmBranch = scmBranch,
+            )
+
+        /**
+         * As of 2025, Sep 26, there is no API endpoint in GitHub (REST or GraphQL) to
+         * get the list of branches for a commit.
+         *
+         * We're now using the local Git repository client (file & `git` based) to
+         * get this information.
+         *
+         * In V6, this will need to be converted into something else.
+         */
+        override fun getBranchesForCommit(project: Project, commit: String): List<String> {
+            val configuration = gitHubConfigurator.getConfiguration(project) ?: return emptyList()
+            val gitRepoClient = gitRepositoryClientFactory.getClient(configuration.gitRepository)
+            return gitRepoClient.getBranchesForCommit(commit)
+        }
 
         private val client: OntrackGitHubClient by lazy {
             clientFactory.create(configuration)

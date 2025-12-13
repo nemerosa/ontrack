@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.dm.tse
 
-import net.nemerosa.ontrack.extension.git.branching.BranchingModelService
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchModelMatcher
 import net.nemerosa.ontrack.model.structure.BranchModelMatcherProvider

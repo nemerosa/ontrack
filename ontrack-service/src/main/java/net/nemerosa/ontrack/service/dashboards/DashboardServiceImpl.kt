@@ -15,9 +15,9 @@ class DashboardServiceImpl(
 ) : DashboardService {
 
     override fun userDashboard(): Dashboard {
-        val account = securityService.currentAccount
+        val account = securityService.currentUser?.account
             ?: return DefaultDashboards.defaultDashboard
-        val selectedUuid = preferencesService.getPreferences(account.account).dashboardUuid
+        val selectedUuid = preferencesService.getPreferences(account).dashboardUuid
             ?: return DefaultDashboards.defaultDashboard
         return dashboardStorageService.findDashboardByUuid(selectedUuid)
             ?: return DefaultDashboards.defaultDashboard
@@ -28,7 +28,7 @@ class DashboardServiceImpl(
         // Built-in dashboards
         list.addAll(DefaultDashboards.defaultDashboards)
         // Private dashboards
-        securityService.currentAccount?.account?.let {
+        securityService.currentUser?.account?.let {
             list.addAll(dashboardStorageService.findDashboardsByUser(it.id))
         }
         // Shared dashboards
@@ -42,7 +42,7 @@ class DashboardServiceImpl(
     override fun shareDashboard(input: ShareDashboardInput): Dashboard {
         // Checking the rights
         securityService.checkGlobalFunction(DashboardSharing::class.java)
-        val userId = securityService.currentAccount?.account?.id!!
+        val userId = securityService.currentUser?.account?.id!!
         // Gets the existing dashboard
         val existing = dashboardStorageService.findDashboardsByUser(userId)
             .find { it.uuid == input.uuid }
@@ -94,7 +94,7 @@ class DashboardServiceImpl(
         dashboardStorageService.saveDashboard(dashboard)
         // Selection for the user
         if (input.select) {
-            val account = securityService.currentAccount?.account
+            val account = securityService.currentUser?.account
             if (account != null) {
                 preferencesService.savePreferences(account) {
                     it.dashboardUuid = dashboard.uuid
@@ -123,7 +123,7 @@ class DashboardServiceImpl(
         val existing = dashboardStorageService.findDashboardByUuid(uuid)
             ?: throw DashboardUuidNotFoundException(uuid)
 
-        val account = securityService.currentAccount?.account
+        val account = securityService.currentUser?.account
         val ownsDashboard = account != null && dashboardStorageService.ownDashboard(uuid, account.id)
 
         val okToDelete: Boolean = when (existing.userScope) {
@@ -149,7 +149,7 @@ class DashboardServiceImpl(
     override fun selectDashboard(uuid: String) {
         val accessible = userDashboards().find { it.uuid == uuid }
             ?: throw DashboardUuidNotFoundException(uuid)
-        val account = securityService.currentAccount?.account
+        val account = securityService.currentUser?.account
         if (account != null) {
             preferencesService.savePreferences(account) {
                 it.dashboardUuid = accessible.uuid
@@ -158,7 +158,7 @@ class DashboardServiceImpl(
     }
 
     override fun getAuthorizations(dashboard: Dashboard): DashboardAuthorizations {
-        val account = securityService.currentAccount?.account
+        val account = securityService.currentUser?.account
         return if (account != null) {
             val ownDashboard = dashboardStorageService.ownDashboard(dashboard.uuid, account.id)
             val editing = securityService.isGlobalFunctionGranted<DashboardEdition>()

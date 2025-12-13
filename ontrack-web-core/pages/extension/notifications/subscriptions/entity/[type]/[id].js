@@ -10,7 +10,7 @@ export default function SubscriptionsEntityPage() {
         <>
             <main>
                 <MainLayout>
-                    <SubscriptionsEntityView type={type} id={id}/>
+                    <SubscriptionsEntityView type={type} id={Number(id)}/>
                 </MainLayout>
             </main>
         </>

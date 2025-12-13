@@ -37,7 +37,7 @@ class GQLProjectSlotGraphFieldContributor(
                         )
                     )
                     .dataFetcher { env ->
-                        val project: Project = env.getSource()
+                        val project: Project = env.getSource()!!
                         val qualifier = env.getArgument<String?>(ARG_QUALIFIER) ?: Slot.DEFAULT_QUALIFIER
                         projectSlotGraphService.slotGraph(project, qualifier)
                     }

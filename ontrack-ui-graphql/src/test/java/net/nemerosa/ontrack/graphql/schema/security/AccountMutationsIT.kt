@@ -1,113 +1,159 @@
 package net.nemerosa.ontrack.graphql.schema.security
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
-import net.nemerosa.ontrack.model.security.Account
-import org.junit.Test
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
+import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.test.TestUtils.uid
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
-class AccountMutationsIT: AbstractQLKTITJUnit4Support() {
+class AccountMutationsIT : AbstractQLKTITSupport() {
 
     @Test
-    fun `Disabling an account`() {
-        val account = createAccount()
-        asAdmin {
-            run("""
-                mutation {
-                    disableAccount(input: {id: ${account.id}}) {
-                        account {
-                            disabled
-                            locked
-                        }
-                        errors {
-                            message
-                        }
+    @AsAdminTest
+    fun `Editing an account`() {
+        val group1 = doCreateAccountGroup()
+        val group2 = doCreateAccountGroup()
+
+        val account = doCreateAccount(group1)
+
+        run(
+            """
+            mutation {
+                editAccount(input: {
+                    id: ${account.id},
+                    fullName: "New full name",
+                    groups: [${group2.id}],
+                }) {
+                    errors {
+                        message
                     }
                 }
-            """).let { data ->
-                val node = assertNoUserError(data, "disableAccount")
-                assertEquals(true, node.path("account").path("disabled").asBoolean())
-                assertEquals(false, node.path("account").path("locked").asBoolean())
+            }
+        """.trimIndent()
+        ) { data ->
+            checkGraphQLUserErrors(data, "editAccount")
+        }
+
+        val savedAccount = accountService.getAccount(account.id)
+        assertEquals("New full name", savedAccount.fullName)
+        assertEquals(
+            setOf(group2.id()),
+            accountService.getGroupsForAccount(savedAccount.id).map { it.id() }.toSet(),
+            "Account groups updated"
+        )
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Deleting an account`() {
+        val account = doCreateAccount()
+
+        run(
+            """
+            mutation {
+                deleteAccount(input: {
+                    accountId: ${account.id}
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        """.trimIndent()
+        ) { data ->
+            checkGraphQLUserErrors(data, "deleteAccount")
+        }
+
+        assertNull(
+            accountService.findAccountByName(account.email),
+            "Account has been deleted"
+        )
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Creating an account group`() {
+        val name = uid("g-")
+        run(
+            """
+            mutation {
+                createAccountGroup(input: {
+                    name: "$name",
+                    description: "Some description"
+                }) {
+                    accountGroup {
+                        id
+                    }
+                    errors {
+                        message
+                    }
+                }
+            }
+        """.trimIndent()
+        ) { data ->
+            checkGraphQLUserErrors(data, "createAccountGroup") { node ->
+                val id = node.path("accountGroup").path("id").asInt()
+                val savedGroup = accountService.getAccountGroup(ID.of(id))
+                assertEquals(name, savedGroup.name)
             }
         }
     }
 
     @Test
-    fun `Enabling an account`() {
-        val account = createAccount(disabled = true)
-        asAdmin {
-            run("""
-                mutation {
-                    enableAccount(input: {id: ${account.id}}) {
-                        account {
-                            disabled
-                            locked
-                        }
-                        errors {
-                            message
-                        }
+    @AsAdminTest
+    fun `Editing an account group`() {
+        val group = doCreateAccountGroup()
+        val name = uid("g-")
+        run(
+            """
+            mutation {
+                editAccountGroup(input: {
+                    id: ${group.id},
+                    name: "$name",
+                    description: "Some description",
+                }) {
+                    errors {
+                        message
                     }
                 }
-            """).let { data ->
-                val node = assertNoUserError(data, "enableAccount")
-                assertEquals(false, node.path("account").path("disabled").asBoolean())
-                assertEquals(false, node.path("account").path("locked").asBoolean())
             }
+        """.trimIndent()
+        ) { data ->
+            checkGraphQLUserErrors(data, "editAccountGroup")
         }
+
+        val savedAccountGroup = accountService.getAccountGroup(group.id)
+        assertEquals(name, savedAccountGroup.name)
+        assertEquals("Some description", savedAccountGroup.description)
     }
 
     @Test
-    fun `Locking an account`() {
-        val account = createAccount()
-        asAdmin {
-            run("""
-                mutation {
-                    lockAccount(input: {id: ${account.id}}) {
-                        account {
-                            disabled
-                            locked
-                        }
-                        errors {
-                            message
-                        }
+    @AsAdminTest
+    fun `Deleting an account group`() {
+        val accountGroup = doCreateAccountGroup()
+
+        run(
+            """
+            mutation {
+                deleteAccountGroup(input: {
+                    id: ${accountGroup.id}
+                }) {
+                    errors {
+                        message
                     }
                 }
-            """).let { data ->
-                val node = assertNoUserError(data, "lockAccount")
-                assertEquals(false, node.path("account").path("disabled").asBoolean())
-                assertEquals(true, node.path("account").path("locked").asBoolean())
             }
+        """.trimIndent()
+        ) { data ->
+            checkGraphQLUserErrors(data, "deleteAccountGroup")
         }
-    }
 
-    @Test
-    fun `Unlocking an account`() {
-        val account = createAccount(locked = true)
-        asAdmin {
-            run("""
-                mutation {
-                    unlockAccount(input: {id: ${account.id}}) {
-                        account {
-                            disabled
-                            locked
-                        }
-                        errors {
-                            message
-                        }
-                    }
-                }
-            """).let { data ->
-                val node = assertNoUserError(data, "unlockAccount")
-                assertEquals(false, node.path("account").path("disabled").asBoolean())
-                assertEquals(false, node.path("account").path("locked").asBoolean())
-            }
-        }
-    }
-
-    private fun createAccount(disabled: Boolean = false, locked: Boolean = false): Account = asAdmin {
-        val initial = doCreateAccount()
-        accountService.setAccountDisabled(initial.id, disabled)
-        accountService.setAccountLocked(initial.id, locked)
-        accountService.getAccount(initial.id)
+        assertNull(
+            accountService.findAccountGroupByName(accountGroup.name),
+            "Account group has been deleted"
+        )
     }
 
 }

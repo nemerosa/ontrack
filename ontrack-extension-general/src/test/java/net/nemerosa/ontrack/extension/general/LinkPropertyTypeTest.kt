@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
 import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 

@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorView
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

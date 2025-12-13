@@ -21,7 +21,7 @@ class ProjectEntitySubscriptionsAuthorizationContributor(
                             context.projectEntityType == ProjectEntityType.PROMOTION_RUN
                     )
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> {
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> {
         val entity = context as ProjectEntity
         return listOf(
             Authorization(

@@ -5,8 +5,9 @@ import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.toJson
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.NamedEntries
+import net.nemerosa.ontrack.model.json.schema.JsonEmptyType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.NumericValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
@@ -23,9 +24,9 @@ class MetricsValidationDataType(
 
     override fun configToJson(config: Any?): JsonNode = NullNode.instance
 
-    override fun configFromJson(node: JsonNode?) {}
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType = JsonEmptyType.INSTANCE
 
-    override fun getConfigForm(config: Any?): Form = Form.create()
+    override fun configFromJson(node: JsonNode?) {}
 
     override fun configToFormJson(config: Any?): JsonNode? = null
 
@@ -34,17 +35,6 @@ class MetricsValidationDataType(
     override fun toJson(data: MetricsValidationData): JsonNode = data.toJson()!!
 
     override fun fromJson(node: JsonNode): MetricsValidationData? = node.parse()
-
-    override fun getForm(data: MetricsValidationData?): Form = Form.create()
-        .with(
-            NamedEntries.of("metrics")
-                .label("List of metrics")
-                .nameLabel("Name")
-                .valueLabel("Value")
-                .addText("Add metric")
-                .help("List of metrics.")
-                .value(data?.metrics?.map { (name, value) -> NameValue(name, value.toString()) })
-        )
 
     override fun fromForm(node: JsonNode?): MetricsValidationData? =
         node?.parse<MetricsValidationDataForm>()?.run {

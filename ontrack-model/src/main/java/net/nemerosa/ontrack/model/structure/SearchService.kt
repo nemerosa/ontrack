@@ -18,16 +18,6 @@ interface SearchService {
     fun paginatedSearch(request: SearchRequest): SearchResults
 
     /**
-     *
-     */
-    fun rawSearch(
-            token: String,
-            indexName: String?,
-            offset: Int = 0,
-            size: Int = 10,
-    ): SearchNodeResults
-
-    /**
      * Makes sure all search indexes are initialized.
      */
     fun indexInit()

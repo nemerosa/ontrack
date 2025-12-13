@@ -1,18 +1,19 @@
 package net.nemerosa.ontrack.extension.notifications.inmemory
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.patchNullableString
+import net.nemerosa.ontrack.json.patchString
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.textField
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 /**
@@ -21,12 +22,7 @@ import org.springframework.stereotype.Component
  * For test only, should not be used in production.
  */
 @Component
-@ConditionalOnProperty(
-    prefix = "ontrack.config.extension.notifications.in-memory",
-    name = ["enabled"],
-    havingValue = "true",
-    matchIfMissing = false,
-)
+@Profile(RunProfile.DEV)
 @Documentation(InMemoryNotificationChannelConfig::class)
 class InMemoryNotificationChannel(
     private val eventTemplatingService: EventTemplatingService,
@@ -40,6 +36,14 @@ class InMemoryNotificationChannel(
             throw EventSubscriptionConfigException("Group cannot be blank")
         }
     }
+
+    override fun mergeConfig(
+        a: InMemoryNotificationChannelConfig,
+        changes: JsonNode
+    ) = InMemoryNotificationChannelConfig(
+        group = patchString(changes, a::group),
+        data = patchNullableString(changes, a::data),
+    )
 
     private val messages = mutableMapOf<String, MutableList<String>>()
 
@@ -64,11 +68,6 @@ class InMemoryNotificationChannel(
     }
 
     override fun toSearchCriteria(text: String): JsonNode = InMemoryNotificationChannelConfig(text).asJson()
-
-    override fun toText(config: InMemoryNotificationChannelConfig): String = config.group
-
-    override fun getForm(c: InMemoryNotificationChannelConfig?): Form = Form.create()
-        .textField(InMemoryNotificationChannelConfig::group, c?.group)
 
     fun clear(): Ack {
         messages.clear()

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.changelog
 
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.model.structure.Build
@@ -41,8 +42,24 @@ interface SCMChangeLogEnabled : SCM {
     fun getConfiguredIssueService(): ConfiguredIssueService?
 
     /**
+     * Gets the repository context for this SCM.
+     *
+     * This variable is accessed only _after_ [getConfiguredIssueService] has been called
+     * and will never be called is there no configured issue service.
+     */
+    val issueRepositoryContext: IssueRepositoryContext
+
+    /**
      * Finding a build using its commit
      */
     fun findBuildByCommit(project: Project, id: String): Build?
+
+    /**
+     * Getting information about a commit
+     *
+     * @param id ID of the commit
+     * @return Commit information or null if not found
+     */
+    fun getCommit(id: String): SCMCommit?
 
 }

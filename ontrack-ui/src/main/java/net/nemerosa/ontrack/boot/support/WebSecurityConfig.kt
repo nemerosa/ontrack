@@ -1,46 +1,44 @@
 package net.nemerosa.ontrack.boot.support
 
-import net.nemerosa.ontrack.common.RunProfile
-import net.nemerosa.ontrack.extension.api.UISecurityExtension
-import net.nemerosa.ontrack.model.structure.TokensService
-import net.nemerosa.ontrack.model.support.EnvService
-import net.nemerosa.ontrack.model.support.isProfileEnabled
+import com.nimbusds.jose.JOSEObjectType
+import com.nimbusds.jose.proc.DefaultJOSEObjectTypeVerifier
+import com.nimbusds.jose.proc.SecurityContext
+import com.nimbusds.jwt.proc.ConfigurableJWTProcessor
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.annotation.Order
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.web.servlet.invoke
+import org.springframework.security.config.annotation.web.invoke
+import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
+import org.springframework.security.oauth2.jwt.SupplierJwtDecoder
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository
+import java.util.function.Supplier
 
 @Configuration
-@EnableWebSecurity
 class WebSecurityConfig(
-    private val envService: EnvService,
+    private val webSecurityFilter: WebSecurityFilter,
+    private val tokenSecurityFilter: TokenSecurityFilter,
+    private val ontrackConfigProperties: OntrackConfigProperties,
 ) {
+
+    private val logger: Logger = LoggerFactory.getLogger(WebSecurityConfig::class.java)
 
     /**
      * Management end points are accessible on a separate port without any authentication needed
      */
     @Bean
-    @Order(1)
-    @ConditionalOnWebApplication
     fun actuatorWebSecurity(http: HttpSecurity): SecurityFilterChain {
-        http {
-            securityMatcher("/manage/**")
-            // Disables CSRF for the actuator calls
-            csrf {
-                disable()
+        http.securityMatcher(EndpointRequest.toAnyEndpoint())
+            .authorizeHttpRequests { requests ->
+                requests.anyRequest().permitAll()
             }
-            authorizeRequests {
-                authorize(EndpointRequest.toAnyEndpoint(), permitAll)
-            }
-        }
+            .csrf { it.disable() }
         return http.build()
     }
 
@@ -48,85 +46,57 @@ class WebSecurityConfig(
      * API login
      */
     @Bean
-    @Order(2)
-    @ConditionalOnWebApplication
     fun apiWebSecurity(
         http: HttpSecurity,
-        tokensService: TokensService,
-        authenticationManager: AuthenticationManager,
+        jwtDecoder: JwtDecoder,
     ): SecurityFilterChain {
         http {
-            securityMatcher("/rest/**")
-            securityMatcher("/graphql/**")
-            securityMatcher("/extension/**")
-            securityMatcher("/hook/secured/**")
-            // Disables CSRF for the API calls
-            csrf {
-                disable()
-            }
-            // Requires authentication
-            authorizeRequests {
+            authorizeHttpRequests {
                 authorize("/hook/secured/**", permitAll)
                 authorize(anyRequest, authenticated)
             }
-            // CORS only for development, acceptance tests or if explicitly enabled
-            if (envService.isProfileEnabled(RunProfile.DEV) ||
-                envService.isProfileEnabled(RunProfile.ACC) ||
-                envService.isProfileEnabled(RunProfile.CORS)
-            ) {
-                cors {}
+            csrf { disable() }
+            sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
+            oauth2ResourceServer {
+                jwt {
+                    if (ontrackConfigProperties.security.authorization.jwt.typ.isNotBlank()) {
+                        this.jwtDecoder = customJwtDecoder(jwtDecoder, ontrackConfigProperties.security.authorization.jwt.typ)
+                    }
+                }
             }
-            // Requires BASIC authentication
-            httpBasic { }
-            // Token based authentication (for API only)
-            addFilterAt<BasicAuthenticationFilter>(
-                TokenHeaderAuthenticationFilter(authenticationManager, tokensService = tokensService),
-            )
+            addFilterAfter<BearerTokenAuthenticationFilter>(tokenSecurityFilter)
+            addFilterAfter<TokenSecurityFilter>(webSecurityFilter)
         }
         return http.build()
     }
 
-    /**
-     * Default UI login
-     */
-    @Bean
-    @ConditionalOnWebApplication
-    fun webSecurity(
-        http: HttpSecurity,
-        uiSecurityExtensions: List<UISecurityExtension>,
-        nextUIRedirector: NextUIRedirector,
-    ): SecurityFilterChain {
-        http {
-            // Enabling JS Cookies for CSRF protection (for AngularJS)
-            csrf {
-                csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
-            }
-            // Excludes assets and login page from authentication
-            authorizeRequests {
-                authorize("/login/**", permitAll)
-                authorize("/assets/**", permitAll)
-                authorize("/favicon.ico", permitAll)
-            }
-            // Requires authentication always
-            authorizeRequests {
-                authorize(anyRequest, authenticated)
-            }
-            // UI extensions
-            uiSecurityExtensions.forEach { extension ->
-                extension.configure(this, LoginSuccessHandler(nextUIRedirector))
-            }
-            // Using a form login
-            formLogin {
-                loginPage = "/login"
-                permitAll()
-                authenticationSuccessHandler = LoginSuccessHandler(nextUIRedirector)
-            }
-            // Logout setup
-            logout {
-                logoutUrl = "/logout"
-            }
+    private fun customJwtDecoder(jwtDecoder: JwtDecoder, typ: String): JwtDecoder {
+        if (jwtDecoder is NimbusJwtDecoder) {
+            @Suppress("UNCHECKED_CAST")
+            val jwtProcessor = jwtDecoder::class
+                .java
+                .getDeclaredField("jwtProcessor")
+                .apply { isAccessible = true }
+                .get(jwtDecoder) as ConfigurableJWTProcessor<SecurityContext>
+            logger.info("Using a custom JWT `typ`: $typ")
+            jwtProcessor.jwsTypeVerifier = DefaultJOSEObjectTypeVerifier(
+                setOf(
+                    JOSEObjectType(typ)
+                )
+            )
+            return jwtDecoder
+        } else if (jwtDecoder is SupplierJwtDecoder) {
+            @Suppress("UNCHECKED_CAST")
+            val delegate = jwtDecoder::class
+                .java
+                .getDeclaredField("delegate")
+                .apply { isAccessible = true }
+                .get(jwtDecoder) as Supplier<JwtDecoder>
+            val delegateDecoder = delegate.get()
+            return customJwtDecoder(delegateDecoder, typ)
+        } else {
+            return jwtDecoder
         }
-        return http.build()
     }
 
 }

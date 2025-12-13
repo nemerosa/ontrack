@@ -29,12 +29,12 @@ class RenderBuildGraphQLFieldContributor(
                     .name("render")
                     .description("Renders a template for this build")
                     .type(GraphQLString.toNotNull())
-                    .argument(stringArgument(ARG_FORMAT, "Format of the rendering"))
-                    .argument(stringArgument(ARG_TEMPLATE, "Template for the rendering"))
+                    .argument(stringArgument(ARG_FORMAT, "Format of the rendering", nullable = false))
+                    .argument(stringArgument(ARG_TEMPLATE, "Template for the rendering", nullable = false))
                     .dataFetcher { env ->
-                        val build: Build = env.getSource()
-                        val format: String = env.getArgument(ARG_FORMAT)
-                        val template: String = env.getArgument(ARG_TEMPLATE)
+                        val build: Build = env.getSource()!!
+                        val format: String = env.getArgument(ARG_FORMAT)!!
+                        val template: String = env.getArgument(ARG_TEMPLATE)!!
 
                         // Renderer
                         val renderer = eventRendererRegistry.findEventRendererById(format)

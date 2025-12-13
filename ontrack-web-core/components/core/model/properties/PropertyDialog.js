@@ -86,7 +86,7 @@ export const usePropertyDialog = () => {
 
             return {
                 entityType,
-                entityId,
+                entityId: Number(entityId),
                 type: type,
                 value: preparedValues,
             }
@@ -145,7 +145,7 @@ export default function PropertyDialog({dialog}) {
                         }
                         {
                             dialog.selectedProperty.editable && <>
-                                <PropertyForm property={dialog.selectedProperty} entity={dialog.entity} prefix="value"/>
+                                <PropertyForm property={dialog.selectedProperty} entity={dialog.entity} prefix="value" form={dialog.form}/>
                             </>
                         }
                     </>

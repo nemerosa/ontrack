@@ -10,10 +10,8 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionHookProcessingService
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
-import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
+import net.nemerosa.ontrack.model.security.AuthenticationStorageService
+import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.core.MessageListener
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer
@@ -27,11 +25,11 @@ class AsyncIngestionHookQueueListener(
     private val ingestionConfigProperties: IngestionConfigProperties,
     private val ingestionHookProcessingService: IngestionHookProcessingService,
     private val ingestionHookPayloadStorage: IngestionHookPayloadStorage,
-    private val securityService: SecurityService,
-    private val applicationLogService: ApplicationLogService,
     private val meterRegistry: MeterRegistry,
+    private val authenticationStorageService: AuthenticationStorageService,
 ) : RabbitListenerConfigurer {
 
+    private val logger = LoggerFactory.getLogger(AsyncIngestionHookQueueListener::class.java)
     private val listener = MessageListener(::onMessage)
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
@@ -93,17 +91,17 @@ class AsyncIngestionHookQueueListener(
                 IngestionMetrics.Queue.consumedCount,
                 INGESTION_METRIC_QUEUE_TAG to queue
             )
-            securityService.asAdmin {
+
+            // Gets the account to use from the queue payload
+            val accountId = payload.accountName ?: error("Account name is required in the payload")
+            authenticationStorageService.withAccountId(accountId) {
                 ingestionHookPayloadStorage.queue(payload, queue)
                 ingestionHookProcessingService.process(payload)
             }
         } catch (any: Throwable) {
-            applicationLogService.log(
-                ApplicationLogEntry.error(
-                    any,
-                    NameDescription.nd("github-ingestion-error", "Catch-all error in GitHub ingestion processing"),
-                    "Uncaught error during the GitHub ingestion processing"
-                )
+            logger.error(
+                "Uncaught error during the GitHub ingestion processing",
+                any
             )
         }
     }

@@ -1,54 +1,53 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
+import net.nemerosa.ontrack.it.NoAuthTest
 import net.nemerosa.ontrack.model.security.*
 import org.apache.commons.lang3.StringUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
 import kotlin.test.*
 
-class SecurityServiceIT : AbstractDSLTestJUnit4Support() {
+class SecurityServiceIT : AbstractDSLTestSupport() {
+
+    @Autowired
+    private lateinit var roleService: RolesService
 
     @Test
-    fun `Disabled accounts cannot access functions in any way`() {
-        val project = project()
-        val initialAccount = doCreateAccountWithGlobalRole(Roles.GLOBAL_ADMINISTRATOR)
-        val account = asAdmin {
-            accountService.setAccountDisabled(initialAccount.id, true)
-            accountService.getAccount(initialAccount.id)
-        }
-        asFixedAccount(account) {
-            // Checks all global functions
-            RolesService.defaultGlobalFunctions.forEach { fn ->
-                assertFalse(securityService.isGlobalFunctionGranted(fn), "${fn.simpleName} must not be granted")
-            }
-            // Checks all project functions in lock mode
-            withNoGrantViewToAll {
-                RolesService.defaultProjectFunctions.forEach { fn ->
-                    assertFalse(securityService.isProjectFunctionGranted(project, fn),
-                        "${fn.simpleName} must not be granted on project")
+    @AsAdminTest
+    fun `Running as admin`() {
+        project {
+            securityService.asAdmin {
+                roleService.globalFunctions.forEach {
+                    assertTrue(
+                        securityService.isGlobalFunctionGranted(it),
+                        "$it is granted for admin"
+                    )
                 }
-            }
-            // Checks all project functions in unlock mode
-            withGrantViewToAll {
-                RolesService.defaultProjectFunctions.forEach { fn ->
-                    assertFalse(securityService.isProjectFunctionGranted(project, fn),
-                        "${fn.simpleName} must not be granted on project")
+                roleService.projectFunctions.forEach {
+                    assertTrue(
+                        securityService.isProjectFunctionGranted(this, it),
+                        "$it is granted for admin"
+                    )
                 }
             }
         }
     }
 
     @Test
+    @AsAdminTest
     fun currentAccount() {
-        val account = asUser().call { securityService.currentAccount }
+        val account = asUser().call { securityService.currentUser?.account }
         assertNotNull(account)
     }
 
     @Test
+    @AsAdminTest
     fun currentAccount_none() {
-        val account = asAnonymous().call { securityService.currentAccount }
+        val account = asAnonymous().call { securityService.currentUser?.account }
         assertNull(account)
     }
 
@@ -65,6 +64,7 @@ class SecurityServiceIT : AbstractDSLTestJUnit4Support() {
     }
 
     @Test
+    @AsAdminTest
     fun read_only_on_one_project() {
         withNoGrantViewToAll {
 
@@ -97,6 +97,7 @@ class SecurityServiceIT : AbstractDSLTestJUnit4Support() {
     }
 
     @Test
+    @AsAdminTest
     fun read_only_on_all_projects() {
         withNoGrantViewToAll {
 
@@ -124,6 +125,7 @@ class SecurityServiceIT : AbstractDSLTestJUnit4Support() {
     }
 
     @Test
+    @AsAdminTest
     fun `Participant in all projects`() {
         withNoGrantViewToAll {
 
@@ -149,6 +151,18 @@ class SecurityServiceIT : AbstractDSLTestJUnit4Support() {
                 securityService.checkProjectFunction(id.value, ValidationRunStatusCommentEditOwn::class.java)
                 //
                 true
+            }
+        }
+    }
+
+    @Test
+    @NoAuthTest
+    fun `As admin has a name`() {
+        securityService.asAdmin {
+            // The run-as account has a name
+            val name = securityService.currentUser?.name
+            assertNotNull(name, "Run-as admin name is defined") {
+                assertTrue(it.isNotBlank(), "Run-as admin name is not blank")
             }
         }
     }

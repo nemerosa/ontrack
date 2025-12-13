@@ -25,7 +25,7 @@ export function useBuildValidateDialog(config) {
         prepareValues: (values, context) => {
             return {
                 ...values,
-                buildId: context.build.id,
+                buildId: Number(context.build.id),
                 dataTypeId: dataType?.descriptor?.id,
             }
         },

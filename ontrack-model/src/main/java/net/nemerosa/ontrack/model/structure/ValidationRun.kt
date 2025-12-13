@@ -11,15 +11,19 @@ import java.time.LocalDateTime
  * @property data Data used for the link to an optional [ValidationDataType] and its data
  */
 data class ValidationRun(
-        override val id: ID,
-        @JsonView(value = [ValidationRun::class, ValidationStampRunView::class])
-        val build: Build,
-        @JsonView(value = [ValidationRun::class, Build::class])
-        val validationStamp: ValidationStamp,
-        val runOrder: Int,
-        val data: ValidationRunData<*>?,
-        @JsonView(value = [ValidationRun::class, BranchBuildView::class, Build::class, ValidationStampRunView::class])
-        val validationRunStatuses: List<ValidationRunStatus>
+    override val id: ID,
+    @JsonView(ValidationRun::class)
+    val build: Build,
+    @JsonView(ValidationRun::class, Build::class)
+    val validationStamp: ValidationStamp,
+    val runOrder: Int,
+    val data: ValidationRunData<*>?,
+    @JsonView(
+        ValidationRun::class,
+        Build::class,
+        ValidationRun::class,
+    )
+    val validationRunStatuses: List<ValidationRunStatus>
 ) : RunnableEntity {
 
     @JsonIgnore
@@ -32,10 +36,10 @@ data class ValidationRun(
     override val runMetricTags: Map<String, String>
         @JsonIgnore
         get() = mapOf(
-                "project" to validationStamp.branch.project.name,
-                "branch" to validationStamp.branch.name,
-                "validationStamp" to validationStamp.name,
-                "status" to lastStatusId
+            "project" to validationStamp.branch.project.name,
+            "branch" to validationStamp.branch.name,
+            "validationStamp" to validationStamp.name,
+            "status" to lastStatusId
         )
 
     override val runTime: LocalDateTime
@@ -50,22 +54,22 @@ data class ValidationRun(
      * Gets the name of the last status
      */
     val lastStatusId: String =
-            if (validationRunStatuses.isEmpty()) {
-                ""
-            } else {
-                validationRunStatuses.first().statusID.id
-            }
+        if (validationRunStatuses.isEmpty()) {
+            ""
+        } else {
+            validationRunStatuses.first().statusID.id
+        }
 
     fun withData(data: ValidationRunData<*>?) =
-            ValidationRun(id, build, validationStamp, runOrder, data, validationRunStatuses)
+        ValidationRun(id, build, validationStamp, runOrder, data, validationRunStatuses)
 
     fun add(status: ValidationRunStatus): ValidationRun = ValidationRun(
-            id,
-            build,
-            validationStamp,
-            runOrder,
-            data,
-            listOf(status) + validationRunStatuses
+        id,
+        build,
+        validationStamp,
+        runOrder,
+        data,
+        listOf(status) + validationRunStatuses
     )
 
     override val project: Project
@@ -82,30 +86,30 @@ data class ValidationRun(
 
         @JvmStatic
         fun of(build: Build, validationStamp: ValidationStamp, runOrder: Int, statuses: List<ValidationRunStatus>) =
-                ValidationRun(
-                        ID.NONE,
-                        build,
-                        validationStamp,
-                        runOrder,
-                        data = null,
-                        validationRunStatuses = statuses
-                )
-
-        @JvmStatic
-        fun of(
-                build: Build,
-                validationStamp: ValidationStamp,
-                runOrder: Int,
-                signature: Signature,
-                validationRunStatusID: ValidationRunStatusID,
-                description: String?
-        ) = of(
+            ValidationRun(
+                ID.NONE,
                 build,
                 validationStamp,
                 runOrder,
-                listOf(
-                        ValidationRunStatus(ID.NONE, signature, validationRunStatusID, description)
-                )
+                data = null,
+                validationRunStatuses = statuses
+            )
+
+        @JvmStatic
+        fun of(
+            build: Build,
+            validationStamp: ValidationStamp,
+            runOrder: Int,
+            signature: Signature,
+            validationRunStatusID: ValidationRunStatusID,
+            description: String?
+        ) = of(
+            build,
+            validationStamp,
+            runOrder,
+            listOf(
+                ValidationRunStatus(ID.NONE, signature, validationRunStatusID, description)
+            )
         )
     }
 

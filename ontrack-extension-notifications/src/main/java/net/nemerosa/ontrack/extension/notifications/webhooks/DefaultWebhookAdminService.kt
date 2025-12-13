@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
 import com.fasterxml.jackson.databind.node.NullNode
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.security.EncryptionService
@@ -73,10 +74,24 @@ class DefaultWebhookAdminService(
         val existing = findWebhookByName(name) ?: throw WebhookNotFoundException(name)
 
         // Controlling the authentication
-        if (authentication != null) {
+        val actualAuthentication = if (authentication != null) {
             val authenticator = webhookAuthenticatorRegistry.findWebhookAuthenticator(authentication.type)
                 ?: throw WebhookAuthenticatorNotFoundException(authentication.type)
             authenticator.validateConfig(authentication.config)
+            // Reusing existing authentication
+            if (authentication.type == existing.authentication.type) {
+                WebhookAuthentication(
+                    type = authentication.type,
+                    config = authenticator.merge(
+                        input = authentication.config,
+                        existing = existing.authentication.config
+                    ).asJson(),
+                )
+            } else {
+                authentication
+            }
+        } else {
+            existing.authentication
         }
 
         // New record
@@ -87,8 +102,7 @@ class DefaultWebhookAdminService(
             timeoutSeconds = timeout?.toSeconds() ?: existing.timeout.toSeconds(),
             authenticationType = authentication?.type ?: existing.authentication.type,
             authenticationEncryptedConfig = encryptionService.encrypt(
-                authentication?.config?.format()
-                    ?: existing.authentication.config.format()
+                actualAuthentication.config.format()
             ) ?: ""
         )
         storageService.store(

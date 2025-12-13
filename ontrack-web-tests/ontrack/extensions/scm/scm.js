@@ -1,19 +1,19 @@
 import {generate} from "@ontrack/utils";
 import {graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
-import {ontrack} from "@ontrack/ontrack";
 import {restCallPost, restCallPostForJson} from "@ontrack/rest";
 
-export const createMockSCMContext = () => {
+export const createMockSCMContext = (ontrack) => {
     // Unique name for the repository
     const repositoryName = generate("repo-")
     // Creating the repository context
-    return new MockSCMContext(repositoryName)
+    return new MockSCMContext(ontrack, repositoryName)
 }
 
 class MockSCMContext {
 
-    constructor(repositoryName) {
+    constructor(ontrack, repositoryName) {
+        this.ontrack = ontrack
         this.repositoryName = repositoryName
         this.commitIdsPerMessage = {}
     }
@@ -39,7 +39,7 @@ class MockSCMContext {
                 }
             `,
             {
-                projectId: project.id,
+                projectId: Number(project.id),
                 value: {
                     name: this.repositoryName,
                     issueServiceIdentifier: issueServiceIdentifier,
@@ -69,7 +69,7 @@ class MockSCMContext {
                 }
             `,
             {
-                branchId: branch.id,
+                branchId: Number(branch.id),
                 value: {
                     name: scmBranch
                 }
@@ -98,7 +98,7 @@ class MockSCMContext {
                 }
             `,
             {
-                buildId: build.id,
+                buildId: Number(build.id),
                 value: {
                     id: commitId
                 }
@@ -108,7 +108,7 @@ class MockSCMContext {
 
     async repositoryIssue({key, summary, type, issueServiceId, linkedKey}) {
         const response = await restCallPost(
-            ontrack().connection,
+            this.ontrack.connection,
             `/extension/${issueServiceId ?? 'scm'}/mock/issue`,
             {
                 name: this.repositoryName,
@@ -125,9 +125,22 @@ class MockSCMContext {
         }
     }
 
+    async repositoryFile({branch = 'main', path, content}) {
+        await restCallPostForJson(
+            this.ontrack.connection,
+            "/extension/scm/mock/file",
+            {
+                name: this.repositoryName,
+                scmBranch: branch,
+                path,
+                content,
+            }
+        )
+    }
+
     async repositoryCommit({branch = 'main', message}) {
         const json = await restCallPostForJson(
-            ontrack().connection,
+            this.ontrack.connection,
             "/extension/scm/mock/commit",
             {
                 name: this.repositoryName,

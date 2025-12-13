@@ -1,10 +1,17 @@
 import SearchResultComponent from "@components/framework/search/SearchResultComponent";
-import LegacyLink from "@components/common/LegacyLink";
+import {Space, Typography} from "antd";
+import Link from "next/link";
 
-export default function Result({data, page}) {
+export default function Result({data}) {
     return <SearchResultComponent
         title={
-            <LegacyLink href={page}>{data.item.displayKey}</LegacyLink>
+            <>
+                <Space>
+                    <Link href={`/extension/git/${data.item.projectId}/issue-info/${data.item.key}`}>
+                        <Typography.Text code>{data.item.displayKey}</Typography.Text>
+                    </Link>
+                </Space>
+            </>
         }
         description=""
     />

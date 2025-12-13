@@ -1,4 +1,3 @@
-import {useRestClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {Tooltip} from "antd";
 import {actionClassName} from "@components/common/ClassUtils";
@@ -6,27 +5,29 @@ import {actionClassName} from "@components/common/ClassUtils";
 /**
  * This renders an image using a call to the REST API.
  */
-export default function ProxyImage({restUri, alt, width, height, onClick, tooltipText, disabled = false}) {
-
-    const client = useRestClient()
+export default function ProxyImage({id, restUri, alt, width, height, onClick, tooltipText, disabled = false}) {
 
     const [dataUrl, setDataUrl] = useState('')
 
     useEffect(() => {
-        if (client && restUri) {
-            client.fetch(restUri)
-                .then(response => response.arrayBuffer())
-                .then(arrayBuffer => {
-                    const base64String = btoa(
-                        new Uint8Array(arrayBuffer)
-                            .reduce((data, byte) => data + String.fromCharCode(byte), '')
-                    );
-
-                    // Now you have a Base64-encoded string of your image, convert this to a Data URL
-                    setDataUrl(`data:image/png;base64,${base64String}`)
-                })
+        if (restUri) {
+            fetch(restUri, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                }
+            }).then(res => {
+                if (res.ok) {
+                    return res.json()
+                } else {
+                    console.error(res)
+                    throw new Error(`Issue with proxy image at ${restUri}`);
+                }
+            }).then(({dataURL}) => {
+                setDataUrl(dataURL)
+            })
         }
-    }, [client, restUri]);
+    }, [restUri])
 
     return (
         <>
@@ -34,6 +35,7 @@ export default function ProxyImage({restUri, alt, width, height, onClick, toolti
                 dataUrl &&
                 <Tooltip title={tooltipText}>
                     <img
+                        data-testid={id}
                         src={dataUrl}
                         alt={alt}
                         width={width}

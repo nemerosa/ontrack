@@ -1,16 +1,17 @@
 package net.nemerosa.ontrack.extension.general
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 
 @Component
 class ReleaseSearchExtension(
     extensionFeature: GeneralExtensionFeature,
-    private val uriBuilder: EntityURIBuilder,
     private val propertyService: PropertyService,
     private val structureService: StructureService
 ) : AbstractExtension(
@@ -19,7 +20,7 @@ class ReleaseSearchExtension(
 
     override val searchResultType = SearchResultType(
         feature = extensionFeature.featureDescription,
-        id = "build-release",
+        id = SEARCH_RESULT_TYPE,
         name = "Build with Release",
         description = "Release, label or version attached to a build",
         order = SearchResultType.ORDER_PROPERTIES + 10,
@@ -29,10 +30,28 @@ class ReleaseSearchExtension(
 
     override val indexName: String = RELEASE_SEARCH_INDEX
 
-    override val indexMapping: SearchIndexMapping = indexMappings<ReleaseSearchItem> {
-        +ReleaseSearchItem::entityId to id { index = false }
-        +ReleaseSearchItem::entityType to keyword { index = false }
-        +ReleaseSearchItem::release to keyword { scoreBoost = 5.0 } to text()
+    override fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder =
+        builder.run {
+            autoCompleteSettings()
+        }.run {
+            mappings { mappings ->
+                mappings
+                    .id(ReleaseSearchItem::entityId)
+                    .properties(ReleaseSearchItem::entityType.name) { property ->
+                        property.keyword { it.index(false) }
+                    }
+                    .autoCompleteText(ReleaseSearchItem::release)
+            }
+        }
+
+    override fun buildQuery(
+        q: Query.Builder,
+        token: String
+    ): ObjectBuilder<Query> {
+        return q.match { m ->
+            m.field(ReleaseSearchItem::release.name)
+                .query(token)
+        }
     }
 
     override fun indexAll(processor: (ReleaseSearchItem) -> Unit) {
@@ -62,20 +81,18 @@ class ReleaseSearchExtension(
             SearchResult(
                 title = entity.entityDisplayName,
                 description = "${entity.entityDisplayName} having version/label/release ${item.release}",
-                uri = uriBuilder.getEntityURI(entity),
-                page = uriBuilder.getEntityPage(entity),
                 accuracy = score,
                 type = searchResultType,
                 data = mapOf(
                     SearchResult.SEARCH_RESULT_BUILD to entity,
-                    SEARCH_RESULT_RELEASE to item.release,
+                    SearchResult.SEARCH_RESULT_BUILD_RELEASE to item.release,
                 )
             )
         }
     }
 
     companion object {
-        const val SEARCH_RESULT_RELEASE = "release"
+        const val SEARCH_RESULT_TYPE = "build-release"
     }
 
 }

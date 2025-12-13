@@ -59,7 +59,7 @@ class JenkinsJobDecorationExtensionTest {
                     IndicatorsExtensionFeature(),
                     SCMExtensionFeature()
                 ),
-                null
+                mockk()
             ),
             JenkinsJobProperty(
                 jenkinsConfiguration,

@@ -11,7 +11,10 @@ import net.nemerosa.ontrack.extension.github.ingestion.processing.config.INGESTI
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.Test
 import kotlin.test.assertNotNull
@@ -91,7 +94,7 @@ internal class DefaultFileLoaderServiceTest {
                     GitBranchConfigurationProperty(
                         branch = "release/1.0",
                         buildCommitLink = null,
-                        isOverride = false,
+                        override = false,
                         buildTagInterval = 0,
                     )
         } else {

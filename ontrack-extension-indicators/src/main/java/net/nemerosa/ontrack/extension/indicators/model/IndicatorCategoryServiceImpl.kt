@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.GlobalSettings
@@ -67,7 +66,7 @@ class IndicatorCategoryServiceImpl(
 
     override fun deprecateCategory(id: String, deprecated: String?) {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
-        val existing = storageService.retrieve(STORE, id, StoredIndicatorCategory::class.java).getOrNull()
+        val existing = storageService.find(STORE, id, StoredIndicatorCategory::class)
         if (existing != null) {
             val deprecatedEntry = existing.withDeprecated(deprecated)
             storageService.store(
@@ -79,8 +78,7 @@ class IndicatorCategoryServiceImpl(
     }
 
     override fun findCategoryById(id: String): IndicatorCategory? =
-        storageService.retrieve(STORE, id, StoredIndicatorCategory::class.java)
-            .getOrNull()
+        storageService.find(STORE, id, StoredIndicatorCategory::class)
             ?.let { fromStorage(it) }
 
     override fun getCategory(id: String): IndicatorCategory {
@@ -95,13 +93,18 @@ class IndicatorCategoryServiceImpl(
             }.sortedBy { it.name }
 
     override fun findBySource(source: IndicatorSource): List<IndicatorCategory> {
-        return storageService.findByJson(STORE, """
-            data->'source'->>'name' = :sourceName 
-            and data->'source'->'provider'->>'id' = :sourceProviderId
-        """, mapOf(
-            "sourceName" to source.name,
-            "sourceProviderId" to source.provider.id
-        ), StoredIndicatorCategory::class.java).map {
+        return storageService.filter(
+            store = STORE,
+            type = StoredIndicatorCategory::class,
+            query = """
+                data->'source'->>'name' = :sourceName 
+                and data->'source'->'provider'->>'id' = :sourceProviderId
+            """,
+            queryVariables = mapOf(
+                "sourceName" to source.name,
+                "sourceProviderId" to source.provider.id
+            )
+        ).map {
             fromStorage(it)
         }.sortedBy { it.name }
     }

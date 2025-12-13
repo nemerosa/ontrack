@@ -10,7 +10,7 @@ export default function PromotionRunPage() {
         <>
             <main>
                 <MainLayout>
-                    <PromotionRunView id={id}/>
+                    <PromotionRunView id={Number(id)}/>
                 </MainLayout>
             </main>
         </>

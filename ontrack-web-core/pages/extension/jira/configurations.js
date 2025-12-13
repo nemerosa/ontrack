@@ -1,4 +1,4 @@
-import {Form, Input, Select, Tag} from "antd";
+import {Form, Input, Select, Tag, Typography} from "antd";
 import Link from "next/link";
 import ConfigurationPage from "@components/configurations/ConfigurationPage";
 
@@ -15,6 +15,12 @@ export default function JiraConfigurationsPage() {
             key: "url",
             dataIndex: "url",
             render: (value) => <Link href={value}>{value}</Link>,
+        },
+        {
+            title: "API URL",
+            key: "apiUrl",
+            dataIndex: "apiUrl",
+            render: (value) => <Typography.Text code>{value}</Typography.Text>,
         },
         {
             title: "User",
@@ -59,6 +65,14 @@ export default function JiraConfigurationsPage() {
             name="url"
             label="Jira URL"
             rules={[{required: true, message: 'URL is required.',},]}
+        >
+            <Input/>
+        </Form.Item>,
+        <Form.Item
+            key="apiUrl"
+            name="apiUrl"
+            label="API URL"
+            help="Alternative URL to access the Jira API (used for Jira Cloud)"
         >
             <Input/>
         </Form.Item>,

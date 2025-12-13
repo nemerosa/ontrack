@@ -1,14 +1,14 @@
 package net.nemerosa.ontrack.extension.general.validation
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.structure.config
 import net.nemerosa.ontrack.test.assertPresent
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class TestSummaryValidationDataTypeGraphQLMutationIT : AbstractQLKTITJUnit4Support() {
+class TestSummaryValidationDataTypeGraphQLMutationIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var testSummaryValidationDataType: TestSummaryValidationDataType
@@ -44,6 +44,47 @@ class TestSummaryValidationDataTypeGraphQLMutationIT : AbstractQLKTITJUnit4Suppo
                                 it.dataType?.descriptor?.id)
                             assertEquals(
                                 TestSummaryValidationConfig(warningIfSkipped = true),
+                                it.dataType?.config
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creation of a test summary validation stamp with failWhenNoResults`() {
+        asAdmin {
+            project {
+                branch {
+                    run("""
+                        mutation {
+                            setupTestSummaryValidationStamp(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                validation: "test",
+                                warningIfSkipped: false,
+                                failWhenNoResults: true
+                            }) {
+                                validationStamp {
+                                    id
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """).let { data ->
+                        val node = assertNoUserError(data, "setupTestSummaryValidationStamp")
+                        assertTrue(node.path("validationStamp").path("id").asInt() != 0, "VS created")
+
+                        assertPresent(structureService.findValidationStampByName(project.name, name, "test")) {
+                            assertEquals("test", it.name)
+                            assertEquals("net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType",
+                                it.dataType?.descriptor?.id)
+                            assertEquals(
+                                TestSummaryValidationConfig(warningIfSkipped = false, failWhenNoResults = true),
                                 it.dataType?.config
                             )
                         }

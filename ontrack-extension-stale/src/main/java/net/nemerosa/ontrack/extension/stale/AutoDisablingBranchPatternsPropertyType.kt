@@ -3,13 +3,14 @@ package net.nemerosa.ontrack.extension.stale
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.*
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class AutoDisablingBranchPatternsPropertyType(
@@ -18,12 +19,15 @@ class AutoDisablingBranchPatternsPropertyType(
     staleExtensionFeature
 ) {
 
-    override fun getName(): String = "Auto-disabling of branches based on patterns"
+    override val name: String = "Auto-disabling of branches based on patterns"
 
-    override fun getDescription(): String =
+    override val description: String =
         "Given a list of patterns and their behaviour, allows the disabling of branches based on their Ontrack names."
 
-    override fun getSupportedEntityTypes() = setOf(ProjectEntityType.PROJECT)
+    override val supportedEntityTypes = setOf(ProjectEntityType.PROJECT)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(AutoDisablingBranchPatternsProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, ProjectEdit::class.java)
@@ -38,19 +42,6 @@ class AutoDisablingBranchPatternsPropertyType(
 
     override fun replaceValue(
         value: AutoDisablingBranchPatternsProperty,
-        replacementFunction: Function<String, String?>,
+        replacementFunction: (String) -> String,
     ): AutoDisablingBranchPatternsProperty = value
-
-    override fun getEditionForm(entity: ProjectEntity, value: AutoDisablingBranchPatternsProperty?): Form =
-        Form.create()
-            .multiform(
-                property = AutoDisablingBranchPatternsProperty::items,
-                items = value?.items
-            ) {
-                Form.create()
-                    .multiStrings(AutoDisablingBranchPatternsPropertyItem::includes, null)
-                    .multiStrings(AutoDisablingBranchPatternsPropertyItem::excludes, null)
-                    .enumField(AutoDisablingBranchPatternsPropertyItem::mode, null)
-                    .intField(AutoDisablingBranchPatternsPropertyItem::keepLast, null, min = 1)
-            }
 }

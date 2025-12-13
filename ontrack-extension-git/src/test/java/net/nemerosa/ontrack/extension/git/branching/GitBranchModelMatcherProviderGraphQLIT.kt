@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.extension.git.branching
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelProperty
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelPropertyType
 import net.nemerosa.ontrack.model.support.NameValue
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class GitBranchModelMatcherProviderGraphQLIT : AbstractGitTestJUnit4Support() {
+class GitBranchModelMatcherProviderGraphQLIT : AbstractGitTestSupport() {
 
     @Test
     fun `List of project branches restricted to the default branching model for a Git project`() {
@@ -52,11 +54,12 @@ class GitBranchModelMatcherProviderGraphQLIT : AbstractGitTestJUnit4Support() {
             project {
                 gitProject(repo)
                 setProperty(this, BranchingModelPropertyType::class.java,
-                        BranchingModelProperty(listOf(
-                                NameValue("Development", "main"),
-                                NameValue("Release", "release/.*")
+                    BranchingModelProperty(
+                        listOf(
+                            NameValue("Development", "main"),
+                            NameValue("Release", "release/.*")
                         )
-                        )
+                    )
                 )
                 branch("main") { gitBranch("main") }
                 branch("develop") { gitBranch("develop") }

@@ -5,10 +5,8 @@ package net.nemerosa.ontrack.model.links
  *
  * @property direction Edge direction (dependency relationship)
  * @property linkedTo Target of the edge
- * @property decorations Decorations for this edge
  */
 class BranchLinksEdge(
     val direction: BranchLinksDirection,
     val linkedTo: BranchLinksNode,
-    val decorations: List<BranchLinksDecoration>
 )

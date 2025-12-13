@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.BuildRequest
 import net.nemerosa.ontrack.model.structure.Entity
 import net.nemerosa.ontrack.model.structure.PropertyCreationRequest
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -24,7 +24,7 @@ class BuildControllerIT : AbstractWebTestSupport() {
             // Creates a branch
             branch {
                 // Creates a build with a release property using the controller
-                asUser().with(this, ProjectEdit::class.java).call {
+                asUser().withProjectFunction(this, ProjectEdit::class.java).call {
                     val build = buildController.newBuild(
                             id,
                             BuildRequest(
@@ -37,7 +37,7 @@ class BuildControllerIT : AbstractWebTestSupport() {
                                             )
                                     )
                             )
-                    )
+                    ).body!!
                     // Checks the build
                     Entity.isEntityDefined(build, "Build is defined")
                     assertEquals(this, build.branch)

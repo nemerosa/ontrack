@@ -10,7 +10,7 @@ export default function BranchAutoVersioningPage() {
         <>
             <main>
                 <MainLayout>
-                    <AutoVersioningConfigView branchId={id}/>
+                    <AutoVersioningConfigView branchId={Number(id)}/>
                 </MainLayout>
             </main>
         </>

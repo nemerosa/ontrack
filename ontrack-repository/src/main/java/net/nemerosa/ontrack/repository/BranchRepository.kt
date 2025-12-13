@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchFilter
 import net.nemerosa.ontrack.model.structure.ID

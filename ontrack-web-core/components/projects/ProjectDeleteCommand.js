@@ -3,8 +3,8 @@ import {FaTrash} from "react-icons/fa";
 import {Typography} from "antd";
 import {gql} from "graphql-request";
 import {useRouter} from "next/router";
-import {branchUri, homeUri, projectUri} from "@components/common/Links";
-import {useBranch, useBuild, useProject} from "@components/services/fragments";
+import {homeUri} from "@components/common/Links";
+import {useProject} from "@components/services/fragments";
 
 export default function ProjectDeleteCommand({id}) {
 
@@ -39,7 +39,7 @@ export default function ProjectDeleteCommand({id}) {
                         }
                     `
                 }
-                gqlVariables={{id}}
+                gqlVariables={{id: Number(id)}}
                 gqlUserNode="deleteProject"
                 onSuccess={onSuccess}
             />

@@ -37,7 +37,7 @@ class GQLTypeSlotPipeline(
                     .description("Is the pipeline finished?")
                     .type(GraphQLBoolean.toNotNull())
                     .dataFetcher { env ->
-                        val pipeline: SlotPipeline = env.getSource()
+                        val pipeline: SlotPipeline = env.getSource()!!
                         pipeline.status.finished
                     }
             }
@@ -47,7 +47,7 @@ class GQLTypeSlotPipeline(
                     .description("Last change having occurred to the pipeline")
                     .type(gqlTypeSlotPipelineChange.typeRef)
                     .dataFetcher { env ->
-                        val pipeline: SlotPipeline = env.getSource()
+                        val pipeline: SlotPipeline = env.getSource()!!
                         slotService.getPipelineChanges(pipeline).firstOrNull()
                     }
             }

@@ -27,7 +27,7 @@ class QueueRecordServiceImpl(
         recordingsService.record(queueRecordingsExtension, record)
     }
 
-    private fun obfuscateUsername() = securityService.currentAccount?.username?.let {
+    private fun obfuscateUsername() = securityService.currentUser?.name?.let {
         if (it == "admin") it else "user"
     }
 

@@ -2,12 +2,12 @@ package net.nemerosa.ontrack.service.support
 
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
+import jakarta.annotation.PostConstruct
 import net.nemerosa.ontrack.model.support.CollectedConnectorStatus
 import net.nemerosa.ontrack.model.support.ConnectorStatusIndicator
 import net.nemerosa.ontrack.model.support.ConnectorStatusType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import javax.annotation.PostConstruct
 
 @Component
 @Transactional(readOnly = true)

@@ -12,7 +12,14 @@ class JIRAConfigurationTest {
 
     @Test
     fun obfuscate() {
-        var config = JIRAConfiguration("Test", "https://host", "user", "secret", emptyList(), emptyList())
+        var config = JIRAConfiguration(
+            name = "Test",
+            url = "https://host",
+            user = "user",
+            password = "secret",
+            include = emptyList(),
+            exclude = emptyList()
+        )
         assertEquals("secret", config.password)
         config = config.obfuscate()
         assertEquals("", config.password)
@@ -116,5 +123,16 @@ class JIRAConfigurationTest {
         assertFalse(config.isValidIssueKey("13"))
         assertFalse(config.isValidIssueKey("13-PRJ"))
         assertFalse(config.isValidIssueKey("1PRJ-12"))
+    }
+
+    @Test
+    fun `Backward compatibility with no API URL`() {
+        val config = mapOf(
+            "name" to "JIRA",
+            "url" to "https://jira",
+            "user" to "some-user",
+            "password" to "some-password",
+        ).asJson().parse<JIRAConfiguration>()
+        assertEquals(null, config.apiUrl)
     }
 }

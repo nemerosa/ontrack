@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.model.security
 
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
 import net.nemerosa.ontrack.model.annotations.APIDescription
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Size
 
 @APIDescription("Group description")
 class AccountGroupInput(

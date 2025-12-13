@@ -17,12 +17,6 @@ class StashGitConfiguration(
     override val type: String = "stash"
     override val name: String = configuration.name
 
-    /**
-     * Checks if this configuration denotes any Bitbucket Cloud instance
-     */
-    @Deprecated("See StashConfiguration")
-    val isCloud: Boolean = configuration.isCloud
-
     override val remote: String
         get() = String.format(
             remoteFormat,
@@ -52,10 +46,8 @@ class StashGitConfiguration(
             repository
         )
 
-    private val fileAtCommitLinkFormat: String =
-        if (isCloud) "%s/%s/%s/src/{commit}/{path}" else "%s/projects/%s/repos/%s/browse/{path}?at={commit}"
-    private val commitLinkFormat: String =
-        if (isCloud) "%s/%s/%s/commits/{commit}" else "%s/projects/%s/repos/%s/commits/{commit}"
-    private val remoteFormat: String = if (isCloud) "%s/%s/%s.git" else "%s/scm/%s/%s.git"
+    private val fileAtCommitLinkFormat: String = "%s/projects/%s/repos/%s/browse/{path}?at={commit}"
+    private val commitLinkFormat: String = "%s/projects/%s/repos/%s/commits/{commit}"
+    private val remoteFormat: String = "%s/scm/%s/%s.git"
 
 }

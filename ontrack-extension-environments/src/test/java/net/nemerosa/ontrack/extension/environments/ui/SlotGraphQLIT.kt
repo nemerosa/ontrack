@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleTestFixtures
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
+@AsAdminTest
 class SlotGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
@@ -25,39 +27,41 @@ class SlotGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Creating a list of slots`() {
-        environmentTestSupport.withEnvironment { env1 ->
-            environmentTestSupport.withEnvironment { env2 ->
-                project {
-                    run(
-                        """
-                        mutation CreateSlots(${'$'}environmentIds: [String!]!) {
-                            createSlots(input: {
-                                projectId: ${project.id},
-                                environmentIds: ${'$'}environmentIds,
-                            }) {
-                                errors {
-                                    message
+        asAdmin {
+            environmentTestSupport.withEnvironment { env1 ->
+                environmentTestSupport.withEnvironment { env2 ->
+                    project {
+                        run(
+                            """
+                                mutation CreateSlots(${'$'}environmentIds: [String!]!) {
+                                    createSlots(input: {
+                                        projectId: ${project.id},
+                                        environmentIds: ${'$'}environmentIds,
+                                    }) {
+                                        errors {
+                                            message
+                                        }
+                                    }
                                 }
-                            }
+                            """,
+                            mapOf(
+                                "environmentIds" to listOf(env1.id, env2.id)
+                            )
+                        ) { data ->
+                            checkGraphQLUserErrors(data, "createSlots")
+                            assertEquals(
+                                listOf(env1 to project),
+                                slotService.findSlotsByEnvironment(env1).map {
+                                    it.environment to it.project
+                                }
+                            )
+                            assertEquals(
+                                listOf(env2 to project),
+                                slotService.findSlotsByEnvironment(env2).map {
+                                    it.environment to it.project
+                                }
+                            )
                         }
-                    """,
-                        mapOf(
-                            "environmentIds" to listOf(env1.id, env2.id)
-                        )
-                    ) { data ->
-                        checkGraphQLUserErrors(data, "createSlots")
-                        assertEquals(
-                            listOf(env1 to project),
-                            slotService.findSlotsByEnvironment(env1).map {
-                                it.environment to it.project
-                            }
-                        )
-                        assertEquals(
-                            listOf(env2 to project),
-                            slotService.findSlotsByEnvironment(env2).map {
-                                it.environment to it.project
-                            }
-                        )
                     }
                 }
             }

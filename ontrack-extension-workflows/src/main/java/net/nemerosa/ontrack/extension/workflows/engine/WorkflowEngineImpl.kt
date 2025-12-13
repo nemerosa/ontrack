@@ -251,6 +251,10 @@ class WorkflowEngineImpl(
         val node = instance.workflow.getNode(nodeId)
         // Getting the node executor
         val executor = workflowNodeExecutorService.getExecutor(node.executorId)
+        // Checking if the executor is enabled
+        if (!executor.enabled) {
+            throw WorkflowNodeExecutorNotEnabledException(executor)
+        }
         // Timeout
         val timeout = Duration.ofSeconds(node.timeout)
 
@@ -305,7 +309,7 @@ class WorkflowEngineImpl(
     }
 
     private fun checkAuthentication(message: String) {
-        securityService.currentAccount ?: error(message)
+        securityService.currentUser ?: error(message)
     }
 
     private fun getNodeStatus(instanceId: String, nodeId: String): WorkflowInstanceNodeStatus? =

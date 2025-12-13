@@ -47,7 +47,7 @@ export const createPromotionRun = async (build, promotionLevel, params) => {
             ${promotionRunFragment}
         `,
         {
-            buildId: build.id,
+            buildId: Number(build.id),
             promotionLevelName,
             description,
         }

@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
-import net.nemerosa.ontrack.extension.issues.export.ExportFormat
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.model.GitCommit
@@ -69,7 +67,10 @@ interface GitService : SCMService {
      * @param gitBranchConfigurationProperty Gt branch configuration
      * @return Pull request or null is none
      */
-    fun getBranchAsPullRequest(branch: Branch, gitBranchConfigurationProperty: GitBranchConfigurationProperty?): GitPullRequest?
+    fun getBranchAsPullRequest(
+        branch: Branch,
+        gitBranchConfigurationProperty: GitBranchConfigurationProperty?
+    ): GitPullRequest?
 
     /**
      * Gets the configuration for a branch
@@ -94,38 +95,6 @@ interface GitService : SCMService {
     fun launchBuildSync(branchId: ID, synchronous: Boolean): Future<*>?
 
     /**
-     * Change log
-     */
-    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
-    fun changeLog(request: BuildDiffRequest): GitChangeLog
-
-    /**
-     * Change log commits
-     */
-    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
-    fun getChangeLogCommits(
-        changeLog: GitChangeLog,
-    ): GitChangeLogCommits
-
-    /**
-     * Change log issues IDs
-     */
-    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
-    fun getChangeLogIssuesIds(changeLog: GitChangeLog): List<String>
-
-    /**
-     * Change log issues
-     */
-    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
-    fun getChangeLogIssues(changeLog: GitChangeLog): GitChangeLogIssues
-
-    /**
-     * Change log files
-     */
-    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
-    fun getChangeLogFiles(changeLog: GitChangeLog): GitChangeLogFiles
-
-    /**
      * Loops over each correctly configured project.
      */
     fun forEachConfiguredProject(consumer: BiConsumer<Project, GitConfiguration>)
@@ -142,15 +111,6 @@ interface GitService : SCMService {
     fun forEachConfiguredBranchInProject(project: Project, consumer: (Branch, GitBranchConfiguration) -> Unit)
 
     /**
-     * Gets information about an issue in a Git-configured project
-     *
-     * @param projectId ID of the project
-     * @param key Display key of the issue
-     * @return Issue & commit information about the issue in the project if available
-     */
-    fun getIssueProjectInfo(projectId: ID, key: String): OntrackGitIssueInfo?
-
-    /**
      * Looks up a commit in the given `configuration`.
      *
      * @param id Commit long or short ID
@@ -159,19 +119,9 @@ interface GitService : SCMService {
     fun lookupCommit(configuration: GitConfiguration, id: String): GitCommit?
 
     /**
-     * Gets information about a commit in a Git-configured project.
-     */
-    fun getCommitProjectInfo(projectId: ID, commit: String): OntrackGitCommitInfo
-
-    /**
      * Gets the list of remote branches, as defined under `ref/heads`.
      */
     fun getRemoteBranches(gitConfiguration: GitConfiguration): List<String>
-
-    /**
-     * Gets a diff on a list of file changes, filtering the changes using ANT-like patterns
-     */
-    fun diff(changeLog: GitChangeLog, patterns: List<String>): String
 
     /**
      * Synchronises the Git repository attached to this project.
@@ -203,7 +153,11 @@ interface GitService : SCMService {
      * @param project Associated project
      * @param listener Logger
      */
-    fun syncProjectRepository(config: GitConfiguration, project: Project, listener: (message: String) -> Unit = { println(it) })
+    fun syncProjectRepository(
+        config: GitConfiguration,
+        project: Project,
+        listener: (message: String) -> Unit = { println(it) }
+    )
 
     /**
      * Gets the Git synchronisation information.
@@ -252,21 +206,19 @@ interface GitService : SCMService {
      *
      * This is the optimized version for jobs running in the background.
      */
-    fun collectIndexableGitCommitForBranch(branch: Branch,
-                                           client: GitRepositoryClient,
-                                           config: GitBranchConfiguration,
-                                           overrides: Boolean,
-                                           listener: JobRunListener)
+    fun collectIndexableGitCommitForBranch(
+        branch: Branch,
+        client: GitRepositoryClient,
+        config: GitBranchConfiguration,
+        overrides: Boolean,
+        listener: JobRunListener
+    )
 
     /**
      * Collects and stores the [IndexableGitCommit]s one build.
      */
+    @Deprecated("Will be removed in V6. Use the SCMBuildCommitIndexService instead.")
     fun collectIndexableGitCommitForBuild(build: Build)
-
-    /**
-     * Converts a raw [GitCommit] into an annotated [GitUICommit]
-     */
-    fun toUICommit(gitConfiguration: GitConfiguration, commit: GitCommit): GitUICommit
 
     /**
      * Loops over the commits of a configuration
@@ -278,14 +230,4 @@ interface GitService : SCMService {
      */
     fun isRepositorySynched(gitConfiguration: GitConfiguration): Boolean
 
-    /**
-     * Gets the list of available issue export formats for this project
-     */
-    @Deprecated("Export formats are no longer issue service specific - will be removed in V5")
-    fun getIssueExportFormats(project: Project): List<ExportFormat>
-
-    /**
-     * Gets a link to view a diff.
-     */
-    fun getDiffLink(gitChangeLog: GitChangeLog): String?
 }

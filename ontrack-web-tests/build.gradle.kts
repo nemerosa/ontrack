@@ -37,5 +37,42 @@ val uiTest by tasks.registering(NpmTask::class) {
     }
 
     args.set(listOf("run", "test"))
+    environment.put("JUNIT_REPORT_PATH", "reports/main/junit/report.xml")
+    environment.put("HTML_REPORT_PATH", "reports/main/html")
 }
 
+// Specialized tests
+
+val uiLdapTest by tasks.registering(NpmTask::class) {
+    dependsOn(playwrightSetup)
+    dependsOn(":ontrack-kdsl-acceptance:kdslLdapComposeUp")
+    finalizedBy(":ontrack-kdsl-acceptance:kdslLdapComposeDown")
+
+    shouldRunAfter(uiTest)
+    shouldRunAfter(":ontrack-kdsl-acceptance:kdslAcceptanceTestComposeDown")
+
+    args.set(listOf("run", "test-ldap"))
+    environment.put("JUNIT_REPORT_PATH", "reports/ldap/junit/report.xml")
+    environment.put("HTML_REPORT_PATH", "reports/ldap/html")
+}
+
+val uiOidcTest by tasks.registering(NpmTask::class) {
+    dependsOn(playwrightSetup)
+    dependsOn(":ontrack-kdsl-acceptance:kdslOidcComposeUp")
+    finalizedBy(":ontrack-kdsl-acceptance:kdslOidcComposeDown")
+
+    shouldRunAfter(uiLdapTest)
+    shouldRunAfter(":ontrack-kdsl-acceptance:kdslLdapComposeDown")
+
+    args.set(listOf("run", "test-oidc"))
+    environment.put("JUNIT_REPORT_PATH", "reports/oidc/junit/report.xml")
+    environment.put("HTML_REPORT_PATH", "reports/oidc/html")
+}
+
+// All tests
+
+val uiTests by tasks.registering {
+    dependsOn(uiTest)
+    dependsOn(uiLdapTest)
+    dependsOn(uiOidcTest)
+}

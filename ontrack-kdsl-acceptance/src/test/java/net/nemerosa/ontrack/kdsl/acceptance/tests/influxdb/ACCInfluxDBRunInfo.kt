@@ -32,7 +32,7 @@ class ACCInfluxDBRunInfo : AbstractACCDSLTestSupport() {
             Query(
                 """
                     SELECT *
-                    FROM ontrack_acceptance_run_build_time_seconds
+                    FROM ontrack_run_build_time_seconds
                     WHERE project = '${project.name}'
                     AND branch = '1.0'
                 """.trimIndent(),
@@ -55,7 +55,7 @@ class ACCInfluxDBRunInfo : AbstractACCDSLTestSupport() {
 
     }
 
-    @Measurement(name = "ontrack_acceptance_run_build_time_seconds")
+    @Measurement(name = "ontrack_run_build_time_seconds")
     class RunInfoMeasurement {
 
         @field:Column(name = "value")

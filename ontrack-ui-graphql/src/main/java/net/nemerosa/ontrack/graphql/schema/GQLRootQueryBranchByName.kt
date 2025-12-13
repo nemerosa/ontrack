@@ -17,11 +17,11 @@ class GQLRootQueryBranchByName(
             .name("branchByName")
             .description("Getting a branch using its name")
             .type(gqlTypeBranch.typeRef)
-            .argument(stringArgument(ARG_PROJECT, "Name of the project"))
-            .argument(stringArgument(ARG_BRANCH, "Name of the branch"))
+            .argument(stringArgument(ARG_PROJECT, "Name of the project", nullable = false))
+            .argument(stringArgument(ARG_BRANCH, "Name of the branch", nullable = false))
             .dataFetcher { env ->
-                val projectName: String = env.getArgument(ARG_PROJECT)
-                val branchName: String = env.getArgument(ARG_BRANCH)
+                val projectName: String = env.getArgument(ARG_PROJECT)!!
+                val branchName: String = env.getArgument(ARG_BRANCH)!!
                 structureService.findBranchByName(projectName, branchName).getOrNull()
             }
             .build()

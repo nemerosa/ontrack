@@ -91,7 +91,7 @@ export default function BuildContentValidations({build}) {
                             }
                         }
                     }
-                `, {branchId: build.branch.id}
+                `, {branchId: Number(build.branch.id)}
             ).then(data => {
                 setStatuses(data.validationRunStatusIDList.sort(sortingByText))
                 setValidationStamps(data.branches[0].validationStamps.sort(sortingByText))
@@ -141,7 +141,7 @@ export default function BuildContentValidations({build}) {
                         }
                     }
                 `, {
-                    buildId: build.id,
+                    buildId: Number(build.id),
                     offset: pageRequest.offset,
                     size: pageRequest.size,
                     statuses: filteredInfo.status,

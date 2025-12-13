@@ -21,7 +21,7 @@ class GQLRootQueryEnvironmentById(
             )
             .type(gqlTypeEnvironment.typeRef)
             .dataFetcher { env ->
-                val id: String = env.getArgument(ARG_ID)
+                val id: String = env.getArgument(ARG_ID)!!
                 environmentService.getById(id)
             }
             .build()

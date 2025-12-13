@@ -67,7 +67,7 @@ export default function SelectProject({
                 onClear={handleClear}
                 notFoundContent={null}
                 options={(projects || []).map((d) => ({
-                    value: idAsValue ? d.id : d.name,
+                    value: idAsValue ? Number(d.id) : d.name,
                     label: d.name,
                 }))}
                 style={{

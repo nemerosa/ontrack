@@ -26,7 +26,7 @@ class ProjectIndicatorPortfoliosGraphQLFieldContributor(
                             .description("List of indicator portfolios associated with this project, through its labels.")
                             .type(listType(indicatorPortfolio.typeRef))
                             .dataFetcher { env ->
-                                val project: Project = env.getSource()
+                                val project: Project = env.getSource()!!
                                 indicatorPortfolioService.findPortfolioByProject(project)
                             }
                             .build()

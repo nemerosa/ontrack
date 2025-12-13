@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonView
-import net.nemerosa.ontrack.model.buildfilter.BuildDiff
-import net.nemerosa.ontrack.model.form.Form
 import java.time.LocalDateTime
 
 data class Build(
@@ -11,7 +9,7 @@ data class Build(
     val name: String,
     override val description: String?,
     override val signature: Signature,
-    @JsonView(value = [Build::class, BuildView::class, PromotionRun::class, ValidationRun::class, BuildDiff::class])
+    @JsonView(Build::class,PromotionRun::class, ValidationRun::class)
     val branch: Branch
 ) : RunnableEntity {
 
@@ -61,14 +59,7 @@ data class Build(
                 branch
             )
 
-        @JvmStatic
-        fun form(): Form = Form.nameAndDescription()
-
     }
-
-    fun asForm(): Form = form()
-        .fill("name", name)
-        .fill("description", description)
 
     fun update(nameDescription: NameDescription): Build = Build(
         id,

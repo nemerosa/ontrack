@@ -1,46 +1,43 @@
-import {useContext, useEffect, useState} from "react";
+import {useContext} from "react";
 import {useEventForRefresh} from "@components/common/EventsContext";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {gqlDecorationFragment} from "@components/services/fragments";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import PaddedContent from "@components/common/PaddedContent";
 import SimpleProjectList from "@components/projects/SimpleProjectList";
 import {gqlProjectContentFragment} from "@components/projects/ProjectGraphQLFragments";
+import {useQuery} from "@components/services/GraphQL";
 
 export default function LastActiveProjectsWidget({count}) {
 
-    const client = useGraphQLClient()
-    const [projects, setProjects] = useState([])
     const projectsRefreshCount = useEventForRefresh("project.created")
     const favouritesRefresh = useEventForRefresh("project.favourite")
 
     const {setTitle} = useContext(DashboardWidgetCellContext)
+    setTitle(`Last ${count} active projects`)
 
-    useEffect(() => {
-        if (client) {
-            client.request(
-                gql`
-                    query LastActiveProjects($count: Int! = 10) {
-                        lastActiveProjects(count: $count) {
-                            ...ProjectContent
-                            favourite
-                            decorations {
-                                ...decorationContent
-                            }
-                        }
+    const {data: projects} = useQuery(
+        gql`
+            query LastActiveProjects($count: Int! = 10) {
+                lastActiveProjects(count: $count) {
+                    ...ProjectContent
+                    favourite
+                    decorations {
+                        ...decorationContent
                     }
+                }
+            }
 
-                    ${gqlProjectContentFragment}
-                    ${gqlDecorationFragment}
-                `,
-                {count}
-            ).then(data => {
-                setProjects(data.lastActiveProjects)
-                setTitle(`Last ${count} active projects`)
-            })
+            ${gqlProjectContentFragment}
+            ${gqlDecorationFragment}
+        `,
+        {
+            variables: {count},
+            initialData: [],
+            deps: [count, projectsRefreshCount, favouritesRefresh],
+            dataFn: data => data.lastActiveProjects,
         }
-    }, [client, count, projectsRefreshCount, favouritesRefresh]);
+    )
 
     return (
         <PaddedContent>

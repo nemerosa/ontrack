@@ -16,15 +16,6 @@ import java.util.Optional;
 public interface AccountService {
 
     /**
-     * Completes an account with the list of its authorisations.
-     *
-     * @param raw Account without authorisations
-     * @return Account with authorisations
-     */
-    @NotNull
-    OntrackAuthenticatedUser withACL(@NotNull OntrackUser raw);
-
-    /**
      * List of accounts
      */
     List<Account> getAccounts();
@@ -33,14 +24,6 @@ public interface AccountService {
      * Creates a built-in account
      */
     Account create(AccountInput input);
-
-    /**
-     * Creates an account and allows for further customisation
-     *
-     * @param input                Account data
-     * @param authenticationSource Authentication source
-     */
-    Account create(AccountInput input, AuthenticationSource authenticationSource);
 
     /**
      * Gets an account using its ID
@@ -237,25 +220,4 @@ public interface AccountService {
     @Nullable
     AccountGroup findAccountGroupByName(@NotNull String name);
 
-    /**
-     * Checks if an account ID exists
-     */
-    boolean doesAccountIdExist(@NotNull ID id);
-
-    /**
-     * Deletes all accounts having the given source.
-     *
-     * @param source Source to delete accounts from
-     */
-    void deleteAccountBySource(@NotNull AuthenticationSource source);
-
-    /**
-     * Disabled / enables an account
-     */
-    void setAccountDisabled(@NotNull ID id, boolean disabled);
-
-    /**
-     * Locks / unlocks an account
-     */
-    void setAccountLocked(@NotNull ID id, boolean locked);
 }

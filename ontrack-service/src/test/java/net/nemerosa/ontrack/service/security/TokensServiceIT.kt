@@ -1,14 +1,11 @@
 package net.nemerosa.ontrack.service.security
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountManagement
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.TokenOptions
-import net.nemerosa.ontrack.model.structure.TokenScope
 import net.nemerosa.ontrack.model.structure.TokensService
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
@@ -76,7 +73,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Bound user`() {
         asUser {
-            val accountId = securityService.currentAccount!!.id()
+            val accountId = securityService.currentUser?.account?.id()
+                ?: fail("No current account")
             tokensService.generateNewToken(TokenOptions("test"))
             val token = tokensService.getCurrentToken("test")!!.value
             val t = tokensService.findAccountByToken(token)
@@ -108,7 +106,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
         asUser {
             val token = tokensService.generateNewToken(TokenOptions("test"))
             // Gets the account ID
-            val accountId = securityService.currentAccount!!.id()
+            val accountId = securityService.currentUser?.account?.id()
+                ?: fail("No current account")
             asUserWith<AccountManagement> {
                 val result = tokensService.getTokens(accountId).find { it.name == "test" }
                 assertNotNull(result) {
@@ -122,7 +121,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     fun `Revoke an account`() {
         asUser {
             tokensService.generateNewToken(TokenOptions("test"))
-            val accountId = securityService.currentAccount!!.id()
+            val accountId = securityService.currentUser?.account?.id()
+                ?: fail("No current account")
             asUserWith<AccountManagement> {
                 tokensService.revokeAllTokens(accountId)
             }
@@ -153,36 +153,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Checking the validity of a token with cache not enabled`() {
-        withCustomTokenCache(false) {
-            asUser {
-                val id = securityService.currentAccount!!.id()
-                val token = tokensService.generateNewToken(TokenOptions("test"))
-                assertTrue(tokensService.isValid(token.value), "Token is valid")
-                asAdmin { tokensService.revokeToken(id, "test") }
-                assertFalse(tokensService.isValid(token.value), "Token has been revoked")
-                assertFalse(tokensService.isValid(token.value), "Token has been revoked")
-            }
-        }
-    }
-
-    @Test
-    fun `Checking the validity of a token with cache enabled`() {
-        withCustomTokenCache(true) {
-            asUser {
-                val id = securityService.currentAccount!!.id()
-                val token = tokensService.generateNewToken(TokenOptions("test"))
-                assertTrue(tokensService.isValid(token.value), "Token is valid")
-                asAdmin { tokensService.revokeToken(id, "test") }
-                assertFalse(tokensService.isValid(token.value), "Token has been revoked")
-            }
-        }
-    }
-
-    @Test
     fun `Changing the validity of a token to a shorter one with unlimited defaults`() {
         asUser {
-            val id = securityService.currentAccount!!.id()
+            val id = securityService.currentUser?.account?.id()
+                ?: fail("No current account")
             asAdmin {
                 val t = tokensService.generateToken(
                     accountId = id,
@@ -200,56 +174,11 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `A transient token has always its validity being set`() {
-        withCustomTokenTransientValidityDuration(Duration.ofHours(2)) {
-            asUser {
-                val id = securityService.currentAccount!!.id()
-                asAdmin {
-                    val t = tokensService.generateToken(
-                        accountId = id,
-                        options = TokenOptions(
-                            name = "test",
-                            scope = TokenScope.NEXT_UI,
-                        )
-                    )
-                    assertNotNull(t.validUntil) {
-                        assertTrue(t.isValid(Time.now() + Duration.ofHours(1)))
-                        assertFalse(t.isValid(Time.now() + Duration.ofHours(3)))
-                    }
-                }
-            }
-        }
-    }
-
-    @Test
-    fun `A transient token has always its validity being overridden`() {
-        withCustomTokenTransientValidityDuration(Duration.ofHours(2)) {
-            asUser {
-                val id = securityService.currentAccount!!.id()
-                asAdmin {
-                    val t = tokensService.generateToken(
-                        accountId = id,
-                        options = TokenOptions(
-                            name = "test",
-                            scope = TokenScope.NEXT_UI,
-                            validity = Duration.ofDays(14),
-                            forceUnlimited = false,
-                        )
-                    )
-                    assertNotNull(t.validUntil) {
-                        assertTrue(t.isValid(Time.now() + Duration.ofHours(1)))
-                        assertFalse(t.isValid(Time.now() + Duration.ofHours(3)))
-                    }
-                }
-            }
-        }
-    }
-
-    @Test
     fun `Generating a token with default duration`() {
         withCustomTokenValidityDuration(Duration.ofDays(14)) {
             asUser {
-                val id = securityService.currentAccount!!.id()
+                val id = securityService.currentUser?.account?.id()
+                    ?: fail("No current account")
                 asAdmin {
                     val t = tokensService.generateToken(
                         accountId = id,
@@ -271,7 +200,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     fun `Generating a token with unlimited duration`() {
         withCustomTokenValidityDuration(Duration.ofDays(14)) {
             asUser {
-                val id = securityService.currentAccount!!.id()
+                val id = securityService.currentUser?.account?.id()
+                    ?: fail("No current account")
                 asAdmin {
                     val t = tokensService.generateToken(
                         accountId = id,
@@ -303,44 +233,13 @@ class TokensServiceIT : AbstractDSLTestSupport() {
         }
     }
 
-    @Test
-    fun `Transient tokens are automatically prolongated`() {
-        withCustomTokenTransientValidityDuration(Duration.ofHours(2)) {
-            asUser {
-                val token = tokensService.generateNewToken(
-                    TokenOptions(
-                        name = "test",
-                        scope = TokenScope.NEXT_UI,
-                    )
-                )
-                assertNull(token.lastUsed, "Last used date not set on creation")
-                val initialValidUntil = token.validUntil
-                assertNotNull(initialValidUntil, "Validation period set")
-                assertTrue(token.isValid(Time.now() + Duration.ofHours(1)))
-                assertFalse(token.isValid(Time.now() + Duration.ofHours(3)))
-                // Waiting a bit
-                val refTime = Time.now() + Duration.ofHours(1)
-                // Getting the account for this token
-                val tokenAccount = tokensService.findAccountByToken(token.value, refTime)
-                assertNotNull(tokenAccount, "Account found")
-                // Getting the tokens for this account
-                asAdmin {
-                    val firstToken = tokensService.getTokens(tokenAccount.account).first()
-                    assertNotNull(firstToken.lastUsed, "Last used date has been set")
-                    assertNotNull(firstToken.validUntil, "Validity still set") { newValidUntil ->
-                        assertTrue(newValidUntil > initialValidUntil, "Validity has been prolongated")
-                    }
-                }
-            }
-        }
-    }
-
     private fun accountWithToken(): Account {
         return asUser {
             tokensService.generateNewToken(TokenOptions("test"))
-            val accountId = securityService.currentAccount!!.id()
+            val id = securityService.currentUser?.account?.id()
+                ?: fail("No current account")
             asAdmin {
-                accountService.getAccount(ID.of(accountId))
+                accountService.getAccount(ID.of(id))
             }
         }
     }
@@ -352,26 +251,6 @@ class TokensServiceIT : AbstractDSLTestSupport() {
             code()
         } finally {
             ontrackConfigProperties.security.tokens.validity = old
-        }
-    }
-
-    private fun <T> withCustomTokenTransientValidityDuration(duration: Duration, code: () -> T): T {
-        val old = ontrackConfigProperties.security.tokens.transientValidity
-        return try {
-            ontrackConfigProperties.security.tokens.transientValidity = duration
-            code()
-        } finally {
-            ontrackConfigProperties.security.tokens.transientValidity = old
-        }
-    }
-
-    private fun <T> withCustomTokenCache(enabled: Boolean, code: () -> T): T {
-        val old = ontrackConfigProperties.security.tokens.cache.enabled
-        return try {
-            ontrackConfigProperties.security.tokens.cache.enabled = enabled
-            code()
-        } finally {
-            ontrackConfigProperties.security.tokens.cache.enabled = old
         }
     }
 

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.settings
 
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.exceptions.PredefinedPromotionLevelNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.PromotionLevelEdit
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
+@AsAdminTest
 class PredefinedPromotionLevelServiceIT : AbstractDSLTestSupport() {
 
     @Autowired

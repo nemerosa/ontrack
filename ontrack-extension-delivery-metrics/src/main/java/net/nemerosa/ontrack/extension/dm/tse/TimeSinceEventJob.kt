@@ -1,14 +1,13 @@
 package net.nemerosa.ontrack.extension.dm.tse
 
 import net.nemerosa.ontrack.extension.dm.model.DeliveryMetricsJobs
-import net.nemerosa.ontrack.extension.git.branching.BranchingModelPropertyType
+import net.nemerosa.ontrack.extension.scm.branching.BranchingModelPropertyType
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
-import java.util.stream.Stream
 
 /**
  * This job computes all "time since events" of main branches and exports the metrics.

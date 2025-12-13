@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.boot.search
 
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class SearchGraphQLIT : AbstractSearchJUnit4TestSupport() {
+class SearchGraphQLIT : AbstractSearchTestSupport() {
 
     @Test
     fun `Looking for a branch`() {

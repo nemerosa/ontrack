@@ -6,8 +6,8 @@ package net.nemerosa.ontrack.extension.license
 interface LicenseService {
 
     /**
-     * Gets the current license. Null for no license (unlimited).
+     * Gets the current license.
      */
-    val license: License?
+    val license: License
 
 }

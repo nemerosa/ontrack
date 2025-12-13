@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.tfc.hook
 
+import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.hook.*
 import net.nemerosa.ontrack.extension.hook.queue.HookQueueSourceData
 import net.nemerosa.ontrack.extension.hook.queue.HookQueueSourceExtension
@@ -20,18 +21,21 @@ import net.nemerosa.ontrack.extension.tfc.settings.TFCSettings
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.core.env.Environment
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Component
 import kotlin.reflect.KProperty0
 
 @Component
 class TFCHookEndpointExtension(
-        private val cachedSettingsService: CachedSettingsService,
-        private val tfcConfigProperties: TFCConfigProperties,
-        private val queueDispatcher: QueueDispatcher,
-        private val queueProcessor: TFCQueueProcessor,
-        private val queueHookInfoLinkExtension: QueueHookInfoLinkExtension,
-        private val hookQueueSourceExtension: HookQueueSourceExtension,
-        extensionFeature: TFCExtensionFeature,
+    private val cachedSettingsService: CachedSettingsService,
+    private val tfcConfigProperties: TFCConfigProperties,
+    private val queueDispatcher: QueueDispatcher,
+    private val queueProcessor: TFCQueueProcessor,
+    private val queueHookInfoLinkExtension: QueueHookInfoLinkExtension,
+    private val hookQueueSourceExtension: HookQueueSourceExtension,
+    private val environment: Environment,
+    extensionFeature: TFCExtensionFeature,
 ) : AbstractExtension(extensionFeature), HookEndpointExtension {
 
     private val logger: Logger = LoggerFactory.getLogger(TFCHookEndpointExtension::class.java)
@@ -41,17 +45,20 @@ class TFCHookEndpointExtension(
     override val enabled: Boolean
         get() = cachedSettingsService.getCachedSettings(TFCSettings::class.java).enabled
 
-    override fun checkAccess(request: HookRequest) {
-        if (tfcConfigProperties.hook.signature.disabled) {
+    override fun checkAccess(request: HookRequest): String {
+        val token = cachedSettingsService.getCachedSettings(TFCSettings::class.java).token
+            .takeIf { it.isNotBlank() }
+            ?: throw AccessDeniedException("No token is provided in the TFC hook settings")
+        if (tfcConfigProperties.hook.signature.disabled || RunProfile.DEV in environment.activeProfiles) {
             logger.warn("TFC Hook signature checks are disabled.")
         } else {
-            val token = cachedSettingsService.getCachedSettings(TFCSettings::class.java).token
             HookSignature.checkSignature(
-                    request.body,
-                    request.getRequiredHeader("X-TFE-Notification-Signature"),
-                    token
+                request.body,
+                request.getRequiredHeader("X-TFE-Notification-Signature"),
+                token
             )
         }
+        return token
     }
 
     override fun process(recordId: String, request: HookRequest): HookResponse {
@@ -68,10 +75,10 @@ class TFCHookEndpointExtension(
     }
 
     private fun processNotification(
-            recordId: String,
-            parameters: TFCParameters,
-            payload: TFCHookPayload,
-            notification: TFCHookPayloadNotification
+        recordId: String,
+        parameters: TFCParameters,
+        payload: TFCHookPayload,
+        notification: TFCHookPayloadNotification
     ): QueueDispatchResult = when (notification.trigger) {
         "verification" -> verification(notification)
         "run:completed" -> processRun(recordId, parameters, payload, notification)
@@ -80,34 +87,34 @@ class TFCHookEndpointExtension(
     }
 
     private fun processRun(
-            recordId: String,
-            parameters: TFCParameters,
-            hook: TFCHookPayload,
-            notification: TFCHookPayloadNotification
+        recordId: String,
+        parameters: TFCParameters,
+        hook: TFCHookPayload,
+        notification: TFCHookPayloadNotification
     ): QueueDispatchResult {
         // Queue payload
         val payload = RunPayload(
-                parameters = parameters,
-                runUrl = payload(hook::runUrl),
-                runId = payload(hook::runId),
-                workspaceId = payload(hook::workspaceId),
-                workspaceName = payload(hook::workspaceName),
-                organizationName = payload(hook::organizationName),
-                message = payload(notification::message),
-                trigger = payload(notification::trigger),
-                runStatus = payload(notification::runStatus),
+            parameters = parameters,
+            runUrl = payload(hook::runUrl),
+            runId = payload(hook::runId),
+            workspaceId = payload(hook::workspaceId),
+            workspaceName = payload(hook::workspaceName),
+            organizationName = payload(hook::organizationName),
+            message = payload(notification::message),
+            trigger = payload(notification::trigger),
+            runStatus = payload(notification::runStatus),
         )
         // Launching the processing on a queue dispatcher
         return queueDispatcher.dispatch(
-                queueProcessor = queueProcessor,
-                payload = payload,
-                source = hookQueueSourceExtension.createQueueSource(
-                        HookQueueSourceData(
-                                hook = id,
-                                id = recordId,
-                        )
+            queueProcessor = queueProcessor,
+            payload = payload,
+            source = hookQueueSourceExtension.createQueueSource(
+                HookQueueSourceData(
+                    hook = id,
+                    id = recordId,
                 )
-                )
+            )
+        )
     }
 
     private fun payload(property: KProperty0<String?>): String {
@@ -120,14 +127,14 @@ class TFCHookEndpointExtension(
     }
 
     private fun verification(notification: TFCHookPayloadNotification) = QueueDispatchResult(
-            type = QueueDispatchResultType.PROCESSED,
-            message = "Notification trigger ${notification.trigger} has been processed",
-            id = null,
+        type = QueueDispatchResultType.PROCESSED,
+        message = "Notification trigger ${notification.trigger} has been processed",
+        id = null,
     )
 
     private fun ignoredTrigger(notification: TFCHookPayloadNotification) = QueueDispatchResult(
-            type = QueueDispatchResultType.IGNORED,
-            message = "Notification trigger ${notification.trigger} is not processed",
-            id = null,
+        type = QueueDispatchResultType.IGNORED,
+        message = "Notification trigger ${notification.trigger} is not processed",
+        id = null,
     )
 }

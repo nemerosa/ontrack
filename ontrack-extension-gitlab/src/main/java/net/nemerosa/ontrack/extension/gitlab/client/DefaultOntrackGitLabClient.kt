@@ -19,7 +19,7 @@ class DefaultOntrackGitLabClient(
         val personalAccessToken = configuration.password
         val api = GitLabApi(configuration.url, personalAccessToken)
         api.setRequestTimeout(1000, 5000)
-        api.setIgnoreCertificateErrors(configuration.isIgnoreSslCertificate)
+        api.ignoreCertificateErrors = configuration.isIgnoreSslCertificate
         api
     }
 

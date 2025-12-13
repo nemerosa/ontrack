@@ -118,11 +118,10 @@ class GitConfigProperties {
     /**
      * Pull requests configuration
      */
-    @Deprecated("Will be removed in V5. Support for pull requests will be transformed in V5.")
     class GitPullRequestConfigProperties {
 
         @APIDescription("""Is the support for pull requests enabled?""")
-        var enabled: Boolean = true
+        var enabled: Boolean = false
 
         @DurationUnit(ChronoUnit.SECONDS)
         @APIDescription("""Timeout before giving up on PR check""")

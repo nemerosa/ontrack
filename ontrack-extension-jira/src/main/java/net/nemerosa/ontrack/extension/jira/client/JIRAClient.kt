@@ -10,6 +10,21 @@ interface JIRAClient : AutoCloseable {
 
     fun getIssue(key: String, configuration: JIRAConfiguration): JIRAIssue?
 
+    /**
+     * Getting the last commit for a given issue.
+     *
+     * @param key Key of the issue
+     * @param configuration Jira configuration
+     * @param applicationType Type of application providing the meta-information (stash, github, ...)
+     * @param repositoryName Name of the repository as recorded by Jira
+     */
+    fun getIssueLastCommit(
+        key: String,
+        configuration: JIRAConfiguration,
+        applicationType: String,
+        repositoryName: String,
+    ): String?
+
     val projects: List<String>
 
     fun createIssue(
@@ -48,5 +63,11 @@ interface JIRAClient : AutoCloseable {
      * Underlying REST template to use
      */
     val restTemplate: RestTemplate
+
+    companion object {
+        const val PROPERTY_JIRA_CLIENT_TYPE = "ontrack.extension.jira.client.type"
+        const val PROPERTY_JIRA_CLIENT_TYPE_DEFAULT = "default"
+        const val PROPERTY_JIRA_CLIENT_TYPE_MOCK = "mock"
+    }
 
 }

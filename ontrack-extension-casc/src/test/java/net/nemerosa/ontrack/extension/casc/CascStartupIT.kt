@@ -1,14 +1,14 @@
 package net.nemerosa.ontrack.extension.casc
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
-import net.nemerosa.ontrack.model.settings.HomePageSettings
+import net.nemerosa.ontrack.extension.casc.support.SampleSettings
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.settings.SecuritySettings
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class CascStartupIT : AbstractDSLTestJUnit4Support() {
+class CascStartupIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var cascStartup: CascStartup
@@ -39,11 +39,11 @@ class CascStartupIT : AbstractDSLTestJUnit4Support() {
         cascConfigurationProperties.apply {
             locations = listOf(
                 "classpath:casc/settings-security.yaml",
-                "classpath:casc/settings-home-page.yaml",
+                "classpath:casc/settings-sample.yaml",
             )
         }
         withSettings<SecuritySettings> {
-            withSettings<HomePageSettings> {
+            withSettings<SampleSettings> {
                 withNoGrantViewToAll {
                     cascStartup.start()
                     // Checks the new settings
@@ -51,9 +51,9 @@ class CascStartupIT : AbstractDSLTestJUnit4Support() {
                     assertTrue(securitySettings.isGrantProjectViewToAll)
                     assertTrue(securitySettings.isGrantProjectParticipationToAll)
 
-                    val homePageSettings = cachedSettingsService.getCachedSettings(HomePageSettings::class.java)
-                    assertEquals(10, homePageSettings.maxBranches)
-                    assertEquals(100, homePageSettings.maxProjects)
+                    val sampleSettings = cachedSettingsService.getCachedSettings(SampleSettings::class.java)
+                    assertEquals(200, sampleSettings.maxProjects)
+                    assertEquals(true, sampleSettings.enabled)
                 }
             }
         }
@@ -68,7 +68,7 @@ class CascStartupIT : AbstractDSLTestJUnit4Support() {
             )
         }
         withSettings<SecuritySettings> {
-            withSettings<HomePageSettings> {
+            withSettings<SampleSettings> {
                 withNoGrantViewToAll {
                     cascStartup.start()
                     // Checks the new settings
@@ -76,9 +76,9 @@ class CascStartupIT : AbstractDSLTestJUnit4Support() {
                     assertTrue(securitySettings.isGrantProjectViewToAll)
                     assertTrue(securitySettings.isGrantProjectParticipationToAll)
 
-                    val homePageSettings = cachedSettingsService.getCachedSettings(HomePageSettings::class.java)
-                    assertEquals(10, homePageSettings.maxBranches)
-                    assertEquals(100, homePageSettings.maxProjects)
+                    val sampleSettings = cachedSettingsService.getCachedSettings(SampleSettings::class.java)
+                    assertEquals(200, sampleSettings.maxProjects)
+                    assertEquals(true, sampleSettings.enabled)
                 }
             }
         }

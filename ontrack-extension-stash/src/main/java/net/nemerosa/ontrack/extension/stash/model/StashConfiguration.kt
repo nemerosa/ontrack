@@ -1,14 +1,8 @@
 package net.nemerosa.ontrack.extension.stash.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
-import net.nemerosa.ontrack.model.form.*
-import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
-import org.apache.commons.lang3.StringUtils
-import java.lang.String.format
 
 /**
  * @property name Name of this configuration
@@ -17,8 +11,7 @@ import java.lang.String.format
  * @property password User password
  * @property autoMergeToken Token used for approving pull requests for the auto merge operations
  */
-// TODO #532 Workaround
-open class StashConfiguration(
+class StashConfiguration(
     name: String,
     val url: String,
     user: String?,
@@ -30,20 +23,6 @@ open class StashConfiguration(
     @APIDescription("Token used for approving pull requests for the auto merge operations")
     val autoMergeToken: String?,
 ) : UserPasswordConfiguration<StashConfiguration>(name, user, password) {
-
-    /**
-     * Checks if this configuration denotes any Bitbucket Cloud instance
-     */
-    @Deprecated("Specific Bitbucket Cloud configuration must be used. Will be removed in V5.")
-    val isCloud: Boolean
-        @JsonIgnore
-        get() = StringUtils.contains(url, "bitbucket.org")
-
-    override val descriptor: ConfigurationDescriptor
-        get() = ConfigurationDescriptor(
-            name,
-            format("%s (%s)", name, url)
-        )
 
     override fun obfuscate() = StashConfiguration(
         name = name,
@@ -65,40 +44,18 @@ open class StashConfiguration(
         )
     }
 
-    fun asForm(): Form {
-        return form()
-            .with(defaultNameField().readOnly().value(name))
-            .fill("url", url)
-            .fill("user", user)
-            .fill("password", "")
-            .fill("autoMergeUser", autoMergeUser)
-            .fill("autoMergeToken", "")
+    /**
+     * Checks if a given "git clone" URL is associated with this configuration.
+     *
+     * @param url URL to test (like `https://bitbucket.dev.yontrack.com/scm/nemerosa/ontrack.git`
+     * or `ssh://git@bitbucket.dev.yontrack.com:7999/nemerosa/ontrack.git`)
+     * @return `true` if the URL is associated with this configuration
+     */
+    fun matchesUrl(url: String): Boolean {
+        // Extract the host from the configuration URL
+        val configHost = this.url.removePrefix("https://").removePrefix("http://").removeSuffix("/")
+        // Check if the provided URL contains the configuration host
+        return url.contains(configHost)
     }
 
-    companion object {
-
-        fun form(): Form {
-            return Form.create()
-                .with(defaultNameField())
-                .with(
-                    Text.of("url")
-                        .label("URL")
-                        .help("URL to the Bitbucket instance (https://bitbucket.org for example)")
-                )
-                .with(
-                    Text.of("user")
-                        .label("User")
-                        .length(16)
-                        .optional()
-                )
-                .with(
-                    Password.of("password")
-                        .label("Password")
-                        .length(40)
-                        .optional()
-                )
-                .textField(StashConfiguration::autoMergeUser, null)
-                .passwordField(StashConfiguration::autoMergeToken)
-        }
-    }
 }

@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.push.tagging
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.github.ingestion.processing.push.PushPayload
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * Tagging strategy based on getting the latest build on a branch.

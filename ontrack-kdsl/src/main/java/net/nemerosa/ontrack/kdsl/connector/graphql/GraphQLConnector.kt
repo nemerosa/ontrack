@@ -1,16 +1,15 @@
 package net.nemerosa.ontrack.kdsl.connector.graphql
 
 import com.apollographql.apollo.api.Mutation
-import com.apollographql.apollo.api.Operation
 import com.apollographql.apollo.api.Query
 
 interface GraphQLConnector {
 
-    fun <D : Operation.Data, T, V : Operation.Variables> query(query: Query<D, T, V>): T?
+    fun <D : Query.Data> query(query: Query<D>): D?
 
-    fun <D : Operation.Data, T, V : Operation.Variables> mutate(
-        mutation: Mutation<D, T, V>,
-        userErrors: (T?) -> UserErrors?,
-    ): T?
+    fun <D : Mutation.Data> mutate(
+        mutation: Mutation<D>,
+        userErrors: (D?) -> UserErrors?,
+    ): D?
 
 }

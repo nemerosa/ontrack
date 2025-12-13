@@ -5,13 +5,13 @@ import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.exceptions.ArgumentMismatchException
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID.Companion.of
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class GQLRootQueryBuilds(

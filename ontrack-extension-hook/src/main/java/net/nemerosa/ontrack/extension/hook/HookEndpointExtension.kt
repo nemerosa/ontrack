@@ -22,8 +22,10 @@ interface HookEndpointExtension : Extension {
      * Checks the access to endpoint.
      *
      * Throws an exception if case the access is denied.
+     *
+     * @return An Ontrack token which is used to target an account to run the hook
      */
-    fun checkAccess(request: HookRequest)
+    fun checkAccess(request: HookRequest): String
 
     /**
      * Processes the hook request.

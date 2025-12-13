@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertJsonNotNull
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
 @QueueNoAsync
+@AsAdminTest
 class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
@@ -283,7 +285,7 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
             assertEquals(WorkflowInstanceStatus.ERROR, overriddenInstance.workflowInstance.status)
             assertNotNull(overriddenInstance.override) {
                 assertEquals("Ignoring the result of the workflow", it.message)
-                assertEquals("admin", it.user)
+                assertEquals(securityService.currentUser?.name, it.user)
                 assertNotNull(it.timestamp, "Timestamp has been set")
             }
 

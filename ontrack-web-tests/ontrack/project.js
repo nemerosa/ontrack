@@ -38,7 +38,7 @@ export const getProjectById = async (ontrack, id) => {
             }
             ${gqlProjectData}
         `,
-        {id}
+        {id: Number(id)}
     )
     return projectInstance(ontrack, data.project)
 }

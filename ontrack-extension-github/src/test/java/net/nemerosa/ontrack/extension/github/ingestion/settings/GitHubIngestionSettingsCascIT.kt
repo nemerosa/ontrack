@@ -54,7 +54,7 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
                       "type": "integer"
                     },
                     "token": {
-                      "description": "Secret token sent by the GitHub hook and signing the payload",
+                      "description": "Secret token sent by the GitHub hook and signing the payload. This MUST be a valid Ontrack API token.",
                       "type": "string"
                     }
                   },

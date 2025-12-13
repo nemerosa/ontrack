@@ -9,8 +9,7 @@ import net.nemerosa.ontrack.extension.queue.metrics.queueProcessErrored
 import net.nemerosa.ontrack.extension.queue.metrics.queueProcessTime
 import net.nemerosa.ontrack.extension.queue.record.QueueRecordService
 import net.nemerosa.ontrack.json.parseAsJson
-import net.nemerosa.ontrack.model.security.AccountOntrackUser
-import net.nemerosa.ontrack.model.security.AccountService
+import net.nemerosa.ontrack.model.security.AuthenticationStorageService
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -21,9 +20,6 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.context.TransientSecurityContext
 import org.springframework.stereotype.Component
 import java.io.IOException
 
@@ -32,9 +28,9 @@ class QueueListener(
     private val queueConfigProperties: QueueConfigProperties,
     private val queueProcessors: List<QueueProcessor<*>>,
     private val securityService: SecurityService,
+    private val authenticationStorageService: AuthenticationStorageService,
     private val queueRecordService: QueueRecordService,
     private val meterRegistry: MeterRegistry,
-    private val accountService: AccountService,
 ) : RabbitListenerConfigurer {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -122,27 +118,11 @@ class QueueListener(
                 securityService.asAdmin {
                     queueRecordService.processing(qp)
 
-                    // Gets the account to use from the queue payload
-                    val account = securityService.asAdmin {
-                        accountService.findAccountByName(qp.accountName)
-                            ?: throw QueuePayloadAccountNameNotFoundException(qp)
-                    }
-
-                    // Sets the security context for expected account
-                    val user = AccountOntrackUser(account)
-                    val authenticatedUser = accountService.withACL(user)
-                    val authentication = UsernamePasswordAuthenticationToken(
-                        authenticatedUser,
-                        "",
-                        user.authorities
-                    )
-                    val oldSecurityContext = SecurityContextHolder.getContext()
-                    val securityContext = TransientSecurityContext(authentication)
-
-                    try {
-                        meterRegistry.queueProcessTime(qp) {
-                            try {
-                                SecurityContextHolder.setContext(securityContext)
+                    // Account ID
+                    val accountId = qp.accountName
+                    authenticationStorageService.withAccountId(accountId) {
+                        try {
+                            meterRegistry.queueProcessTime(qp) {
                                 logger.debug("Processing: {}", payload)
                                 queueProcessor.process(
                                     payload = payload,
@@ -150,16 +130,14 @@ class QueueListener(
                                         queueName = queue,
                                     )
                                 )
-                            } finally {
-                                SecurityContextHolder.setContext(oldSecurityContext)
                             }
+                            meterRegistry.queueProcessCompleted(qp)
+                            queueRecordService.completed(qp)
+                        } catch (any: Exception) {
+                            meterRegistry.queueProcessErrored(qp)
+                            queueRecordService.errored(qp, any)
+                            throw any
                         }
-                        meterRegistry.queueProcessCompleted(qp)
-                        queueRecordService.completed(qp)
-                    } catch (any: Exception) {
-                        meterRegistry.queueProcessErrored(qp)
-                        queueRecordService.errored(qp, any)
-                        throw any
                     }
                 }
             } catch (any: Throwable) {

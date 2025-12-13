@@ -1,0 +1,99 @@
+version: v1
+configuration:
+  defaults:
+    branch:
+      autoVersioning:
+        configurations:
+          - sourceProject: yontrack
+            sourceBranch: '&latest'
+            sourcePromotion: RELEASE
+            targetPath: versions.properties
+            targetProperty: yontrack
+      validations:
+        BUILD:
+          tests: {}
+        UI_UNIT:
+          tests: {}
+        KDSL.ACCEPTANCE:
+          tests: {}
+        PLAYWRIGHT:
+          tests: {}
+      promotions:
+        BRONZE:
+          validations:
+            - BUILD
+            - UI_UNIT
+            - KDSL.ACCEPTANCE
+            - PLAYWRIGHT
+        RELEASE:
+          promotions:
+            - BRONZE
+          validations:
+            - GITHUB.RELEASE
+      workflows:
+        RELEASE:
+          - name: On internal release
+            nodes:
+              - id: notification
+                executorId: notification
+                data:
+                  channel: slack
+                  channelConfig:
+                    channel: '#internal-releases'
+                    type: 'SUCCESS'
+                  template: |
+                    Yontrack ${build} has been released.
+      
+                    ${promotionRun.changelog?title=true&commitsOption=ALWAYS}
+              - id: docs.yontrack.com
+                executorId: notification
+                data:
+                  channel: github-workflow
+                  channelConfig:
+                    config: github.com
+                    owner: yontrack
+                    repository: doc.yontrack.com
+                    workflowId: doc.yml
+                    reference: main
+                    callMode: ASYNC
+      notificationsConfig:
+        notifications:
+          - name: On validation error
+            events:
+              - new_validation_run
+            keywords: failed
+            channel: slack
+            channelConfig:
+              channel: '#notifications'
+              type: 'ERROR'
+            contentTemplate: |
+              Build ${build} has failed on ${validationStamp}.
+          - name: On BRONZE
+            promotion: BRONZE
+            events:
+              - new_promotion_run
+            channel: slack
+            channelConfig:
+              channel: '#notifications'
+              type: 'SUCCESS'
+            contentTemplate: |
+              Build ${build} has been promoted to ${promotionLevel}.
+  custom:
+    configs:
+      - conditions:
+          branch: '^release/\d+\.\d+$'
+        branch:
+          notificationsConfig:
+            notifications:
+            - name: On RELEASE
+              promotion: RELEASE
+              events:
+                - new_promotion_run
+              channel: slack
+              channelConfig:
+                channel: '#releases'
+                type: 'SUCCESS'
+              contentTemplate: |
+                Yontrack ${build} has been released.
+                
+                ${promotionRun.changelog?title=true&commitsOption=OPTIONAL}

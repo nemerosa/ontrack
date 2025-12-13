@@ -2,9 +2,10 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.github.ingestion
 
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsText
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
-import net.nemerosa.ontrack.kdsl.spec.extension.general.label
+import net.nemerosa.ontrack.kdsl.spec.extension.general.release
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
 import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.GitHubIngestionValidationDataInput
 import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.ingestion
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@TestOnGitHub
 class ACCDSLGitHubIngestionValidateData : AbstractACCDSLGitHubIngestionTestSupport() {
 
     /**
@@ -193,7 +195,7 @@ class ACCDSLGitHubIngestionValidateData : AbstractACCDSLGitHubIngestionTestSuppo
             .createProject(repository, "")
             .createBranch("main", "")
             .createBuild("build-15", "").apply {
-                label = "1.0.0"
+                release = "1.0.0"
             }
 
         // Calling the API to simulate the GHA call

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.elastic.metrics
 
 import net.nemerosa.ontrack.extension.general.validation.*
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.config
@@ -17,6 +18,7 @@ import kotlin.test.assertNull
         "ontrack.extension.elastic.metrics.index.immediate=true",
     ]
 )
+@AsAdminTest
 class ElasticMetricsValidationRunMetricsExtensionIT : AbstractDSLTestSupport() {
 
     @Autowired

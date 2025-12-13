@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.IntegerIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.PercentageIndicatorValueType
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 

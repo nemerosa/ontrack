@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Pattern
 import kotlin.jvm.optionals.getOrNull
 
 @Component

@@ -4,10 +4,26 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 
 object LicenseFixtures {
 
-    fun sampleFeatureData() = LicenseFeatureData(
-        id = uid("f-"),
-        enabled = true,
-        data = emptyList(),
+    val sampleFeatureId = uid("f-")
+
+    fun sampleProvidedFeature() = ProvidedLicensedFeature(
+        id = sampleFeatureId,
+        name = "Sample feature",
+        alwaysEnabled = false,
+    )
+
+    fun testLicense(
+        active: Boolean = true,
+        message: String? = null,
+    ) = License(
+        type = "test",
+        name = "Test",
+        assignee = "test",
+        active = active,
+        validUntil = null,
+        maxProjects = 10,
+        features = emptyList(),
+        message = message,
     )
 
 }

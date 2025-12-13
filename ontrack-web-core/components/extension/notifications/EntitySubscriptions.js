@@ -1,9 +1,8 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {List, Space, Tag, Typography} from "antd";
+import {List, Tag, Typography} from "antd";
 import SubscriptionLink from "@components/extension/notifications/SubscriptionLink";
-import Link from "next/link";
 import SubscriptionsLink from "@components/extension/notifications/SubscriptionsLink";
 
 /**
@@ -42,7 +41,7 @@ export default function EntitySubscriptions({type, id}) {
                         }
                     }
                 `,
-                {entity: {type, id}}
+                {entity: {type, id: Number(id)}}
             ).then(data => {
                 setSubscriptions(data.eventSubscriptions.pageItems)
                 setPageInfo(data.eventSubscriptions.pageInfo)

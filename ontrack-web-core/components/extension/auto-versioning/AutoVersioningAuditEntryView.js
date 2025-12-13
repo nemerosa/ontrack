@@ -10,6 +10,9 @@ import {AutoVersioningAuditContext} from "@components/extension/auto-versioning/
 import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import {AutoRefreshContextProvider} from "@components/common/AutoRefresh";
 import {gqlPromotionRunContentFragment} from "@components/promotionRuns/PromotionRunGraphQLFragments";
+import {CloseCommand} from "@components/common/Commands";
+import {autoVersioningAuditUri} from "@components/extension/auto-versioning/AutoVersioningLinks";
+import Link from "next/link";
 
 export default function AutoVersioningAuditEntryView({uuid}) {
 
@@ -19,8 +22,13 @@ export default function AutoVersioningAuditEntryView({uuid}) {
     const [commands, setCommands] = useState([])
     useEffect(() => {
         if (auditContext) {
-            // Sets the breadcrumbs
-            setBreadcrumbs(homeBreadcrumbs())
+            setBreadcrumbs([
+                ...homeBreadcrumbs(),
+                <Link key="audit" href={autoVersioningAuditUri()}>Auto-versioning audit</Link>,
+            ])
+            setCommands([
+                <CloseCommand key="close" href={autoVersioningAuditUri()}/>
+            ])
         }
     }, [auditContext]);
 
@@ -96,6 +104,7 @@ export default function AutoVersioningAuditEntryView({uuid}) {
                                         propertyRegex
                                         versionSource
                                     }
+                                    schedule
                                 }
                             }
                         }

@@ -62,7 +62,6 @@ export const gqlSlotPipelineBuildData = gql`
                 name
                 description
                 image
-                _image
             }
         }
         releaseProperty {

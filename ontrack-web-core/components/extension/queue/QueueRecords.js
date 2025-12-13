@@ -7,11 +7,11 @@ import QueueRecordDetails from "@components/extension/queue/QueueRecordDetails";
 import SelectQueueProcessor from "@components/extension/queue/SelectQueueProcessor";
 import SelectQueueRecordState from "@components/extension/queue/SelectQueueRecordState";
 import QueuePurgeButton from "@components/extension/queue/QueuePurgeButton";
-import {useReloadState} from "@components/common/StateUtils";
+import {useRefresh} from "@components/common/RefreshUtils";
 
-export default function QueueRecords() {
+export default function QueueRecords({id}) {
 
-    const [reloadCount, reload] = useReloadState()
+    const [reloadCount, reload] = useRefresh()
 
     return (
         <>
@@ -134,6 +134,7 @@ export default function QueueRecords() {
                     `
                 }
                 queryNode="queueRecordings"
+                initialFilter={{id}}
                 filter={{}}
                 columns={[
                     {

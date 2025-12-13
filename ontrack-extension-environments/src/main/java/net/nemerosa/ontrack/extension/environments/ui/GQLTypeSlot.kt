@@ -48,7 +48,7 @@ class GQLTypeSlot(
                     .description("Last eligible build for this slot")
                     .type(GraphQLTypeReference(GQLTypeBuild.BUILD))
                     .dataFetcher { env ->
-                        val slot: Slot = env.getSource()
+                        val slot: Slot = env.getSource()!!
                         slotService.getEligibleBuilds(slot, count = 1).pageItems.firstOrNull()
                     }
             }
@@ -77,7 +77,7 @@ class GQLTypeSlot(
                     .description("Current pipeline in the slot")
                     .type(gqlTypeSlotPipeline.typeRef)
                     .dataFetcher { env ->
-                        val slot: Slot = env.getSource()
+                        val slot: Slot = env.getSource()!!
                         slotService.getCurrentPipeline(slot)
                     }
             }
@@ -87,7 +87,7 @@ class GQLTypeSlot(
                     .description("Last deployed pipeline in the slot")
                     .type(gqlTypeSlotPipeline.typeRef)
                     .dataFetcher { env ->
-                        val slot: Slot = env.getSource()
+                        val slot: Slot = env.getSource()!!
                         slotService.getLastDeployedPipeline(slot)
                     }
             }
@@ -124,7 +124,7 @@ class GQLTypeSlot(
                     .description("List of configured admission rules for this slot")
                     .type(listType(gqlTypeSlotAdmissionRuleConfig.typeRef))
                     .dataFetcher { env ->
-                        val slot: Slot = env.getSource()
+                        val slot: Slot = env.getSource()!!
                         slotService.getAdmissionRuleConfigs(slot)
                     }
             }
@@ -135,7 +135,7 @@ class GQLTypeSlot(
                     .type(listType(SlotWorkflow::class.toTypeRef()))
                     .argument(enumArgument<SlotPipelineStatus>("trigger", "Type of trigger to filter on"))
                     .dataFetcher { env ->
-                        val source: Slot = env.getSource()
+                        val source: Slot = env.getSource()!!
                         val trigger = env.getArgument<String?>("trigger")?.let {
                             SlotPipelineStatus.valueOf(it)
                         }

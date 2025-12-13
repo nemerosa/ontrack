@@ -4,12 +4,12 @@ import ValidationStampUpdateDialog, {
     useValidationStampUpdateDialog
 } from "@components/validationStamps/ValidationStampUpdateDialog";
 
-export default function ValidationStampUpdateCommand({id}) {
+export default function ValidationStampUpdateCommand({validationStamp, refresh}) {
 
-    const validationStampUpdateDialog = useValidationStampUpdateDialog()
+    const validationStampUpdateDialog = useValidationStampUpdateDialog({onSuccess: refresh})
 
     const onAction = () => {
-        validationStampUpdateDialog.start({id})
+        validationStampUpdateDialog.start({validationStamp})
     }
 
     return (

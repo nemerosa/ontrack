@@ -10,41 +10,39 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
-import java.net.URI
 
 @Component
 class GitPullRequestInformationExtension(
     extensionFeature: GitExtensionFeature,
     private val propertyService: PropertyService,
-    private val uriBuilder: EntityURIBuilder,
     private val gitService: GitService
 ) : AbstractExtension(extensionFeature), EntityInformationExtension {
 
     override val title: String = "Pull request"
 
     override fun getInformation(entity: ProjectEntity): EntityInformation? =
-            if (entity is Branch) {
-                val property: GitBranchConfigurationProperty? = propertyService.getProperty(entity, GitBranchConfigurationPropertyType::class.java).value
-                val pr = gitService.getBranchAsPullRequest(entity, property)
-                pr?.let {
-                    EntityInformation(this, GitPullRequestInformationExtensionData(
-                            pr = pr,
-                            sourceBranchPage = gitService.findBranchWithGitBranch(entity.project, pr.source)
-                                    ?.let { uriBuilder.getEntityPage(it) },
-                            targetBranchPage = gitService.findBranchWithGitBranch(entity.project, pr.target)
-                                    ?.let { uriBuilder.getEntityPage(it) }
-                    ))
-                }
-            } else {
-                null
+        if (entity is Branch) {
+            val property: GitBranchConfigurationProperty? =
+                propertyService.getProperty(entity, GitBranchConfigurationPropertyType::class.java).value
+            val pr = gitService.getBranchAsPullRequest(entity, property)
+            pr?.let {
+                EntityInformation(
+                    this, GitPullRequestInformationExtensionData(
+                        pr = pr,
+                        sourceBranchId = gitService.findBranchWithGitBranch(entity.project, pr.source)?.id(),
+                        targetBranchId = gitService.findBranchWithGitBranch(entity.project, pr.target)?.id()
+                    )
+                )
             }
+        } else {
+            null
+        }
 
     class GitPullRequestInformationExtensionData(
-            val pr: GitPullRequest,
-            val sourceBranchPage: URI?,
-            val targetBranchPage: URI?
+        val pr: GitPullRequest,
+        val sourceBranchId: Int?,
+        val targetBranchId: Int?
     )
 
 }

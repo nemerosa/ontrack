@@ -3,8 +3,9 @@ package net.nemerosa.ontrack.repository
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.AccountNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.exceptions.AccountNotFoundException
-import net.nemerosa.ontrack.model.security.*
-import net.nemerosa.ontrack.model.security.Account.Companion.of
+import net.nemerosa.ontrack.model.security.Account
+import net.nemerosa.ontrack.model.security.AccountGroup
+import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.ID.Companion.of
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
@@ -16,43 +17,21 @@ import javax.sql.DataSource
 
 @Repository
 class AccountJdbcRepository(
-        dataSource: DataSource,
-        private val authenticationSourceRepository: AuthenticationSourceRepository
+    dataSource: DataSource
 ) : AbstractJdbcRepository(dataSource), AccountRepository {
 
-    override fun findBuiltinAccount(username: String): BuiltinAccount? {
-        return getFirstItem(
-                "SELECT * FROM ACCOUNTS WHERE PROVIDER = :provider AND NAME = :name",
-                params("name", username)
-                        .addValue("provider", BuiltinAuthenticationSourceProvider.ID)
-        ) { rs: ResultSet, _: Int ->
-            toAccount(rs)?.let { account ->
-                BuiltinAccount(
-                        account,
-                        rs.getString("password")
-                )
-            }
-        }
-    }
-
-    private fun toAccount(rs: ResultSet): Account? {
-        val authenticationSource = rs.getAuthenticationSource(authenticationSourceRepository)
-        return authenticationSource?.let {
-            of(
-                    rs.getString("name"),
-                    rs.getString("fullName"),
-                    rs.getString("email"),
-                    getEnum(SecurityRole::class.java, rs, "role"),
-                    authenticationSource,
-                    disabled = rs.getBoolean("disabled"),
-                    locked = rs.getBoolean("locked"),
-            ).withId(id(rs))
-        }
+    private fun toAccount(rs: ResultSet): Account {
+        return Account.of(
+            fullName = rs.getString("fullName"),
+            email = rs.getString("email"),
+            // Only USER roles can be loaded from the database
+            role = SecurityRole.USER,
+        ).withId(id(rs))
     }
 
     override fun findAll(): Collection<Account> {
         return jdbcTemplate!!.query(
-                "SELECT * FROM ACCOUNTS ORDER BY NAME"
+            "SELECT * FROM ACCOUNTS ORDER BY EMAIL"
         ) { rs: ResultSet, _ ->
             toAccount(rs)
         }.filterNotNull()
@@ -61,85 +40,63 @@ class AccountJdbcRepository(
     override fun newAccount(account: Account): Account {
         return try {
             val id = dbCreate(
-                    "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, PROVIDER, SOURCE, PASSWORD, ROLE, DISABLED, LOCKED) " +
-                            "VALUES (:name, :fullName, :email, :provider, :source, :password, :role, :disabled, :locked)",
-                    account.authenticationSource.asParams()
-                            .addValue("name", account.name)
-                            .addValue("fullName", account.fullName)
-                            .addValue("email", account.email)
-                            .addValue("password", "")
-                            .addValue("role", account.role.name)
-                            .addValue("disabled", account.disabled)
-                            .addValue("locked", account.locked)
+                "INSERT INTO ACCOUNTS (FULLNAME, EMAIL) " +
+                        "VALUES (:fullName, :email)",
+                params("fullName", account.fullName)
+                    .addValue("email", account.email)
             )
             account.withId(of(id))
-        } catch (ex: DuplicateKeyException) {
-            throw AccountNameAlreadyDefinedException(account.name)
+        } catch (_: DuplicateKeyException) {
+            throw AccountNameAlreadyDefinedException(account.email)
         }
     }
 
     override fun saveAccount(account: Account) {
         try {
             namedParameterJdbcTemplate!!.update(
-                    "UPDATE ACCOUNTS SET NAME = :name, FULLNAME = :fullName, EMAIL = :email, DISABLED = :disabled, LOCKED = :locked " +
-                            "WHERE ID = :id",
-                    params("id", account.id())
-                            .addValue("name", account.name)
-                            .addValue("fullName", account.fullName)
-                            .addValue("email", account.email)
-                            .addValue("disabled", account.disabled)
-                            .addValue("locked", account.locked)
+                """
+                    UPDATE ACCOUNTS SET FULLNAME = :fullName, EMAIL = :email
+                    WHERE ID = :id
+                """,
+                params("id", account.id())
+                    .addValue("fullName", account.fullName)
+                    .addValue("email", account.email)
             )
-        } catch (ex: DuplicateKeyException) {
-            throw AccountNameAlreadyDefinedException(account.name)
+        } catch (_: DuplicateKeyException) {
+            throw AccountNameAlreadyDefinedException(account.email)
         }
     }
 
     override fun deleteAccount(accountId: ID): Ack {
         return Ack.one(
-                namedParameterJdbcTemplate!!.update(
-                        "DELETE FROM ACCOUNTS WHERE ID = :id",
-                        params("id", accountId.value)
-                )
-        )
-    }
-
-    override fun setPassword(accountId: Int, encodedPassword: String) {
-        namedParameterJdbcTemplate!!.update(
-                "UPDATE ACCOUNTS SET PASSWORD = :password WHERE ID = :id",
-                params("id", accountId)
-                        .addValue("password", encodedPassword)
+            namedParameterJdbcTemplate!!.update(
+                "DELETE FROM ACCOUNTS WHERE ID = :id",
+                params("id", accountId.value)
+            )
         )
     }
 
     override fun getAccount(accountId: ID): Account {
         return namedParameterJdbcTemplate!!.queryForObject(
-                "SELECT * FROM ACCOUNTS WHERE ID = :id",
-                params("id", accountId.value)
+            "SELECT * FROM ACCOUNTS WHERE ID = :id",
+            params("id", accountId.value)
         ) { rs: ResultSet, _ ->
             toAccount(rs)
         } ?: throw AccountNotFoundException(accountId.value)
     }
 
-    override fun deleteAccountBySource(source: AuthenticationSource) {
-        namedParameterJdbcTemplate!!.update(
-                "DELETE FROM ACCOUNTS WHERE PROVIDER = :provider AND SOURCE = :source",
-                source.asParams()
-        )
-    }
-
     override fun doesAccountIdExist(id: ID): Boolean {
         return getFirstItem(
-                "SELECT ID FROM ACCOUNTS WHERE ID = :id",
-                params("id", id.value),
-                Int::class.java
+            "SELECT ID FROM ACCOUNTS WHERE ID = :id",
+            params("id", id.value),
+            Int::class.java
         ) != null
     }
 
     override fun findByNameToken(token: String): List<Account> {
         return namedParameterJdbcTemplate!!.query(
-                "SELECT * FROM ACCOUNTS WHERE LOWER(NAME) LIKE :filter ORDER BY NAME",
-                params("filter", String.format("%%%s%%", StringUtils.lowerCase(token)))
+            "SELECT * FROM ACCOUNTS WHERE LOWER(EMAIL) LIKE :filter ORDER BY EMAIL",
+            params("filter", String.format("%%%s%%", StringUtils.lowerCase(token)))
         ) { rs: ResultSet, _ ->
             toAccount(rs)
         }
@@ -147,38 +104,40 @@ class AccountJdbcRepository(
 
     override fun getAccountsForGroup(accountGroup: AccountGroup): List<Account> {
         return namedParameterJdbcTemplate!!.query(
-                "SELECT A.* FROM ACCOUNTS A " +
-                        "INNER JOIN ACCOUNT_GROUP_LINK L ON L.ACCOUNT = A.ID " +
-                        "WHERE L.ACCOUNTGROUP = :accountGroupId " +
-                        "ORDER BY A.NAME ASC",
-                params("accountGroupId", accountGroup.id())
+            """
+                SELECT A.* FROM ACCOUNTS A 
+                INNER JOIN ACCOUNT_GROUP_LINK L ON L.ACCOUNT = A.ID 
+                WHERE L.ACCOUNTGROUP = :accountGroupId 
+                ORDER BY A.EMAIL
+            """,
+            params("accountGroupId", accountGroup.id())
         ) { rs: ResultSet, _ ->
             toAccount(rs)
         }
     }
 
-    override fun findAccountByName(username: String): Account? {
+    override fun findAccountByName(email: String): Account? {
         return getFirstItem(
-                "SELECT * FROM ACCOUNTS WHERE NAME = :name",
-                params("name", username)
-        ) { rs: ResultSet, _ ->
+            "SELECT * FROM ACCOUNTS WHERE EMAIL = :email",
+            params("email", email)
+        ) { rs, _ ->
             toAccount(rs)
         }
     }
 
-    override fun setAccountDisabled(id: ID, disabled: Boolean) {
-        namedParameterJdbcTemplate!!.update(
-            "UPDATE ACCOUNTS SET DISABLED = :disabled WHERE ID = :id",
-            params("id", id.get())
-                .addValue("disabled", disabled)
-        )
-    }
-
-    override fun setAccountLocked(id: ID, locked: Boolean) {
-        namedParameterJdbcTemplate!!.update(
-            "UPDATE ACCOUNTS SET LOCKED = :locked WHERE ID = :id",
-            params("id", id.get())
-                .addValue("locked", locked)
-        )
+    override fun findOrCreateAccount(account: Account): Account {
+        return namedParameterJdbcTemplate!!.query(
+            """
+                INSERT INTO ACCOUNTS (FULLNAME, EMAIL)
+                VALUES (:fullName, :email)
+                ON CONFLICT (EMAIL)
+                DO UPDATE SET EMAIL = EXCLUDED.EMAIL
+                RETURNING *
+            """.trimIndent(),
+            params("fullName", account.fullName)
+                .addValue("email", account.email)
+        ) { rs, _ -> toAccount(rs) }
+            .firstOrNull()
+            ?: error("Cannot get or create account")
     }
 }

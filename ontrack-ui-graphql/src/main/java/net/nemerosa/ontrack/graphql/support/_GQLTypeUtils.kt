@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql.support
 
+import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars.*
 import graphql.schema.*
 import net.nemerosa.ontrack.graphql.schema.GQLType
@@ -29,7 +30,7 @@ fun <T> TypeBuilder.booleanFieldFunction(
             .description(description)
             .type(GraphQLBoolean.toNotNull())
             .dataFetcher { env ->
-                val source: T = env.getSource()
+                val source: T = env.getSource()!!
                 fn(source)
             }
     }
@@ -37,11 +38,14 @@ fun <T> TypeBuilder.booleanFieldFunction(
 fun TypeBuilder.intField(name: String, description: String): GraphQLObjectType.Builder =
     field { it.name(name).description(description).type(GraphQLInt) }
 
-fun TypeBuilder.intField(property: KProperty<Int>, description: String? = null): GraphQLObjectType.Builder =
+fun TypeBuilder.intField(property: KProperty<Int?>, description: String? = null): GraphQLObjectType.Builder =
     field { it.name(property.name).description(getPropertyDescription(property, description)).type(GraphQLInt) }
 
 fun TypeBuilder.longField(property: KProperty<Long>, description: String? = null): GraphQLObjectType.Builder =
     field { it.name(property.name).description(getPropertyDescription(property, description)).type(GraphQLInt) }
+
+fun TypeBuilder.doubleField(property: KProperty<Double?>, description: String? = null): GraphQLObjectType.Builder =
+    field { it.name(property.name).description(getPropertyDescription(property, description)).type(GraphQLFloat) }
 
 fun TypeBuilder.stringField(name: String, description: String): GraphQLObjectType.Builder =
     field {
@@ -130,6 +134,28 @@ fun TypeBuilder.jsonField(
             .type(GQLScalarJSON.INSTANCE)
     }
 
+fun <P> TypeBuilder.jsonFieldGetter(
+    name: String,
+    description: String? = null,
+    deprecation: String? = null,
+    code: (source: P, env: DataFetchingEnvironment) -> JsonNode?
+): GraphQLObjectType.Builder =
+    field {
+        it.name(name)
+            .description(description)
+            .apply {
+                if (!deprecation.isNullOrBlank()) {
+                    deprecate(deprecation)
+                }
+            }
+            .type(GQLScalarJSON.INSTANCE)
+            .dataFetcher { env ->
+                val source: P = env.getSource()!!
+                code(source, env)
+            }
+
+    }
+
 fun TypeBuilder.booleanField(property: KProperty<Boolean>, description: String? = null): GraphQLObjectType.Builder =
     field {
         it.name(getPropertyName(property))
@@ -204,7 +230,7 @@ inline fun <P, reified E> TypeBuilder.fieldGetter(
         .type(E::class.toTypeRef().nullable(nullable))
         .arguments(arguments)
         .dataFetcher { env ->
-            val source: P = env.getSource()
+            val source: P = env.getSource()!!
             code(source, env)
         }
 }
@@ -236,7 +262,7 @@ inline fun <P, reified E> TypeBuilder.listFieldGetter(
         .description(description)
         .type(listType(GraphQLTypeReference(E::class.java.simpleName)))
         .dataFetcher { env ->
-            val source: P = env.getSource()
+            val source: P = env.getSource()!!
             code(source)
         }
 }

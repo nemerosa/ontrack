@@ -35,7 +35,7 @@ class JIRAClientImplTest {
     @Test
     fun toIssue() {
         // Configuration to test with
-        val config = JIRAConfiguration("Test", "http://jira", "user", "secret", emptyList(), emptyList())
+        val config = config()
         // Issue to parse
         val node = ObjectMapper().readTree(this::class.java.getResource("/issue.json"))
         // Parsing the issue
@@ -55,7 +55,7 @@ class JIRAClientImplTest {
     @Test
     fun `toIssue with one inward link`() {
         // Configuration to test with
-        val config = JIRAConfiguration("Test", "http://jira", "user", "secret", emptyList(), emptyList())
+        val config = config()
         // Issue to parse
         val node = ObjectMapper().readTree(this::class.java.getResource("/issue-link-inward.json"))
         // Parsing the issue
@@ -87,7 +87,7 @@ class JIRAClientImplTest {
     @Test
     fun `toIssue with one outward link`() {
         // Configuration to test with
-        val config = JIRAConfiguration("Test", "http://jira", "user", "secret", emptyList(), emptyList())
+        val config = config()
         // Issue to parse
         val node = ObjectMapper().readTree(this::class.java.getResource("/issue-link-outward.json"))
         // Parsing the issue
@@ -119,7 +119,7 @@ class JIRAClientImplTest {
     @Test
     fun `toIssue with two links`() {
         // Configuration to test with
-        val config = JIRAConfiguration("Test", "http://jira", "user", "secret", emptyList(), emptyList())
+        val config = config()
         // Issue to parse
         val node = ObjectMapper().readTree(this::class.java.getResource("/issue-link-both.json"))
         // Parsing the issue
@@ -192,5 +192,14 @@ class JIRAClientImplTest {
 
         assertNull(client.getIssue("XXX-1", config))
     }
+
+    private fun config() = JIRAConfiguration(
+        name = "Test",
+        url = "http://jira",
+        user = "user",
+        password = "secret",
+        include = emptyList(),
+        exclude = emptyList()
+    )
 
 }

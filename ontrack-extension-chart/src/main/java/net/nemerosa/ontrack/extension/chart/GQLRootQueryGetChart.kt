@@ -22,7 +22,7 @@ class GQLRootQueryGetChart(
         }
         .type(GQLScalarJSON.INSTANCE)
         .dataFetcher { env ->
-            val input: Any = env.getArgument<Any>(ARG_INPUT)
+            val input: Any = env.getArgument<Any>(ARG_INPUT)!!
             val getChartInput = gqlInputGetChartInput.convert(input) ?: error("getChart input is required")
             chartService.getChart(getChartInput)
         }

@@ -9,12 +9,6 @@ import net.nemerosa.ontrack.model.structure.BranchNamePolicy
 interface BranchOrderingService {
 
     /**
-     * Given an [id], returns a [BranchOrdering].
-     */
-    @Deprecated("Will be removed in V5. Consider using built-in orderings.")
-    fun getBranchOrdering(id: String): BranchOrdering?
-
-    /**
      * Gets an ordering based on semantic versioning.
      *
      * The branch name or display name is used to get the semantic version
@@ -28,10 +22,6 @@ interface BranchOrderingService {
         branchNamePolicy: BranchNamePolicy = BranchNamePolicy.DISPLAY_NAME_OR_NAME,
     ): Comparator<Branch>
 
-    /**
-     * Gets the list of available branch orderings.
-     */
-    @Deprecated("Will be removed in V5. Consider using built-in orderings.")
-    val branchOrderings: List<BranchOrdering>
+    fun getRegexVersionComparator(regex: Regex): Comparator<Branch>
 
 }

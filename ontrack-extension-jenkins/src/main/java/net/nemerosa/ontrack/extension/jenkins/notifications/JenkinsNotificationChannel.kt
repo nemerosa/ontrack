@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 @APIDescription("This channel is used to trigger remote Jenkins jobs with some parameters.")
 @Documentation(JenkinsNotificationChannelConfig::class)
 @Documentation(JenkinsNotificationChannelOutput::class, section = "output")
-@DocumentationLink(value = "integration-jenkins-notifications", name = "Jenkins notifications")
+@DocumentationLink(value = "integrations/notifications/jenkins.md", name = "Jenkins notifications")
 @NoTemplate
 @Component
 class JenkinsNotificationChannel(

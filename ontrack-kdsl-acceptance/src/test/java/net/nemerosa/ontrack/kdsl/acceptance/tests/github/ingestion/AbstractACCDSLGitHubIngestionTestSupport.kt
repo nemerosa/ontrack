@@ -6,7 +6,10 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.connector.parse
 import net.nemerosa.ontrack.kdsl.spec.extension.github.GitHubConfiguration
 import net.nemerosa.ontrack.kdsl.spec.extension.github.gitHub
+import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.gitHubIngestion
 import net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion.ingestion
+import net.nemerosa.ontrack.kdsl.spec.settings.settings
+import org.junit.jupiter.api.BeforeEach
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -14,6 +17,16 @@ import kotlin.test.assertTrue
 import kotlin.test.fail
 
 abstract class AbstractACCDSLGitHubIngestionTestSupport : AbstractACCDSLGitHubTestSupport() {
+
+    @BeforeEach
+    fun ingestionToken() {
+        val token = ontrack.connector.token
+            ?: error("Missing authentication token")
+        val current = ontrack.settings.gitHubIngestion.get()
+        ontrack.settings.gitHubIngestion.set(
+            current.withToken(token)
+        )
+    }
 
     protected fun sendPayloadToHook(
         gitHubConfiguration: GitHubConfiguration,

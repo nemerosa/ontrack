@@ -1,11 +1,17 @@
 import SearchResultComponent from "@components/framework/search/SearchResultComponent";
-import LegacyLink from "@components/common/LegacyLink";
-import {Typography} from "antd";
+import {Space, Typography} from "antd";
+import Link from "next/link";
 
-export default function Result({page, data}) {
+export default function Result({data}) {
     return <SearchResultComponent
         title={
-            <LegacyLink href={page}><Typography.Text code>{data.item.commitShort}</Typography.Text></LegacyLink>
+            <>
+                <Space>
+                    <Link href={`/extension/git/${data.item.projectId}/commit-info/${data.item.commit}`}>
+                        <Typography.Text code>{data.item.commitShort}</Typography.Text>
+                    </Link>
+                </Space>
+            </>
         }
         description={data.item.commitMessage}
     />

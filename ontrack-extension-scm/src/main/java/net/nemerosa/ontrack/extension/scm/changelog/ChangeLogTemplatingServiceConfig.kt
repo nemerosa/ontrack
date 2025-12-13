@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.extension.scm.changelog
 
+import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.model.annotations.APIDescription
 
 open class ChangeLogTemplatingServiceConfig(
     @APIDescription("String to use to render an empty or non existent change log")
     val empty: String = "",
     @APIDescription("Comma-separated list of project links to follow one by one for a get deep change log. Each item in the list is either a project name, or a project name and qualifier separated by a colon (:).")
+    @ListRef
     val dependencies: List<String> = emptyList(),
     @APIDescription("Include a title for the change log")
     val title: Boolean = false,

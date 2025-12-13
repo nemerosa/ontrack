@@ -1,14 +1,14 @@
-import {ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
 
 export class JenkinsConfigurationsPage {
 
-    constructor(page) {
+    constructor(page, ontrack) {
         this.page = page
+        this.ontrack = ontrack
     }
 
     async goTo() {
-        await this.page.goto(`${ui()}/extension/jenkins/configurations`)
+        await this.page.goto(`${this.ontrack.connection.ui}/extension/jenkins/configurations`)
         await expect(this.page.getByText("Jenkins configurations")).toBeVisible()
         await expect(this.page.getByText("Create config")).toBeVisible()
     }

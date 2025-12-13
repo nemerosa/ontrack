@@ -35,7 +35,7 @@ class GQLBranchDownstreamLinksFieldContributor(
                         )
                     )
                     .dataFetcher { env ->
-                        val branch: Branch = env.getSource()
+                        val branch: Branch = env.getSource()!!
                         val builds: Int? = env.getArgument(ARG_BUILDS)
                         branchLinksService.getDownstreamDependencies(branch, builds ?: DEFAULT_BUILDS)
                     }

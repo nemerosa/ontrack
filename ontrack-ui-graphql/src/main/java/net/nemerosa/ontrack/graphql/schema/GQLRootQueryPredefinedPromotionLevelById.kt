@@ -19,7 +19,7 @@ class GQLRootQueryPredefinedPromotionLevelById(
             .type(gqlTypePredefinedPromotionLevel.typeRef)
             .argument(intArgument("id", "ID", nullable = false))
             .dataFetcher { env ->
-                val id: Int = env.getArgument("id")
+                val id: Int = env.getArgument("id")!!
                 predefinedPromotionLevelService.getPredefinedPromotionLevel(ID.of(id))
             }
             .build()

@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.common
 
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
 import java.time.Duration
 import java.util.concurrent.TimeoutException
+import kotlin.time.ExperimentalTime
 
 suspend fun <T> untilTimeout(
     name: String,
@@ -59,4 +62,70 @@ suspend fun <T> untilTimeout(
     // Timout
     logger("$tries/$retryCount - $name - timeout")
     throw TimeoutException("$name - Could not get result in time")
+}
+
+
+@OptIn(ExperimentalTime::class)
+fun <T> waitFor(
+    message: String,
+    initial: kotlin.time.Duration? = null,
+    interval: kotlin.time.Duration = 5.seconds,
+    timeout: kotlin.time.Duration = 60.seconds,
+    code: () -> T?
+): Waiting<T> = Waiting(
+    message = message,
+    initial = initial,
+    interval = interval,
+    timeout = timeout,
+    access = code,
+)
+
+@OptIn(ExperimentalTime::class)
+class Waiting<T>(
+    private val message: String,
+    private val initial: kotlin.time.Duration? = null,
+    private val interval: kotlin.time.Duration = 5.seconds,
+    private val timeout: kotlin.time.Duration = 60.seconds,
+    private val access: () -> T?
+) {
+
+    private val logger = LoggerFactory.getLogger(Waiting::class.java)
+
+    infix fun until(check: (t: T) -> Boolean): T {
+        return runBlocking {
+            val timeoutMs = timeout.inWholeMilliseconds
+            val start = System.currentTimeMillis()
+            // Logging
+            log(message, "Starting...")
+            // Waiting some initial time
+            if (initial != null) {
+                log(message, "Initial delay ($initial")
+                delay(initial.inWholeMilliseconds)
+            }
+            // Checks
+            while ((System.currentTimeMillis() - start) < timeoutMs) {
+                // Check
+                log(message, "Checking...")
+                // Getting the input
+                val t = access()
+                if (t != null) {
+                    val ok = check(t)
+                    if (ok) {
+                        // OK
+                        log(message, "OK.")
+                        return@runBlocking t
+                    }
+                }
+                log(message, "Interval delay ($interval")
+                delay(interval.inWholeMilliseconds)
+            }
+            // Timeout
+            throw TimeoutException("$message: Timeout exceeded after $timeout")
+        }
+    }
+
+    private fun log(message: String, info: String) {
+        logger.info("$message: $info")
+    }
+
 }

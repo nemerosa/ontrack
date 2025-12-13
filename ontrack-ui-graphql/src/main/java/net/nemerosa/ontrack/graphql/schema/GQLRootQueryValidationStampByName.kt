@@ -21,9 +21,9 @@ class GQLRootQueryValidationStampByName(
             .argument(stringArgument("branch", "Branch name", nullable = false))
             .argument(stringArgument("name", "Validation stamp name", nullable = false))
             .dataFetcher { env ->
-                val project: String = env.getArgument("project")
-                val branch: String = env.getArgument("branch")
-                val name: String = env.getArgument("name")
+                val project: String = env.getArgument("project")!!
+                val branch: String = env.getArgument("branch")!!
+                val name: String = env.getArgument("name")!!
                 structureService.findValidationStampByName(project, branch, name).getOrNull()
             }
             .build()

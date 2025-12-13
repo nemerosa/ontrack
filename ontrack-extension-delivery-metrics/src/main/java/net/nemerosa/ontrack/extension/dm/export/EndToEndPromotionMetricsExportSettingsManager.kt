@@ -1,9 +1,5 @@
 package net.nemerosa.ontrack.extension.dm.export
 
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.intField
-import net.nemerosa.ontrack.model.form.textField
-import net.nemerosa.ontrack.model.form.yesNoField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -29,12 +25,6 @@ class EndToEndPromotionMetricsExportSettingsManager(
         settingsRepository.setInt<EndToEndPromotionMetricsExportSettings>(settings::pastDays)
         settingsRepository.setInt<EndToEndPromotionMetricsExportSettings>(settings::restorationDays)
     }
-
-    override fun getSettingsForm(settings: EndToEndPromotionMetricsExportSettings): Form = Form.create()
-        .yesNoField(EndToEndPromotionMetricsExportSettings::enabled, settings.enabled)
-        .textField(EndToEndPromotionMetricsExportSettings::branches, settings.branches)
-        .intField(EndToEndPromotionMetricsExportSettings::pastDays, settings.pastDays)
-        .intField(EndToEndPromotionMetricsExportSettings::restorationDays, settings.restorationDays)
 
     override fun getId(): String = "end-to-end-promotion-metrics-export"
 

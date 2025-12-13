@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.scm.graphql
 import net.nemerosa.ontrack.extension.scm.model.SCMFileChangeFilter
 import net.nemerosa.ontrack.extension.scm.service.SCMFileChangeFilterService
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.getRequiredBooleanField
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.model.security.ProjectConfig
@@ -17,6 +18,7 @@ class SCMFileChangeFiltersProjectGraphQLFieldContributorIT : AbstractQLKTITSuppo
     private lateinit var scmFileChangeFilterService: SCMFileChangeFilterService
 
     @Test
+    @AsAdminTest
     fun `Getting the list of filters with full authorizations`() {
         project {
             val filterName = uid("f_")
@@ -52,6 +54,7 @@ class SCMFileChangeFiltersProjectGraphQLFieldContributorIT : AbstractQLKTITSuppo
     }
 
     @Test
+    @AsAdminTest
     fun `Getting the list of filters with no authorizations`() {
         project {
             val filterName = uid("f_")

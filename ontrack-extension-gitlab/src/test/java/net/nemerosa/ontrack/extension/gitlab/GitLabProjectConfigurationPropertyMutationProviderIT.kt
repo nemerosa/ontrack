@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.gitlab
 
 import net.nemerosa.ontrack.extension.gitlab.property.GitLabProjectConfigurationPropertyType
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 

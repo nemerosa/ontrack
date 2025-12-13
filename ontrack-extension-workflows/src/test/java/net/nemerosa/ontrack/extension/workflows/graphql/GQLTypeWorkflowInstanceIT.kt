@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.extension.workflows.graphql
 
+import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.workflows.WorkflowTestSupport
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.dehydrate
@@ -14,6 +16,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
+@QueueNoAsync
+@AsAdminTest
 class GQLTypeWorkflowInstanceIT : AbstractQLKTITSupport() {
 
     @Autowired

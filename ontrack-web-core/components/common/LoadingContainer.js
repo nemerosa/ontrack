@@ -1,10 +1,15 @@
-import {Skeleton} from "antd";
+import {Alert, Skeleton} from "antd";
 
-export default function LoadingContainer({loading, className, style, children}) {
+export default function LoadingContainer({loading, error, className, style, children}) {
     return (
         <>
             <Skeleton className={className} style={style} active loading={loading}>
-                {children}
+                {!error && children}
+                {
+                    error && <Alert type="error" closable showIcon>
+                        {error}
+                    </Alert>
+                }
             </Skeleton>
         </>
     )

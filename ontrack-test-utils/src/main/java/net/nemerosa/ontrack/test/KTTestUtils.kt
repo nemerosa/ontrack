@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.test
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.test.TestUtils.uid
 import java.util.*
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -84,3 +85,11 @@ fun resourceBase64(path: String): String =
             Base64.encode(it)
         }
         ?: error("Could not find resource $path")
+
+/**
+ * Generating a random email
+ */
+fun email(
+    name: String = uid("u-"),
+    domain: String = "@ontrack.local"
+) = "$name$domain"

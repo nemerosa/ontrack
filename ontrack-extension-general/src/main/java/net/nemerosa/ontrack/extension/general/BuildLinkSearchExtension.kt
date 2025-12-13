@@ -1,5 +1,9 @@
 package net.nemerosa.ontrack.extension.general
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -7,7 +11,6 @@ import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.events.BuildLinkListener
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 
 /**
@@ -16,7 +19,6 @@ import org.springframework.stereotype.Component
 @Component
 class BuildLinkSearchExtension(
     extensionFeature: GeneralExtensionFeature,
-    private val uriBuilder: EntityURIBuilder,
     private val structureService: StructureService,
     private val buildDisplayNameService: BuildDisplayNameService,
     private val searchIndexService: SearchIndexService
@@ -36,12 +38,33 @@ class BuildLinkSearchExtension(
         order = SearchResultType.ORDER_PROPERTIES + 30,
     )
 
-    override val indexMapping: SearchIndexMapping? = indexMappings<BuildLinkSearchItem> {
-        +BuildLinkSearchItem::fromBuildId to id { index = false }
-        +BuildLinkSearchItem::targetBuildId to id { index = false }
-        +BuildLinkSearchItem::targetProject to keyword()
-        +BuildLinkSearchItem::targetBuild to keyword()
-        +BuildLinkSearchItem::targetKey to text { scoreBoost = 1.0 }
+    override fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder =
+        builder.run {
+            autoCompleteSettings()
+        }.run {
+            mappings { mappings ->
+                mappings
+                    .id(BuildLinkSearchItem::fromBuildId)
+                    .id(BuildLinkSearchItem::targetBuildId)
+                    .autoCompleteText(BuildLinkSearchItem::targetProject)  // Changed from keyword
+                    .autoCompleteText(BuildLinkSearchItem::targetBuild)    // Changed from keyword
+                    .autoCompleteText(BuildLinkSearchItem::targetKey)      // Changed from text
+            }
+        }
+
+    override fun buildQuery(
+        q: Query.Builder,
+        token: String
+    ): ObjectBuilder<Query> {
+        return q.multiMatch { m ->
+            m.query(token)
+                .type(TextQueryType.BestFields)
+                .fields(
+                    BuildLinkSearchItem::targetProject to 3.0,  // Project name priority
+                    BuildLinkSearchItem::targetBuild to 2.0,    // Build name secondary
+                    BuildLinkSearchItem::targetKey to 1.0,      // Combined key lowest
+                )
+        }
     }
 
     override fun indexAll(processor: (BuildLinkSearchItem) -> Unit) {
@@ -61,8 +84,6 @@ class BuildLinkSearchExtension(
         return SearchResult(
             title = sourceBuild.entityDisplayName,
             description = "Linked to ${item.targetProject}:${item.targetBuild}",
-            uri = uriBuilder.getEntityURI(sourceBuild),
-            page = uriBuilder.getEntityPage(sourceBuild),
             accuracy = score,
             type = searchResultType,
             // Puts source & linked build, and qualifier

@@ -1,8 +1,5 @@
 package net.nemerosa.ontrack.extension.notifications.recording
 
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.longField
-import net.nemerosa.ontrack.model.form.yesNoField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -27,11 +24,6 @@ class NotificationRecordingSettingsManager(
         settingsRepository.setLong<NotificationRecordingSettings>(settings::retentionSeconds)
         settingsRepository.setLong<NotificationRecordingSettings>(settings::cleanupIntervalSeconds)
     }
-
-    override fun getSettingsForm(settings: NotificationRecordingSettings): Form = Form.create()
-        .yesNoField(NotificationRecordingSettings::enabled, settings.enabled)
-        .longField(NotificationRecordingSettings::retentionSeconds, settings.retentionSeconds)
-        .longField(NotificationRecordingSettings::cleanupIntervalSeconds, settings.cleanupIntervalSeconds)
 
     override fun getId(): String = "notification-recordings"
 

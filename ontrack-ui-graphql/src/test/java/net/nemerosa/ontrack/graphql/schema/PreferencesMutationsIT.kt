@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.getBooleanField
 import net.nemerosa.ontrack.model.preferences.PreferencesService
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class PreferencesMutationsIT : AbstractQLKTITJUnit4Support() {
+class PreferencesMutationsIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var preferencesService: PreferencesService
@@ -24,7 +24,8 @@ class PreferencesMutationsIT : AbstractQLKTITJUnit4Support() {
     @Test
     fun `Setting all the preferences`() {
         asUser {
-            run("""
+            run(
+                """
                 mutation {
                     setPreferences(input: {
                         branchViewVsNames: true,
@@ -36,7 +37,8 @@ class PreferencesMutationsIT : AbstractQLKTITJUnit4Support() {
                         }
                     }
                 }
-            """) { data ->
+            """
+            ) { data ->
                 val preferences = data["setPreferences"]["preferences"]
                 assertEquals(true, preferences.getBooleanField("branchViewVsNames"))
                 assertEquals(true, preferences.getBooleanField("branchViewVsGroups"))
@@ -51,7 +53,8 @@ class PreferencesMutationsIT : AbstractQLKTITJUnit4Support() {
     @Test
     fun `Setting only one preference`() {
         asUser {
-            run("""
+            run(
+                """
                 mutation {
                     setPreferences(input: {
                         branchViewVsNames: true,
@@ -62,7 +65,8 @@ class PreferencesMutationsIT : AbstractQLKTITJUnit4Support() {
                         }
                     }
                 }
-            """) { data ->
+            """
+            ) { data ->
                 val preferences = data["setPreferences"]["preferences"]
                 assertEquals(true, preferences.getBooleanField("branchViewVsNames"))
                 assertEquals(false, preferences.getBooleanField("branchViewVsGroups"))
@@ -74,7 +78,9 @@ class PreferencesMutationsIT : AbstractQLKTITJUnit4Support() {
         }
     }
 
-    private fun getPreferences() = preferencesService.getPreferences(securityService.currentAccount?.account
-        ?: error("Authentication is required"))
+    private fun getPreferences() = preferencesService.getPreferences(
+        securityService.currentUser?.account
+            ?: error("Authentication is required")
+    )
 
 }

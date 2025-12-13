@@ -1,8 +1,7 @@
 import {Button, Form, Modal, Space} from "antd";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import FormErrors from "@components/form/FormErrors";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {getUserErrors} from "@components/services/graphql-utils";
+import {useMutation} from "@components/services/GraphQL";
 
 export function useFormDialog(config) {
     const [open, setOpen] = useState(false)
@@ -24,13 +23,22 @@ export function useFormDialog(config) {
     }
 }
 
-export default function FormDialog({id, dialog, onValuesChange, children, hasOk = true, submittable = true, header, width, height, extraButtons, okText}) {
-
-    const client = useGraphQLClient()
+export default function FormDialog({
+                                       id,
+                                       dialog,
+                                       onValuesChange,
+                                       children,
+                                       hasOk = true,
+                                       submittable = true,
+                                       header,
+                                       width,
+                                       height,
+                                       extraButtons,
+                                       okText
+                                   }) {
 
     const form = dialog.form
     const [formErrors, setFormErrors] = useState([]);
-    const [loading, setLoading] = useState(false)
 
     const bodyStyle = {}
     if (height) {
@@ -68,41 +76,38 @@ export default function FormDialog({id, dialog, onValuesChange, children, hasOk 
         }
     }
 
+    const actualQuery = getActualQuery()
+
+    const formOnSuccess = (result) => {
+        dialog.setOpen(false)
+        form.resetFields()
+        if (dialog.onSuccess) {
+            dialog.onSuccess(result, dialog.context)
+        }
+    }
+
+    const {mutate, loading, error} = useMutation(
+        actualQuery,
+        {
+            userNodeName: getActualUserNode(),
+            onSuccess: formOnSuccess,
+        }
+    )
+
+    useEffect(() => {
+        setFormErrors(error ? [error] : [])
+    }, [error])
+
     const onSubmit = async () => {
-        setLoading(true)
         setFormErrors([])
-        try {
-            let values = await form.validateFields()
-            if (dialog.prepareValues) {
-                values = await dialog.prepareValues(values, dialog.context)
-            }
-            let result
-            let errors
-            const actualQuery = getActualQuery()
-            if (actualQuery) {
-                const data = await client.request(
-                    actualQuery,
-                    values
-                )
-                const actualUserNode = getActualUserNode()
-                result = data[actualUserNode]
-                errors = getUserErrors(result)
-            } else {
-                result = values
-            }
-            if (errors) {
-                setFormErrors(errors)
-            } else {
-                dialog.setOpen(false)
-                form.resetFields()
-                if (dialog.onSuccess) {
-                    dialog.onSuccess(result, dialog.context)
-                }
-            }
-        } catch (ignored) {
-            //
-        } finally {
-            setLoading(false)
+        let values = await form.validateFields()
+        if (dialog.prepareValues) {
+            values = await dialog.prepareValues(values, dialog.context)
+        }
+        if (actualQuery) {
+            await mutate(values)
+        } else {
+            formOnSuccess(values)
         }
     }
 
@@ -143,7 +148,8 @@ export default function FormDialog({id, dialog, onValuesChange, children, hasOk 
                                 </Button>
                                 {
                                     hasOk &&
-                                    <Button loading={loading} type="primary" htmlType="submit" disabled={loading || !submittable}>
+                                    <Button loading={loading} type="primary" htmlType="submit"
+                                            disabled={loading || !submittable}>
                                         {okText ?? "OK"}
                                     </Button>
                                 }

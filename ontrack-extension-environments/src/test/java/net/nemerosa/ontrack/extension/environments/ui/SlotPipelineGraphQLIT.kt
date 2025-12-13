@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTestSup
 import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import org.junit.jupiter.api.Test
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
 @QueueNoAsync
+@AsAdminTest
 class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
@@ -318,88 +320,90 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Checking if a pipeline can be deployed with one overridden rule`() {
-        slotTestSupport.withSlotPipeline { pipeline ->
-            /* val pl = */ pipeline.build.branch.promotionLevel("GOLD")
-            val admissionRuleConfig = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(pipeline.slot)
-            slotService.addAdmissionRuleConfig(
-                config = admissionRuleConfig,
-            )
-            slotService.overrideAdmissionRule(
-                pipeline = pipeline,
-                admissionRuleConfig = admissionRuleConfig,
-                message = "Because I want to",
-            )
-            run(
-                """
-                    {
-                        slotPipelineById(id: "${pipeline.id}") {
-                            runAction {
-                                ok
-                                overridden
-                                successCount
-                                totalCount
-                                percentage
+        asAdmin {
+            slotTestSupport.withSlotPipeline { pipeline ->
+                /* val pl = */ pipeline.build.branch.promotionLevel("GOLD")
+                val admissionRuleConfig = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(pipeline.slot)
+                slotService.addAdmissionRuleConfig(
+                    config = admissionRuleConfig,
+                )
+                slotService.overrideAdmissionRule(
+                    pipeline = pipeline,
+                    admissionRuleConfig = admissionRuleConfig,
+                    message = "Because I want to",
+                )
+                run(
+                    """
+                            {
+                                slotPipelineById(id: "${pipeline.id}") {
+                                    runAction {
+                                        ok
+                                        overridden
+                                        successCount
+                                        totalCount
+                                        percentage
+                                    }
+                                    admissionRules {
+                                        check {
+                                            ok
+                                            reason
+                                        }
+                                        admissionRuleConfig {
+                                            ruleId
+                                            ruleConfig
+                                        }
+                                        data {
+                                            user
+                                            timestamp
+                                            data
+                                        }
+                                        canBeOverridden
+                                        overridden
+                                        override {
+                                            user
+                                            message
+                                        }
+                                    }
+                                }
                             }
-                            admissionRules {
-                                check {
-                                    ok
-                                    reason
-                                }
-                                admissionRuleConfig {
-                                    ruleId
-                                    ruleConfig
-                                }
-                                data {
-                                    user
-                                    timestamp
-                                    data
-                                }
-                                canBeOverridden
-                                overridden
-                                override {
-                                    user
-                                    message
-                                }
-                            }
-                        }
-                    }
-                """.trimIndent()
-            ) { data ->
-                assertEquals(
-                    mapOf(
-                        "slotPipelineById" to mapOf(
-                            "runAction" to mapOf(
-                                "ok" to true,
-                                "overridden" to true,
-                                "successCount" to 1,
-                                "totalCount" to 1,
-                                "percentage" to 100,
-                            ),
-                            "admissionRules" to listOf(
-                                mapOf(
-                                    "check" to mapOf(
-                                        "ok" to true,
-                                        "reason" to "Rule has been overridden",
-                                    ),
-                                    "admissionRuleConfig" to mapOf(
-                                        "ruleId" to "promotion",
-                                        "ruleConfig" to mapOf(
-                                            "promotion" to "GOLD"
-                                        ),
-                                    ),
-                                    "data" to null,
-                                    "canBeOverridden" to true,
+                        """.trimIndent()
+                ) { data ->
+                    assertEquals(
+                        mapOf(
+                            "slotPipelineById" to mapOf(
+                                "runAction" to mapOf(
+                                    "ok" to true,
                                     "overridden" to true,
-                                    "override" to mapOf(
-                                        "user" to "admin",
-                                        "message" to "Because I want to"
-                                    ),
+                                    "successCount" to 1,
+                                    "totalCount" to 1,
+                                    "percentage" to 100,
+                                ),
+                                "admissionRules" to listOf(
+                                    mapOf(
+                                        "check" to mapOf(
+                                            "ok" to true,
+                                            "reason" to "Rule has been overridden",
+                                        ),
+                                        "admissionRuleConfig" to mapOf(
+                                            "ruleId" to "promotion",
+                                            "ruleConfig" to mapOf(
+                                                "promotion" to "GOLD"
+                                            ),
+                                        ),
+                                        "data" to null,
+                                        "canBeOverridden" to true,
+                                        "overridden" to true,
+                                        "override" to mapOf(
+                                            "user" to securityService.currentUser?.name,
+                                            "message" to "Because I want to"
+                                        ),
+                                    )
                                 )
                             )
-                        )
-                    ).asJson(),
-                    data
-                )
+                        ).asJson(),
+                        data
+                    )
+                }
             }
         }
     }

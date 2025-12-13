@@ -27,7 +27,7 @@ class GQLTypeAutoVersioningAuditEntryState(
                 it.name("creation")
                     .type(creation.typeRef.toNotNull())
                     .dataFetcher { env ->
-                        val item: AutoVersioningAuditEntryState = env.getSource()
+                        val item: AutoVersioningAuditEntryState = env.getSource()!!
                         val signature = item.signature
                         GQLTypeCreation.getCreationFromSignature(signature)
                     }
@@ -42,7 +42,7 @@ class GQLTypeAutoVersioningAuditEntryState(
                     .description("Is the state indicating a running request?")
                     .type(GraphQLBoolean.toNotNull())
                     .dataFetcher { env ->
-                        val item: AutoVersioningAuditEntryState = env.getSource()
+                        val item: AutoVersioningAuditEntryState = env.getSource()!!
                         item.state.isRunning
                     }
             }
@@ -51,7 +51,7 @@ class GQLTypeAutoVersioningAuditEntryState(
                     .description("Is the state indicating a request being processed?")
                     .type(GraphQLBoolean.toNotNull())
                     .dataFetcher { env ->
-                        val item: AutoVersioningAuditEntryState = env.getSource()
+                        val item: AutoVersioningAuditEntryState = env.getSource()!!
                         item.state.isProcessing
                     }
             }
@@ -60,7 +60,7 @@ class GQLTypeAutoVersioningAuditEntryState(
                     .description("Associated data")
                     .type(GQLScalarJSON.INSTANCE.toNotNull())
                     .dataFetcher { env ->
-                        val item: AutoVersioningAuditEntryState = env.getSource()
+                        val item: AutoVersioningAuditEntryState = env.getSource()!!
                         item.data.asJson()
                     }
             }

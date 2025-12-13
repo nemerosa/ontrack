@@ -1,0 +1,55 @@
+extend type Query {
+    """Application health status"""
+    systemHealth: SystemHealth
+}
+
+"""Application health"""
+type SystemHealth {
+    """Health endpoints"""
+    health: JSON!
+    """Connectors"""
+    connectors: ConnectorGlobalStatus
+}
+
+"""List of statuses for all connectors"""
+type ConnectorGlobalStatus {
+    statuses: [CollectedConnectorStatus!]!
+    count: Int!
+    upCount: Int!
+    downCount: Int!
+    status: ConnectorStatusType!
+    percent: Int!
+}
+
+"""Status type for a connector"""
+enum ConnectorStatusType{
+    UP,
+    DOWN,
+}
+
+"""Status for an individual connector"""
+type CollectedConnectorStatus {
+    status: ConnectorStatus!
+    time: String!
+}
+
+"""Connector status"""
+type ConnectorStatus {
+    description: ConnectorDescription!
+    type: ConnectorStatusType!
+    error: String
+}
+
+"""Description for a connector"""
+type ConnectorDescription {
+    connector: Connector
+    connection: String
+}
+
+"""Definition of a connector"""
+type Connector {
+    """Type of connector"""
+    type: String
+    """Name of the connector"""
+    name: String
+}

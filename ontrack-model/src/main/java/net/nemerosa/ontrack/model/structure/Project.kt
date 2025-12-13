@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.YesNo
 
 /**
  * A project in Ontrack. Usually associated with a SCM repository, this is the main entity in the Ontrack
@@ -40,12 +38,6 @@ data class Project(
         fun of(nameDescription: NameDescription) =
                 Project(ID.NONE, nameDescription.name, nameDescription.description, false, Signature.anonymous())
 
-        @JvmStatic
-        fun form(): Form =
-                Form.nameAndDescription()
-                        .with(
-                                YesNo.of("disabled").label("Disabled").help("Check if the project must be disabled.")
-                        )
     }
 
     override val project: Project get() = this
@@ -59,8 +51,5 @@ data class Project(
 
     fun update(form: NameDescriptionState): Project =
             of(form).withId(id).withDisabled(form.isDisabled)
-
-    fun asForm(): Form =
-            form().name(name).description(description).fill("disabled", isDisabled)
 
 }

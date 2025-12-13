@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.casc
 
 import net.nemerosa.ontrack.extension.casc.context.core.admin.MockAdminContext
+import net.nemerosa.ontrack.extension.casc.support.SampleSettings
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.Roles
-import net.nemerosa.ontrack.model.settings.HomePageSettings
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -78,37 +78,37 @@ class CascServiceIT : AbstractCascTestSupport() {
     }
 
     private fun renderAsYaml() {
-        withSettings<HomePageSettings> {
+        withSettings<SampleSettings> {
             settingsManagerService.saveSettings(
-                HomePageSettings(
-                    maxBranches = 2,
+                SampleSettings(
                     maxProjects = 200,
+                    enabled = true,
                 )
             )
             val yaml = cascService.renderAsYaml()
-            assertTrue("maxBranches: 2" in yaml)
             assertTrue("maxProjects: 200" in yaml)
+            assertTrue("enabled: true" in yaml)
         }
     }
 
     @Test
     fun `Rendering as JSON`() {
         asAdmin {
-            withSettings<HomePageSettings> {
+            withSettings<SampleSettings> {
                 settingsManagerService.saveSettings(
-                    HomePageSettings(
-                        maxBranches = 2,
+                    SampleSettings(
                         maxProjects = 200,
+                        enabled = true,
                     )
                 )
                 val json = cascService.renderAsJson()
                 assertEquals(
-                    2,
-                    json.path("ontrack").path("config").path("settings").path("home-page").path("maxBranches").asInt()
+                    200,
+                    json.path("ontrack").path("config").path("settings").path("sample").path("maxProjects").asInt()
                 )
                 assertEquals(
-                    200,
-                    json.path("ontrack").path("config").path("settings").path("home-page").path("maxProjects").asInt()
+                    true,
+                    json.path("ontrack").path("config").path("settings").path("sample").path("enabled").asBoolean()
                 )
             }
         }

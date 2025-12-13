@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.sonarqube
 
-import com.nhaarman.mockitokotlin2.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.api.support.TestBranchModelMatcherProvider
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayProperty
@@ -20,6 +22,7 @@ import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettin
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubeProperty
 import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Build
@@ -39,6 +42,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
+@AsAdminTest
 class SonarQubeIT : AbstractDSLTestSupport() {
 
     @Autowired
@@ -68,23 +72,21 @@ class SonarQubeIT : AbstractDSLTestSupport() {
         ) { build ->
             // Checks that metrics are exported
             returnedMeasures.forEach { (name, value) ->
-                verify(metricsExportService).exportMetrics(
-                    metric = eq("ontrack_sonarqube_measure"),
-                    tags = eq(
-                        mapOf(
+                verify {
+                    metricsExportService.exportMetrics(
+                        metric = "ontrack_sonarqube_measure",
+                        tags = mapOf(
                             "project" to build.project.name,
                             "branch" to build.branch.name,
                             "status" to "PASSED",
                             "measure" to name
-                        )
-                    ),
-                    fields = eq(
-                        mapOf(
+                        ),
+                        fields = mapOf(
                             "value" to value
-                        )
-                    ),
-                    timestamp = any()
-                )
+                        ),
+                        timestamp = any()
+                    )
+                }
             }
             // Checks the entity information
             val information = informationExtension.getInformation(build)
@@ -132,23 +134,21 @@ class SonarQubeIT : AbstractDSLTestSupport() {
         ) { build ->
             // Checks that metrics are exported
             returnedMeasures.forEach { (name, value) ->
-                verify(metricsExportService).exportMetrics(
-                    metric = eq("ontrack_sonarqube_measure"),
-                    tags = eq(
-                        mapOf(
+                verify {
+                    metricsExportService.exportMetrics(
+                        metric = "ontrack_sonarqube_measure",
+                        tags = mapOf(
                             "project" to build.project.name,
                             "branch" to build.branch.name,
                             "status" to "PASSED",
                             "measure" to name
-                        )
-                    ),
-                    fields = eq(
-                        mapOf(
+                        ),
+                        fields = mapOf(
                             "value" to value
-                        )
-                    ),
-                    timestamp = any()
-                )
+                        ),
+                        timestamp = any()
+                    )
+                }
             }
             // Checks the entity information
             val information = informationExtension.getInformation(build)
@@ -865,17 +865,17 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     }
 
     private fun mockSonarQubeMeasures(key: String, version: String, vararg measures: Pair<String, Double>) {
-        whenever(
+        every {
             client.getMeasuresForVersion(
-                eq(key),
-                any(),
-                eq(version),
-                any()
+                key = key,
+                branch = any(),
+                version = version,
+                metrics = any()
             )
-        ).then { invocation ->
+        } answers { invocation ->
             // List of desired measures
             @Suppress("UNCHECKED_CAST")
-            val measureList: List<String> = invocation.arguments[3] as List<String>
+            val measureList: List<String> = invocation.invocation.args[3] as List<String>
             // Map of measures
             val index = measures.toMap()
             // Results
@@ -896,7 +896,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     private lateinit var testBranchModelMatcherProvider: TestBranchModelMatcherProvider
 
     @Configuration
-    @Profile(RunProfile.UNIT_TEST)
+    @Profile(RunProfile.DEV)
     class SonarQubeITConfiguration {
 
         /**
@@ -904,13 +904,13 @@ class SonarQubeIT : AbstractDSLTestSupport() {
          */
         @Bean
         @Primary
-        fun metricsExportService() = mock<MetricsExportService>()
+        fun metricsExportService() = mockk<MetricsExportService>(relaxed = true)
 
         /**
          * Client mock
          */
         @Bean
-        fun sonarQubeClient() = mock<SonarQubeClient>()
+        fun sonarQubeClient() = mockk<SonarQubeClient>(relaxed = true)
 
         /**
          * Factory

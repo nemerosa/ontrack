@@ -1,44 +1,20 @@
 package net.nemerosa.ontrack.boot.support
 
-import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
-import net.nemerosa.ontrack.ui.resource.ResourceModule
-import org.slf4j.LoggerFactory
-import org.springframework.boot.task.TaskExecutorBuilder
+import jakarta.servlet.DispatcherType
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.http.converter.StringHttpMessageConverter
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.web.filter.ShallowEtagHeaderFilter
-import org.springframework.web.servlet.config.annotation.*
-import javax.annotation.PostConstruct
-import javax.servlet.DispatcherType
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
-class WebConfig(
-    private val uriBuilder: EntityURIBuilder,
-    private val securityService: SecurityService,
-    private val resourceModules: List<ResourceModule>,
-    private val taskExecutorBuilder: TaskExecutorBuilder
-) : WebMvcConfigurer {
-
-    private val logger = LoggerFactory.getLogger(WebConfig::class.java)
-
-    /**
-     * Logging
-     */
-    @PostConstruct
-    fun log() {
-        logger.info("[web] URI builder = " + uriBuilder.javaClass.name)
-    }
-
-    override fun configureAsyncSupport(configurer: AsyncSupportConfigurer) {
-        val executor = taskExecutorBuilder.build()
-        executor.initialize()
-        configurer.setTaskExecutor(executor)
-        configurer.setDefaultTimeout(300000) // 5 minutes
-    }
+class WebConfig : WebMvcConfigurer {
 
     /**
      * Uses the HTTP header for content negociation.
@@ -66,15 +42,15 @@ class WebConfig(
         // Documents
         converters.add(DocumentHttpMessageConverter())
         // JSON
-        converters.add(ResourceHttpMessageConverter(uriBuilder, securityService, resourceModules))
+        converters.add(MappingJackson2HttpMessageConverter())
     }
 
     override fun addCorsMappings(registry: CorsRegistry) {
         listOf(
-                "/graphql/**",
-                "/rest/**",
-                "/extension/**",
-                "/hook/secured/**",
+            "/graphql/**",
+            "/rest/**",
+            "/extension/**",
+            "/hook/secured/**",
         ).forEach {
             registry.addMapping(it).allowedMethods(*ALLOWED_API_METHODS.toTypedArray())
         }

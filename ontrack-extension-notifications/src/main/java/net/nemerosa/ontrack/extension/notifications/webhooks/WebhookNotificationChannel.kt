@@ -6,12 +6,10 @@ import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.patchString
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.selectionOfString
-import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
@@ -24,7 +22,6 @@ class WebhookNotificationChannel(
     private val webhookAdminService: WebhookAdminService,
     private val webhookExecutionService: WebhookExecutionService,
     private val cachedSettingsService: CachedSettingsService,
-    private val securityService: SecurityService,
 ) : AbstractNotificationChannel<WebhookNotificationChannelConfig, WebhookNotificationChannelOutput>(
     WebhookNotificationChannelConfig::class
 ) {
@@ -34,6 +31,13 @@ class WebhookNotificationChannel(
             throw EventSubscriptionConfigException("Webhook with name ${config.name} not found")
         }
     }
+
+    override fun mergeConfig(
+        a: WebhookNotificationChannelConfig,
+        changes: JsonNode
+    ) = WebhookNotificationChannelConfig(
+        name = patchString(changes, a::name),
+    )
 
     override fun publish(
         recordId: String,
@@ -68,17 +72,6 @@ class WebhookNotificationChannel(
 
     override fun toSearchCriteria(text: String): JsonNode =
         mapOf(WebhookNotificationChannelConfig::name.name to text).asJson()
-
-    override fun toText(config: WebhookNotificationChannelConfig): String = config.name
-
-    override fun getForm(c: WebhookNotificationChannelConfig?): Form = Form.create()
-        .selectionOfString(
-            WebhookNotificationChannelConfig::name,
-            securityService.asAdmin {
-                webhookAdminService.webhooks.map { it.name }.sorted()
-            },
-            c?.name
-        )
 
     override val type: String = "webhook"
 

@@ -191,7 +191,7 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
     fun `Filtering workflows by trigger data`() {
         workflowInstanceRepository.clearAll()
         asUser {
-            val username = securityService.currentAccount?.username
+            val username = securityService.currentUser?.name
             val instances = (1..3).map { no ->
                 createInstance(
                     workflow = WorkflowParser.parseYamlWorkflow(WorkflowFixtures.simpleLinearWorkflowYaml)

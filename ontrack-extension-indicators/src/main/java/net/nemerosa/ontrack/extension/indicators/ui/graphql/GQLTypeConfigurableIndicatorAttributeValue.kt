@@ -24,7 +24,7 @@ class GQLTypeConfigurableIndicatorAttributeValue(
                 .description("Attribute definition")
                 .type(gqlConfigurableIndicatorAttribute.typeRef.toNotNull())
                 .dataFetcher { env ->
-                    val value: ConfigurableIndicatorAttributeValue = env.getSource()
+                    val value: ConfigurableIndicatorAttributeValue = env.getSource()!!
                     value.attribute
                 }
         }
@@ -34,7 +34,7 @@ class GQLTypeConfigurableIndicatorAttributeValue(
                 .description("Attribute key")
                 .type(GraphQLString.toNotNull())
                 .dataFetcher { env ->
-                    val value: ConfigurableIndicatorAttributeValue = env.getSource()
+                    val value: ConfigurableIndicatorAttributeValue = env.getSource()!!
                     value.attribute.key
                 }
         }

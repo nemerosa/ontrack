@@ -4,14 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.*
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.BuildConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class BuildGitHubWorkflowRunPropertyType(
@@ -20,31 +21,19 @@ class BuildGitHubWorkflowRunPropertyType(
     extensionFeature
 ) {
 
-    override fun getName(): String = "GitHub Workflow Run"
+    override val name: String = "GitHub Workflow Run"
 
-    override fun getDescription(): String = "Link to the GitHub Workflow Run which created this build."
+    override val description: String = "Link to the GitHub Workflow Run which created this build."
 
-    override fun getSupportedEntityTypes() = setOf(ProjectEntityType.BUILD)
+    override val supportedEntityTypes = setOf(ProjectEntityType.BUILD)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(BuildGitHubWorkflowRunProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, BuildConfig::class.java)
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
-
-    override fun getEditionForm(entity: ProjectEntity, value: BuildGitHubWorkflowRunProperty?): Form =
-        Form.create()
-            .multiform(
-                BuildGitHubWorkflowRunProperty::workflows,
-                value?.workflows
-            ) {
-                Form.create()
-                    .longField(BuildGitHubWorkflowRun::runId, null)
-                    .urlField(BuildGitHubWorkflowRun::url, null)
-                    .textField(BuildGitHubWorkflowRun::name, null)
-                    .intField(BuildGitHubWorkflowRun::runNumber, null)
-                    .yesNoField(BuildGitHubWorkflowRun::running, null)
-                    .textField(BuildGitHubWorkflowRun::event, null)
-            }
 
     override fun fromClient(node: JsonNode): BuildGitHubWorkflowRunProperty = node.parse()
 
@@ -59,11 +48,11 @@ class BuildGitHubWorkflowRunPropertyType(
 
     override fun replaceValue(
         value: BuildGitHubWorkflowRunProperty,
-        replacementFunction: Function<String, String>,
+        replacementFunction: (String) -> String,
     ): BuildGitHubWorkflowRunProperty = value
 
-    override fun getSearchArguments(token: String?): PropertySearchArguments? =
-        if (!token.isNullOrBlank()) {
+    override fun getSearchArguments(token: String): PropertySearchArguments? =
+        if (token.isNotBlank()) {
             try {
                 val value = token.toLong()
                 PropertySearchArguments(

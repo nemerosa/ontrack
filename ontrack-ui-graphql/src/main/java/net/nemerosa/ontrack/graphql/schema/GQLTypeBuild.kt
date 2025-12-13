@@ -7,8 +7,6 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.and
 import net.nemerosa.ontrack.extension.api.ExtensionManager
-import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
-import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.intArgument
 import net.nemerosa.ontrack.graphql.support.listType
@@ -28,7 +26,6 @@ import kotlin.jvm.optionals.getOrNull
 @Component
 class GQLTypeBuild(
     private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
-    private val uiActionsGraphQLService: UIActionsGraphQLService,
     private val structureService: StructureService,
     private val projectEntityInterface: GQLProjectEntityInterface,
     private val validation: GQLTypeValidation,
@@ -60,8 +57,6 @@ class GQLTypeBuild(
             .name(BUILD)
             .withInterface(projectEntityInterface.typeRef)
             .fields(projectEntityInterfaceFields())
-            // Actions
-            .actions(uiActionsGraphQLService, Build::class)
             // Authorizations
             .apply {
                 gqlInterfaceAuthorizableService.apply(this, Build::class)
@@ -232,38 +227,6 @@ class GQLTypeBuild(
             }
             // Build links - "using" direction, with pagination
             .field(
-                paginatedListFactory.createPaginatedField<Build, Build>(
-                    cache = cache,
-                    fieldName = "using",
-                    fieldDescription = "List of builds being used by this one.",
-                    deprecation = "usingQualified must be used instead",
-                    itemType = this.typeName,
-                    arguments = listOf(
-                        newArgument()
-                            .name("project")
-                            .description("Keeps only links targeted from this project")
-                            .type(GraphQLString)
-                            .build(),
-                        newArgument()
-                            .name("branch")
-                            .description("Keeps only links targeted from this branch. `project` argument is also required.")
-                            .type(GraphQLString)
-                            .build()
-                    ),
-                    itemPaginatedListProvider = { environment, build, offset, size ->
-                        val filter: (BuildLink) -> Boolean = getFilter(environment)
-                        structureService.getBuildsUsedBy(
-                            build,
-                            offset,
-                            size
-                        ) { candidate ->
-                            filter(BuildLink(candidate, ""))
-                        }
-                    }
-                )
-            )
-            // Build links - "using" direction, with pagination
-            .field(
                 paginatedListFactory.createPaginatedField<Build, BuildLink>(
                     cache = cache,
                     fieldName = "usingQualified",
@@ -322,38 +285,6 @@ class GQLTypeBuild(
             )
             // Build links - "usedBy" direction, with pagination
             .field(
-                paginatedListFactory.createPaginatedField<Build, Build>(
-                    cache = cache,
-                    fieldName = "usedBy",
-                    fieldDescription = "List of builds using this one.",
-                    deprecation = "usedByQualified must be used instead",
-                    itemType = this.typeName,
-                    arguments = listOf(
-                        newArgument()
-                            .name("project")
-                            .description("Keeps only links targeted from this project")
-                            .type(GraphQLString)
-                            .build(),
-                        newArgument()
-                            .name("branch")
-                            .description("Keeps only links targeted from this branch. `project` argument is also required.")
-                            .type(GraphQLString)
-                            .build()
-                    ),
-                    itemPaginatedListProvider = { environment, build, offset, size ->
-                        val filter = getFilter(environment)
-                        structureService.getBuildsUsing(
-                            build,
-                            offset,
-                            size
-                        ) { candidate ->
-                            filter(BuildLink(candidate, ""))
-                        }
-                    }
-                )
-            )
-            // Build links - "usedBy" direction, with pagination
-            .field(
                 paginatedListFactory.createPaginatedField<Build, BuildLink>(
                     cache = cache,
                     fieldName = "usedByQualified",
@@ -395,7 +326,7 @@ class GQLTypeBuild(
                     .description("Previous build")
                     .type(GraphQLTypeReference(BUILD))
                     .dataFetcher { env ->
-                        val build: Build = env.getSource()
+                        val build: Build = env.getSource()!!
                         structureService.getPreviousBuild(build.id)
                     }
             }
@@ -405,7 +336,7 @@ class GQLTypeBuild(
                     .description("Next build")
                     .type(GraphQLTypeReference(BUILD))
                     .dataFetcher { env ->
-                        val build: Build = env.getSource()
+                        val build: Build = env.getSource()!!
                         structureService.getNextBuild(build.id)
                     }
             }
@@ -440,7 +371,7 @@ class GQLTypeBuild(
 
     private fun buildValidationsFetcher() =
         DataFetcher { environment ->
-            val build: Build = environment.getSource()
+            val build: Build = environment.getSource()!!
             // Filter on validation stamp
             val validationStampName: String? = environment.getArgument(ARG_VALIDATION_STAMP)
             val validationStampNames: List<String>? = environment.getArgument(ARG_VALIDATION_STAMPS)
@@ -497,7 +428,7 @@ class GQLTypeBuild(
 
     private fun buildValidationRunsFetcher() =
         DataFetcher { environment ->
-            val build: Build = environment.getSource()
+            val build: Build = environment.getSource()!!
             // Filter
             val count: Int = environment.getArgument(ARG_COUNT) ?: 50
             val validation: String? = environment.getArgument(ARG_VALIDATION_STAMP)
@@ -541,7 +472,7 @@ class GQLTypeBuild(
 
     private fun buildPromotionRunsFetcher() =
         DataFetcher<List<PromotionRun>> { environment ->
-            val build: Build = environment.getSource()
+            val build: Build = environment.getSource()!!
             // Last per promotion filter?
             val lastPerLevel: Boolean = environment.getArgument(ARG_LAST_PER_LEVEL) ?: false
             // Promotion filter

@@ -3,8 +3,9 @@ package net.nemerosa.ontrack.json
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
-import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.node.*
+import java.io.IOException
+import java.time.LocalDate
 import kotlin.reflect.KClass
 
 private val mapper = ObjectMapperFactory.create()
@@ -12,7 +13,12 @@ private val mapper = ObjectMapperFactory.create()
 /**
  * Parses a string as JSON
  */
-fun String.parseAsJson(): JsonNode = JsonUtils.parseAsNode(this)
+fun String.parseAsJson(): JsonNode =
+    try {
+        mapper.readTree(this)
+    } catch (e: IOException) {
+        throw JsonParseException(e)
+    }
 
 /**
  * Map as JSON
@@ -24,7 +30,7 @@ fun jsonOf(vararg pairs: Pair<*, *>) =
  * Converts any object into JSON, or null if not defined.
  */
 fun <T> T?.toJson(): JsonNode? =
-    JsonUtils.format(this)
+    this?.let { mapper.valueToTree(it) }
 
 /**
  * Non-null JSON transformation
@@ -36,14 +42,38 @@ fun <T> T.asJson(): JsonNode = if (this is JsonNode) {
 }
 
 /**
- * To a Map through JSON
+ * Transforms the JSON node into a regular object (primitive types, list & maps)
  */
-fun JsonNode.toJsonMap(): Map<String, *> = JsonUtils.toMap(asJson())
+fun JsonNode?.toObject(): Any? =
+    if (this != null) {
+        when (this) {
+            is NullNode -> null
+            is BooleanNode -> booleanValue()
+            is NumericNode -> numberValue()
+            is BinaryNode -> binaryValue()
+            is TextNode -> textValue()
+
+            is ArrayNode -> map { it.toObject() }
+
+            is ObjectNode -> properties().asSequence().map { (k, v) ->
+                k to v.toObject()
+            }.toMap()
+
+            else -> error("Cannot convert JSON to Object: $this")
+        }
+    } else {
+        null
+    }
 
 /**
  * Format as a string
  */
-fun JsonNode.asJsonString(): String = JsonUtils.toJSONString(this)
+fun JsonNode.asJsonString(): String =
+    try {
+        mapper.writeValueAsString(this)
+    } catch (e: JsonProcessingException) {
+        throw JsonParseException(e)
+    }
 
 /**
  * Parses any node into an object.
@@ -92,7 +122,11 @@ fun userFriendlyMessage(ex: MismatchedInputException): String {
 /**
  * Formatting a JSON node as a string
  */
-fun JsonNode.format(): String = JsonUtils.toJSONString(this)
+fun JsonNode.format(): String = try {
+    mapper.writeValueAsString(this)
+} catch (e: JsonProcessingException) {
+    throw JsonParseException(e)
+}
 
 /**
  * Parses any node into an object or returns `null` if parsing fails
@@ -148,7 +182,17 @@ fun JsonNode.getRequiredJsonField(field: String): JsonNode =
  */
 fun JsonNode.getIntField(field: String): Int? =
     if (has(field)) {
-        get(field).asInt()
+        val value = get(field)
+        if (value.isNull) {
+            null
+        } else if (value.isNumber) {
+            value.asInt()
+        } else if (value.isTextual) {
+            val text = value.asText()
+            text.toIntOrNull()
+        } else {
+            null
+        }
     } else {
         null
     }
@@ -175,13 +219,14 @@ fun JsonNode.getTextField(field: String): String? = if (has(field)) {
 }
 
 /**
- * Gets a list of strings
+ * Gets a LocalDate field
  */
-fun JsonNode.getListStringField(field: String): List<String>? = if (has(field)) {
-    get(field).map { it.asText() }
-} else {
-    null
-}
+fun JsonNode.getDateField(field: String): LocalDate? =
+    if (this.has(field) && !this.get(field).isNull) {
+        JDKLocalDateDeserializer.parse(path(field).asText())
+    } else {
+        null
+    }
 
 /**
  * Gets a required string field

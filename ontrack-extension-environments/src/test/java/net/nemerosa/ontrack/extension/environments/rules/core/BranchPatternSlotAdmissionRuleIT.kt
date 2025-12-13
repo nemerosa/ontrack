@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleConfig
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Build
 import org.junit.jupiter.api.BeforeEach
@@ -14,6 +15,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class BranchPatternSlotAdmissionRuleIT : AbstractDSLTestSupport() {
 
     @Autowired

@@ -1,8 +1,5 @@
 package net.nemerosa.ontrack.extension.general.message
 
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.enumField
-import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.message.MessageType
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
@@ -27,11 +24,6 @@ class SystemMessageSettingsManager(
         settingsRepository.setString<SystemMessageSettings>(settings::content)
         settingsRepository.setEnum<SystemMessageSettings, MessageType>(settings::type)
     }
-
-    override fun getSettingsForm(settings: SystemMessageSettings): Form =
-        Form.create()
-            .textField(SystemMessageSettings::content, settings.content)
-            .enumField(SystemMessageSettings::type, settings.type)
 
     override fun getId(): String = "system-message"
 

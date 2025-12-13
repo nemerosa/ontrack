@@ -20,7 +20,7 @@ class GQLRootQueryPredefinedValidationStampById(
             .type(PredefinedValidationStamp::class.toTypeRef())
             .argument(intArgument("id", "ID", nullable = false))
             .dataFetcher { env ->
-                val id: Int = env.getArgument("id")
+                val id: Int = env.getArgument("id")!!
                 predefinedValidationStampService.getPredefinedValidationStamp(ID.of(id))
             }
             .build()

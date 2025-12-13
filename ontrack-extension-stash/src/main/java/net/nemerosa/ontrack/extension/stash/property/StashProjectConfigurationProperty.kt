@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.stash.model.getRepositoryUrl
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationIgnore
 import net.nemerosa.ontrack.model.docs.DocumentationType
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaString
 import net.nemerosa.ontrack.model.support.ConfigurationProperty
 
 /**
@@ -17,6 +18,7 @@ import net.nemerosa.ontrack.model.support.ConfigurationProperty
  */
 class StashProjectConfigurationProperty(
     @DocumentationType("String", "Name of the Bitbucket Server configuration")
+    @JsonSchemaString
     override val configuration: StashConfiguration,
     @APIDescription("Name of the project")
     val project: String,

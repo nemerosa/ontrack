@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.client
 
+import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.mockk
 import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.extension.github.app.DefaultGitHubAppTokenService
@@ -22,6 +23,8 @@ class DefaultOntrackGitHubClientIT {
 
     private lateinit var client: OntrackGitHubClient
 
+    private val meterRegistry: MeterRegistry = mockk(relaxed = true)
+
     @BeforeEach
     fun init() {
         client = DefaultOntrackGitHubClient(
@@ -30,8 +33,8 @@ class DefaultOntrackGitHubClientIT {
                 gitHubAppClient = MockGitHubAppClient(),
                 ontrackConfigProperties = OntrackConfigProperties(),
             ),
-            applicationLogService = mockk(relaxed = true),
             timeout = Duration.ofSeconds(60),
+            meterRegistry = meterRegistry,
         )
     }
 
@@ -211,6 +214,18 @@ class DefaultOntrackGitHubClientIT {
         assertEquals(
             githubTestEnv.changeLog.messages,
             commits.map { it.commit.message }
+        )
+    }
+
+    @Test
+    fun `Getting the last commit for an issue`() {
+        val commit = client.getIssueLastCommit(
+            repository = githubTestEnv.fullRepository,
+            key = githubTestEnv.issues.issue,
+        )
+        assertEquals(
+            githubTestEnv.issues.issueCommit,
+            commit,
         )
     }
 

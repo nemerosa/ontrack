@@ -1,8 +1,11 @@
 import StandardPage from "@components/layouts/StandardPage";
 import {CloseToHomeCommand} from "@components/common/Commands";
 import QueueRecords from "@components/extension/queue/QueueRecords";
+import {useRouter} from "next/router";
 
 export default function QueueRecordsPage() {
+    const router = useRouter()
+    const {id} = router.query
     return (
         <>
             <StandardPage
@@ -11,7 +14,7 @@ export default function QueueRecordsPage() {
                     <CloseToHomeCommand key="home"/>,
                 ]}
             >
-                <QueueRecords/>
+                <QueueRecords id={id}/>
             </StandardPage>
         </>
     )

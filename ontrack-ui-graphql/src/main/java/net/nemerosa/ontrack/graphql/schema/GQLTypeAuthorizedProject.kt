@@ -28,7 +28,7 @@ class GQLTypeAuthorizedProject(
                             .description("Role for the project")
                             .type(projectRole.typeRef.toNotNull())
                             .dataFetcher { env ->
-                                val pra: ProjectRoleAssociation = env.getSource()
+                                val pra: ProjectRoleAssociation = env.getSource()!!
                                 pra.projectRole
                             }
                 }
@@ -37,7 +37,7 @@ class GQLTypeAuthorizedProject(
                             .description("Authorized project")
                             .type(GraphQLNonNull(GraphQLTypeReference(GQLTypeProject.PROJECT)))
                             .dataFetcher { env ->
-                                val pra: ProjectRoleAssociation = env.getSource()
+                                val pra: ProjectRoleAssociation = env.getSource()!!
                                 structureService.getProject(ID.of(pra.projectId))
                             }
                 }

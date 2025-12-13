@@ -21,6 +21,14 @@ public interface BuildFilterService {
     BuildFilterProviderData<?> defaultFilterProviderData();
 
     /**
+     * Gets the list of forms to create new filters
+     *
+     * @param branchId Branch to get the forms for
+     * @return List of forms
+     */
+    Collection<BuildFilterForm> getBuildFilterForms(ID branchId);
+
+    /**
      * Builds a last promotion filter
      */
     BuildFilterProviderData<?> lastPromotedBuildsFilterData();
@@ -42,14 +50,6 @@ public interface BuildFilterService {
      * @return List of filters
      */
     Collection<BuildFilterResource<?>> getBuildFilters(ID branchId);
-
-    /**
-     * Gets the list of forms to create new filters
-     *
-     * @param branchId Branch to get the forms for
-     * @return List of forms
-     */
-    Collection<BuildFilterForm> getBuildFilterForms(ID branchId);
 
     /**
      * Gets a build filter provider for the given type.

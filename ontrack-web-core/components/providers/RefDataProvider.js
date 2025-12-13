@@ -1,9 +1,13 @@
 import {createContext, useContext, useEffect, useState} from "react";
+import {useQuery} from "@components/services/GraphQL";
 import {gql} from "graphql-request";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useJobStates} from "@components/core/admin/jobs/JobState";
 
 const refDataSignature = {
+    /**
+     * Ref data loaded?
+     */
+    loaded: false,
     /**
      * Management of validation run statuses
      */
@@ -51,8 +55,39 @@ export const useRefData = () => useContext(RefDataContext)
 
 export default function RefDataContextProvider({children}) {
 
-    const client = useGraphQLClient()
+    const {data, loading, error, finished} = useQuery(
+        gql`
+            query RefData {
+                validationRunStatusIDList {
+                    id
+                    name
+                    root
+                    passed
+                    followingStatuses
+                }
+                info {
+                    version {
+                        display
+                    }
+                }
+                eventTypes {
+                    id
+                    description
+                }
+                searchResultTypes {
+                    feature {
+                        id
+                    }
+                    id
+                    name
+                    description
+                }
+            }
+        `
+    )
 
+
+    const jobStates = useJobStates()
     const [refData, setRefData] = useState(refDataSignature)
 
     const validationRunStatuses = (list) => {
@@ -81,51 +116,24 @@ export default function RefDataContextProvider({children}) {
         }
     }
 
-    const jobStates = useJobStates()
-
     useEffect(() => {
-        if (client) {
-            client.request(
-                gql`
-                    query RefData {
-                        validationRunStatusIDList {
-                            id
-                            name
-                            root
-                            passed
-                            followingStatuses
-                        }
-                        info {
-                            version {
-                                display
-                            }
-                        }
-                        eventTypes {
-                            id
-                            description
-                        }
-                        searchResultTypes {
-                            feature {
-                                id
-                            }
-                            id
-                            name
-                            description
-                        }
-                    }
-                `
-            ).then(data => {
-                setRefData({
-                    validationRunStatuses: validationRunStatuses(data.validationRunStatusIDList),
-                    eventTypes: data.eventTypes,
-                    jobStates: jobStates,
-                    version: data.info.version.display,
-                    searchResultTypes: data.searchResultTypes,
-                })
+        if (data && finished) {
+            setRefData({
+                loaded: true,
+                validationRunStatuses: validationRunStatuses(data.validationRunStatusIDList),
+                eventTypes: data.eventTypes,
+                jobStates: jobStates,
+                version: data.info.version.display,
+                searchResultTypes: data.searchResultTypes,
             })
         }
-    }, [client, jobStates]);
+    }, [data, finished, jobStates])
 
-    return <RefDataContext.Provider value={refData}>{children}</RefDataContext.Provider>
+    return <>
+        {
+            !loading &&
+            <RefDataContext.Provider value={refData}>{children}</RefDataContext.Provider>
+        }
+    </>
 
 }

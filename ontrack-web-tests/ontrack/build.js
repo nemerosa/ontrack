@@ -31,7 +31,7 @@ export const createBuild = async (branch, name) => {
             }
         `,
         {
-            branchId: branch.id,
+            branchId: Number(branch.id),
             name: actualName,
         }
     )

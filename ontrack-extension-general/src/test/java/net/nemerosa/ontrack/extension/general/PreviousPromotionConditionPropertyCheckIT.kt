@@ -2,10 +2,10 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.ProjectEntity
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
 
-class PreviousPromotionConditionPropertyCheckIT : AbstractGeneralExtensionTestJUnit4Support() {
+class PreviousPromotionConditionPropertyCheckIT : AbstractGeneralExtensionTestSupport() {
 
     @Test
     fun `No promotion check`() {

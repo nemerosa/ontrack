@@ -1,13 +1,15 @@
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
 
 dependencies {
     api(project(":ontrack-json"))
     api(project(":ontrack-common"))
-    api("javax.validation:validation-api")
     api("org.springframework:spring-tx")
+    api("co.elastic.clients:elasticsearch-java")
 
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation(project(":ontrack-job"))
     implementation("org.apache.commons:commons-text")
     implementation("org.springframework:spring-context")
@@ -16,23 +18,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     testImplementation(project(":ontrack-test-utils"))
-}
 
-val testJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("tests")
-    from(sourceSets["test"].output)
-}
-
-configure<PublishingExtension> {
-    publications {
-        maybeCreate<MavenPublication>("mavenCustom").artifact(tasks["testJar"])
-    }
-}
-
-tasks["assemble"].dependsOn("testJar")
-
-val tests by configurations.creating
-
-artifacts {
-    add("tests", testJar)
+    testFixturesImplementation("org.springframework:spring-context")
 }

@@ -3,8 +3,8 @@ import {FaTrash} from "react-icons/fa";
 import {Typography} from "antd";
 import {gql} from "graphql-request";
 import {useRouter} from "next/router";
-import {branchUri, projectUri} from "@components/common/Links";
-import {useBranch, useBuild} from "@components/services/fragments";
+import {projectUri} from "@components/common/Links";
+import {useBranch} from "@components/services/fragments";
 
 export default function BranchDeleteCommand({id}) {
 
@@ -39,7 +39,7 @@ export default function BranchDeleteCommand({id}) {
                         }
                     `
                 }
-                gqlVariables={{id}}
+                gqlVariables={{id: Number(id)}}
                 gqlUserNode="deleteBranchById"
                 onSuccess={onSuccess}
             />

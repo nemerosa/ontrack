@@ -52,7 +52,7 @@ export default function BuildLinksView({id}) {
                         }
                     }
                 `,
-                {id}
+                {id: Number(id)}
             ).then(data => {
                 const build = data.build
                 setBuild(build)

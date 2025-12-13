@@ -1,13 +1,21 @@
 package net.nemerosa.ontrack.boot.search
 
 import net.nemerosa.ontrack.boot.BUILD_SEARCH_INDEX
+import net.nemerosa.ontrack.boot.BUILD_SEARCH_RESULT_TYPE
+import net.nemerosa.ontrack.common.waitFor
+import net.nemerosa.ontrack.extension.general.ReleaseProperty
+import net.nemerosa.ontrack.extension.general.ReleasePropertyType
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 
-class BuildSearchIT : AbstractSearchJUnit4TestSupport() {
+class BuildSearchIT : AbstractSearchTestSupport() {
 
     @Test
     fun `Searching builds`() {
@@ -25,11 +33,108 @@ class BuildSearchIT : AbstractSearchJUnit4TestSupport() {
         // Indexes the builds
         index(BUILD_SEARCH_INDEX)
         // Searches for the builds using the name
-        val results = asUser { searchService.paginatedSearch(SearchRequest(name)).items }
+        val results = asUser {
+            searchService.paginatedSearch(
+                SearchRequest(
+                    token = name,
+                    type = BUILD_SEARCH_RESULT_TYPE,
+                )
+            ).items
+        }
         // Checks the builds have been found
         builds.forEach { build ->
-            assertTrue(build.entityDisplayName in results.map { it.title })
+            assertTrue(build.name in results.map { it.title })
         }
+    }
+
+    @Test
+    fun `Searching builds on release`() {
+        val name = uid("B")
+        val release = uid("R")
+        project<Build> {
+            branch<Build> {
+                build(name) {
+                    setProperty(
+                        this,
+                        ReleasePropertyType::class.java,
+                        ReleaseProperty(release)
+                    )
+                }
+            }
+        }
+        // Creates other builds
+        repeat(3) { project { branch { build() } } }
+        // Indexes the builds
+        index(BUILD_SEARCH_INDEX)
+        // Searches for the builds using the name
+        val results = asUser {
+            searchService.paginatedSearch(
+                SearchRequest(
+                    token = name,
+                    type = BUILD_SEARCH_RESULT_TYPE,
+                )
+            ).items
+        }
+        // Checks the builds have been found
+        assertTrue(release in results.map { it.title })
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Searching for a build based on its release information using the build index`() {
+        val value = uid("V")
+        val value1 = uid("V1")
+        val value2 = uid("V2")
+        project {
+            branch {
+                build("Build 1") {
+                    release("$value-$value1")
+                }
+                build("Build 2") {
+                    release("$value-$value2")
+                }
+
+                // Checks that we find one build on an exact match
+                var results = searchService.paginatedSearch(
+                    SearchRequest(
+                        token = "$value-$value1",
+                        type = "build",
+                    )
+                )
+                val build1Result =
+                    results.items.single()
+                assertEquals(
+                    "$value-$value1",
+                    build1Result.title,
+                    "Build 1 as first result"
+                )
+
+
+                // Checks that we find two builds on the prefix match
+                results = waitFor(
+                    message = "Waiting for the indexation of the builds",
+                    interval = 1.seconds,
+                ) {
+                    searchService.paginatedSearch(
+                        SearchRequest(
+                            token = value,
+                            type = "build",
+                        )
+                    )
+                } until {
+                    it.items.size >= 2
+                }
+                assertNotNull(
+                    results.items.find { it.title == "$value-$value1" },
+                    "Build 1 found on prefix"
+                )
+                assertNotNull(
+                    results.items.find { it.title == "$value-$value2" },
+                    "Build 2 found on prefix"
+                )
+            }
+        }
+
     }
 
 }

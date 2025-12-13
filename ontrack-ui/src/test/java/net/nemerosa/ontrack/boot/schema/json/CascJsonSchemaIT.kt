@@ -1,19 +1,22 @@
 package net.nemerosa.ontrack.boot.schema.json
 
+import net.nemerosa.ontrack.boot.Application
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
+import org.springframework.boot.test.context.SpringBootTest
 import java.io.File
 import kotlin.test.assertTrue
 
 /**
  * Testing the generation of the Casc JSON schema at the highest level.
  */
+@SpringBootTest(classes = [Application::class])
 class CascJsonSchemaIT : AbstractCascTestSupport() {
 
     @Test
     fun `Casc schema generation`() {
-        val schema = cascJsonSchemaService.createCascJsonSchema()
+        val schema = cascJsonSchemaService.createJsonSchema()
         // Checking that defs are correctly generated, at least for some samples
         val defs = schema.path("${'$'}defs")
         val expectedDefs = listOf(

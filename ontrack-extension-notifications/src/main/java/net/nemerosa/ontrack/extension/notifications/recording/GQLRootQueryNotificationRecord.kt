@@ -17,7 +17,7 @@ class GQLRootQueryNotificationRecord(
             .type(gqlTypeNotificationRecord.typeRef)
             .argument(stringArgument(ARG_ID, "Record ID", nullable = false))
             .dataFetcher { env ->
-                val id: String = env.getArgument(ARG_ID)
+                val id: String = env.getArgument(ARG_ID)!!
                 notificationRecordingService.findRecordById(id)
             }
             .build()

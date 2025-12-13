@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.jenkins.indicator
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.indicators.computing.*
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorSource
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorSourceProviderDescription
@@ -9,7 +8,9 @@ import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTyp
 import net.nemerosa.ontrack.extension.jenkins.JenkinsExtensionFeature
 import net.nemerosa.ontrack.extension.scm.service.SCMServiceDetector
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.templating.TemplatingService
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * Indicator which checks if a project default branch has a `Jenkinsfile` at its root.
@@ -20,7 +21,8 @@ class JenkinsPipelineFileIndicatorComputer(
     private val scmServiceDetector: SCMServiceDetector,
     booleanIndicatorValueType: BooleanIndicatorValueType,
     configurableIndicatorService: ConfigurableIndicatorService,
-) : AbstractConfigurableIndicatorComputer(extensionFeature, configurableIndicatorService) {
+    templatingService: TemplatingService,
+) : AbstractConfigurableIndicatorComputer(extensionFeature, configurableIndicatorService, templatingService) {
 
     companion object {
         const val TYPE = "jenkins-pipeline-file"
@@ -52,7 +54,7 @@ class JenkinsPipelineFileIndicatorComputer(
         ConfigurableIndicatorType(
             category = indicatorCategory,
             id = TYPE,
-            name = "The repository {required} have a Jenkinsfile",
+            name = "The repository \${required} have a Jenkinsfile",
             valueType = booleanIndicatorValueType,
             valueConfig = { _, state -> BooleanIndicatorValueTypeConfig(required = state.getRequiredAttribute()) },
             attributes = listOf(

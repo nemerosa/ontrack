@@ -5,9 +5,9 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.fragment.EnvironmentFr
 
 fun EnvironmentFragment.toEnvironment(connected: Connected) = Environment(
     connector = connected.connector,
-    id = id(),
-    name = name(),
-    order = order()!!,
-    description = description(),
-    tags = tags(),
+    id = id,
+    name = name,
+    order = order!!,
+    description = description,
+    tags = tags,
 )

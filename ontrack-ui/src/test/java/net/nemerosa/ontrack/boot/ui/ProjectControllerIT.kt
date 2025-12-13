@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.NameDescriptionState
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.*
@@ -25,34 +25,36 @@ class ProjectControllerIT : AbstractWebTestSupport() {
         asUser().with(ProjectCreation::class.java).execute {
             val nameDescription = nameDescription().asState()
             val resource = controller.newProject(nameDescription)
-            checkProject(resource, nameDescription)
+            checkProject(resource.body!!, nameDescription)
         }
     }
 
-    @Test(expected = AccessDeniedException::class)
+    @Test
     fun createProject_denied() {
-        asUser().call { controller.newProject(nameDescription().asState()) }
+        assertFailsWith<AccessDeniedException> {
+            asUser().call { controller.newProject(nameDescription().asState()) }
+        }
     }
 
     @Test
     fun disablingEnablingProject() {
         val project = doCreateProject()
         // Disables it
-        val disabled = asUser().with(project, ProjectEdit::class.java).call { controller.disableProject(project.id) }
+        val disabled = asUser().withProjectFunction(project, ProjectEdit::class.java).call { controller.disableProject(project.id) }.body!!
         assertTrue(disabled.isDisabled, "Project is disabled")
         val disabledEvent = asUser { eventQueryService.getLastEvent(project, EventFactory.DISABLE_PROJECT) }
         assertNotNull(disabledEvent, "Disabled event is there") { event ->
-            val eventProject: Project? = event.getEntity(ProjectEntityType.PROJECT)
+            val eventProject: Project = event.getEntity(ProjectEntityType.PROJECT)
             assertNotNull(eventProject, "Project associated to the event") {
                 assertEquals(project.name, it.name)
             }
         }
         // Enables it
-        val enabled = asUser().with(project, ProjectEdit::class.java).call { controller.enableProject(project.id) }
+        val enabled = asUser().withProjectFunction(project, ProjectEdit::class.java).call { controller.enableProject(project.id) }.body!!
         assertFalse(enabled.isDisabled, "Project is enabled")
         val enabledEvent = asUser { eventQueryService.getLastEvent(project, EventFactory.ENABLE_PROJECT) }
         assertNotNull(enabledEvent, "Enabled event is there") { event ->
-            val eventProject: Project? = event.getEntity(ProjectEntityType.PROJECT)
+            val eventProject: Project = event.getEntity(ProjectEntityType.PROJECT)
             assertNotNull(eventProject, "Project associated to the event") {
                 assertEquals(project.name, it.name)
             }
@@ -63,18 +65,18 @@ class ProjectControllerIT : AbstractWebTestSupport() {
     fun updateProject() {
         // Creates the project
         val initialNames = nameDescription().asState()
-        val project = asUser().with(ProjectCreation::class.java).call { controller.newProject(initialNames) }
+        val project = asUser().with(ProjectCreation::class.java).call { controller.newProject(initialNames) }.body!!
         val id = project.id
         // Edition
-        asUser().with(id.value, ProjectEdit::class.java).execute {
+        asUser().withProjectFunction(project, ProjectEdit::class.java).execute {
             // Updates
             val nameDescription = nameDescription().asState()
             assertNotEquals(initialNames, nameDescription)
-            var updated = controller.saveProject(id, nameDescription)
+            var updated = controller.saveProject(id, nameDescription).body!!
             // Checks
             checkProject(updated, nameDescription)
             // Gets the project back
-            updated = controller.getProject(id)
+            updated = controller.getProject(id).body!!
             checkProject(updated, nameDescription)
         }
     }

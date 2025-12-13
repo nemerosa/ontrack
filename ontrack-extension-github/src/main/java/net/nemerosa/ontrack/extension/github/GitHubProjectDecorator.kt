@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.structure.Decoration
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertyService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.util.*
 

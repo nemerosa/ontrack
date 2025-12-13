@@ -4,8 +4,8 @@ import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.message.GlobalMessage
 import net.nemerosa.ontrack.model.message.GlobalMessageService
-import net.nemerosa.ontrack.model.message.Message
 import net.nemerosa.ontrack.model.message.MessageType
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -71,10 +71,11 @@ class SystemMessageSettingsCascIT : AbstractCascTestSupport() {
                                         content: This is a global warning!
                     """.trimIndent()
                 )
-                val messages = globalMessageService.globalMessages
+                val messages = globalMessageService.globalMessages.filter { it.featureId == "general" }
                 assertEquals(
                     listOf(
-                        Message(
+                        GlobalMessage(
+                            featureId = "general",
                             content = "This is a global warning!",
                             type = MessageType.WARNING
                         )
@@ -92,7 +93,7 @@ class SystemMessageSettingsCascIT : AbstractCascTestSupport() {
                     """.trimIndent()
                 )
                 assertTrue(
-                    globalMessageService.globalMessages.isEmpty(),
+                    globalMessageService.globalMessages.none { it.featureId == "general" },
                     "No more messages"
                 )
             }

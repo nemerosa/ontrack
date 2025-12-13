@@ -13,8 +13,8 @@ import java.time.temporal.ChronoUnit
 @APIName("License configuration")
 class LicenseConfigurationProperties {
 
-    @APIDescription("License provider")
-    var provider: String = "none"
+    @APIDescription("License key")
+    var key: String = ""
 
     @DurationUnit(ChronoUnit.DAYS)
     @APIDescription("Duration before the expiry date, when to emit a warning (expressed by defaults in days)")

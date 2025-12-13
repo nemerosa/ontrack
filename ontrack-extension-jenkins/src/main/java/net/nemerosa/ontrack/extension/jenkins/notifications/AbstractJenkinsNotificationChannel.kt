@@ -9,10 +9,13 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.patchEnum
+import net.nemerosa.ontrack.json.patchInt
+import net.nemerosa.ontrack.json.patchString
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
-import net.nemerosa.ontrack.model.form.*
+import net.nemerosa.ontrack.model.utils.patchList
 
 abstract class AbstractJenkinsNotificationChannel(
     private val jenkinsConfigurationService: JenkinsConfigurationService,
@@ -32,6 +35,17 @@ abstract class AbstractJenkinsNotificationChannel(
             throw EventSubscriptionConfigException("Jenkins job is required")
         }
     }
+
+    override fun mergeConfig(
+        a: JenkinsNotificationChannelConfig,
+        changes: JsonNode
+    ) = JenkinsNotificationChannelConfig(
+        config = patchString(changes, a::config),
+        job = patchString(changes, a::job),
+        parameters = patchList(changes, a::parameters) { it.name },
+        callMode = patchEnum(changes, a::callMode),
+        timeout = patchInt(changes, a::timeout),
+    )
 
     override fun publish(
         recordId: String,
@@ -160,47 +174,6 @@ abstract class AbstractJenkinsNotificationChannel(
         ).asJson()
 
     override val enabled: Boolean = true
-
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun getForm(c: JenkinsNotificationChannelConfig?): Form = Form.create()
-        // Selection of configuration
-        .selectionOfString(
-            property = JenkinsNotificationChannelConfig::config,
-            items = jenkinsConfigurationService.configurations.map { it.name },
-            value = c?.config
-        )
-        // Job
-        .textField(JenkinsNotificationChannelConfig::job, c?.job)
-        // Parameters
-        .multiform(
-            property = JenkinsNotificationChannelConfig::parameters,
-            items = c?.parameters,
-        ) {
-            Form.create()
-                .textField(JenkinsNotificationChannelConfigParam::name, null)
-                .textField(JenkinsNotificationChannelConfigParam::value, null)
-        }
-        // Call mode
-        .enumField(
-            JenkinsNotificationChannelConfig::callMode,
-            c?.callMode ?: JenkinsNotificationChannelConfigCallMode.ASYNC
-        )
-        // Timeout
-        .intField(
-            JenkinsNotificationChannelConfig::timeout,
-            c?.timeout ?: JenkinsNotificationChannelConfig.DEFAULT_TIMEOUT,
-            min = 1,
-        )
-
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: JenkinsNotificationChannelConfig): String {
-        val jenkinsConfig = jenkinsConfigurationService.findConfiguration(config.config)
-        return if (jenkinsConfig != null) {
-            "${jenkinsConfig.url}/${config.job}"
-        } else {
-            "n/a"
-        }
-    }
 
     data class JobLaunchResult(
         val error: String?,

@@ -21,7 +21,7 @@ class ProjectIndicatorsGraphQLFieldContributor(
                             .description("List of project indicators")
                             .type(projectIndicators.typeRef)
                             .dataFetcher { env ->
-                                val project: Project = env.getSource()
+                                val project: Project = env.getSource()!!
                                 ProjectIndicators(project)
                             }
                             .build()

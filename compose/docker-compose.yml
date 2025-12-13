@@ -1,67 +1,54 @@
-# Docker Compose file used for a quick start
-
-version: "2.1"
-
 services:
 
-  # Ontrack container
-  ontrack:
-    image: nemerosa/ontrack:${ONTRACK_VERSION:-5}
-    restart: always
-    environment:
-      PROFILE: prod
-      JAVA_OPTIONS: "${JAVA_OPTIONS:--Xms1024m -Xmx1024m}"
-      # Database
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
-      # Elasticsearch
-      SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
-      # Rabbit MQ
-      SPRING_RABBITMQ_HOST: rabbit
-      SPRING_RABBITMQ_USERNAME: ontrack
-      SPRING_RABBITMQ_PASSWORD: ontrack
-    depends_on:
-      postgres:
-        condition: service_started
-      elasticsearch:
-        condition: service_started
-      rabbit:
-        condition: service_started
-    volumes:
-      - "ontrack_data:/var/ontrack/data"
-    ports:
-      - "8080:8080"
-      - "8800:8800"
-
-  # Postgresql database
+  # Database
   postgres:
-    image: postgres:15
-    restart: always
+    image: postgres:17
     environment:
-      POSTGRES_DB: ${ONTRACK_POSTGRES_DB:-ontrack}
-      POSTGRES_USER: ${ONTRACK_POSTGRES_USER:-ontrack}
-      POSTGRES_PASSWORD: ${ONTRACK_POSTGRES_PASSWORD:-ontrack}
-    volumes:
-      - "ontrack_postgres:/var/lib/postgresql/data"
+      POSTGRES_DB: ontrack
+      POSTGRES_USER: ontrack
+      POSTGRES_PASSWORD: ontrack
+    ports:
+      - "5432:5432"
 
-  # ElasticSearch
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
-    restart: always
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.2.0
+    ports:
+      - "9200:9200"
+      - "9300:9300"
     environment:
       - "discovery.type=single-node"
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "xpack.security.enabled=false"
     ulimits:
       memlock:
         soft: -1
         hard: -1
-    volumes:
-      - "ontrack_elasticsearch:/usr/share/elasticsearch/data"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=1s || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
 
-  # Rabbit MQ
-  rabbit:
-    image: rabbitmq:3.13.7-management
-    restart: always
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2.5
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: http://localhost:8008
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: true
+      KC_HOSTNAME_STRICT: false
+    ports:
+      - "8008:8080"
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - ./keycloak/import/dev:/opt/keycloak/data/import
+
+  rabbitmq:
+    image: rabbitmq:4.1.3-management
     hostname: rabbit
     environment:
       RABBITMQ_DEFAULT_USER: ontrack
@@ -70,7 +57,64 @@ services:
       - "15672:15672"
       - "5672:5672"
 
-volumes:
-  ontrack_postgres:
-  ontrack_elasticsearch:
-  ontrack_data:
+  ontrack:
+    image: "nemerosa/ontrack:${ONTRACK_VERSION:-5}"
+    ports:
+      - "8080:8080"
+      - "8800:8800"
+    depends_on:
+      postgres:
+        condition: service_started
+      elasticsearch:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      keycloak:
+        condition: service_started
+    environment:
+
+      ############################################################
+      # Configuration of Ontrack
+      ############################################################
+
+      # Evaluation key (valid until 2025-12-31, up to 10 projects, no extra features)
+      ONTRACK_CONFIG_LICENSE_KEY: "${ONTRACK_CONFIG_LICENSE_KEY:-eyJkYXRhIjoiZXlKdVlXMWxJam9pVXlJc0ltRnpjMmxuYm1WbElqb2lVSFZpYkdsaklpd2lkbUZzYVdSVmJuUnBiQ0k2SWpJd01qVXRNVEl0TXpFaUxDSnRZWGhRY205cVpXTjBjeUk2TVRBc0ltWmxZWFIxY21WeklqcGJleUpwWkNJNkltVjRkR1Z1YzJsdmJpNWxiblpwY205dWJXVnVkSE1pTENKbGJtRmliR1ZrSWpwbVlXeHpaU3dpWkdGMFlTSTZXM3NpYm1GdFpTSTZJbTFoZUVWdWRtbHliMjV0Wlc1MGN5SXNJblpoYkhWbElqb2lNQ0o5WFgxZExDSnRaWE56WVdkbElqb2lXVzkxSUdGeVpTQjFjMmx1WnlCaGJpQmxkbUZzZFdGMGFXOXVJR3hwWTJWdWMyVXVJbjA9Iiwic2lnbmF0dXJlIjoiTUVVQ0lFMWNjQWQxT25ZQXl2M3B4c3ZaQWc0eDE1Q3dmY3FjMFNNRm12ZUU5TVRDQWlFQTJJZHVsZEtxek5DU2Q2VHJNNGxsczhzVGlHWXQ3Nmw5bFRZQ3pFdDBKMjQ9In0=}"
+
+      # General configuration
+      JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
+
+      # Database
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"
+
+      # Elastic search
+      ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE: "true"
+      SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
+
+      # RabbitMQ
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: ontrack
+      SPRING_RABBITMQ_PASSWORD: ontrack
+
+      # Authentication
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8008/realms/ontrack
+      # We need to skip the host verification (keycloak vs. localhost)
+      # DO NOT USE IN PRODUCTION
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/ontrack/protocol/openid-connect/certs
+
+  ui:
+    image: "nemerosa/ontrack-ui:${ONTRACK_VERSION:-5}"
+    ports:
+      - "3000:3000"
+    environment:
+      ONTRACK_URL: http://ontrack:8080
+      NEXTAUTH_SECRET: "${ONTRACK_NEXTAUTH_SECRET:-31415926}"
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_ISSUER: http://keycloak:8080/realms/ontrack
+      NEXTAUTH_CLIENT_ID: ontrack-client
+      NEXTAUTH_CLIENT_SECRET: ontrack-client-secret
+      NEXTAUTH_ACCOUNT_URL: http://localhost:8008/realms/ontrack/account
+    depends_on:
+      ontrack:
+        condition: service_started
+      keycloak:
+        condition: service_started

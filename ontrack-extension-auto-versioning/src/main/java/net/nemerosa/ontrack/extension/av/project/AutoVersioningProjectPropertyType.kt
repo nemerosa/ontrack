@@ -4,15 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.AutoVersioningExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.dateTime
-import net.nemerosa.ontrack.model.form.multiStrings
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class AutoVersioningProjectPropertyType(
@@ -20,11 +19,14 @@ class AutoVersioningProjectPropertyType(
 ) : AbstractPropertyType<AutoVersioningProjectProperty>(
     extensionFeature
 ) {
-    override fun getName(): String = "Auto-versioning"
+    override val name: String = "Auto-versioning"
 
-    override fun getDescription(): String = "Auto-versioning rules at project level"
+    override val description: String = "Auto-versioning rules at project level"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = setOf(ProjectEntityType.PROJECT)
+    override val supportedEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.PROJECT)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(AutoVersioningProjectProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
@@ -37,12 +39,7 @@ class AutoVersioningProjectPropertyType(
 
     override fun replaceValue(
         value: AutoVersioningProjectProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String,
     ): AutoVersioningProjectProperty = value
 
-    override fun getEditionForm(entity: ProjectEntity, value: AutoVersioningProjectProperty?): Form =
-        Form.create()
-            .multiStrings(AutoVersioningProjectProperty::branchIncludes, value?.branchIncludes)
-            .multiStrings(AutoVersioningProjectProperty::branchExcludes, value?.branchExcludes)
-            .dateTime(AutoVersioningProjectProperty::lastActivityDate, value?.lastActivityDate)
 }

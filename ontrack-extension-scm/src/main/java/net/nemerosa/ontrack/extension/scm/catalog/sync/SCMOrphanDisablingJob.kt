@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.catalog.sync
 
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.SCMJobs
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -14,14 +15,20 @@ import java.time.Duration
 class SCMOrphanDisablingJob(
     private val scmOrphanDisablingService: SCMOrphanDisablingService,
     private val cachedSettingsService: CachedSettingsService,
+    private val scmExtensionConfigProperties: SCMExtensionConfigProperties,
 ) : JobProvider {
 
-    override fun getStartingJobs() = listOf(
-        JobRegistration(
-            createSCMOrphanDisablingJob(),
-            Schedule.EVERY_WEEK.after(Duration.ofDays(7))
-        )
-    )
+    override fun getStartingJobs() =
+        if (scmExtensionConfigProperties.catalog.enabled) {
+            listOf(
+                JobRegistration(
+                    createSCMOrphanDisablingJob(),
+                    Schedule.EVERY_WEEK.after(Duration.ofDays(7))
+                )
+            )
+        } else {
+            emptyList()
+        }
 
     private fun createSCMOrphanDisablingJob() = object : Job {
         override fun getKey(): JobKey = SCMJobs.category

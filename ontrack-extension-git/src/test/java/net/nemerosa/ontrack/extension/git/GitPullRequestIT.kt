@@ -11,6 +11,7 @@ import kotlin.test.assertNull
 /**
  * Interacting with pull requests
  */
+@WithGitPullRequestEnabled
 class GitPullRequestIT : AbstractGitTestSupport() {
 
     @Autowired

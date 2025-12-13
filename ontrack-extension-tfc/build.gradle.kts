@@ -1,10 +1,6 @@
-import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
-
 plugins {
     `java-library`
 }
-
-apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-support"))
@@ -14,17 +10,16 @@ dependencies {
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-general"))
     implementation("io.micrometer:micrometer-core")
+    implementation("commons-codec:commons-codec")
     implementation("org.slf4j:slf4j-api")
     implementation("jakarta.annotation:jakarta.annotation-api")
 
     testImplementation(project(":ontrack-it-utils"))
-    testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-hook", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation("com.networknt:json-schema-validator")
-    testImplementation(project(path = ":ontrack-extension-recordings", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+
+    testImplementation(testFixtures(project(":ontrack-extension-casc")))
+    testImplementation(testFixtures(project(":ontrack-extension-hook")))
+    testImplementation(testFixtures(project(":ontrack-extension-queue")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

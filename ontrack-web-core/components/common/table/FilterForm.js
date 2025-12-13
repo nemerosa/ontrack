@@ -1,9 +1,25 @@
-import {Button, Card, Form, Space} from "antd";
+import {Button, Form, Space} from "antd";
 import {FaBan, FaFilter} from "react-icons/fa";
+import TableFormSection from "@components/common/table/TableFormSection";
+import {useEffect} from "react";
 
-export default function FilterForm({setFilterFormData, onFilterFormValuesChanged, filterForm, filterExtraButtons}) {
+export default function FilterForm({
+                                       initialFilter,
+                                       setFilterFormData,
+                                       onFilterFormValuesChanged,
+                                       filterForm,
+                                       filterExtraButtons,
+                                       extraComponents,
+                                   }) {
 
     const [filterFormInstance] = Form.useForm()
+
+    useEffect(() => {
+        if (initialFilter) {
+            filterFormInstance.setFieldsValue(initialFilter)
+            setFilterFormData(initialFilter)
+        }
+    }, [])
 
     const onFilterFormFinish = (values) => {
         setFilterFormData(values)
@@ -16,10 +32,7 @@ export default function FilterForm({setFilterFormData, onFilterFormValuesChanged
 
     return (
         <>
-            <Card
-                size="small"
-                className="ot-well"
-            >
+            <TableFormSection>
                 <Form
                     layout="inline"
                     onFinish={onFilterFormFinish}
@@ -30,31 +43,41 @@ export default function FilterForm({setFilterFormData, onFilterFormValuesChanged
                         columnGap: 8,
                     }}
                 >
-                    {filterForm}
-                    {/* Filter */}
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                    >
-                        <Space>
-                            <FaFilter/>
-                            Filter
-                        </Space>
-                    </Button>
-                    {/* Clear */}
-                    <Button
-                        type="link"
-                        onClick={onFilterFormClear}
-                    >
-                        <Space>
-                            <FaBan/>
-                            Clear filter
-                        </Space>
-                    </Button>
-                    {/* Extra buttons */}
-                    {filterExtraButtons}
+                    {
+                        filterForm.length > 0 && <>
+                            {filterForm}
+                            {/* Filter */}
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                            >
+                                <Space>
+                                    <FaFilter/>
+                                    Filter
+                                </Space>
+                            </Button>
+                            {/* Clear */}
+                            <Button
+                                type="link"
+                                onClick={onFilterFormClear}
+                            >
+                                <Space>
+                                    <FaBan/>
+                                    Clear filter
+                                </Space>
+                            </Button>
+                            {/* Extra buttons */}
+                            {filterExtraButtons}
+                        </>
+                    }
+                    {
+                        extraComponents &&
+                        <Form.Item>
+                            {extraComponents}
+                        </Form.Item>
+                    }
                 </Form>
-            </Card>
+            </TableFormSection>
         </>
     )
 }

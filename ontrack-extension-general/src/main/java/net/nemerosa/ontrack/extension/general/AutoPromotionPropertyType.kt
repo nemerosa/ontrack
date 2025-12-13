@@ -4,83 +4,37 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.create
-import net.nemerosa.ontrack.model.form.MultiSelection
-import net.nemerosa.ontrack.model.form.Text
+import net.nemerosa.ontrack.model.json.schema.JsonEmptyType
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaIgnore
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 import kotlin.jvm.optionals.getOrNull
 
 @Component
+@JsonSchemaIgnore
 class AutoPromotionPropertyType(
     extensionFeature: GeneralExtensionFeature,
     private val structureService: StructureService
 ) : AbstractPropertyType<AutoPromotionProperty>(extensionFeature) {
 
-    override fun getName(): String = "Auto promotion"
+    override val name: String = "Auto promotion"
 
-    override fun getDescription(): String =
+    override val description: String =
         "Allows a promotion level to be granted on a build as soon as a list of validation stamps and/or other promotions has been passed"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROMOTION_LEVEL)
+    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROMOTION_LEVEL)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType = JsonEmptyType.INSTANCE
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
-
-    override fun getEditionForm(entity: ProjectEntity, value: AutoPromotionProperty?): Form {
-        val promotionLevel = entity as PromotionLevel
-        return create()
-            .with(
-                MultiSelection.of("validationStamps")
-                    .label("Validation stamps")
-                    .items(
-                        structureService.getValidationStampListForBranch(promotionLevel.branch.id)
-                            .map { vs ->
-                                ValidationStampSelection(
-                                    vs,
-                                    value?.containsDirectValidationStamp(vs) ?: false
-                                )
-                            }
-                    )
-                    .help("When all the selected validation stamps have passed for a build, the promotion will automatically be granted.")
-            )
-            .with(
-                Text.of("include")
-                    .label("Include")
-                    .optional()
-                    .value(value?.include ?: "")
-                    .help("Regular expression to select validation stamps by name")
-            )
-            .with(
-                Text.of("exclude")
-                    .label("Exclude")
-                    .optional()
-                    .value(value?.exclude ?: "")
-                    .help("Regular expression to exclude validation stamps by name")
-            )
-            .with(
-                MultiSelection.of("promotionLevels")
-                    .label("Promotion levels")
-                    .items(
-                        structureService.getPromotionLevelListForBranch(promotionLevel.branch.id)
-                            .filter { pl -> pl.id() != promotionLevel.id() }
-                            .map { pl: PromotionLevel ->
-                                PromotionLevelSelection(
-                                    pl,
-                                    value?.contains(pl) ?: false
-                                )
-                            }
-                    )
-                    .help("When all the selected promotion levels have been granted to a build, the promotion will automatically be granted.")
-            )
-    }
 
     override fun fromClient(node: JsonNode): AutoPromotionProperty {
         return loadAutoPromotionProperty(node)
@@ -133,7 +87,7 @@ class AutoPromotionPropertyType(
         sourceEntity: ProjectEntity,
         value: AutoPromotionProperty,
         targetEntity: ProjectEntity,
-        replacementFn: Function<String, String>
+        replacementFn: (String) -> String
     ): AutoPromotionProperty {
         val targetPromotionLevel = targetEntity as PromotionLevel
         return AutoPromotionProperty(
@@ -176,7 +130,7 @@ class AutoPromotionPropertyType(
 
     override fun replaceValue(
         value: AutoPromotionProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): AutoPromotionProperty {
         return value
     }

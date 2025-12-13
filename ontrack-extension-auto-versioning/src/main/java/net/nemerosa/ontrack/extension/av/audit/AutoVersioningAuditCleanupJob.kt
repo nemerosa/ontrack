@@ -27,7 +27,8 @@ class AutoVersioningAuditCleanupJob(
 
         override fun getTask() = JobRun { listener ->
             val count = autoVersioningAuditCleanupService.cleanup()
-            listener.message("Removed $count audit entries")
+            listener.message("Number of non-running audit entries having been removed: ${count.nonRunning}")
+            listener.message("Number of audit entries having been removed, whatever their running state: ${count.anyState}")
         }
 
         override fun getDescription(): String = "Cleanup of old auto versioning requests audit entries"

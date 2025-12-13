@@ -1,11 +1,9 @@
 package net.nemerosa.ontrack.model.support
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseInto
 import net.nemerosa.ontrack.model.pagination.PaginatedList
-import java.util.*
 import kotlin.reflect.KClass
 
 /**
@@ -20,16 +18,6 @@ interface StorageService {
      * @param node  Data to store (null to delete)
      */
     fun storeJson(store: String, key: String, node: JsonNode?)
-
-    /**
-     * Retrieves some JSON using a key
-     *
-     * @param store Store (typically an extension class name)
-     * @param key   Identifier of data
-     * @return Data or empty if not found
-     */
-    @Deprecated("Use findJson. Will be removed in V5.")
-    fun retrieveJson(store: String, key: String): Optional<JsonNode>
 
     /**
      * Retrieves some JSON using a key
@@ -71,21 +59,6 @@ interface StorageService {
      * @param store Store (typically an extension class name)
      * @param key   Identifier of data
      * @param type  Class of the data to retrieve
-     * @return Data or empty if not found
-     */
-    @Deprecated("Use find instead. Will be removed in V5.")
-    fun <T> retrieve(store: String, key: String, type: Class<T>): Optional<T> {
-        @Suppress("DEPRECATION")
-        return retrieveJson(store, key)
-            .map { node: JsonNode -> JsonUtils.parse(node, type) }
-    }
-
-    /**
-     * Retrieves some data using a key
-     *
-     * @param store Store (typically an extension class name)
-     * @param key   Identifier of data
-     * @param type  Class of the data to retrieve
      * @return Data or null if not found
      */
     fun <T : Any> find(store: String, key: String, type: KClass<T>): T? {
@@ -110,17 +83,6 @@ interface StorageService {
      * @return `true` if the entry exists
      */
     fun exists(store: String, key: String): Boolean
-
-    /**
-     * Looking for stored entries using JSON queries
-     */
-    @Deprecated("Use filter instead. Will be removed in V5.")
-    fun <T> findByJson(
-        store: String,
-        query: String,
-        variables: Map<String, *>,
-        type: Class<T>,
-    ): List<T>
 
     /**
      * Gets the count of items in a store matching some criteria.
@@ -215,10 +177,10 @@ interface StorageService {
      * @param store Store (typically an extension class name)
      * @param type  Class of the data to retrieve
      */
-    fun <T> getData(store: String, type: Class<T>): Map<String, T> {
+    fun <T: Any> getData(store: String, type: Class<T>): Map<String, T> {
         return getData(store)
             .mapValues { (_, value) ->
-                JsonUtils.parse(value, type)
+                value.parseInto(type.kotlin)
             }
     }
 }

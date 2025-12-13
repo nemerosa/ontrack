@@ -5,7 +5,7 @@ export default function RunInfoTime({info, mode = "complete"}) {
     return (
         <>
             {
-                info && info.runTime && mode === "complete" &&
+                info && info.runTime !== null && mode === "complete" &&
                 <Typography.Text>
                     Ran in <Duration
                     seconds={info.runTime}
@@ -15,7 +15,7 @@ export default function RunInfoTime({info, mode = "complete"}) {
                 </Typography.Text>
             }
             {
-                info && info.runTime && mode === "minimal" &&
+                info && info.runTime !== null && mode === "minimal" &&
                 <Typography.Text>
                     <Duration
                         seconds={info.runTime}

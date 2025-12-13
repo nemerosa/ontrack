@@ -8,13 +8,12 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.patchString
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.textField
 import org.springframework.stereotype.Component
 
 @Component
@@ -46,6 +45,16 @@ class JiraLinkNotificationChannel(
             throw EventSubscriptionConfigException("Jira link name is required")
         }
     }
+
+    override fun mergeConfig(
+        a: JiraLinkNotificationChannelConfig,
+        changes: JsonNode
+    ) = JiraLinkNotificationChannelConfig(
+        configName = patchString(changes, a::configName),
+        sourceQuery = patchString(changes, a::sourceQuery),
+        targetQuery = patchString(changes, a::targetQuery),
+        linkName = patchString(changes, a::linkName),
+    )
 
     override fun publish(
         recordId: String,
@@ -131,13 +140,4 @@ class JiraLinkNotificationChannel(
     override val displayName: String = "Jira link creation"
     override val enabled: Boolean = true
 
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun getForm(c: JiraLinkNotificationChannelConfig?): Form =
-        Form.create()
-            .textField(JiraLinkNotificationChannelConfig::sourceQuery, c?.sourceQuery)
-            .textField(JiraLinkNotificationChannelConfig::targetQuery, c?.targetQuery)
-            .textField(JiraLinkNotificationChannelConfig::linkName, c?.linkName)
-
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: JiraLinkNotificationChannelConfig): String = config.linkName
 }

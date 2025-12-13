@@ -5,11 +5,13 @@ import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfigPath
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.general.setMetaInfoProperty
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ACCAutoVersioningMultiplePaths : AbstractACCAutoVersioningTestSupport() {
 
     @Test
+    @Disabled("Waiting for #1156")
     fun `Auto versioning with additional paths`() {
         withMockScmRepository(ontrack) {
             withAutoVersioning {

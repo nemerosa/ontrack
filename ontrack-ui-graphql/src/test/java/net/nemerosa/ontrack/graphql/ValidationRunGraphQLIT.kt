@@ -1,21 +1,25 @@
 package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.node.TextNode
+import net.nemerosa.ontrack.extension.general.ReleaseProperty
+import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.TextValidationDataType
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.structure.config
 import net.nemerosa.ontrack.model.structure.data
 import net.nemerosa.ontrack.test.assertIs
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
+@AsAdminTest
+class ValidationRunGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var textValidationDataType: TextValidationDataType
@@ -29,7 +33,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
             branch {
                 val vs = validationStamp()
                 build {
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation CreateValidationRun {
                             createValidationRun(input: {
                                 project: "${project.name}",
@@ -50,14 +55,18 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the errors
-                    assertUserError(data, "createValidationRun",
+                    assertUserError(
+                        data, "createValidationRun",
                         message = "Validation Run Status is required because no data is provided.",
                         exception = "net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredBecauseNoDataException"
                     )
-                    assertTrue(data["createValidationRun"]["validationRun"].isNullOrNullNode(),
-                        "Validation run not returned")
+                    assertTrue(
+                        data["createValidationRun"]["validationRun"].isNullOrNullNode(),
+                        "Validation run not returned"
+                    )
                 }
             }
         }
@@ -69,7 +78,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
             branch {
                 val vs = validationStamp()
                 build {
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation CreateValidationRun {
                             createValidationRunById(input: {
                                 buildId: $id,
@@ -85,7 +95,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     assertNoUserError(data, "createValidationRunById").let { node ->
                         assertEquals(
                             "PASSED",
@@ -105,7 +116,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
             branch {
                 val vs = validationStamp()
                 build {
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation CreateValidationRun {
                             createValidationRun(input: {
                                 project: "${project.name}",
@@ -127,7 +139,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     val node = assertNoUserError(data, "createValidationRun")
                     assertEquals(
                         "PASSED",
@@ -150,7 +163,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                     )
                 )
                 build {
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation CreateValidationRun {
                             createValidationRunById(input: {
                                 buildId: $id,
@@ -176,7 +190,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     val node = assertNoUserError(data, "createValidationRunById")
                     assertEquals(0, node.path("errors").size())
                     assertEquals(
@@ -216,7 +231,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                     )
                 )
                 build {
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation CreateValidationRun {
                             createValidationRunById(input: {
                                 buildId: $id,
@@ -242,7 +258,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     val node = assertNoUserError(data, "createValidationRunById")
                     assertEquals(0, node.path("errors").size())
                     assertEquals(
@@ -285,13 +302,15 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                     ).apply {
                         validationStatus(ValidationRunStatusID.STATUS_DEFECTIVE, "See https://issues/browser/ONT-1234")
                     }
-                    val data = run("""{
+                    val data = run(
+                        """{
                         validationRuns(id: ${run.id}) {
                             validationRunStatuses {
                                 annotatedDescription
                             }
                         }
-                    }""")
+                    }"""
+                    )
                     val descriptions =
                         data["validationRuns"][0]["validationRunStatuses"].map { it["annotatedDescription"].asText() }
                     assertEquals(
@@ -320,7 +339,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                         validationStatus(ValidationRunStatusID.STATUS_INVESTIGATING, "Investigating")
                         validationStatus(ValidationRunStatusID.STATUS_EXPLAINED, "Explained")
                     }
-                    val data = run("""{
+                    val data = run(
+                        """{
                         validationRuns(id: ${run.id}) {
                             validationRunStatuses {
                                 statusID {
@@ -329,7 +349,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 description
                             }
                         }
-                    }""")
+                    }"""
+                    )
                     val validationRunStatuses = data["validationRuns"][0]["validationRunStatuses"]
                     assertEquals(
                         listOf("EXPLAINED", "INVESTIGATING", "FAILED"),
@@ -351,7 +372,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                 val vs = validationStamp("VS")
                 build("1") {
                     val run = validate(vs, ValidationRunStatusID.STATUS_PASSED)
-                    val data = run("""{
+                    val data = run(
+                        """{
                         validationRuns(id: ${run.id}) {
                             build {
                                 id
@@ -366,7 +388,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    }""")
+                    }"""
+                    )
                     val v = data["validationRuns"].first()
                     assertEquals(this.id(), v["build"]["id"].asInt())
                     assertEquals(vs.id(), v["validationStamp"]["id"].asInt())
@@ -392,7 +415,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
 
         // Performs a query
         val data = asUser().withView(vs).call {
-            run("""
+            run(
+                """
                 {
                     validationRuns(id: ${run.id}) {
                         data {
@@ -406,7 +430,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                         }
                     }
                 }
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
 
         // Gets the data
@@ -422,7 +447,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
             branch {
                 val vs = validationStamp()
                 build {
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation CreateValidationRun {
                             createValidationRunById(input: {
                                 buildId: $id,
@@ -448,7 +474,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     val node = assertNoUserError(data, "createValidationRunById")
                     val runInfo = node.path("validationRun").path("runInfo")
                     assertEquals("github", runInfo.path("sourceType").asText())
@@ -466,7 +493,8 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
             branch {
                 val vs = validationStamp()
                 build {
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation CreateValidationRun {
                             createValidationRun(input: {
                                 project: "${project.name}",
@@ -494,13 +522,89 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     val node = assertNoUserError(data, "createValidationRun")
                     val runInfo = node.path("validationRun").path("runInfo")
                     assertEquals("github", runInfo.path("sourceType").asText())
                     assertEquals("url-to-github", runInfo.path("sourceUri").asText())
                     assertEquals("push", runInfo.path("triggerType").asText())
                     assertEquals(14, runInfo.path("runTime").asInt())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a validation run using a release label`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    setProperty(this, ReleasePropertyType::class.java, ReleaseProperty("1.2"))
+                    val data = run(
+                        """
+                        mutation CreateValidationRun {
+                            createValidationRunByRelease(input: {
+                                project: "${project.name}",
+                                buildRelease: "1.2",
+                                validationStamp: "${vs.name}",
+                                validationRunStatus: "PASSED"
+                            }) {
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """
+                    )
+                    assertNoUserError(data, "createValidationRunByRelease")
+                    val runs = structureService.getValidationRunsForBuildAndValidationStamp(
+                        buildId = id,
+                        validationStampId = vs.id,
+                        offset = 0,
+                        count = 10
+                    )
+                    assertEquals(1, runs.size)
+                    val run = runs.first()
+                    assertEquals(
+                        ValidationRunStatusID.PASSED,
+                        run.lastStatus.statusID.id
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a validation run using a release label when not found`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    // setProperty(this, ReleasePropertyType::class.java, ReleaseProperty("1.2"))
+                    val data = run(
+                        """
+                        mutation CreateValidationRun {
+                            createValidationRunByRelease(input: {
+                                project: "${project.name}",
+                                buildRelease: "1.2",
+                                validationStamp: "${vs.name}",
+                                validationRunStatus: "PASSED"
+                            }) {
+                                errors {
+                                    message
+                                    exception
+                                }
+                            }
+                        }
+                    """
+                    )
+                    assertUserError(
+                        data, "createValidationRunByRelease",
+                        message = """Could not find build with release "1.2" in ${project.name}.""",
+                        exception = null
+                    )
                 }
             }
         }

@@ -6,7 +6,7 @@ import kotlin.reflect.KClass
 
 interface LicenseControlService {
 
-    fun control(license: License?): LicenseControl
+    fun control(license: License): LicenseControl
 
     fun getLicensedFeatures(license: License): List<LicensedFeature>
 

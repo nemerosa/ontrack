@@ -29,9 +29,6 @@ class EventTemplatingServiceImplTest {
         every { eventVariableService.getTemplateContext(any(), any()) } returns mapOf(
             "branch" to "release/1.27"
         )
-        every { eventVariableService.getTemplateParameters(any(), caseVariants = true) } returns mapOf(
-            "branch" to "release/1.27"
-        )
 
         entityDisplayNameService = mockk()
         every { entityDisplayNameService.getEntityDisplayName(any()) } answers {
@@ -51,18 +48,6 @@ class EventTemplatingServiceImplTest {
             eventVariableService,
             templatingService,
         )
-    }
-
-    @Test
-    fun `Render event for legacy`() {
-        val event = mockk<Event>()
-        val text = eventTemplatingService.renderEvent(
-            event = event,
-            context = emptyMap(),
-            template = "Legacy {branch} branch",
-            renderer = PlainEventRenderer.INSTANCE,
-        )
-        assertEquals("Legacy release/1.27 branch", text)
     }
 
     @Test

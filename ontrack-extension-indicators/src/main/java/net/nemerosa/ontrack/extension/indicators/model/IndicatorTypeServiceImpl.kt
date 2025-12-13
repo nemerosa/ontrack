@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.indicators.model
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.GlobalSettings
@@ -49,19 +48,18 @@ class IndicatorTypeServiceImpl(
             )
 
     override fun findTypeById(typeId: String): IndicatorType<*, *>? =
-        storageService.retrieve(STORE, typeId, StoredIndicatorType::class.java)
-            .getOrNull()
+        storageService.find(STORE, typeId, StoredIndicatorType::class)
             ?.let { fromStorage<Any, Any>(it) }
 
     override fun getTypeById(typeId: String): IndicatorType<*, *> =
         findTypeById(typeId) ?: throw IndicatorTypeNotFoundException(typeId)
 
     override fun findByCategory(category: IndicatorCategory): List<IndicatorType<*, *>> {
-        return storageService.findByJson(
-            STORE,
-            "data->>'category' = :category",
-            mapOf("category" to category.id),
-            StoredIndicatorType::class.java
+        return storageService.filter(
+            store = STORE,
+            type = StoredIndicatorType::class,
+            query = "data->>'category' = :category",
+            queryVariables = mapOf("category" to category.id),
         ).mapNotNull {
             fromStorage<Any, Any>(it)
         }.sortedWith(
@@ -73,15 +71,19 @@ class IndicatorTypeServiceImpl(
     }
 
     override fun findBySource(source: IndicatorSource): List<IndicatorType<*, *>> {
-        return storageService.findByJson(
-            STORE, """
-            data->'source'->>'name' = :sourceName 
-            and data->'source'->'provider'->>'id' = :sourceProviderId
-        """, mapOf(
-            "sourceName" to source.name,
-            "sourceProviderId" to source.provider.id
-        ), StoredIndicatorType::class.java).mapNotNull {
-            fromStorage<Any,Any>(it)
+        return storageService.filter(
+            store = STORE,
+            type = StoredIndicatorType::class,
+            query = """
+                data->'source'->>'name' = :sourceName 
+                and data->'source'->'provider'->>'id' = :sourceProviderId
+            """,
+            queryVariables = mapOf(
+                "sourceName" to source.name,
+                "sourceProviderId" to source.provider.id
+            )
+        ).mapNotNull {
+            fromStorage<Any, Any>(it)
         }
     }
 
@@ -146,7 +148,7 @@ class IndicatorTypeServiceImpl(
         }
     }
 
-    override fun deleteType(id: String, force:Boolean): Ack {
+    override fun deleteType(id: String, force: Boolean): Ack {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
         if (force) securityService.checkGlobalFunction(GlobalSettings::class.java)
         val type = findTypeById(id)
@@ -165,7 +167,7 @@ class IndicatorTypeServiceImpl(
 
     override fun deprecateType(id: String, deprecated: String?) {
         securityService.checkGlobalFunction(IndicatorTypeManagement::class.java)
-        val existing = storageService.retrieve(STORE, id, StoredIndicatorType::class.java).getOrNull()
+        val existing = storageService.find(STORE, id, StoredIndicatorType::class)
         if (existing != null) {
             val deprecatedEntry = existing.withDeprecated(deprecated)
             storageService.store(

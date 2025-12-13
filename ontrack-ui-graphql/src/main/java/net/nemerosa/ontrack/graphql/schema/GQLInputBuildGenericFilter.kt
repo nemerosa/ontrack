@@ -6,7 +6,7 @@ import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInputType
 import graphql.schema.GraphQLType
 import graphql.schema.GraphQLTypeReference
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import org.apache.commons.lang3.StringUtils
@@ -49,7 +49,7 @@ class GQLInputBuildGenericFilter(
     fun getFilterData(argument: Any?): JsonNode? {
         return if (argument is Map<*, *>) {
             val data = argument[FIELD_DATA] as String?
-            if (data != null && StringUtils.isNotBlank(data)) JsonUtils.parseAsNode(data) else null
+            if (data != null && StringUtils.isNotBlank(data)) data.parseAsJson() else null
         } else {
             null
         }

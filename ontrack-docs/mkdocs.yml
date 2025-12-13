@@ -1,0 +1,104 @@
+site_name: !ENV [ YONTRACK_DOCS_TITLE, 'Local Yontrack documentation' ]
+repo_url: https://github.com/nemerosa/ontrack
+edit_uri: !ENV [ YONTRACK_DOCS_EDIT, 'edit/master/ontrack-docs/docs' ]
+theme:
+  # https://squidfunk.github.io/mkdocs-material/
+  name: material
+  # Customization
+  logo: img/yontrack-logo.svg
+  favicon: img/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    # scheme: yontrack
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Hanken Grotesk
+  features:
+    - navigation.path
+    - content.code.copy
+    - content.action.edit
+use_directory_urls: false
+markdown_extensions:
+  - def_list
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.snippets:
+      base_path: docs/content/generated/snippets
+extra_css:
+  - stylesheets/extra.css
+plugins:
+  - search
+  - macros:
+      on_error_fail: false
+      on_undefined: strict
+extra:
+  yontrack_version: !ENV [ YONTRACK_VERSION, 'dev' ]
+  ontrack_github_actions_cli_config_version: 1.0.3
+  ontrack_cli_version: 5.0.0-beta+002
+nav:
+  - Home: index.md
+  - Getting started:
+      - Installation: content/start/getting-started.md
+      - Configuration: content/start/configuration.md
+  - Security:
+      - OIDC: content/security/oidc.md
+      - LDAP: content/security/ldap.md
+      - Roles: content/security/roles.md
+      - Groups: content/security/groups.md
+      - Group mappings: content/security/group-mappings.md
+      - Tokens: content/security/tokens.md
+  - Concepts:
+      - Model: content/concepts/model/index.md
+      - Build links: content/concepts/model/build-links.md
+  - Configuration:
+      - CI Configuration: content/configuration/ci-config.md
+      - Configuration as Code: content/configuration/casc.md
+  - Automation:
+      - Notifications:
+          - Overview: content/integrations/notifications/index.md
+          - Jenkins: content/integrations/notifications/jenkins.md
+          - GitHub Workflows: content/integrations/notifications/github-workflow.md
+      - Auto-versioning: content/integrations/auto-versioning/auto-versioning.md
+      - Workflows: content/integrations/workflows/workflows.md
+  - Reference:
+      - API:
+          - GraphQL API: content/api/graphql.md
+      - Configuration properties: content/generated/configurations/index.md
+      - CI Configuration:
+          - Conditions: content/generated/ci-config/conditions/index.md
+          - CI Engines: content/reference/ci-config/ci-engines/index.md
+          - SCM Engines: content/reference/ci-config/scm-engines/index.md
+      - Event types: content/generated/events/index.md
+      - Metrics: content/generated/metrics/index.md
+      - Notification channels: content/generated/notifications/index.md
+      - Properties: content/generated/properties/index.md
+      - Templating:
+          - Filters: content/generated/templating/filters/index.md
+          - Functions: content/generated/templating/functions/index.md
+          - Renderables: content/generated/templating/renderables/index.md
+          - Sources: content/generated/templating/sources/index.md
+      - Workflow node executors: content/generated/workflow-node-executors/index.md
+  - Operations:
+      - Metrics: content/operations/metrics.md
+      - Troubleshooting:
+          - RabbitMQ: content/operations/rabbitmq.md
+  - Appendix:
+      - Templating: content/appendix/templating.md
+      - JSON schemas: content/appendix/json-schemas.md
+      - Migration from V4: content/appendix/migration-from-v4.md

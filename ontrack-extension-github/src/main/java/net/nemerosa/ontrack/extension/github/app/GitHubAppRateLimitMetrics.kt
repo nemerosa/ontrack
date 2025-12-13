@@ -129,5 +129,7 @@ class GitHubAppRateLimitMetrics(
         private const val RATE_LIMIT_GRAPHQL_LIMIT_METRIC = "${RATE_LIMIT_METRIC}_graphql_limit"
         private const val RATE_LIMIT_GRAPHQL_REMAINING_METRIC = "${RATE_LIMIT_METRIC}_graphql_remaining_limit"
         private const val RATE_LIMIT_GRAPHQL_USED_METRIC = "${RATE_LIMIT_METRIC}_graphql_used"
+
+        const val RATE_LIMIT_SEARCH_EXCEEDED = "${RATE_LIMIT_METRIC}_search_exceeded"
     }
 }

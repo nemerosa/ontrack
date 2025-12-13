@@ -1,20 +1,15 @@
 package net.nemerosa.ontrack.model.structure
 
-import org.apache.commons.text.CaseUtils
-import java.util.*
-
 object ProjectEntityPageBuilder {
 
-    fun getEntityPageName(projectEntityType: ProjectEntityType): String =
-        CaseUtils.toCamelCase(
-            projectEntityType.name.lowercase(Locale.getDefault()),
-            false,
-            '_'
-        )
-
-    fun getEntityPage(entity: ProjectEntity): String =
-        "${getEntityPageName(entity.projectEntityType)}/${entity.id()}"
-
     fun getEntityPageRelativeURI(entity: ProjectEntity): String =
-        "#/${getEntityPage(entity)}"
+        when (entity.projectEntityType) {
+            ProjectEntityType.PROJECT -> "project/${entity.id()}"
+            ProjectEntityType.BRANCH -> "branch/${entity.id()}"
+            ProjectEntityType.BUILD -> "build/${entity.id()}"
+            ProjectEntityType.PROMOTION_LEVEL -> "promotionLevel/${entity.id()}"
+            ProjectEntityType.PROMOTION_RUN -> "promotionRun/${entity.id()}"
+            ProjectEntityType.VALIDATION_STAMP -> "validationStamp/${entity.id()}"
+            ProjectEntityType.VALIDATION_RUN -> "validationRun/${entity.id()}"
+        }
 }

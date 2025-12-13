@@ -63,7 +63,7 @@ export default function BuildContentEnvironments({build}) {
         `,
         {
             variables: {
-                id: build.id,
+                id: Number(build.id),
                 environment: environmentName,
             },
             deps: [refreshState, environmentName],

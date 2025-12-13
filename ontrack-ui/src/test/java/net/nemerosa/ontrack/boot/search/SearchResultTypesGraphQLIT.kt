@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.boot.search
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
-import org.junit.Test
+import net.nemerosa.ontrack.boot.support.UITest
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import org.junit.jupiter.api.Test
 import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertTrue
 
@@ -10,7 +11,8 @@ import kotlin.test.assertTrue
             "ontrack.config.search.index.immediate=true"
         ]
 )
-class SearchResultTypesGraphQLIT : AbstractQLKTITJUnit4Support() {
+@UITest
+class SearchResultTypesGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Getting the list of search result types`() {

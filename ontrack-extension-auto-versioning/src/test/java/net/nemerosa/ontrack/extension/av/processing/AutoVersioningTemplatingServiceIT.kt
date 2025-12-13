@@ -192,7 +192,7 @@ class AutoVersioningTemplatingServiceIT : AbstractAutoVersioningTestSupport() {
                                 )
 
                                 assertEquals(
-                                    """The version of <a href="http://localhost:8080/#/project/${source.project.id}">${source.project.name}</a> in gradle.properties has been upgraded to 2.0.0.""",
+                                    """The version of <a href="http://localhost:3000/project/${source.project.id}">${source.project.name}</a> in gradle.properties has been upgraded to 2.0.0.""",
                                     body
                                 )
                             }

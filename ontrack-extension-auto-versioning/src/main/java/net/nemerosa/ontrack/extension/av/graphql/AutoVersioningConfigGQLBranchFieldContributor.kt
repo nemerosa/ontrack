@@ -23,7 +23,7 @@ class AutoVersioningConfigGQLBranchFieldContributor(
                 .description("Auto versioning configuration")
                 .type(gqlTypeAutoVersioningConfig.typeRef)
                 .dataFetcher { env ->
-                    val branch: Branch = env.getSource()
+                    val branch: Branch = env.getSource()!!
                     autoVersioningConfigurationService.getAutoVersioning(branch)
                 }
                 .build(),

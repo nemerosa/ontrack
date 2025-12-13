@@ -5,13 +5,13 @@ import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueServiceConfigurati
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper
 import net.nemerosa.ontrack.extension.gitlab.property.GitLabGitConfiguration
 import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
+import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
 import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
-import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
+import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.util.regex.Pattern
@@ -19,14 +19,12 @@ import java.util.regex.Pattern
 @Component
 class GitLabIssueServiceExtension(
     extensionFeature: GitLabExtensionFeature,
-    issueExportServiceFactory: IssueExportServiceFactory,
     private val configurationService: GitLabConfigurationService,
     private val gitLabClientFactory: OntrackGitLabClientFactory,
 ) : AbstractIssueServiceExtension(
     extensionFeature,
     GITLAB_SERVICE_ID,
     "GitLab",
-    issueExportServiceFactory,
 ) {
     /**
      * The GitLab configurations are not selectable outside GitLab configurations and this method returns an empty list.
@@ -62,14 +60,14 @@ class GitLabIssueServiceExtension(
 
     override fun extractIssueKeysFromMessage(
         issueServiceConfiguration: IssueServiceConfiguration,
-        message: String
+        message: String?
     ): Set<String> {
         val result: MutableSet<String> = HashSet()
-        if (StringUtils.isNotBlank(message)) {
+        if (!message.isNullOrBlank()) {
             val matcher = Pattern.compile(GITLAB_ISSUE_PATTERN).matcher(message)
             while (matcher.find()) {
                 // Gets the issue
-                val issueKey = matcher.group(1)
+                val issueKey = matcher.group(2)
                 // Adds to the result
                 result.add(issueKey)
             }
@@ -80,8 +78,8 @@ class GitLabIssueServiceExtension(
 
     override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator {
         val configuration = issueServiceConfiguration as GitLabIssueServiceConfiguration
-        return LegacyRegexMessageAnnotator(
-            GITLAB_ISSUE_PATTERN
+        return RegexMessageAnnotator(
+            GITLAB_ISSUE_PATTERN.toRegex()
         ) { key: String ->
             of("a")
                 .attr(
@@ -101,8 +99,8 @@ class GitLabIssueServiceExtension(
         )
     }
 
-    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String): String? {
-        return if (StringUtils.isNumeric(token) || validIssueToken(token)) {
+    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String?): String? {
+        return if (token != null && (StringUtils.isNumeric(token) || validIssueToken(token))) {
             getIssueId(token).toString()
         } else {
             null
@@ -126,8 +124,16 @@ class GitLabIssueServiceExtension(
         return HashSet(wrapper.labels)
     }
 
+    override fun getLastCommit(
+        issueServiceConfiguration: IssueServiceConfiguration,
+        repositoryContext: IssueRepositoryContext,
+        key: String
+    ): String? {
+        TODO("Not yet implemented")
+    }
+
     companion object {
         const val GITLAB_SERVICE_ID: String = "gitlab"
-        private const val GITLAB_ISSUE_PATTERN = "#(\\d+)"
+        private const val GITLAB_ISSUE_PATTERN = "(#(\\d+))"
     }
 }

@@ -24,6 +24,7 @@ public interface OntrackGitLabClient {
      * @param id         ID of the issue
      * @return Details about the issue
      */
+    @Nullable
     GitLabIssueWrapper getIssue(String repository, int id);
 
     /**

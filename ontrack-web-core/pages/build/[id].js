@@ -10,7 +10,7 @@ export default function BuildPage() {
         <>
             <main>
                 <MainLayout>
-                    <BuildView id={id}/>
+                    <BuildView id={Number(id)}/>
                 </MainLayout>
             </main>
         </>

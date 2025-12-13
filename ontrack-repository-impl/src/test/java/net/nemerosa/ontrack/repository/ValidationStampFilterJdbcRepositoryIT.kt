@@ -6,24 +6,22 @@ import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ValidationStampFilter
-import org.apache.commons.lang3.StringUtils
-import org.junit.Before
-import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
-
-import java.util.Arrays
-
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Assert.*
+import org.apache.commons.lang3.StringUtils
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import java.util.*
+import kotlin.test.*
 
-class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
+class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
 
     @Autowired
     private lateinit var filterRepository: ValidationStampFilterRepository
 
     private lateinit var branch: Branch
 
-    @Before
+    @BeforeEach
     fun setup() {
         branch = do_create_branch()
     }
@@ -31,89 +29,95 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     @Test
     fun new_global_filter() {
         val filter = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = "My filter",
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = "My filter",
+                vsNames = listOf("CI")
+            )
         )
         assertTrue(filter.id.isSet)
     }
 
-    @Test(expected = ValidationStampFilterNameAlreadyDefinedException::class)
+    @Test
     fun new_global_filter_with_existing_name() {
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = "My filter",
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = "My filter",
+                vsNames = listOf("CI")
+            )
         )
         // Creates another filter with the same name
-        filterRepository.newValidationStampFilter(
+        assertFailsWith<ValidationStampFilterNameAlreadyDefinedException> {
+            filterRepository.newValidationStampFilter(
                 ValidationStampFilter(
-                        name = "My filter",
-                        vsNames = listOf("OTHER")
+                    name = "My filter",
+                    vsNames = listOf("OTHER")
                 )
-        )
+            )
+        }
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun new_filter_with_both_project_and_branch() {
         val project = Project.of(NameDescription.nd("P", ""))
-        filterRepository.newValidationStampFilter(
+        assertFailsWith<IllegalStateException> {
+            filterRepository.newValidationStampFilter(
                 ValidationStampFilter(
-                        name = "My filter",
-                        project = project,
-                        branch = Branch.of(project, NameDescription.nd("B", "")),
-                        vsNames = listOf("CI")
+                    name = "My filter",
+                    project = project,
+                    branch = Branch.of(project, NameDescription.nd("B", "")),
+                    vsNames = listOf("CI")
                 )
-        )
+            )
+        }
     }
 
     @Test
     fun new_project_filter() {
         val filter = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = "My filter",
-                        project = branch.project,
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = "My filter",
+                project = branch.project,
+                vsNames = listOf("CI")
+            )
         )
         assertTrue(filter.id.isSet)
     }
 
-    @Test(expected = ValidationStampFilterNameAlreadyDefinedException::class)
+    @Test
     fun new_project_filter_with_existing_name() {
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = "My filter",
-                        project = branch.project,
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = "My filter",
+                project = branch.project,
+                vsNames = listOf("CI")
+            )
         )
         // Creates another filter with the same name
-        filterRepository.newValidationStampFilter(
+        assertFailsWith<ValidationStampFilterNameAlreadyDefinedException> {
+            filterRepository.newValidationStampFilter(
                 ValidationStampFilter(
-                        name = "My filter",
-                        project = branch.project,
-                        vsNames = listOf("OTHER")
+                    name = "My filter",
+                    project = branch.project,
+                    vsNames = listOf("OTHER")
                 )
-        )
+            )
+        }
     }
 
     @Test
     fun new_project_filter_with_same_name_than_global() {
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = "My filter",
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = "My filter",
+                vsNames = listOf("CI")
+            )
         )
         val filter = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = "My filter",
-                        project = branch.project,
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = "My filter",
+                project = branch.project,
+                vsNames = listOf("CI")
+            )
         )
         assertTrue(filter.id.isSet)
     }
@@ -121,48 +125,50 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     @Test
     fun new_branch_filter() {
         val filter = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = "My filter",
-                        branch = branch,
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = "My filter",
+                branch = branch,
+                vsNames = listOf("CI")
+            )
         )
         assertTrue(filter.id.isSet)
     }
 
-    @Test(expected = ValidationStampFilterNameAlreadyDefinedException::class)
+    @Test
     fun new_branch_filter_with_existing_name() {
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = "My filter",
-                        branch = branch,
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = "My filter",
+                branch = branch,
+                vsNames = listOf("CI")
+            )
         )
         // Creates another filter with the same name
-        filterRepository.newValidationStampFilter(
+        assertFailsWith<ValidationStampFilterNameAlreadyDefinedException> {
+            filterRepository.newValidationStampFilter(
                 ValidationStampFilter(
-                        name = "My filter",
-                        branch = branch,
-                        vsNames = listOf("OTHER")
+                    name = "My filter",
+                    branch = branch,
+                    vsNames = listOf("OTHER")
                 )
-        )
+            )
+        }
     }
 
     @Test
     fun new_branch_filter_with_same_name_than_global() {
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = "My filter",
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = "My filter",
+                vsNames = listOf("CI")
+            )
         )
         val filter = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = "My filter",
-                        branch = branch,
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = "My filter",
+                branch = branch,
+                vsNames = listOf("CI")
+            )
         )
         assertTrue(filter.id.isSet)
     }
@@ -170,18 +176,18 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     @Test
     fun new_branch_filter_with_same_name_than_project() {
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = "My filter",
-                        project = branch.project,
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = "My filter",
+                project = branch.project,
+                vsNames = listOf("CI")
+            )
         )
         val filter = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = "My filter",
-                        branch = branch,
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = "My filter",
+                branch = branch,
+                vsNames = listOf("CI")
+            )
         )
         assertTrue(filter.id.isSet)
     }
@@ -190,26 +196,26 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
         val name = uid("F")
         // Global
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = name,
-                        vsNames = listOf("GLOBAL")
-                )
+            ValidationStampFilter(
+                name = name,
+                vsNames = listOf("GLOBAL")
+            )
         )
         // Project
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = name,
-                        project = branch.project,
-                        vsNames = listOf("PROJECT")
-                )
+            ValidationStampFilter(
+                name = name,
+                project = branch.project,
+                vsNames = listOf("PROJECT")
+            )
         )
         // Branch
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = name,
-                        branch = branch,
-                        vsNames = listOf("BRANCH")
-                )
+            ValidationStampFilter(
+                name = name,
+                branch = branch,
+                vsNames = listOf("BRANCH")
+            )
         )
         // OK
         return name
@@ -219,7 +225,7 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     fun global_filters() {
         val name = createFilters()
         val list = filterRepository.globalValidationStampFilters
-                .filter { f -> StringUtils.equals(name, f.name) }
+            .filter { f -> StringUtils.equals(name, f.name) }
         assertEquals(1, list.size.toLong())
         assertEquals(name, list[0].name)
         assertEquals(listOf("GLOBAL"), list[0].vsNames)
@@ -229,7 +235,7 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     fun project_filters() {
         val name = createFilters()
         val list = filterRepository.getProjectValidationStampFilters(branch.project)
-                .filter { f -> StringUtils.equals(name, f.name) }
+            .filter { f -> StringUtils.equals(name, f.name) }
         assertEquals(1, list.size.toLong())
         assertEquals(name, list[0].name)
         assertEquals(listOf("PROJECT"), list[0].vsNames)
@@ -239,7 +245,7 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     fun branch_filters() {
         val name = createFilters()
         val list = filterRepository.getBranchValidationStampFilters(branch)
-                .filter { f -> StringUtils.equals(name, f.name) }
+            .filter { f -> StringUtils.equals(name, f.name) }
         assertEquals(1, list.size.toLong())
         assertEquals(name, list[0].name)
         assertEquals(listOf("BRANCH"), list[0].vsNames)
@@ -249,32 +255,33 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     fun by_name_global_only() {
         val name = uid("F")
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = name,
-                        vsNames = listOf("GLOBAL")
-                )
+            ValidationStampFilter(
+                name = name,
+                vsNames = listOf("GLOBAL")
+            )
         )
         val f = filterRepository.getValidationStampFilterByName(branch, name).orElse(null)
-        assertNotNull(f)
-        assertEquals(name, f.name)
-        assertEquals(listOf("GLOBAL"), f.vsNames)
+        assertNotNull(f) {
+            assertEquals(name, it.name)
+            assertEquals(listOf("GLOBAL"), it.vsNames)
+        }
     }
 
     @Test
     fun by_name_global_and_project() {
         val name = uid("F")
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = name,
-                        vsNames = listOf("GLOBAL")
-                )
+            ValidationStampFilter(
+                name = name,
+                vsNames = listOf("GLOBAL")
+            )
         )
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = name,
-                        project = branch.project,
-                        vsNames = listOf("PROJECT")
-                )
+            ValidationStampFilter(
+                name = name,
+                project = branch.project,
+                vsNames = listOf("PROJECT")
+            )
         )
         val f = filterRepository.getValidationStampFilterByName(branch, name).orElse(null)
         assertNotNull(f)
@@ -286,24 +293,24 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     fun by_name_branch() {
         val name = uid("F")
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = name,
-                        vsNames = listOf("GLOBAL")
-                )
+            ValidationStampFilter(
+                name = name,
+                vsNames = listOf("GLOBAL")
+            )
         )
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = name,
-                        project = branch.project,
-                        vsNames = listOf("PROJECT")
-                )
+            ValidationStampFilter(
+                name = name,
+                project = branch.project,
+                vsNames = listOf("PROJECT")
+            )
         )
         filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = name,
-                        branch = branch,
-                        vsNames = listOf("BRANCH")
-                )
+            ValidationStampFilter(
+                name = name,
+                branch = branch,
+                vsNames = listOf("BRANCH")
+            )
         )
         val f = filterRepository.getValidationStampFilterByName(branch, name).orElse(null)
         assertNotNull(f)
@@ -321,10 +328,10 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     @Test
     fun save_global() {
         var f = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = uid("F"),
-                        vsNames = listOf("GLOBAL")
-                )
+            ValidationStampFilter(
+                name = uid("F"),
+                vsNames = listOf("GLOBAL")
+            )
         )
         filterRepository.saveValidationStampFilter(f.withVsNames(Arrays.asList("GLOBAL", "ONTRACK")))
         f = filterRepository.getValidationStampFilter(f.id)
@@ -334,11 +341,11 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     @Test
     fun save_project() {
         var f = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = uid("F"),
-                        project = branch.project,
-                        vsNames = listOf("PROJECT")
-                )
+            ValidationStampFilter(
+                name = uid("F"),
+                project = branch.project,
+                vsNames = listOf("PROJECT")
+            )
         )
         filterRepository.saveValidationStampFilter(f.withVsNames(Arrays.asList("PROJECT", "ONTRACK")))
         f = filterRepository.getValidationStampFilter(f.id)
@@ -348,11 +355,11 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     @Test
     fun save_branch() {
         var f = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = uid("F"),
-                        branch = branch,
-                        vsNames = listOf("BRANCH")
-                )
+            ValidationStampFilter(
+                name = uid("F"),
+                branch = branch,
+                vsNames = listOf("BRANCH")
+            )
         )
         filterRepository.saveValidationStampFilter(f.withVsNames(Arrays.asList("BRANCH", "ONTRACK")))
         f = filterRepository.getValidationStampFilter(f.id)
@@ -362,10 +369,10 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     @Test
     fun delete() {
         val f = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = uid("F"),
-                        vsNames = listOf("GLOBAL")
-                )
+            ValidationStampFilter(
+                name = uid("F"),
+                vsNames = listOf("GLOBAL")
+            )
         )
         filterRepository.deleteValidationStampFilter(f.id)
         // Checks it is gone
@@ -381,11 +388,11 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     @Test
     fun share_from_branch_to_project() {
         val f = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = uid("F"),
-                        branch = branch,
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = uid("F"),
+                branch = branch,
+                vsNames = listOf("CI")
+            )
         )
         val f2 = filterRepository.shareValidationStampFilter(f, branch.project)
         assertTrue(f.id() == f2.id())
@@ -396,11 +403,11 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     @Test
     fun share_from_branch_to_global() {
         val f = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = uid("F"),
-                        branch = branch,
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = uid("F"),
+                branch = branch,
+                vsNames = listOf("CI")
+            )
         )
         val f2 = filterRepository.shareValidationStampFilter(f)
         assertTrue(f.id() == f2.id())
@@ -411,11 +418,11 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     @Test
     fun share_from_project_to_global() {
         val f = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = uid("F"),
-                        project = branch.project,
-                        vsNames = listOf("CI")
-                )
+            ValidationStampFilter(
+                name = uid("F"),
+                project = branch.project,
+                vsNames = listOf("CI")
+            )
         )
         val f2 = filterRepository.shareValidationStampFilter(f)
         assertTrue(f.id() == f2.id())
@@ -426,10 +433,10 @@ class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSuppor
     @Test
     fun empty_patterns() {
         var f = filterRepository.newValidationStampFilter(
-                ValidationStampFilter(
-                        name = uid("F"),
-                        vsNames = emptyList()
-                )
+            ValidationStampFilter(
+                name = uid("F"),
+                vsNames = emptyList()
+            )
         )
         f = filterRepository.getValidationStampFilter(f.id)
         assertNotNull(f.vsNames)

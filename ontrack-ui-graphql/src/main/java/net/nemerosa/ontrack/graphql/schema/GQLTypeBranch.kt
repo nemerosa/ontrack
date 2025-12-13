@@ -63,7 +63,7 @@ class GQLTypeBranch(
                 .description("Is this branch a favourite of the current user?")
                 .type(Scalars.GraphQLBoolean)
                 .dataFetcher { env ->
-                    val branch: Branch = env.getSource()
+                    val branch: Branch = env.getSource()!!
                     branchFavouriteService.isBranchFavourite(branch)
                 }
         }

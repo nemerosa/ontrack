@@ -2,9 +2,9 @@ package net.nemerosa.ontrack.extension.environments.security
 
 import net.nemerosa.ontrack.extension.environments.EnvironmentsLicense
 import net.nemerosa.ontrack.extension.environments.Slot
+import net.nemerosa.ontrack.model.security.AuthenticatedUser
 import net.nemerosa.ontrack.model.security.Authorization
 import net.nemerosa.ontrack.model.security.AuthorizationContributor
-import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 
@@ -21,7 +21,7 @@ class SlotsAuthorizationContributor(
 
     override fun appliesTo(context: Any): Boolean = context is Slot
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> {
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> {
         val slot = context as Slot
         val environmentFeatureEnabled = environmentsLicense.environmentFeatureEnabled
         return listOf(

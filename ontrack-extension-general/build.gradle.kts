@@ -1,10 +1,7 @@
-import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
-
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
-
-apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-support"))
@@ -13,33 +10,18 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-indicators"))
+    implementation(project(":ontrack-extension-config"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
-    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
+    testImplementation(testFixtures(project(":ontrack-model")))
+    testImplementation(testFixtures(project(":ontrack-ui-graphql")))
+    testImplementation(testFixtures(project(":ontrack-extension-casc")))
+    testImplementation(testFixtures(project(":ontrack-extension-config")))
     testImplementation("com.networknt:json-schema-validator")
     testImplementation(project(":ontrack-it-utils"))
 
+    testFixturesImplementation(project(":ontrack-it-utils"))
+
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
-}
-
-val testJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("tests")
-    from(sourceSets["test"].output)
-}
-
-configure<PublishingExtension> {
-    publications {
-        maybeCreate<MavenPublication>("mavenCustom").artifact(tasks["testJar"])
-    }
-}
-
-tasks["assemble"].dependsOn("testJar")
-
-val tests by configurations.creating
-
-artifacts {
-    add("tests", testJar)
 }

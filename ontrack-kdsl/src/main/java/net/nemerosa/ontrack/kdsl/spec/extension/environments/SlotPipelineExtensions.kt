@@ -6,9 +6,9 @@ import net.nemerosa.ontrack.kdsl.spec.toBuild
 
 fun SlotPipelineFragment.toPipeline(connected: Connected) = SlotPipeline(
     connector = connected.connector,
-    id = id(),
-    number = number()!!,
-    status = status(),
-    slot = slot().fragments().slotFragment().toSlot(connected),
-    build = build().fragments().buildFragment().toBuild(connected),
+    id = id,
+    number = number!!,
+    status = status,
+    slot = slot.slotFragment.toSlot(connected),
+    build = build.buildFragment.toBuild(connected),
 )

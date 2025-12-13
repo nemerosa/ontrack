@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.extension.scm.mock.mockScm
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventTemplatingService
-import net.nemerosa.ontrack.model.events.EventVariableService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

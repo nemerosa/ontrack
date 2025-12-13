@@ -8,7 +8,6 @@ export default function BuildLinkDecorationExtension({decoration}) {
         <>
             {
                 decoration.data.buildId &&
-                decoration.data.linksCount &&
                 decoration.data.linksCount > 0 &&
                 <Tag title={
                     `This build has ${decoration.data.linksCount} downstream link(s).`

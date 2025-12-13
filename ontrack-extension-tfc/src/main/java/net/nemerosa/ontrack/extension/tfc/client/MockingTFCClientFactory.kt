@@ -1,15 +1,15 @@
 package net.nemerosa.ontrack.extension.tfc.client
 
+import jakarta.annotation.PostConstruct
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.tfc.config.TFCConfiguration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import javax.annotation.PostConstruct
 
 @Component
-@Profile(RunProfile.ACC)
+@Profile(RunProfile.DEV)
 class MockingTFCClientFactory : TFCClientFactory {
 
     private val logger: Logger = LoggerFactory.getLogger(MockingTFCClientFactory::class.java)

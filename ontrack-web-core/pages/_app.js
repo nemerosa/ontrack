@@ -7,47 +7,20 @@ import UserContextProvider from "@components/providers/UserProvider";
 import EventsContextProvider from "@components/common/EventsContext";
 import PreferencesContextProvider from "@components/providers/PreferencesProvider";
 import RefDataContextProvider from "@components/providers/RefDataProvider";
-import ConnectionContextProvider from "@components/providers/ConnectionContextProvider";
 import Head from "next/head";
 import {useRouter} from "next/router";
-import {isConnectionLoggingEnabled, isConnectionTracingEnabled, ontrackUiUrl, ontrackUrl} from "@/connection";
 import SearchContextProvider from "@components/search/SearchContext";
+import {SessionProvider} from "next-auth/react"
 // Ace editors modes & themes
 import 'ace-builds/src-noconflict/ace';
 import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-github';
 import MessageContextProvider from "@components/providers/MessageProvider";
+import AuthProvider from "@components/providers/AuthProvider";
+import LoadingAggregator from "@components/providers/LoadingAggregator";
 
-export async function getServerSideProps() {
-    console.log("[init] Environment ", ontrack)
-    return {
-        props: {
-            environment: {
-                ontrack,
-            }
-        }
-    }
-}
-
-App.getInitialProps = async (ctx) => {
-    const ontrack = {
-        url: ontrackUrl(),
-        ui: {
-            url: ontrackUiUrl(),
-        },
-        connection: {
-            logging: isConnectionLoggingEnabled(),
-            tracing: isConnectionTracingEnabled(),
-        }
-    }
-    const environment = {ontrack}
-    return {
-        environment,
-    }
-}
-
-export default function App({Component, environment, pageProps}) {
+export default function App({Component, pageProps}) {
 
     const router = useRouter()
 
@@ -56,21 +29,25 @@ export default function App({Component, environment, pageProps}) {
             <Head>
                 <link rel="shortcut icon" href={`${router.basePath}/favicon.ico`}/>
             </Head>
-            <MessageContextProvider>
-                <ConnectionContextProvider environment={environment}>
-                    <UserContextProvider>
-                        <PreferencesContextProvider>
-                            <RefDataContextProvider>
-                                <SearchContextProvider>
-                                    <EventsContextProvider>
-                                        <Component {...pageProps} />
-                                    </EventsContextProvider>
-                                </SearchContextProvider>
-                            </RefDataContextProvider>
-                        </PreferencesContextProvider>
-                    </UserContextProvider>
-                </ConnectionContextProvider>
-            </MessageContextProvider>
+            <SessionProvider>
+                <MessageContextProvider>
+                    <AuthProvider>
+                        <UserContextProvider>
+                            <PreferencesContextProvider>
+                                <RefDataContextProvider>
+                                    <SearchContextProvider>
+                                        <EventsContextProvider>
+                                            <LoadingAggregator>
+                                                <Component {...pageProps} />
+                                            </LoadingAggregator>
+                                        </EventsContextProvider>
+                                    </SearchContextProvider>
+                                </RefDataContextProvider>
+                            </PreferencesContextProvider>
+                        </UserContextProvider>
+                    </AuthProvider>
+                </MessageContextProvider>
+            </SessionProvider>
         </>
     )
 }

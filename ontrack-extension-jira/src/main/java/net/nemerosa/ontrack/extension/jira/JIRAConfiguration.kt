@@ -2,13 +2,9 @@ package net.nemerosa.ontrack.extension.jira
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIIgnore
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
-import net.nemerosa.ontrack.model.form.Password
-import net.nemerosa.ontrack.model.form.Text
-import net.nemerosa.ontrack.model.form.multiStrings
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
+import net.nemerosa.ontrack.model.annotations.APILabel
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import org.apache.commons.lang3.StringUtils
 
@@ -17,6 +13,7 @@ import org.apache.commons.lang3.StringUtils
  *
  * @param name Name for this configuration
  * @param url URL to the JIRA server
+ * @param apiUrl Optional alternative URL for the JIRA API
  * @param user Username for the connection to the JIRA server
  * @param password Password or token for the connection to the JIRA server
  * @param include List of regular expressions for the accepted JIRA projects (default = empty = all of them)
@@ -26,6 +23,9 @@ import org.apache.commons.lang3.StringUtils
 open class JIRAConfiguration(
     name: String,
     val url: String,
+    @APIDescription("Optional alternative URL for the JIRA API")
+    @APILabel("API URL")
+    val apiUrl: String? = null,
     user: String?,
     password: String?,
     val include: List<String> = emptyList(),
@@ -57,6 +57,7 @@ open class JIRAConfiguration(
         return JIRAConfiguration(
             name = name,
             url = url,
+            apiUrl = apiUrl,
             user = user,
             password = "",
             include = include,
@@ -64,29 +65,17 @@ open class JIRAConfiguration(
         )
     }
 
-    fun asForm(): Form {
-        return form()
-            .with(defaultNameField().readOnly().value(name))
-            .fill("url", url)
-            .fill("user", user)
-            .fill("password", "")
-            .fill("include", include)
-            .fill("exclude", exclude)
-    }
-
     override fun withPassword(password: String?): JIRAConfiguration {
         return JIRAConfiguration(
             name = name,
             url = url,
+            apiUrl = apiUrl,
             user = user,
             password = password,
             include = include,
             exclude = exclude,
         )
     }
-
-    @APIIgnore
-    override val descriptor: ConfigurationDescriptor get() = ConfigurationDescriptor(name, name)
 
     @APIIgnore
     override val serviceId: String = JIRAServiceExtension.SERVICE
@@ -123,15 +112,5 @@ open class JIRAConfiguration(
 
         val ISSUE_PATTERN_REGEX = "(?:[^A-Z0-9]|^)([A-Z][A-Z0-9]+-\\d+)(?:[^0-9]|\$)".toRegex()
 
-        @JvmStatic
-        fun form(): Form {
-            return Form.create()
-                .with(defaultNameField())
-                .url()
-                .with(Text.of("user").label("User").length(16).optional())
-                .with(Password.of("password").label("Password").length(40).optional())
-                .multiStrings(JIRAConfiguration::include, null)
-                .multiStrings(JIRAConfiguration::exclude, null)
-        }
     }
 }

@@ -3,29 +3,27 @@ package net.nemerosa.ontrack.model.structure
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonView
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.YesNo
-import javax.validation.constraints.Size
+import jakarta.validation.constraints.Size
 
 /**
  * Representation of a branch inside a [Project]. They are usually associated
  * to a branch of the SCM associated with the parent project.
  */
 data class Branch(
-        override val id: ID,
-        @Size(max = NAME_MAX_LENGTH)
-        val name: String,
-        override val description: String?,
-        @JsonProperty("disabled")
-        val isDisabled: Boolean,
-        @JsonProperty("project")
-        @get:JsonView(value = [
-            PromotionView::class, Branch::class, Build::class, PromotionLevel::class, ValidationStamp::class,
-            PromotionRun::class, ValidationRun::class, PromotionRunView::class,
-        ])
-        @get:JsonIgnore(false) // Overridding default at [ProjectEntity] level
-        override val project: Project,
-        override val signature: Signature
+    override val id: ID,
+    @Size(max = NAME_MAX_LENGTH)
+    val name: String,
+    override val description: String?,
+    @JsonProperty("disabled")
+    val isDisabled: Boolean,
+    @JsonProperty("project")
+    @JsonView(
+        PromotionLevel::class, Branch::class, Build::class, ValidationStamp::class,
+        PromotionRun::class, ValidationRun::class
+    )
+    @get:JsonIgnore(false) // Overridding default at [ProjectEntity] level
+    override val project: Project,
+    override val signature: Signature
 ) : ProjectEntity {
 
     fun withId(id: ID) = Branch(id, name, description, isDisabled, project, signature)
@@ -45,28 +43,19 @@ data class Branch(
 
         @JvmStatic
         fun of(project: Project, nameDescription: NameDescription) =
-                of(project, nameDescription.asState())
+            of(project, nameDescription.asState())
 
         @JvmStatic
         fun of(project: Project, nameDescription: NameDescriptionState) =
-                Branch(
-                        ID.NONE,
-                        nameDescription.name,
-                        nameDescription.description,
-                        nameDescription.isDisabled,
-                        project,
-                        Signature.anonymous()
-                )
+            Branch(
+                ID.NONE,
+                nameDescription.name,
+                nameDescription.description,
+                nameDescription.isDisabled,
+                project,
+                Signature.anonymous()
+            )
 
-        @JvmStatic
-        fun form(): Form = Form.create()
-                .with(
-                        Form.defaultNameField().length(120)
-                )
-                .description()
-                .with(
-                        YesNo.of("disabled").label("Disabled").help("Check if the branch must be disabled.")
-                )
     }
 
     override val parent: ProjectEntity? get() = project
@@ -77,13 +66,8 @@ data class Branch(
         get() = "Branch ${project.name}/$name"
 
 
-    fun toForm(): Form = form()
-            .fill("name", name)
-            .fill("description", description)
-            .fill("disabled", isDisabled)
-
     fun update(form: NameDescriptionState): Branch =
-            of(project, form)
-                    .withId(id).withDisabled(form.isDisabled)
+        of(project, form)
+            .withId(id).withDisabled(form.isDisabled)
 
 }

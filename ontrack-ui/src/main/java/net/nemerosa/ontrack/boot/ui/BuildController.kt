@@ -1,25 +1,14 @@
 package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.extension.api.BuildDiffExtension
-import net.nemerosa.ontrack.extension.api.ExtensionManager
+import jakarta.validation.Valid
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
-import net.nemerosa.ontrack.model.form.*
-import net.nemerosa.ontrack.model.form.Form.Companion.create
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.structure.Build.Companion.form
 import net.nemerosa.ontrack.model.structure.Build.Companion.of
-import net.nemerosa.ontrack.model.support.Action
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Resource
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
-import java.util.stream.Collectors
-import javax.validation.Valid
 
 @RestController
 @RequestMapping("/rest/structure")
@@ -27,84 +16,10 @@ class BuildController(
     private val structureService: StructureService,
     private val propertyService: PropertyService,
     private val securityService: SecurityService,
-    private val extensionManager: ExtensionManager,
-) : AbstractResourceController() {
-
-    @GetMapping("project/{projectId}/builds")
-    fun buildSearchForm(@PathVariable projectId: ID): Resource<Form> {
-        return Resource.of(
-            createBuildSearchForm(),
-            uri(MvcUriComponentsBuilder.on(javaClass).buildSearchForm(projectId))
-        ).with("_search", uri(MvcUriComponentsBuilder.on(javaClass).buildSearch(projectId, null)))
-    }
-
-    private fun createBuildSearchForm(): Form {
-        // List of properties for a build
-        val properties = propertyService.propertyTypes.stream()
-            .filter { type: PropertyType<*> -> type.supportedEntityTypes.contains(ProjectEntityType.BUILD) }
-            .map { type: PropertyType<*>? -> PropertyTypeDescriptor.of(type) }
-            .collect(Collectors.toList())
-        // Form
-        return create()
-            .intField(BuildSearchForm::maximumCount, null)
-            .textField(BuildSearchForm::branchName, null)
-            .textField(BuildSearchForm::buildName, null)
-            .textField(BuildSearchForm::promotionName, null)
-            .textField(BuildSearchForm::validationStampName, null)
-            .selectionOfString(
-                BuildSearchForm::property,
-                properties.map { it.typeName },
-                null,
-            )
-            .textField(BuildSearchForm::propertyValue, null)
-    }
-
-    /**
-     * Build search
-     */
-    @GetMapping("project/{projectId}/builds/search")
-    fun buildSearch(@PathVariable projectId: ID, form: @Valid BuildSearchForm?): Resources<BuildView> {
-        return Resources.of(
-            structureService.buildSearch(projectId, form ?: BuildSearchForm())
-                .map { build: Build? ->
-                    structureService.getBuildView(
-                        build!!, true
-                    )
-                },
-            uri(MvcUriComponentsBuilder.on(javaClass).buildSearch(projectId, form))
-        )
-            .forView(BuildView::class.java)
-    }
-
-    /**
-     * List of diff actions
-     */
-    @GetMapping("project/{projectId}/builds/diff")
-    fun buildDiffActions(@PathVariable projectId: ID): Resources<Action> {
-        return Resources.of(
-            extensionManager.getExtensions(BuildDiffExtension::class.java)
-                .stream()
-                .filter { extension: BuildDiffExtension ->
-                    extension.apply(
-                        structureService.getProject(projectId)
-                    )
-                }
-                .map { actionExtension: BuildDiffExtension? -> this.resolveExtensionAction(actionExtension) }
-                .collect(Collectors.toList()),
-            uri(MvcUriComponentsBuilder.on(javaClass).buildDiffActions(projectId))
-        )
-    }
-
-    @GetMapping("branches/{branchId}/builds/create")
-    fun newBuildForm(@PathVariable branchId: ID): Form {
-        // Checks the branch does exist
-        structureService.getBranch(branchId)
-        // Returns the form
-        return form()
-    }
+) {
 
     @PostMapping("branches/{branchId}/builds/create")
-    fun newBuild(@PathVariable branchId: ID, @RequestBody request: @Valid BuildRequest?): Build {
+    fun newBuild(@PathVariable branchId: ID, @RequestBody request: @Valid BuildRequest?): ResponseEntity<Build> {
         // Gets the holding branch
         val branch = structureService.getBranch(branchId)
         // Build signature
@@ -122,28 +37,28 @@ class BuildController(
             )
         }
         // OK
-        return build
+        return ResponseEntity.ok(build)
     }
 
     /**
      * Looking for a build using its exact name on a branch.
      */
     @GetMapping("branches/{branchId}/builds/{name:[A-Za-z0-9_.-]+}")
-    fun getBuildByBranchAndName(@PathVariable branchId: ID, @PathVariable name: String): Build {
+    fun getBuildByBranchAndName(@PathVariable branchId: ID, @PathVariable name: String): ResponseEntity<Build> {
         // Gets the holding branch
         val (_, name1, _, _, project) = structureService.getBranch(branchId)
         // Gets the build by name
-        return structureService.findBuildByName(project.name, name1, name)
-            .orElseThrow { BuildNotFoundException(project.name, name1, name) }
-    }
-
-    @GetMapping("builds/{buildId}/update")
-    fun updateBuildForm(@PathVariable buildId: ID): Form {
-        return structureService.getBuild(buildId).asForm()
+        return ResponseEntity.ok(
+            structureService.findBuildByName(project.name, name1, name)
+                .orElseThrow { BuildNotFoundException(project.name, name1, name) }
+        )
     }
 
     @PutMapping("builds/{buildId}/update")
-    fun updateBuild(@PathVariable buildId: ID, @RequestBody nameDescription: @Valid NameDescription): Build {
+    fun updateBuild(
+        @PathVariable buildId: ID,
+        @RequestBody nameDescription: @Valid NameDescription
+    ): ResponseEntity<Build> {
         // Gets from the repository
         var build = structureService.getBuild(buildId)
         // Updates
@@ -151,24 +66,14 @@ class BuildController(
         // Saves in repository
         structureService.saveBuild(build)
         // As resource
-        return build
-    }
-
-    /**
-     * Update form for the build signature.
-     */
-    @GetMapping("builds/{buildId}/signature")
-    fun updateBuildSignatureForm(@PathVariable buildId: ID): Form {
-        return SignatureRequest.of(
-            structureService.getBuild(buildId).signature
-        ).asForm()
+        return ResponseEntity.ok(build)
     }
 
     /**
      * Update the build signature
      */
     @PutMapping("builds/{buildId}/signature")
-    fun updateBuildSignature(@PathVariable buildId: ID, @RequestBody request: SignatureRequest): Build {
+    fun updateBuildSignature(@PathVariable buildId: ID, @RequestBody request: SignatureRequest): ResponseEntity<Build> {
         // Gets from the repository
         var build = structureService.getBuild(buildId)
         // Updates
@@ -178,17 +83,17 @@ class BuildController(
         // Saves in repository
         structureService.saveBuild(build)
         // As resource
-        return build
+        return ResponseEntity.ok(build)
     }
 
     @DeleteMapping("builds/{buildId}")
-    fun deleteBuild(@PathVariable buildId: ID): Ack {
-        return structureService.deleteBuild(buildId)
+    fun deleteBuild(@PathVariable buildId: ID): ResponseEntity<Ack> {
+        return ResponseEntity.ok(structureService.deleteBuild(buildId))
     }
 
     @GetMapping("builds/{buildId}")
-    fun getBuild(@PathVariable buildId: ID): Build {
-        return structureService.getBuild(buildId)
+    fun getBuild(@PathVariable buildId: ID): ResponseEntity<Build> {
+        return ResponseEntity.ok(structureService.getBuild(buildId))
     }
 
     /**
@@ -230,15 +135,14 @@ class BuildController(
         @PathVariable buildId: ID,
         @RequestParam(defaultValue = "0") offset: Int,
         @RequestParam(defaultValue = "10") size: Int
-    ): Resources<Build> {
-        return Resources.of(
+    ): ResponseEntity<List<Build>> {
+        return ResponseEntity.ok(
             structureService.getQualifiedBuildsUsedBy(
                 structureService.getBuild(buildId),
                 offset,
                 size
             ).pageItems.map { it.build },
-            uri(MvcUriComponentsBuilder.on(javaClass).getBuildLinksFrom(buildId, offset, size))
-        ).forView(Build::class.java)
+        )
     }
 
     /**
@@ -252,15 +156,14 @@ class BuildController(
         @PathVariable buildId: ID,
         @RequestParam(defaultValue = "0") offset: Int,
         @RequestParam(defaultValue = "10") size: Int
-    ): Resources<Build> {
-        return Resources.of(
-            structureService.getBuildsUsing(
+    ): ResponseEntity<List<Build>> {
+        return ResponseEntity.ok(
+            structureService.getQualifiedBuildsUsing(
                 structureService.getBuild(buildId),
                 offset,
                 size
-            ).pageItems,
-            uri(MvcUriComponentsBuilder.on(javaClass).getBuildLinksTo(buildId, offset, size))
-        ).forView(Build::class.java)
+            ).pageItems.map { it.build },
+        )
     }
 
     /**
@@ -270,10 +173,10 @@ class BuildController(
      * @return List of builds
      */
     @PutMapping("builds/{buildId}/links/edit")
-    fun createBuildLinkFromForm(@PathVariable buildId: ID, @RequestBody form: BuildLinkForm?): Build {
+    fun createBuildLinkFromForm(@PathVariable buildId: ID, @RequestBody form: BuildLinkForm?): ResponseEntity<Build> {
         val build = structureService.getBuild(buildId)
         structureService.editBuildLinks(build, form ?: BuildLinkForm())
-        return build
+        return ResponseEntity.ok(build)
     }
 
     /**
@@ -284,11 +187,11 @@ class BuildController(
      * @return List of builds
      */
     @PutMapping("builds/{buildId}/links/{targetBuildId}")
-    fun addBuildLink(@PathVariable buildId: ID, @PathVariable targetBuildId: ID): Build {
+    fun addBuildLink(@PathVariable buildId: ID, @PathVariable targetBuildId: ID): ResponseEntity<Build> {
         val build = structureService.getBuild(buildId)
         val targetBuild = structureService.getBuild(targetBuildId)
         structureService.createBuildLink(build, targetBuild, BuildLink.DEFAULT)
-        return build
+        return ResponseEntity.ok(build)
     }
 
     /**
@@ -303,10 +206,10 @@ class BuildController(
         @PathVariable buildId: ID,
         @PathVariable targetBuildId: ID,
         @RequestParam qualifier: String?
-    ): Build {
+    ): ResponseEntity<Build> {
         val build = structureService.getBuild(buildId)
         val targetBuild = structureService.getBuild(targetBuildId)
         structureService.deleteBuildLink(build, targetBuild, qualifier ?: BuildLink.DEFAULT)
-        return build
+        return ResponseEntity.ok(build)
     }
 }

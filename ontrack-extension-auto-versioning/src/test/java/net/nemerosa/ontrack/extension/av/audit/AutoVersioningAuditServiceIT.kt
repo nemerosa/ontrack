@@ -30,7 +30,8 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                 val order = createOrder(
                     sourceProject = source.name
                 )
-                autoVersioningAuditService.onQueuing(order, "routing")
+                autoVersioningAuditService.onCreated(order)
+                autoVersioningAuditService.onScheduled(order, "routing")
                 autoVersioningAuditService.onReceived(order, "queue")
                 autoVersioningAuditService.onProcessingStart(order)
                 autoVersioningAuditService.onProcessingCreatingBranch(order, "feature/version-2.0.0")
@@ -58,6 +59,7 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                         audit(AutoVersioningAuditState.PROCESSING_CREATING_BRANCH, "branch" to "feature/version-2.0.0"),
                         audit(AutoVersioningAuditState.PROCESSING_START),
                         audit(AutoVersioningAuditState.RECEIVED),
+                        audit(AutoVersioningAuditState.SCHEDULED),
                         audit(AutoVersioningAuditState.CREATED)
                     )
                 }
@@ -73,7 +75,8 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                 val order = createOrder(
                     sourceProject = source.name
                 )
-                autoVersioningAuditService.onQueuing(order, "routing")
+                autoVersioningAuditService.onCreated(order)
+                autoVersioningAuditService.onScheduled(order, "routing")
                 autoVersioningAuditService.onReceived(order, "queue")
                 autoVersioningAuditService.onProcessingStart(order)
                 autoVersioningAuditService.onProcessingCreatingBranch(order, "feature/version-2.0.0")
@@ -105,6 +108,7 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                         audit(AutoVersioningAuditState.PROCESSING_CREATING_BRANCH, "branch" to "feature/version-2.0.0"),
                         audit(AutoVersioningAuditState.PROCESSING_START),
                         audit(AutoVersioningAuditState.RECEIVED),
+                        audit(AutoVersioningAuditState.SCHEDULED),
                         audit(AutoVersioningAuditState.CREATED)
                     )
                 }
@@ -123,7 +127,8 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                 val error = RuntimeException("test")
                 val initialStack = ExceptionUtils.getStackTrace(error)
 
-                autoVersioningAuditService.onQueuing(order, "routing")
+                autoVersioningAuditService.onCreated(order)
+                autoVersioningAuditService.onScheduled(order, "routing")
                 autoVersioningAuditService.onError(order, error)
 
                 autoVersioningAuditQueryService.getByUUID(this, order.uuid).let { entry ->
@@ -148,7 +153,8 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
 
                 val error = RuntimeException("test")
 
-                autoVersioningAuditService.onQueuing(order, "routing")
+                autoVersioningAuditService.onCreated(order)
+                autoVersioningAuditService.onScheduled(order, "routing")
                 autoVersioningAuditService.onReceived(order, "queue")
                 autoVersioningAuditService.onProcessingStart(order)
                 autoVersioningAuditService.onProcessingCreatingBranch(order, "feature/version-2.0.0")
@@ -175,6 +181,7 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                         audit(AutoVersioningAuditState.PROCESSING_CREATING_BRANCH, "branch" to "feature/version-2.0.0"),
                         audit(AutoVersioningAuditState.PROCESSING_START),
                         audit(AutoVersioningAuditState.RECEIVED),
+                        audit(AutoVersioningAuditState.SCHEDULED),
                         audit(AutoVersioningAuditState.CREATED)
                     )
                 }
@@ -196,7 +203,8 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                 val order = createOrder(
                     sourceProject = source.name
                 )
-                checkRunning(order, true) { autoVersioningAuditService.onQueuing(order, "routing") }
+                checkRunning(order, true) { autoVersioningAuditService.onCreated(order) }
+                checkRunning(order, true) { autoVersioningAuditService.onScheduled(order, "routing") }
                 checkRunning(order, true) { autoVersioningAuditService.onReceived(order, "queue") }
                 checkRunning(order, true) {
                     autoVersioningAuditService.onPostProcessingStart(
@@ -244,7 +252,8 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                 val order = createOrder(
                     sourceProject = source.name
                 )
-                checkRunning(order, true) { autoVersioningAuditService.onQueuing(order, "routing") }
+                checkRunning(order, true) { autoVersioningAuditService.onCreated(order) }
+                checkRunning(order, true) { autoVersioningAuditService.onScheduled(order, "routing") }
                 checkRunning(order, true) { autoVersioningAuditService.onReceived(order, "queue") }
                 checkRunning(order, true) {
                     autoVersioningAuditService.onPostProcessingStart(
@@ -285,7 +294,8 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                 val order = createOrder(
                     sourceProject = source.name
                 )
-                checkRunning(order, true) { autoVersioningAuditService.onQueuing(order, "routing") }
+                checkRunning(order, true) { autoVersioningAuditService.onCreated(order) }
+                checkRunning(order, true) { autoVersioningAuditService.onScheduled(order, "routing") }
                 checkRunning(order, true) { autoVersioningAuditService.onReceived(order, "queue") }
                 checkRunning(order, true) {
                     autoVersioningAuditService.onPostProcessingStart(

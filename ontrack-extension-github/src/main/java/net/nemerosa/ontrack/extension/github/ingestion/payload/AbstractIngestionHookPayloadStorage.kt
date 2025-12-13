@@ -38,6 +38,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 completion = payload.completion,
                 routing = payload.routing,
                 queue = payload.queue,
+                accountName = payload.accountName,
             )
         )
     }
@@ -68,6 +69,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 completion = old.completion,
                 routing = routing,
                 queue = old.queue,
+                accountName = old.accountName,
             )
         )
     }
@@ -98,6 +100,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 completion = old.completion,
                 routing = old.routing,
                 queue = queue,
+                accountName = old.accountName,
             )
         )
     }
@@ -128,6 +131,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 completion = null,
                 routing = old.routing,
                 queue = old.queue,
+                accountName = old.accountName,
             )
         )
     }
@@ -158,6 +162,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 completion = Time.now(),
                 routing = old.routing,
                 queue = old.queue,
+                accountName = old.accountName,
             )
         )
     }
@@ -188,6 +193,7 @@ abstract class AbstractIngestionHookPayloadStorage(
                 completion = Time.now(),
                 routing = old.routing,
                 queue = old.queue,
+                accountName = old.accountName,
             )
         )
     }

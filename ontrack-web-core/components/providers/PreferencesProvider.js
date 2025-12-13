@@ -1,6 +1,6 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {useMutation, useQuery} from "@components/services/GraphQL";
 
 export const PreferencesContext = createContext({
     branchViewVsGroups: null,
@@ -9,59 +9,78 @@ export const PreferencesContext = createContext({
     selectedBranchViewKey: null,
     setPreferences: () => {
     },
+    loaded: false,
 })
 
 export default function PreferencesContextProvider({children}) {
 
-    const client = useGraphQLClient()
+    const [loaded, setLoaded] = useState(false)
 
-    const [preferencesRecord, setPreferencesRecord] = useState({})
+    const [preferencesRecord, setPreferencesRecord] = useState({
+        branchViewVsGroups: null,
+        branchViewVsNames: null,
+        dashboardUuid: null,
+        selectedBranchViewKey: null,
+    })
+
+    const {data, loading, error, finished} = useQuery(
+        gql`
+            query GetPreferences {
+                preferences {
+                    branchViewVsGroups
+                    branchViewVsNames
+                    dashboardUuid
+                    selectedBranchViewKey
+                }
+            }
+        `,
+        {
+            dataFn: data => data.preferences
+        }
+    )
 
     useEffect(() => {
-        if (client) {
-            client.request(
-                gql`
-                    query GetPreferences {
-                        preferences {
-                            branchViewVsGroups
-                            branchViewVsNames
-                            dashboardUuid
-                            selectedBranchViewKey
-                        }
-                    }
-                `
-            ).then(data => {
-                setPreferencesRecord(data.preferences)
-            })
+        if (data && finished) {
+            setPreferencesRecord(data)
+            setLoaded(true)
         }
-    }, [client]);
+    }, [data, finished])
 
-    const setPreferences = (values) => {
-        client.request(
-            gql`
-                mutation SetPreferences($input: SetPreferencesInput!) {
-                    setPreferences(input: $input) {
-                        errors {
-                            message
-                        }
+    const {mutate} = useMutation(
+        gql`
+            mutation SetPreferences($input: SetPreferencesInput!) {
+                setPreferences(input: $input) {
+                    errors {
+                        message
                     }
                 }
-            `,
-            {input: values}
-        ).then(() => {
-            setPreferencesRecord({
-                ...preferencesRecord,
-                ...values,
-            })
+            }
+        `,
+        {
+            userNodeName: 'setPreferences'
+        }
+    )
+
+    const setPreferences = async (values) => {
+        await mutate({input: values})
+        setPreferencesRecord({
+            ...preferencesRecord,
+            ...values,
         })
     }
 
     const contextValue = {
         ...preferencesRecord,
         setPreferences,
+        loaded,
     }
 
-    return <PreferencesContext.Provider value={contextValue}>{children}</PreferencesContext.Provider>
+    return <>
+        {
+            !loading &&
+            <PreferencesContext.Provider value={contextValue}>{children}</PreferencesContext.Provider>
+        }
+    </>
 }
 
 export function usePreferences() {

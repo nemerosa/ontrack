@@ -40,7 +40,7 @@ class GQLTypeProjectIndicatorHistoryItem(
                         .description("Compliance for the indicator")
                         .type(Scalars.GraphQLInt)
                         .dataFetcher { env ->
-                            env.getSource<ProjectIndicator>().compliance?.value
+                            env.getSource<ProjectIndicator>()!!.compliance?.value
                         }
             }
             .field {
@@ -53,7 +53,7 @@ class GQLTypeProjectIndicatorHistoryItem(
                         .type(Scalars.GraphQLString)
                         .description("Comment with links.")
                         .dataFetcher { env ->
-                            val projectIndicator = env.getSource<ProjectIndicator>()
+                            val projectIndicator = env.getSource<ProjectIndicator>()!!
                             val comment = projectIndicator.comment
                             if (comment.isNullOrBlank()) {
                                 comment
@@ -74,7 +74,7 @@ class GQLTypeProjectIndicatorHistoryItem(
                         .description("Time elapsed (in seconds) since the indicator value was set.")
                         .type(Scalars.GraphQLInt)
                         .dataFetcher { env ->
-                            val projectIndicator = env.getSource<ProjectIndicator>()
+                            val projectIndicator = env.getSource<ProjectIndicator>()!!
                             val time = projectIndicator.signature.time
                             (Duration.between(time, Time.now()).toMillis() / 1000).toInt()
                         }
@@ -85,7 +85,7 @@ class GQLTypeProjectIndicatorHistoryItem(
                         .description("Rating for this indicator")
                         .type(Scalars.GraphQLString)
                         .dataFetcher { env ->
-                            env.getSource<ProjectIndicator>().compliance?.let { compliance ->
+                            env.getSource<ProjectIndicator>()!!.compliance?.let { compliance ->
                                 Rating.asRating(compliance.value)
                             }
                         }

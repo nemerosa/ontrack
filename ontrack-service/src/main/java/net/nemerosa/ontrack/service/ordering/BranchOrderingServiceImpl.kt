@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service.ordering
 
-import net.nemerosa.ontrack.model.ordering.BranchOrdering
 import net.nemerosa.ontrack.model.ordering.BranchOrderingService
+import net.nemerosa.ontrack.model.ordering.VersionOrName
 import net.nemerosa.ontrack.model.ordering.VersionUtils
 import net.nemerosa.ontrack.model.ordering.VersionUtils.semVerSuffixRegex
 import net.nemerosa.ontrack.model.structure.Branch
@@ -11,17 +11,19 @@ import org.springframework.stereotype.Service
 
 @Service
 class BranchOrderingServiceImpl(
-    orderings: List<BranchOrdering>,
     private val branchDisplayNameService: BranchDisplayNameService,
 ) : BranchOrderingService {
 
-    private val index = orderings.associateBy { it.id }
+    override fun getRegexVersionComparator(regex: Regex): Comparator<Branch> {
+        return compareByDescending { branch -> getVersion(branch, regex) }
+    }
 
-    @Deprecated("Will be removed in V5. Consider using built-in orderings.")
-    override fun getBranchOrdering(id: String): BranchOrdering? = index[id]
-
-    @Deprecated("Will be removed in V5. Consider using built-in orderings.")
-    override val branchOrderings: List<BranchOrdering> = index.values.sortedBy { it.id }
+    internal fun getVersion(branch: Branch, regex: Regex): VersionOrName {
+        // Path to use for the branch
+        val path: String = branchDisplayNameService.getBranchDisplayName(branch, BranchNamePolicy.DISPLAY_NAME_OR_NAME)
+        // Path first, then name, then version = name
+        return VersionUtils.getVersion(regex, path) ?: VersionOrName(path)
+    }
 
     override fun getSemVerBranchOrdering(branchNamePolicy: BranchNamePolicy): Comparator<Branch> {
         return compareByDescending { branch ->

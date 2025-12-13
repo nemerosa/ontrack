@@ -7,13 +7,10 @@ import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescriptionState
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class BranchControllerIT : AbstractWebTestSupport() {
 
@@ -30,10 +27,10 @@ class BranchControllerIT : AbstractWebTestSupport() {
         // Branch
         val nameDescription = nameDescription().asState()
         val branch = asUser()
-                .with(project.id(), BranchCreate::class.java)
-                .call {
-                    controller.newBranch(project.id, nameDescription)
-                }
+            .with(project.id(), BranchCreate::class.java)
+            .call {
+                controller.newBranch(project.id, nameDescription)
+            }.body!!
         // Checks the branch
         checkBranchResource(branch, nameDescription)
     }
@@ -42,33 +39,37 @@ class BranchControllerIT : AbstractWebTestSupport() {
     fun disablingEnablingBranch() {
         val branch = doCreateBranch()
         // Disables it
-        val disabled = asUser().with(branch, ProjectEdit::class.java).call { controller.disableBranch(branch.id) }
+        val disabled = asUser().withProjectFunction(branch, ProjectEdit::class.java)
+            .call { controller.disableBranch(branch.id) }.body!!
         assertTrue(disabled.isDisabled, "Branch is disabled")
         val disabledEvent = asUser { eventQueryService.getLastEvent(branch, EventFactory.DISABLE_BRANCH) }
         assertNotNull(disabledEvent, "Disabled event is there") { event ->
-            val eventBranch: Branch? = event.getEntity(ProjectEntityType.BRANCH)
+            val eventBranch: Branch = event.getEntity(ProjectEntityType.BRANCH)
             assertNotNull(eventBranch, "Branch associated to the event") {
                 assertEquals(branch.id, it.id)
             }
         }
         // Enables it
-        val enabled = asUser().with(branch, ProjectEdit::class.java).call { controller.enableBranch(branch.id) }
+        val enabled = asUser().withProjectFunction(branch, ProjectEdit::class.java)
+            .call { controller.enableBranch(branch.id) }.body!!
         assertFalse(enabled.isDisabled, "Branch is enabled")
         val enabledEvent = asUser { eventQueryService.getLastEvent(branch, EventFactory.ENABLE_BRANCH) }
         assertNotNull(enabledEvent, "Enabled event is there") { event ->
-            val eventBranch: Branch? = event.getEntity(ProjectEntityType.BRANCH)
+            val eventBranch: Branch = event.getEntity(ProjectEntityType.BRANCH)
             assertNotNull(eventBranch, "Branch associated to the event") {
                 assertEquals(branch.id, it.id)
             }
         }
     }
 
-    @Test(expected = AccessDeniedException::class)
+    @Test
     fun createBranch_denied() {
         // Project
         val project = doCreateProject()
         // Branch
-        asUser().call { controller.newBranch(project.id, nameDescription().asState()) }
+        assertFailsWith<AccessDeniedException> {
+            asUser().call { controller.newBranch(project.id, nameDescription().asState()) }
+        }
     }
 
     private fun checkBranchResource(branch: Branch, nameDescription: NameDescriptionState) {

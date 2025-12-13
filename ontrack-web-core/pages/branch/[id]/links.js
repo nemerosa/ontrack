@@ -10,7 +10,7 @@ export default function BranchLinksPage() {
         <>
             <main>
                 <MainLayout>
-                    <BranchLinksView id={id}/>
+                    <BranchLinksView id={Number(id)}/>
                 </MainLayout>
             </main>
         </>

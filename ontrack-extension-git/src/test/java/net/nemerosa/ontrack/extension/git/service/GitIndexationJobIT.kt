@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.issues.mock.TestIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.model.toIdentifier
 import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.JobScheduler
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
+@AsAdminTest
 class GitIndexationJobIT : AbstractServiceTestSupport() {
 
     @Autowired

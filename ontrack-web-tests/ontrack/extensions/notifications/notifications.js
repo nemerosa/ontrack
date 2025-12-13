@@ -38,7 +38,7 @@ export const registerNotificationExtensions = (projectEntity) => {
             {
                 name,
                 entityType: projectEntity.type,
-                entityId: projectEntity.id,
+                entityId: Number(projectEntity.id),
                 events,
                 keywords,
                 channel,

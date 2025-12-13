@@ -25,7 +25,7 @@ export default function WorkflowNodeExecutorContextProvider({children}) {
             client.request(
                 gql`
                     query WorkflowNodeExecutors {
-                        workflowNodeExecutors {
+                        workflowNodeExecutors(enabled: true) {
                             id
                             displayName
                         }

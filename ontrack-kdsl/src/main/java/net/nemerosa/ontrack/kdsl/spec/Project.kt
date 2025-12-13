@@ -30,7 +30,7 @@ class Project(
         graphqlConnector.mutate(
             DeleteProjectByIdMutation(id.toInt())
         ) {
-            it?.deleteProject()?.fragments()?.payloadUserErrors()?.convert()
+            it?.deleteProject?.payloadUserErrors?.convert()
         }
     }
 
@@ -52,10 +52,10 @@ class Project(
                 description
             )
         ) {
-            it?.createBranch()?.fragments()?.payloadUserErrors()?.convert()
+            it?.createBranch?.payloadUserErrors?.convert()
         }
-            ?.checkData { it.createBranch()?.branch() }
-            ?.fragments()?.branchFragment()?.toBranch(this)
+            ?.checkData { it.createBranch?.branch }
+            ?.branchFragment?.toBranch(this)
             ?: throw GraphQLMissingDataException("Did not get back the created branch")
 
 
@@ -65,8 +65,8 @@ class Project(
     fun branchList(): List<Branch> =
         graphqlConnector.query(
             BranchListQuery(id.toInt())
-        )?.project()?.branches()?.map {
-            it.fragments().branchFragment().toBranch(this)
+        )?.project?.branches?.map {
+            it.branchFragment.toBranch(this)
         } ?: emptyList()
 
 }

@@ -4,10 +4,12 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import org.springframework.beans.factory.annotation.Autowired
 
+@AsAdminTest
 abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
@@ -147,6 +149,7 @@ abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
     }
 
     protected fun withSimpleSetup(
+        cronSchedule: String? = null,
         code: (
             pl: PromotionLevel,
             target: Branch,
@@ -164,6 +167,15 @@ abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
                             project<Branch> {
                                 branch {
                                     configureMockSCMBranch()
+
+                                    repositoryFile(
+                                        branch = "main",
+                                        path = "target.properties",
+                                        content = """
+                                            version = 0.0.1
+                                        """.trimIndent()
+                                    )
+
                                     autoVersioningConfigurationService.setupAutoVersioning(
                                         this,
                                         AutoVersioningConfig(
@@ -173,6 +185,8 @@ abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
                                                     sourceBranch = sourceBranch.name,
                                                     sourcePromotion = pl.name,
                                                     targetPath = "target.properties",
+                                                    targetProperty = "version",
+                                                    cronSchedule = cronSchedule,
                                                 )
                                             )
                                         )

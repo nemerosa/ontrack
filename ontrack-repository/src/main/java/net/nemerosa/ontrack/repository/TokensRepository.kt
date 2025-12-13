@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.repository
 
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.structure.Token
-import net.nemerosa.ontrack.model.structure.TokenScope
 import java.time.LocalDateTime
 
 /**
@@ -25,11 +24,10 @@ interface TokensRepository {
      * @param id ID of the account
      * @param name Name of the token
      * @param token Token to save
-     * @param scope Token scope
      * @param time Creation time
      * @param until End of the validity time
      */
-    fun save(id: Int, name: String, token: String, scope: TokenScope, time: LocalDateTime, until: LocalDateTime?)
+    fun save(id: Int, name: String, token: String, time: LocalDateTime, until: LocalDateTime?)
 
     /**
      * Gets a named token for an account.

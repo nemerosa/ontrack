@@ -41,7 +41,7 @@ class DashboardStorageServiceImpl(
             STORE,
             dashboard.uuid,
             StoredDashboard(
-                userId = securityService.currentAccount?.id(),
+                userId = securityService.currentUser?.account?.id(),
                 dashboard = dashboard,
             )
         )

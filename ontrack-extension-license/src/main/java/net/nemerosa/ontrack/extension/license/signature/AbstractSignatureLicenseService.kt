@@ -23,7 +23,7 @@ abstract class AbstractSignatureLicenseService(
     )
 
     @OptIn(ExperimentalEncodingApi::class)
-    override val license: License? by lazy {
+    override val license: License by lazy {
         // Parsing the license data (license data + signature)
         val licenseData = encodedLicense
             ?.takeIf { it.isNotBlank() }

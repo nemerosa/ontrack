@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
@@ -83,6 +84,74 @@ internal class WebhookAdminServiceIT : AbstractNotificationTestSupport() {
                     authentication = WebhookFixtures.webhookAuthentication(),
                 )
             }
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Editing a webhook`() {
+        val name = uid("wh")
+        webhookAdminService.createWebhook(
+            name = name,
+            enabled = true,
+            url = "uri:test",
+            timeout = Duration.ofMinutes(1),
+            authentication = WebhookFixtures.webhookAuthentication(value = "xxxx"),
+        )
+        webhookAdminService.updateWebhook(
+            name = name,
+            enabled = true,
+            url = "uri:test",
+            timeout = Duration.ofMinutes(2),
+            authentication = WebhookFixtures.webhookAuthentication(value = "yyyy"),
+        )
+        assertNotNull(webhookAdminService.findWebhookByName(name)) {
+            assertEquals(name, it.name)
+            assertEquals(true, it.enabled)
+            assertEquals("uri:test", it.url)
+            assertEquals(Duration.ofMinutes(2), it.timeout)
+            assertEquals("header", it.authentication.type)
+            assertEquals(
+                mapOf(
+                    "name" to "X-Ontrack-Token",
+                    "value" to "yyyy",
+                ).asJson(),
+                it.authentication.config
+            )
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Editing a webhook with existing credentials`() {
+        val name = uid("wh")
+        webhookAdminService.createWebhook(
+            name = name,
+            enabled = true,
+            url = "uri:test",
+            timeout = Duration.ofMinutes(1),
+            authentication = WebhookFixtures.webhookAuthentication(value = "xxxx"),
+        )
+        webhookAdminService.updateWebhook(
+            name = name,
+            enabled = false,
+            url = "uri:test",
+            timeout = Duration.ofMinutes(2),
+            authentication = WebhookFixtures.webhookAuthentication(value = ""),
+        )
+        assertNotNull(webhookAdminService.findWebhookByName(name)) {
+            assertEquals(name, it.name)
+            assertEquals(false, it.enabled)
+            assertEquals("uri:test", it.url)
+            assertEquals(Duration.ofMinutes(2), it.timeout)
+            assertEquals("header", it.authentication.type)
+            assertEquals(
+                mapOf(
+                    "name" to "X-Ontrack-Token",
+                    "value" to "xxxx",
+                ).asJson(),
+                it.authentication.config
+            )
         }
     }
 

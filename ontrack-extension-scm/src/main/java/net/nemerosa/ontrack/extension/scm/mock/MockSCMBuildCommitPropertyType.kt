@@ -5,29 +5,33 @@ import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
-@Profile(value = [RunProfile.DEV, RunProfile.ACC, RunProfile.UNIT_TEST])
+@Profile(RunProfile.DEV)
 class MockSCMBuildCommitPropertyType(
     extensionFeature: SCMExtensionFeature,
 ) : AbstractPropertyType<MockSCMBuildCommitProperty>(extensionFeature) {
 
-    override fun getName(): String = "Mock SCM commit"
+    override val name: String = "Mock SCM commit"
 
-    override fun getDescription(): String = "Mock SCM used for testing only"
+    override val description: String = "Mock SCM used for testing only"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = setOf(ProjectEntityType.BUILD)
+    override val supportedEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.BUILD)
 
-    override fun canEdit(entity: ProjectEntity?, securityService: SecurityService?): Boolean = true
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(MockSCMBuildCommitProperty::class)
 
-    override fun canView(entity: ProjectEntity?, securityService: SecurityService?): Boolean = true
+    override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean = true
+
+    override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
 
     override fun fromClient(node: JsonNode): MockSCMBuildCommitProperty = node.parse()
 
@@ -35,8 +39,7 @@ class MockSCMBuildCommitPropertyType(
 
     override fun replaceValue(
         value: MockSCMBuildCommitProperty,
-        replacementFunction: Function<String, String>,
+        replacementFunction: (String) -> String,
     ): MockSCMBuildCommitProperty = value
 
-    override fun getEditionForm(entity: ProjectEntity, value: MockSCMBuildCommitProperty?): Form = Form.create()
 }

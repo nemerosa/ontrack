@@ -15,7 +15,7 @@ class ValidationRunAuthorizationContributor(
 
     override fun appliesTo(context: Any): Boolean = context is ValidationRun
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> {
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> {
         val run = context as ValidationRun
         return listOf(
             Authorization(

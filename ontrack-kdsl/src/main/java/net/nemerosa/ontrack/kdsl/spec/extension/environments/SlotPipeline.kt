@@ -3,10 +3,10 @@ package net.nemerosa.ontrack.kdsl.spec.extension.environments
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.FinishDeploymentPipelineMutation
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.PipelineRequiredInputsQuery
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.StartDeployingPipelineMutation
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.UpdatePipelineDataMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FinishDeploymentPipelineMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.PipelineRequiredInputsQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.StartDeployingPipelineMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.UpdatePipelineDataMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.SlotPipelineDataInputValue
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.SlotPipelineStatus
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
@@ -27,8 +27,8 @@ class SlotPipeline(
             StartDeployingPipelineMutation(
                 id
             )
-        ) { it?.startSlotPipelineDeployment()?.fragments()?.payloadUserErrors()?.convert() }
-            ?.startSlotPipelineDeployment()?.deploymentStatus()?.ok()
+        ) { it?.startSlotPipelineDeployment?.payloadUserErrors?.convert() }
+            ?.startSlotPipelineDeployment?.deploymentStatus?.ok
             ?: error("Cannot get the deployment status")
         if (!status) error("Deployment could not be started")
         return this
@@ -39,7 +39,7 @@ class SlotPipeline(
             FinishDeploymentPipelineMutation(
                 id
             )
-        ) { it?.finishSlotPipelineDeployment()?.fragments()?.payloadUserErrors()?.convert() }
+        ) { it?.finishSlotPipelineDeployment?.payloadUserErrors?.convert() }
         return this
     }
 
@@ -47,26 +47,24 @@ class SlotPipeline(
         // Getting the inputs of this pipeline
         val configId = graphqlConnector.query(
             PipelineRequiredInputsQuery(id)
-        )?.slotPipelineById()?.requiredInputs()?.find {
-            it.config().ruleId() == "manual"
-        }?.config()?.id() ?: error("Could not find any manual rule")
+        )?.slotPipelineById?.requiredInputs?.find {
+            it.config.ruleId == "manual"
+        }?.config?.id ?: error("Could not find any manual rule")
         // Sending the message
         graphqlConnector.mutate(
             UpdatePipelineDataMutation(
                 id,
                 listOf(
-                    SlotPipelineDataInputValue.builder()
-                        .configId(configId)
-                        .data(
-                            mapOf(
-                                "approval" to true,
-                                "message" to message
-                            ).asJson()
-                        )
-                        .build()
+                    SlotPipelineDataInputValue(
+                        configId = configId,
+                        data = mapOf(
+                            "approval" to true,
+                            "message" to message
+                        ).asJson()
+                    )
                 )
             )
-        ) { it?.updatePipelineData()?.fragments()?.payloadUserErrors()?.convert() }
+        ) { it?.updatePipelineData?.payloadUserErrors?.convert() }
         // OK
         return this
     }

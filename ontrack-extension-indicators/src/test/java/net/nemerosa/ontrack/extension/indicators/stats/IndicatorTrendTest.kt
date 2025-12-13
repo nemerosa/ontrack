@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.stats
 
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.extension.indicators.model.Rating
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class IndicatorTrendTest {

@@ -65,7 +65,7 @@ export default function ValidationRunHistoryDialog({dialog, onChange}) {
                         }
                     }
                 `,
-                {runId: dialog.run.id}
+                {runId: Number(dialog.run.id)}
             ).then(data => {
                 const buildId = data.validationRuns[0].build.id
                 const validationStampName = data.validationRuns[0].validationStamp.name
@@ -85,7 +85,6 @@ export default function ValidationRunHistoryDialog({dialog, onChange}) {
                                         id
                                         name
                                         image
-                                        _image
                                         dataType {
                                             descriptor {
                                                 id
@@ -112,7 +111,7 @@ export default function ValidationRunHistoryDialog({dialog, onChange}) {
                         }
                         ${gqlValidationRunContent}
                     `, {
-                        buildId,
+                        buildId: Number(buildId),
                         validationStampName,
                         offset: 0,
                         size: 10,

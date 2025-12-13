@@ -9,7 +9,7 @@ export default function PredefinedValidationStampChangeImageCommand({id, onChang
     const dialog = usePredefinedValidationStampChangeImageDialog({onChange})
 
     const onChangeImage = () => {
-        dialog.start({id})
+        dialog.start({id: Number(id)})
     }
 
     return (

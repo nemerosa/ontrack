@@ -104,19 +104,20 @@ class AutoVersioningProcessingServiceImpl(
             val targetPathUpdated: List<Boolean> = try {
                 order.allPaths.flatMap { configPath ->
                     // Target version
-                    val targetVersion: String = if (configPath.versionSource.isNullOrBlank()) {
+                    val versionSource = configPath.versionSource
+                    val targetVersion: String = if (versionSource.isNullOrBlank()) {
                         order.targetVersion
                     } else {
                         val build = sourceBuild
                         if (build != null) {
                             versionSourceFactory.getBuildVersion(
                                 build = build,
-                                versionSource = configPath.versionSource,
+                                versionSource = versionSource,
                             )
                         } else {
                             throw AutoVersioningCustomVersionNotFoundException(
                                 configPath.path,
-                                configPath.versionSource
+                                versionSource
                             )
                         }
                     }
@@ -396,10 +397,11 @@ class AutoVersioningProcessingServiceImpl(
         targetVersion: String
     ): List<String> {
         val type = filePropertyType
-        val actualValue = if (propertyRegex.isNullOrBlank()) {
+        val regex = propertyRegex
+        val actualValue = if (regex.isNullOrBlank()) {
             targetVersion
         } else {
-            val regex = propertyRegex.toRegex()
+            val regex = regex.toRegex()
             val previousValue = type.readProperty(content, property) ?: error("Cannot find target property")
             regex.replaceGroup(previousValue, 1, targetVersion)
         }

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.*
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.ValidationStampDeletePropertyMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.ValidationStampGetPropertyQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.ValidationStampSetPropertyMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.fragment.ValidationStampFragment
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
@@ -14,11 +16,11 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
  */
 fun ValidationStampFragment.toValidationStamp(connected: Connected) = ValidationStamp(
     connector = connected.connector,
-    id = id().toUInt(),
-    name = name()!!,
-    description = description(),
-    dataType = dataType()?.descriptor()?.id(),
-    dataTypeConfig = dataType()?.config()?.asJson(),
+    id = id.toUInt(),
+    name = name!!,
+    description = description,
+    dataType = dataType?.descriptor?.id,
+    dataTypeConfig = dataType?.config?.asJson(),
 )
 
 
@@ -39,7 +41,7 @@ fun ValidationStamp.setProperty(
             data.asJson()
         )
     ) {
-        it?.setValidationStampPropertyById()?.fragments()?.payloadUserErrors()?.convert()
+        it?.setValidationStampPropertyById?.payloadUserErrors?.convert()
     }
     return this
 }
@@ -58,7 +60,7 @@ fun ValidationStamp.deleteProperty(
             type
         )
     ) {
-        it?.setValidationStampPropertyById()?.fragments()?.payloadUserErrors()?.convert()
+        it?.setValidationStampPropertyById?.payloadUserErrors?.convert()
     }
     return this
 }
@@ -74,4 +76,4 @@ fun ValidationStamp.getProperty(
 ): JsonNode? =
     graphqlConnector.query(
         ValidationStampGetPropertyQuery(id.toInt(), type)
-    )?.validationStamp()?.properties()?.firstOrNull()?.value()?.asJson()
+    )?.validationStamp?.properties?.firstOrNull()?.value?.asJson()

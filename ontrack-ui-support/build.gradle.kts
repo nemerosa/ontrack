@@ -14,24 +14,6 @@ dependencies {
 
     testApi(project(":ontrack-it-utils"))
 
-    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
-}
+    testImplementation(testFixtures(project(":ontrack-model")))
 
-val testJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("tests")
-    from(sourceSets["test"].output)
-}
-
-configure<PublishingExtension> {
-    publications {
-        maybeCreate<MavenPublication>("mavenCustom").artifact(tasks["testJar"])
-    }
-}
-
-tasks["assemble"].dependsOn("testJar")
-
-val tests by configurations.creating
-
-artifacts {
-    add("tests", testJar)
 }

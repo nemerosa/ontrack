@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupp
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordFilter
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordingService
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
+import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.support.client.MockRestTemplateContext
 import net.nemerosa.ontrack.extension.support.client.MockRestTemplateProvider
 import net.nemerosa.ontrack.extension.support.client.success
@@ -18,15 +19,10 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-@TestPropertySource(
-    properties = [
-        "ontrack.config.extension.support.client.resttemplate=mock",
-    ]
-)
+@QueueNoAsync
 class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
 
     @Autowired
@@ -127,7 +123,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                                 ),
                                 "labels" to listOf("test", "v${build.name}"),
                                 "description" to """
-                                    Build [${build.name}|http://localhost:8080/#/build/${build.id}] has been promoted to [${pl.name}|http://localhost:8080/#/promotionLevel/${pl.id}].
+                                    Build [${build.name}|http://localhost:3000/build/${build.id}] has been promoted to [${pl.name}|http://localhost:3000/promotionLevel/${pl.id}].
                                 """.trimIndent(),
                                 "assignee" to mapOf(
                                     "name" to "dcoraboeuf"
@@ -249,7 +245,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                                 ),
                                 "labels" to listOf("test", "v${build.name}"),
                                 "description" to """
-                                    Build [${build.name}|http://localhost:8080/#/build/${build.id}] has been promoted to [${pl.name}|http://localhost:8080/#/promotionLevel/${pl.id}].
+                                    Build [${build.name}|http://localhost:3000/build/${build.id}] has been promoted to [${pl.name}|http://localhost:3000/promotionLevel/${pl.id}].
                                 """.trimIndent(),
                                 "assignee" to mapOf(
                                     "name" to "dcoraboeuf"

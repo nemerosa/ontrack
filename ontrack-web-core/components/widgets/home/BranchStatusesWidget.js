@@ -40,8 +40,8 @@ export default function BranchStatusesWidget({
     const getBranch = data => {
         if (data.projects) {
             const project = data.projects[0]
-            if (project.branches) {
-                const branch = project.branches[0]
+            if (project.branch) {
+                const branch = project.branch
                 return {
                     ...branch,
                     project: {
@@ -91,7 +91,7 @@ export default function BranchStatusesWidget({
                             projects(name: $project) {
                                 id
                                 name
-                                branches(name: $branch) {
+                                branch(name: $branch) {
                                     id
                                     name
                                     promotionStatuses(names: $promotions) {

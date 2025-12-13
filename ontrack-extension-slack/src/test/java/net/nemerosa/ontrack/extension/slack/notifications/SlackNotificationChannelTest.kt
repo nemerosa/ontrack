@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultT
 import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.extension.slack.service.SlackNotificationType
 import net.nemerosa.ontrack.extension.slack.service.SlackService
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventTemplatingService
@@ -122,6 +123,31 @@ class SlackNotificationChannelTest {
             enabled = false
         )
         assertFalse(channel.enabled, "Channel is disabled")
+    }
+
+    @Test
+    fun `Configuration merge with channel change only`() {
+        val config = channel.mergeConfig(
+            a = SlackNotificationChannelConfig(channel = "#test", type = SlackNotificationType.SUCCESS),
+            changes = mapOf(
+                "channel" to "#new-channel",
+            ).asJson(),
+        )
+        assertEquals("#new-channel", config.channel)
+        assertEquals(SlackNotificationType.SUCCESS, config.type)
+    }
+
+    @Test
+    fun `Configuration merge with channel change and type`() {
+        val config = channel.mergeConfig(
+            a = SlackNotificationChannelConfig(channel = "#test", type = SlackNotificationType.SUCCESS),
+            changes = mapOf(
+                "channel" to "#new-channel",
+                "type" to "WARNING",
+            ).asJson(),
+        )
+        assertEquals("#new-channel", config.channel)
+        assertEquals(SlackNotificationType.WARNING, config.type)
     }
 
 }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
@@ -8,6 +9,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class GQLRootQueryValidationStampNamesIT: AbstractQLKTITSupport() {
 
     @Test

@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.tfc.service
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class TFCBuildServiceImpl(

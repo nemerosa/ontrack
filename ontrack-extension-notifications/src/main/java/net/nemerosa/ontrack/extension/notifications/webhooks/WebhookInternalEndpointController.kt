@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
 import com.fasterxml.jackson.databind.JsonNode
+import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.BaseException
+import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.json.parseOrNull
@@ -11,10 +13,9 @@ import net.nemerosa.ontrack.model.exceptions.NotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.*
 import java.util.*
-import javax.annotation.PostConstruct
 
 /**
  * Internal endpoint for simulating a webhook.
@@ -22,12 +23,7 @@ import javax.annotation.PostConstruct
  * Should be used only for testing.
  */
 @RestController
-@ConditionalOnProperty(
-    prefix = "ontrack.config.extension.notifications.webhook.internal",
-    name = ["enabled"],
-    havingValue = "true",
-    matchIfMissing = false,
-)
+@Profile(RunProfile.DEV)
 @RequestMapping("/extension/notifications/webhooks/internal")
 class WebhookInternalEndpointController(
     private val securityService: SecurityService,

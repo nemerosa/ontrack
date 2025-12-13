@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.jira.JIRAFixtures.jiraConfiguration
 import net.nemerosa.ontrack.extension.jira.client.JIRAClient
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue
@@ -18,7 +17,9 @@ import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
 import net.nemerosa.ontrack.tx.DefaultTransactionService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class JIRAServiceExtensionTest {
 
@@ -39,17 +40,13 @@ class JIRAServiceExtensionTest {
         every { session.close() } just Runs
         every { session.client } returns client
 
-        val issueExportServiceFactory = mockk<IssueExportServiceFactory>()
-
         val propertyService = mockk<PropertyService>()
 
         service = JIRAServiceExtension(
             extensionFeature = JIRAExtensionFeature(),
             jiraConfigurationService = jiraConfigurationService,
             jiraSessionFactory = jiraSessionFactory,
-            transactionService = transactionService,
-            issueExportServiceFactory = issueExportServiceFactory,
-            propertyService = propertyService
+            transactionService = transactionService
         )
     }
 
@@ -209,20 +206,6 @@ class JIRAServiceExtensionTest {
         )
     }
 
-    @Test
-    fun `Message regular expression`() {
-        val regex = service.getMessageRegex(jiraConfiguration(), createIssue(120)).toRegex()
-        assertTrue(regex.containsMatchIn("TEST-120"))
-        assertTrue(regex.containsMatchIn("TEST-120 at the beginning"))
-        assertTrue(regex.containsMatchIn("In the TEST-120 middle"))
-        assertTrue(regex.containsMatchIn("In the end TEST-120"))
-        assertTrue(regex.containsMatchIn("TEST-120: with separator"))
-        assertFalse(regex.containsMatchIn("Too many TEST-1200 digits"))
-        assertFalse(regex.containsMatchIn("Too many digits TEST-1200"))
-        assertFalse(regex.containsMatchIn("Wrong XTEST-1200 project"))
-        assertFalse(regex.containsMatchIn("XTEST-1200 Wrong project"))
-    }
-
     private fun createLink(i: Int, name: String, relation: String) =
         JIRALink(
             "TEST-$i",
@@ -234,6 +217,7 @@ class JIRAServiceExtensionTest {
 
     private fun createIssue(i: Int) =
         JIRAIssue(
+            "1",
             "http://host/browser/TEST-$i",
             "TEST-$i",
             "Issue $i",

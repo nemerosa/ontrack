@@ -4,9 +4,6 @@ import net.nemerosa.ontrack.common.Version
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.textField
-import net.nemerosa.ontrack.model.form.yesNoField
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -87,13 +84,5 @@ data class JenkinsPipelineLibraryIndicatorLibrarySettings(
 
     companion object {
         private const val NOT_APPLICABLE = 100
-
-        fun getForm(settings: JenkinsPipelineLibraryIndicatorLibrarySettings?) =
-            Form.create()
-                .textField(JenkinsPipelineLibraryIndicatorLibrarySettings::library, settings?.library)
-                .yesNoField(JenkinsPipelineLibraryIndicatorLibrarySettings::required, settings?.required)
-                .textField(JenkinsPipelineLibraryIndicatorLibrarySettings::lastSupported, settings?.lastSupported)
-                .textField(JenkinsPipelineLibraryIndicatorLibrarySettings::lastDeprecated, settings?.lastDeprecated)
-                .textField(JenkinsPipelineLibraryIndicatorLibrarySettings::lastUnsupported, settings?.lastUnsupported)
     }
 }

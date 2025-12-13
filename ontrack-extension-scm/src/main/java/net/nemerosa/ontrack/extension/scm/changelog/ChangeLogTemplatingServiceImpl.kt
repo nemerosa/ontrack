@@ -25,47 +25,60 @@ class ChangeLogTemplatingServiceImpl(
         renderer: EventRenderer
     ): String {
 
-        val empty = ChangeLogTemplatingServiceConfig.emptyValue(configMap)
-        val title =
-            configMap.getBooleanTemplatingParam(ChangeLogTemplatingServiceConfig::title.name, false)
-        val dependencies =
-            configMap.getListStringsTemplatingParam(ChangeLogTemplatingServiceConfig::dependencies.name)
-                ?: emptyList()
-        val allQualifiers = configMap.getBooleanTemplatingParam(
-            ChangeLogTemplatingServiceConfig::allQualifiers.name,
-            false
-        )
-        val defaultQualifierFallback = configMap.getBooleanTemplatingParam(
-            ChangeLogTemplatingServiceConfig::defaultQualifierFallback.name,
-            false
+        val config = ChangeLogTemplatingServiceConfig(
+            empty = ChangeLogTemplatingServiceConfig.emptyValue(configMap),
+            title = configMap.getBooleanTemplatingParam(ChangeLogTemplatingServiceConfig::title.name, false),
+            dependencies = configMap.getListStringsTemplatingParam(ChangeLogTemplatingServiceConfig::dependencies.name)
+                ?: emptyList(),
+            allQualifiers = configMap.getBooleanTemplatingParam(
+                ChangeLogTemplatingServiceConfig::allQualifiers.name,
+                false
+            ),
+            defaultQualifierFallback = configMap.getBooleanTemplatingParam(
+                ChangeLogTemplatingServiceConfig::defaultQualifierFallback.name,
+                false
+            ),
+            commitsOption = configMap[ChangeLogTemplatingServiceConfig::commitsOption.name]
+                ?.let { ChangeLogTemplatingCommitsOption.valueOf(it) }
+                ?: ChangeLogTemplatingCommitsOption.NONE,
         )
 
-        val commitsOption = configMap[ChangeLogTemplatingServiceConfig::commitsOption.name]
-            ?.let { ChangeLogTemplatingCommitsOption.valueOf(it) }
-            ?: ChangeLogTemplatingCommitsOption.NONE
+        return render(
+            fromBuild = fromBuild,
+            toBuild = toBuild,
+            config = config,
+            renderer = renderer,
+        )
+    }
 
-        return if (allQualifiers && dependencies.isNotEmpty()) {
+    override fun render(
+        fromBuild: Build,
+        toBuild: Build,
+        config: ChangeLogTemplatingServiceConfig,
+        renderer: EventRenderer
+    ): String {
+        return if (config.allQualifiers && config.dependencies.isNotEmpty()) {
             renderAllQualifiers(
                 fromBuild = fromBuild,
                 toBuild = toBuild,
-                dependencies = dependencies,
-                defaultQualifierFallback = defaultQualifierFallback,
+                dependencies = config.dependencies,
+                defaultQualifierFallback = config.defaultQualifierFallback,
                 renderer = renderer,
-                empty = empty,
-                title = title,
-                commitsOption = commitsOption
+                empty = config.empty,
+                title = config.title,
+                commitsOption = config.commitsOption
             )
         } else {
             // Single change log
             renderChangeLog(
                 fromBuild = fromBuild,
                 toBuild = toBuild,
-                dependencies = dependencies,
-                defaultQualifierFallback = defaultQualifierFallback,
+                dependencies = config.dependencies,
+                defaultQualifierFallback = config.defaultQualifierFallback,
                 renderer = renderer,
-                empty = empty,
-                title = title,
-                commitsOption = commitsOption,
+                empty = config.empty,
+                title = config.title,
+                commitsOption = config.commitsOption,
             )
         }
     }

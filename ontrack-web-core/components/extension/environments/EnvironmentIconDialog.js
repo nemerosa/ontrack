@@ -1,13 +1,11 @@
 import ChangeImageDialog, {useChangeImageDialog} from "@components/common/ChangeImageDialog";
 import {gql} from "graphql-request";
 import EnvironmentIcon from "@components/extension/environments/EnvironmentIcon";
-import {useRestClient} from "@components/providers/ConnectionContextProvider";
 import {useContext} from "react";
 import {EventsContext} from "@components/common/EventsContext";
 
 export const useEnvironmentIconDialog = () => {
 
-    const restClient = useRestClient()
     const eventsContext = useContext(EventsContext)
 
     return useChangeImageDialog({
@@ -23,7 +21,10 @@ export const useEnvironmentIconDialog = () => {
         `,
         queryUserNode: 'environmentById',
         imageCallback: (data, id) => {
-            restClient.put(`/rest/extension/environments/environments/${id}/image`, data).then(() => {
+            fetch(`/api/protected/images/environments/${id}`, {
+                method: 'PUT',
+                body: data,
+            }).then(() => {
                 eventsContext.fireEvent("environment.image", {id})
             })
         }

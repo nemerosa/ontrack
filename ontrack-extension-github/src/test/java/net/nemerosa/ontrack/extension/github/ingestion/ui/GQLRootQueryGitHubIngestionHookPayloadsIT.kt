@@ -9,9 +9,7 @@ import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.parse
 import org.junit.jupiter.api.Test
 import org.springframework.graphql.execution.ErrorType
-import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport() {
 
@@ -40,6 +38,7 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport()
                             message
                             completion
                             source
+                            accountName
                         }
                      }
                     }
@@ -49,6 +48,7 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport()
                         data.path("gitHubIngestionHookPayloads").path("pageItems").first().parse<IngestionHookPayload>()
                 assertEquals(payload.uuid, item.uuid)
                 assertEquals("sample source", item.source)
+                assertEquals("admin", item.accountName)
             }
         }
     }

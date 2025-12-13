@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.environments.events
 import net.nemerosa.ontrack.extension.environments.EnvironmentTestSupport
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
+@AsAdminTest
 class EnvironmentsEventsFactoryIT : AbstractDSLTestSupport() {
 
     @Autowired
@@ -65,7 +67,7 @@ class EnvironmentsEventsFactoryIT : AbstractDSLTestSupport() {
             val event = environmentsEventsFactory.slotCreation(slot)
             val text = render(event)
             assertEquals(
-                """Slot <a href="http://localhost:3000/ui/extension/environments/slot/${slot.id}">${slot.environment.name}/${slot.project.name}</a> for environment ${slot.environment.name} has been created.""",
+                """Slot <a href="http://localhost:3000/extension/environments/slot/${slot.id}">${slot.environment.name}/${slot.project.name}</a> for environment ${slot.environment.name} has been created.""",
                 text
             )
         }
@@ -77,7 +79,7 @@ class EnvironmentsEventsFactoryIT : AbstractDSLTestSupport() {
             val event = environmentsEventsFactory.slotUpdated(slot)
             val text = render(event)
             assertEquals(
-                """Slot <a href="http://localhost:3000/ui/extension/environments/slot/${slot.id}">${slot.environment.name}/${slot.project.name}</a> for environment ${slot.environment.name} has been updated.""",
+                """Slot <a href="http://localhost:3000/extension/environments/slot/${slot.id}">${slot.environment.name}/${slot.project.name}</a> for environment ${slot.environment.name} has been updated.""",
                 text
             )
         }
@@ -89,7 +91,7 @@ class EnvironmentsEventsFactoryIT : AbstractDSLTestSupport() {
             val event = environmentsEventsFactory.slotDeleted(slot)
             val text = render(event)
             assertEquals(
-                """Slot <a href="http://localhost:8080/#/project/${slot.project.id}">${slot.project.name}</a> (qualifier = "") for environment ${slot.environment.name} has been deleted.""",
+                """Slot <a href="http://localhost:3000/project/${slot.project.id}">${slot.project.name}</a> (qualifier = "") for environment ${slot.environment.name} has been deleted.""",
                 text
             )
         }
@@ -102,7 +104,7 @@ class EnvironmentsEventsFactoryIT : AbstractDSLTestSupport() {
             val event = environmentsEventsFactory.pipelineCreation(pipeline)
             val text = render(event)
             assertEquals(
-                """Pipeline <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.slot.environment.name}/${pipeline.slot.project.name}#1</a> has started.""",
+                """Pipeline <a href="http://localhost:3000/extension/environments/pipeline/${pipeline.id}">${pipeline.slot.environment.name}/${pipeline.slot.project.name}#1</a> has started.""",
                 text
             )
         }
@@ -114,7 +116,7 @@ class EnvironmentsEventsFactoryIT : AbstractDSLTestSupport() {
             val event = environmentsEventsFactory.pipelineDeploying(pipeline)
             val text = render(event)
             assertEquals(
-                """Pipeline <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.slot.environment.name}/${pipeline.slot.project.name}#1</a> is starting its deployment.""",
+                """Pipeline <a href="http://localhost:3000/extension/environments/pipeline/${pipeline.id}">${pipeline.slot.environment.name}/${pipeline.slot.project.name}#1</a> is starting its deployment.""",
                 text
             )
         }
@@ -126,7 +128,7 @@ class EnvironmentsEventsFactoryIT : AbstractDSLTestSupport() {
             val event = environmentsEventsFactory.pipelineDeployed(pipeline)
             val text = render(event)
             assertEquals(
-                """Pipeline <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.slot.environment.name}/${pipeline.slot.project.name}#1</a> has been deployed.""",
+                """Pipeline <a href="http://localhost:3000/extension/environments/pipeline/${pipeline.id}">${pipeline.slot.environment.name}/${pipeline.slot.project.name}#1</a> has been deployed.""",
                 text
             )
         }
@@ -138,7 +140,7 @@ class EnvironmentsEventsFactoryIT : AbstractDSLTestSupport() {
             val event = environmentsEventsFactory.pipelineCancelled(pipeline)
             val text = render(event)
             assertEquals(
-                """Pipeline <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.slot.environment.name}/${pipeline.slot.project.name}#1</a> has been cancelled.""",
+                """Pipeline <a href="http://localhost:3000/extension/environments/pipeline/${pipeline.id}">${pipeline.slot.environment.name}/${pipeline.slot.project.name}#1</a> has been cancelled.""",
                 text
             )
         }
@@ -152,7 +154,7 @@ class EnvironmentsEventsFactoryIT : AbstractDSLTestSupport() {
                 val event = environmentsEventsFactory.pipelineStatusOverridden(pipeline)
                 val text = render(event)
                 assertEquals(
-                    """Pipeline <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.slot.environment.name}/${pipeline.slot.project.name}#1</a> status has been overridden by $user.""",
+                    """Pipeline <a href="http://localhost:3000/extension/environments/pipeline/${pipeline.id}">${pipeline.slot.environment.name}/${pipeline.slot.project.name}#1</a> status has been overridden by $user.""",
                     text
                 )
             }
@@ -165,7 +167,7 @@ class EnvironmentsEventsFactoryIT : AbstractDSLTestSupport() {
             val event = environmentsEventsFactory.pipelineStatusChanged(pipeline)
             val text = render(event)
             assertEquals(
-                """Pipeline <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.slot.environment.name}/${pipeline.slot.project.name}#1</a> status has been updated.""",
+                """Pipeline <a href="http://localhost:3000/extension/environments/pipeline/${pipeline.id}">${pipeline.slot.environment.name}/${pipeline.slot.project.name}#1</a> status has been updated.""",
                 text
             )
         }

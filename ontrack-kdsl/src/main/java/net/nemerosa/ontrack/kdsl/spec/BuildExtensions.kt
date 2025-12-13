@@ -15,10 +15,10 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
  */
 fun BuildFragment.toBuild(connected: Connected) = Build(
     connector = connected.connector,
-    branch = branch()?.fragments()?.branchFragment()?.toBranch(connected) ?: error("Missing parent branch"),
-    id = id().toUInt(),
-    name = name()!!,
-    description = description(),
+    branch = branch?.branchFragment?.toBranch(connected) ?: error("Missing parent branch"),
+    id = id.toUInt(),
+    name = name!!,
+    description = description,
 )
 
 /**
@@ -38,7 +38,7 @@ fun Build.setProperty(
             data.asJson()
         )
     ) {
-        it?.setBuildPropertyById()?.fragments()?.payloadUserErrors()?.convert()
+        it?.setBuildPropertyById?.payloadUserErrors?.convert()
     }
     return this
 }
@@ -57,7 +57,7 @@ fun Build.deleteProperty(
             type
         )
     ) {
-        it?.setBuildPropertyById()?.fragments()?.payloadUserErrors()?.convert()
+        it?.setBuildPropertyById?.payloadUserErrors?.convert()
     }
     return this
 }
@@ -73,4 +73,4 @@ fun Build.getProperty(
 ): JsonNode? =
     graphqlConnector.query(
         BuildGetPropertyQuery(id.toInt(), type)
-    )?.builds()?.firstOrNull()?.properties()?.firstOrNull()?.value()?.asJson()
+    )?.builds?.firstOrNull()?.properties?.firstOrNull()?.value?.asJson()

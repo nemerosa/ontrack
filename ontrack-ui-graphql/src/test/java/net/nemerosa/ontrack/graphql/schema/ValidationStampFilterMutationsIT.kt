@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.ValidationStampFilterMgt
 import net.nemerosa.ontrack.model.structure.ValidationStampFilter
 import net.nemerosa.ontrack.model.structure.ValidationStampFilterService
@@ -15,6 +16,7 @@ class ValidationStampFilterMutationsIT : AbstractQLKTITSupport() {
     private lateinit var validationStampFilterService: ValidationStampFilterService
 
     @Test
+    @AsAdminTest
     fun `Deletion of a validation stamp filter`() {
         project {
             branch {

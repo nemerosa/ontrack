@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.git.property
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationField
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaIgnore
+import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration
 
 class GitBranchConfigurationProperty(
@@ -17,18 +19,34 @@ class GitBranchConfigurationProperty(
      */
     @DocumentationField
     @APIDescription("How builds are linked to their Git commit")
+    @JsonSchemaIgnore
     val buildCommitLink: ServiceConfiguration?,
 
     /**
      * Build overriding policy when synchronizing
      */
     @APIDescription("Build overriding policy when synchronizing")
-    val isOverride: Boolean,
+    @JsonSchemaIgnore
+    val override: Boolean,
 
     /**
      * Interval in minutes for build/tag synchronization
      */
     @APIDescription("Interval in minutes for build/tag synchronization")
+    @JsonSchemaIgnore
     val buildTagInterval: Int
 
-)
+) {
+    companion object {
+        fun getSearchArguments(scmName: String): PropertySearchArguments? =
+            if (scmName.isNotBlank()) {
+                PropertySearchArguments(
+                    jsonContext = null,
+                    jsonCriteria = "pp.json->>'branch' = :scmName",
+                    criteriaParams = mapOf("scmName" to scmName)
+                )
+            } else {
+                null
+            }
+    }
+}

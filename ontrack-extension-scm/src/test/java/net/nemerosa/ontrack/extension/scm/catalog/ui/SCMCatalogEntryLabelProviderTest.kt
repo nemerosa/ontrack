@@ -1,14 +1,15 @@
 package net.nemerosa.ontrack.extension.scm.catalog.ui
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import io.mockk.every
+import io.mockk.mockk
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogFixtures
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -20,11 +21,16 @@ class SCMCatalogEntryLabelProviderTest {
 
     private lateinit var project: Project
 
-    @Before
+    @BeforeEach
     fun init() {
         project = Project.of(NameDescription.nd("PRJ", "")).withId(ID.of(1))
-        catalogLinkService = mock()
-        provider = SCMCatalogEntryLabelProvider(catalogLinkService)
+        catalogLinkService = mockk(relaxed = true)
+        provider = SCMCatalogEntryLabelProvider(
+            catalogLinkService = catalogLinkService,
+            scmExtensionConfigProperties = SCMExtensionConfigProperties().apply {
+                catalog.enabled = true
+            },
+        )
     }
 
     @Test
@@ -35,7 +41,7 @@ class SCMCatalogEntryLabelProviderTest {
 
     @Test
     fun `Label for linked project`() {
-        whenever(catalogLinkService.getSCMCatalogEntry(project)).thenReturn(CatalogFixtures.entry())
+        every { catalogLinkService.getSCMCatalogEntry(project) } returns CatalogFixtures.entry()
         val labels = provider.getLabelsForProject(project)
         assertEquals(1, labels.size)
         val label = labels.first()
@@ -48,7 +54,7 @@ class SCMCatalogEntryLabelProviderTest {
 
     @Test
     fun `Label for unlinked project`() {
-        whenever(catalogLinkService.getSCMCatalogEntry(project)).thenReturn(null)
+        every { catalogLinkService.getSCMCatalogEntry(project) } returns null
         val labels = provider.getLabelsForProject(project)
         assertEquals(1, labels.size)
         val label = labels.first()

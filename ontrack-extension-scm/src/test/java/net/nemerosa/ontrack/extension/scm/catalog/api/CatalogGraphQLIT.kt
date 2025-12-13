@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogAccessFunction
 import net.nemerosa.ontrack.extension.scm.catalog.mock.MockSCMCatalogProvider
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.security.Roles
@@ -19,6 +20,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class CatalogGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired

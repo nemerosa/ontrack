@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.*
 import java.util.*
-import java.util.function.Function
 
 abstract class AbstractConfigurationService<T : Configuration<T>>(
     private val configurationClass: Class<T>,
@@ -32,11 +31,6 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
     override val configurations: List<T>
         get() = configurationRepository.list(configurationClass)
             .map { config: T -> decrypt(config) }
-
-    override val configurationDescriptors: List<ConfigurationDescriptor>
-        get() = securityService.asAdmin {
-            configurations.map { it.descriptor }
-        }
 
     override fun newConfiguration(configuration: T): T {
         checkAccess()
@@ -66,9 +60,6 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
         configurationRepository
             .find(configurationClass, name)
             ?.run { decrypt(this) }
-
-    override fun getOptionalConfiguration(name: String): Optional<T> =
-        Optional.ofNullable(findConfiguration(name))
 
     override fun deleteConfiguration(name: String) {
         checkAccess()
@@ -139,13 +130,6 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
      * Validates a configuration by connecting to its target
      */
     protected abstract fun validate(configuration: T): ConnectionResult
-
-    /**
-     * Returns itself, no replacement any longer.
-     */
-    override fun replaceConfiguration(configuration: T, replacementFunction: Function<String, String>): T {
-        return configuration
-    }
 
     override val configurationType: Class<T> = configurationClass
 

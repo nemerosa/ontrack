@@ -31,4 +31,13 @@ interface BuildDisplayNameExtension : Extension {
         onlyDisplayName: Boolean,
     ): Build?
 
+    /**
+     * Sets the display name for a build.
+     *
+     * If [override] is `false`, the display name will be set only if not already set.
+     *
+     * @return `true` if the display name was set
+     */
+    fun setDisplayName(build: Build, displayName: String, override: Boolean): Boolean
+
 }

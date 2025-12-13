@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec
 
-import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
@@ -21,14 +21,14 @@ class Ontrack(connector: Connector) : Connected(connector) {
         graphqlConnector.mutate(
             CreateProjectMutation(
                 name,
-                Input.optional(description),
+                Optional.presentIfNotNull(description),
             )
         ) {
-            it?.createProject()?.fragments()?.payloadUserErrors()?.convert()
+            it?.createProject?.payloadUserErrors?.convert()
         }?.checkData {
-            it.createProject()?.project()
+            it.createProject?.project
         }
-            ?.fragments()?.projectFragment()?.toProject(this)
+            ?.projectFragment?.toProject(this)
             ?: throw GraphQLMissingDataException("Did not get back the created project")
 
     /**
@@ -39,8 +39,8 @@ class Ontrack(connector: Connector) : Connected(connector) {
      */
     fun findProjectByName(name: String): Project? = graphqlConnector.query(
         FindProjectByNameQuery(name)
-    )?.projects()?.firstOrNull()
-        ?.fragments()?.projectFragment()?.toProject(this)
+    )?.projects?.firstOrNull()
+        ?.projectFragment?.toProject(this)
 
     /**
      * Getting a branch using its name
@@ -51,8 +51,8 @@ class Ontrack(connector: Connector) : Connected(connector) {
      */
     fun findBranchByName(project: String, branch: String): Branch? = graphqlConnector.query(
         FindBranchByNameQuery(project, branch)
-    )?.branches()?.firstOrNull()
-        ?.fragments()?.branchFragment()?.toBranch(this@Ontrack)
+    )?.branches?.firstOrNull()
+        ?.branchFragment?.toBranch(this@Ontrack)
 
     /**
      * Getting a build using its name
@@ -64,8 +64,8 @@ class Ontrack(connector: Connector) : Connected(connector) {
      */
     fun findBuildByName(project: String, branch: String, build: String): Build? = graphqlConnector.query(
         FindByBuildByNameQuery(project, branch, build)
-    )?.builds()?.firstOrNull()
-        ?.fragments()?.buildFragment()?.toBuild(this@Ontrack)
+    )?.builds?.firstOrNull()
+        ?.buildFragment?.toBuild(this@Ontrack)
 
     /**
      * Getting a list of the last projects
@@ -73,8 +73,8 @@ class Ontrack(connector: Connector) : Connected(connector) {
     fun projects(): List<Project> =
         graphqlConnector.query(
             ProjectListQuery()
-        )?.projects()?.map {
-            it.fragments().projectFragment().toProject(this)
+        )?.projects?.map {
+            it.projectFragment.toProject(this)
         } ?: emptyList()
 
 }

@@ -14,11 +14,6 @@ class BranchDisplayNameServiceImpl(
     private val extensionManager: ExtensionManager
 ) : BranchDisplayNameService {
 
-    @Deprecated("Will be removed in V5. Use the method with the branch name policy.")
-    override fun getBranchDisplayName(branch: Branch): String {
-        return getBranchDisplayName(branch, BranchNamePolicy.DISPLAY_NAME_OR_NAME)
-    }
-
     override fun getBranchDisplayName(branch: Branch, policy: BranchNamePolicy): String {
         val displayName: String? by lazy {
             extensionManager.getExtensions(BranchDisplayNameExtension::class.java)

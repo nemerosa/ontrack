@@ -12,7 +12,7 @@ export default function ValidationStampPage() {
             <main>
                 <MainLayout>
                     <StoredChartOptionsCommandContextProvider id="validation-charts">
-                        <ValidationStampView id={id}/>
+                        <ValidationStampView id={Number(id)}/>
                     </StoredChartOptionsCommandContextProvider>
                 </MainLayout>
             </main>

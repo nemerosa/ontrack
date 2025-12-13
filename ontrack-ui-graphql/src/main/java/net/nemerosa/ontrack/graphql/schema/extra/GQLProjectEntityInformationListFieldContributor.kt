@@ -34,7 +34,7 @@ class GQLProjectEntityInformationListFieldContributor(
                 .description("List of information components attached to this entity")
                 .type(listType(information.typeRef))
                 .dataFetcher { env ->
-                    val entity: ProjectEntity = env.getSource()
+                    val entity: ProjectEntity = env.getSource()!!
                     extensions.mapNotNull { it.getInformation(entity) }
                 }
                 .build()

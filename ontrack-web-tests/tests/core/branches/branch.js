@@ -1,4 +1,3 @@
-const {ui} = require("@ontrack/connection");
 const {expect} = require("@playwright/test");
 const {ValidationRunHistoryDialog} = require("../validationRuns/ValidationRunHistoryDialog");
 const {SCMChangeLogPage} = require("../../extensions/scm/scm");
@@ -19,7 +18,7 @@ class BranchPage {
     }
 
     async goTo() {
-        await this.page.goto(`${ui()}/branch/${this.branch.id}`)
+        await this.page.goto(`${this.branch.ontrack.connection.ui}/branch/${this.branch.id}`)
         await this.checkOnPage()
     }
 

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.indicators.computing
 
-import net.nemerosa.ontrack.common.SimpleExpand
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorValueType
 import net.nemerosa.ontrack.model.structure.Project
 
@@ -9,7 +8,7 @@ import net.nemerosa.ontrack.model.structure.Project
  *
  * @property category Associated category
  * @property id Unique ID for this type
- * @property name Display name this type, including variables as defined for being used by [SimpleExpand].
+ * @property name Display name this type, including variables as defined for being used by the templating service.
  * @property valueType Type of value (see [IndicatorComputedType.valueType]
  * @property valueConfig Configuration of this type (see [IndicatorComputedType.valueConfig], computed from the project and its stored state
  * @property attributes List of attributes for this type
@@ -25,12 +24,4 @@ class ConfigurableIndicatorType<T, C>(
     private val computing: (project: Project, state: ConfigurableIndicatorState) -> T?
 ) {
     fun computeValue(project: Project, state: ConfigurableIndicatorState) = computing(project, state)
-
-    fun expandName(state: ConfigurableIndicatorState): String {
-        val valueMap = state.values.associate {
-            it.attribute.key to it.attribute.type.map(it.value)
-        }
-        // Expanding
-        return SimpleExpand.expand(name, valueMap)
-    }
 }

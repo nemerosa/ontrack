@@ -2,6 +2,7 @@ import {Descriptions, Typography} from "antd";
 import AutoVersioningPostProcessing from "@components/extension/auto-versioning/AutoVersioningPostProcessing";
 import AutoVersioningConfigNotifications from "@components/extension/auto-versioning/AutoVersioningConfigNotifications";
 import AutoVersioningAdditionalPaths from "@components/extension/auto-versioning/AutoVersioningAdditionalPaths";
+import AutoVersioningSchedule from "@components/extension/auto-versioning/AutoVersioningSchedule";
 
 export default function AutoVersioningConfigDetails({source, additionalItems = [], size}) {
 
@@ -132,6 +133,11 @@ export default function AutoVersioningConfigDetails({source, additionalItems = [
             key: 'additionalPaths',
             label: "Additional paths",
             children: <AutoVersioningAdditionalPaths additionalPaths={source.additionalPaths}/>,
+        },
+        {
+            key: 'schedule',
+            label: "Schedule",
+            children: <AutoVersioningSchedule schedule={source.schedule}/>,
         },
     )
 

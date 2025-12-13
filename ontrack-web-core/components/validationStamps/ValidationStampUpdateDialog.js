@@ -1,37 +1,30 @@
 import FormDialog, {useFormDialog} from "@components/form/FormDialog";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {getValidationStampById, gqlValidationStampFragment} from "@components/services/fragments";
+import {gqlValidationStampFragment} from "@components/services/fragments";
 import {Form, Input} from "antd";
 import {gql} from "graphql-request";
-import {EventsContext} from "@components/common/EventsContext";
-import {useContext, useState} from "react";
+import {useState} from "react";
 import SelectValidationDataType from "@components/validationStamps/SelectValidationDataType";
 import Well from "@components/common/Well";
 import ValidationDataTypeForm from "@components/framework/validation-data-type-form/ValidationDataTypeForm";
 
-export const useValidationStampUpdateDialog = () => {
-
-    const client = useGraphQLClient()
-    const eventsContext = useContext(EventsContext)
+export const useValidationStampUpdateDialog = ({onSuccess}) => {
 
     const [dataType, setDataType] = useState()
 
     return useFormDialog({
         dataType, setDataType,
-        init: (form, {id}) => {
-            getValidationStampById(client, id).then(vs => {
-                setDataType(vs.dataType)
-                return form.setFieldsValue({
-                    ...vs,
-                    dataType: vs.dataType.descriptor.id,
-                });
+        init: (form, {validationStamp}) => {
+            setDataType(validationStamp.dataType)
+            return form.setFieldsValue({
+                ...validationStamp,
+                dataType: validationStamp.dataType?.descriptor?.id,
+                config: validationStamp.dataType?.config,
             })
         },
-        prepareValues: (values, {id}) => {
-            console.log({values, id, dataType})
+        prepareValues: (values, {validationStamp}) => {
             return {
                 ...values,
-                id,
+                id: Number(validationStamp.id),
                 dataTypeId: values.dataType,
                 dataTypeConfig: values.config,
             }
@@ -62,9 +55,7 @@ export const useValidationStampUpdateDialog = () => {
             ${gqlValidationStampFragment}
         `,
         userNode: 'updateValidationStampById',
-        onSuccess: (updateValidationStampById) => {
-            eventsContext.fireEvent("validationStamp.updated", {...updateValidationStampById.validationStamp})
-        }
+        onSuccess,
     })
 }
 

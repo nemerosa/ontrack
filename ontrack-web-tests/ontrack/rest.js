@@ -1,15 +1,14 @@
 export const restCallPost = async (connection, path, body) => {
-    const username = connection.credentials.username
-    const password = connection.credentials.password
-
-    const token = btoa(`${username}:${password}`)
-
+    const token = connection.token
+    if (!token) {
+        throw new Error("No token is available in the connection.")
+    }
     return await fetch(
         `${connection.backend}${path}`,
         {
             method: 'POST',
             headers: {
-                Authorization: `Basic ${token}`,
+                'X-Ontrack-Token': token,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(body)
@@ -19,5 +18,9 @@ export const restCallPost = async (connection, path, body) => {
 
 export const restCallPostForJson = async (connection, path, body) => {
     const response = await restCallPost(connection, path, body)
-    return response.json()
+    if (response.status === 202) {
+        return null
+    } else {
+        return response.json()
+    }
 }

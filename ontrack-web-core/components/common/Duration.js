@@ -8,7 +8,9 @@ dayjs.extend(relativeTime)
 
 export const formatSeconds = (seconds, nanValue = "-") => {
     if (typeof seconds === 'number' && !isNaN(seconds)) {
-        if (seconds < 60) {
+        if (seconds < 0) {
+            return nanValue
+        } else if (seconds < 60) {
             if (seconds <= 1) {
                 return `${seconds} second`
             } else {

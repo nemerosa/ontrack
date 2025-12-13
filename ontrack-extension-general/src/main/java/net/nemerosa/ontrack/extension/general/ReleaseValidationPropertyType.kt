@@ -3,26 +3,29 @@ package net.nemerosa.ontrack.extension.general
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.textField
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class ReleaseValidationPropertyType(
     extensionFeature: GeneralExtensionFeature,
 ) : AbstractPropertyType<ReleaseValidationProperty>(extensionFeature) {
 
-    override fun getName(): String = "Validation on release/label"
+    override val name: String = "Validation on release/label"
 
-    override fun getDescription(): String = "When set, adding a release/label on a build will also validate this build."
+    override val description: String = "When set, adding a release/label on a build will also validate this build."
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = setOf(ProjectEntityType.BRANCH)
+    override val supportedEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.BRANCH)
+
+    override fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        jsonTypeBuilder.toType(ReleaseValidationProperty::class)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
@@ -33,15 +36,13 @@ class ReleaseValidationPropertyType(
 
     override fun fromStorage(node: JsonNode): ReleaseValidationProperty = node.parse()
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: ReleaseValidationProperty,
-        replacementFunction: Function<String, String>,
+        replacementFunction: (String) -> String,
     ) = ReleaseValidationProperty(
-        validation = replacementFunction.apply(value.validation)
+        validation = replacementFunction(value.validation)
     )
-
-    override fun getEditionForm(entity: ProjectEntity, value: ReleaseValidationProperty?): Form = Form.create()
-        .textField(ReleaseValidationProperty::validation, value?.validation)
 
     override fun containsValue(value: ReleaseValidationProperty, propertyValue: String): Boolean =
         value.validation == propertyValue

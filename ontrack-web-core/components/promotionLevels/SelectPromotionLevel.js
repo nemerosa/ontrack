@@ -35,7 +35,7 @@ export default function SelectPromotionLevel({
                         }
                     }
                 `,
-                {branchId: branch.id}
+                {branchId: Number(branch.id)}
             ).then(data => {
                 setOptions(data.branches[0].promotionLevels.map(pl => {
                     return {

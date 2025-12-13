@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.tfc.service
 
 import io.micrometer.core.instrument.MeterRegistry
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.tfc.client.TFCClientFactory
 import net.nemerosa.ontrack.extension.tfc.config.TFCConfigurationService
 import net.nemerosa.ontrack.extension.tfc.metrics.TFCMetrics
@@ -9,6 +8,7 @@ import net.nemerosa.ontrack.model.metrics.time
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class TFCServiceImpl(

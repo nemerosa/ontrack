@@ -1,11 +1,9 @@
 package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
-import net.nemerosa.ontrack.json.getBooleanField
 import net.nemerosa.ontrack.json.getRequiredBooleanField
-import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.security.Roles
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 

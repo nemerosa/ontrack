@@ -1,28 +1,21 @@
 import {Select, Space, Typography} from "antd";
-import {useEffect, useState} from "react";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
+import {useQuery} from "@components/services/useQuery";
 
-export default function SelectIssueService({value, onChange, self}) {
+export default function SelectIssueService({id, value, onChange, self}) {
 
-    const client = useGraphQLClient()
-
-    const [loading, setLoading] = useState(false)
-    const [options, setOptions] = useState([])
-
-    useEffect(() => {
-        if (client) {
-            setLoading(true)
-            client.request(
-                gql`
-                    query GetIssueServicesConfigurations {
-                        issueServiceConfigurations {
-                            name
-                            id
-                        }
-                    }
-                `
-            ).then(data => {
+    const {data: options, loading} = useQuery(
+        gql`
+            query GetIssueServicesConfigurations {
+                issueServiceConfigurations {
+                    name
+                    id
+                }
+            }
+        `,
+        {
+            initialData: [],
+            dataFn: data => {
                 const options = data.issueServiceConfigurations.map(({name, id}) => ({
                     value: id,
                     label: <Space>
@@ -39,16 +32,16 @@ export default function SelectIssueService({value, onChange, self}) {
                         </Space>,
                     })
                 }
-                setOptions(options)
-            }).finally(() => {
-                setLoading(false)
-            })
+                return options
+            },
+            deps: [self]
         }
-    }, [client, self])
+    )
 
     return (
         <>
             <Select
+                id={id}
                 options={options}
                 loading={loading}
                 value={value}

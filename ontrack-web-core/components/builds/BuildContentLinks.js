@@ -68,7 +68,7 @@ export default function BuildContentLinks({build, id, title, fieldName}) {
                     }
                 `,
                 {
-                    id: build.id,
+                    id: Number(build.id),
                     offset: pagination.offset,
                     size: pagination.size,
                 }

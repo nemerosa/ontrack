@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.indicators.computing
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
@@ -48,11 +47,11 @@ class ConfigurableIndicatorServiceImpl(
     }
 
     override fun getConfigurableIndicatorState(type: ConfigurableIndicatorType<*, *>): ConfigurableIndicatorState? =
-        storageService.retrieve(
+        storageService.find(
             ConfigurableIndicatorState::class.java.name,
             type.id,
-            StoredConfigurableIndicatorState::class.java
-        ).getOrNull()?.fromStore(type)
+            StoredConfigurableIndicatorState::class
+        )?.fromStore(type)
 
     private class StoredConfigurableIndicatorState(
         val enabled: Boolean,

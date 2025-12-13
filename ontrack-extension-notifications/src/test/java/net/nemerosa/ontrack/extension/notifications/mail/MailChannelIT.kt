@@ -47,7 +47,7 @@ class MailChannelIT : AbstractMailTestSupport() {
                         }
                         if (mail != null) {
                             assertEquals(
-                                """Build <a href="http://localhost:8080/#/build/${this.id}">${this.name}</a> has been promoted to <a href="http://localhost:8080/#/promotionLevel/${pl.id}">${pl.name}</a> for branch <a href="http://localhost:8080/#/branch/${branch.id}">${branch.name}</a> in <a href="http://localhost:8080/#/project/${project.id}">${project.name}</a>.""",
+                                """Build <a href="http://localhost:3000/build/${this.id}">${this.name}</a> has been promoted to <a href="http://localhost:3000/promotionLevel/${pl.id}">${pl.name}</a> for branch <a href="http://localhost:3000/branch/${branch.id}">${branch.name}</a> in <a href="http://localhost:3000/project/${project.id}">${project.name}</a>.""",
                                 GreenMailUtil.getBody(mail)
                             )
                         } else {
@@ -101,9 +101,9 @@ class MailChannelIT : AbstractMailTestSupport() {
                         if (message != null) {
                             assertEquals(
                                 """
-                                    <a href="http://localhost:8080/#/project/${project.id}">${project.name}</a> <a href="http://localhost:8080/#/build/$id">$name</a> has been released.
+                                    <a href="http://localhost:3000/project/${project.id}">${project.name}</a> <a href="http://localhost:3000/build/$id">$name</a> has been released.
                                     
-                                    It's actually been promoted to <a href="http://localhost:8080/#/promotionLevel/${pl.id}">${pl.name}</a>.
+                                    It's actually been promoted to <a href="http://localhost:3000/promotionLevel/${pl.id}">${pl.name}</a>.
                                 """.trimIndent()
                                     .lines().map { it.trim() },
                                 GreenMailUtil.getBody(message)

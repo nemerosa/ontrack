@@ -1,36 +1,31 @@
 package net.nemerosa.ontrack.kdsl.connector.graphql
 
-import com.apollographql.apollo.api.CustomTypeAdapter
-import com.apollographql.apollo.api.CustomTypeValue
-import com.apollographql.apollo.api.ScalarType
+import com.apollographql.apollo.api.Adapter
+import com.apollographql.apollo.api.CustomScalarAdapters
+import com.apollographql.apollo.api.json.JsonReader
+import com.apollographql.apollo.api.json.JsonWriter
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
-class LocalDateTimeCustomTypeAdapter : CustomTypeAdapter<LocalDateTime> {
+object localDateTimeCustomTypeAdapter : Adapter<LocalDateTime> {
 
-    override fun decode(value: CustomTypeValue<*>): LocalDateTime {
-        val s = value.value?.toString()?.takeIf { it.isNotBlank() }
+    override fun fromJson(reader: JsonReader, customScalarAdapters: CustomScalarAdapters): LocalDateTime {
+        val str = reader.nextString()
             ?: error("Cannot parse blank or null into a LocalDateTime")
         return try {
-            LocalDateTime.parse(s, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+            LocalDateTime.parse(str, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         } catch (ignored: DateTimeParseException) {
             // ... with a time zone
-            LocalDateTime.ofInstant(Instant.parse(s), ZoneOffset.UTC)
+            LocalDateTime.ofInstant(Instant.parse(str), ZoneOffset.UTC)
         }
     }
 
-    override fun encode(value: LocalDateTime): CustomTypeValue<*> {
-        return CustomTypeValue.GraphQLString(value.toInstant(ZoneOffset.UTC).toString())
-    }
-
-    companion object {
-        val TYPE = object : ScalarType {
-            override fun typeName(): String = "LocalDateTime"
-            override fun className(): String = LocalDateTime::class.java.name
-        }
+    override fun toJson(writer: JsonWriter, customScalarAdapters: CustomScalarAdapters, value: LocalDateTime) {
+        val str = value.toInstant(ZoneOffset.UTC).toString()
+        writer.value(str)
     }
 
 }

@@ -2,20 +2,20 @@ package net.nemerosa.ontrack.extension.github.client
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
+import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.runIf
 import net.nemerosa.ontrack.common.untilTimeout
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
+import net.nemerosa.ontrack.extension.github.app.GitHubAppRateLimitMetrics
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.model.*
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.git.support.GitConnectionRetry
 import net.nemerosa.ontrack.json.*
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
+import net.nemerosa.ontrack.model.metrics.increment
 import org.apache.commons.codec.binary.Base64
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -37,12 +37,12 @@ import java.util.*
 class DefaultOntrackGitHubClient(
     private val configuration: GitHubEngineConfiguration,
     private val gitHubAppTokenService: GitHubAppTokenService,
-    private val applicationLogService: ApplicationLogService,
     private val timeout: Duration = Duration.ofSeconds(60),
     private val retries: UInt = 3u,
     private val interval: Duration = Duration.ofSeconds(30),
     private val notFoundRetries: UInt = 6u,
     private val notFoundInterval: Duration = Duration.ofSeconds(5),
+    private val meterRegistry: MeterRegistry,
 ) : OntrackGitHubClient {
 
     private val logger: Logger = LoggerFactory.getLogger(OntrackGitHubClient::class.java)
@@ -58,12 +58,9 @@ class DefaultOntrackGitHubClient(
             // Rate limit not supported
             null
         } catch (any: Exception) {
-            applicationLogService.log(
-                ApplicationLogEntry.error(
-                    any,
-                    NameDescription.nd("github-ratelimit", "Cannot get the GitHub rate limit"),
-                    "Cannot get the rate limit for GitHub at ${configuration.url}"
-                ).withDetail("configuration", configuration.name)
+            logger.error(
+                "Cannot get the rate limit for GitHub at ${configuration.url} (config = ${configuration.name})",
+                any
             )
             // No rate limit
             null
@@ -327,18 +324,26 @@ class DefaultOntrackGitHubClient(
                 code()
             }
         } catch (ex: RestClientResponseException) {
-            val contentType: Any? = ex.responseHeaders?.contentType
-            if (contentType != null && contentType is MediaType && contentType.includes(MediaType.APPLICATION_JSON)) {
-                val json = ex.responseBodyAsString
-                try {
-                    val error: GitHubErrorMessage = json.parseAsJson().parse()
-                    throw GitHubErrorsException(message, error, ex.rawStatusCode)
-                } catch (_: JsonParseException) {
-                    throw ex
-                }
+            val error = ex.getJsonGitHubErrorMessage()
+            if (error != null) {
+                throw GitHubErrorsException(message, error, ex.statusCode.value())
             } else {
                 throw ex
             }
+        }
+    }
+
+    private fun RestClientResponseException.getJsonGitHubErrorMessage(): GitHubErrorMessage? {
+        val contentType: Any? = this.responseHeaders?.contentType
+        return if (contentType != null && contentType is MediaType && contentType.includes(MediaType.APPLICATION_JSON)) {
+            val json = this.responseBodyAsString
+            return try {
+                json.parseAsJson().parseOrNull<GitHubErrorMessage>()
+            } catch (_: JsonParseException) {
+                null
+            }
+        } else {
+            null
         }
     }
 
@@ -347,8 +352,8 @@ class DefaultOntrackGitHubClient(
 
     private fun createGitHubTemplate(graphql: Boolean, token: String?): RestTemplate = RestTemplateBuilder()
         .rootUri(getApiRoot(configuration.url, graphql))
-        .setConnectTimeout(timeout)
-        .setReadTimeout(timeout)
+        .connectTimeout(timeout)
+        .readTimeout(timeout)
         .run {
             if (token != null) {
                 defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer $token")
@@ -792,6 +797,32 @@ class DefaultOntrackGitHubClient(
         }.reversed()
     }
 
+    override fun getCommit(
+        repository: String,
+        commit: String
+    ): GitHubCommit? {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        return try {
+            client("Getting commit $commit") {
+                getForObject<GitHubCommit?>(
+                    "/repos/$owner/$name/commits/$commit"
+                )
+            }
+        } catch (ex: GitHubErrorsException) {
+            if (ex.status == 404) {
+                null
+            } else {
+                throw ex
+            }
+        } catch (_: HttpClientErrorException.NotFound) {
+            null
+        }
+    }
+
     override fun launchWorkflowRun(
         repository: String,
         workflow: String,
@@ -828,20 +859,61 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun waitUntilWorkflowRun(repository: String, runId: Long, retries: Int, retriesDelaySeconds: Int) {
+    override fun getWorkflowRun(repository: String, runId: Long): WorkflowRun {
         val client = createGitHubRestTemplate()
+        return client.getForObject<WorkflowRun>("/repos/$repository/actions/runs/$runId")
+    }
+
+    override fun waitUntilWorkflowRun(repository: String, runId: Long, retries: Int, retriesDelaySeconds: Int) {
         val success = runBlocking {
             untilTimeout(
                 name = "Waiting for workflow run $repository/$runId",
                 retryCount = retries,
                 retryDelay = Duration.ofSeconds(retriesDelaySeconds.toLong()),
             ) {
-                val run = client.getForObject<WorkflowRun>("/repos/$repository/actions/runs/$runId")
+                val run = getWorkflowRun(repository, runId)
                 run.success
             }
         }
         if (!success) {
             throw GitHubWorkflowRunFailedException(repository, runId)
+        }
+    }
+
+    override fun getIssueLastCommit(repository: String, key: Int): String? {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Search commits mentioning the issue, sorted by most recent
+        return try {
+            val url = "/search/commits?q={query}&sort={sort}&order={order}"
+            val params = mapOf(
+                "query" to "repo:$owner/$name #$key",
+                "sort" to "committer-date",
+                "order" to "desc"
+            )
+            val node = client.getForObject<JsonNode>(url, params)
+            val items = node.path("items")
+            if (items.isArray && items.size() > 0) {
+                items[0].path("sha").asText(null)
+            } else {
+                null
+            }
+        } catch (_: HttpClientErrorException.NotFound) {
+            null
+        } catch (ex: HttpClientErrorException.Forbidden) {
+            val error = ex.getJsonGitHubErrorMessage()
+            if (error != null && "rate limit exceeded" in error.message) {
+                // The search API has very restrictive API rate limits
+                meterRegistry.increment(
+                    GitHubAppRateLimitMetrics.RATE_LIMIT_SEARCH_EXCEEDED,
+                    "repository" to repository
+                )
+                null
+            } else {
+                throw ex
+            }
         }
     }
 

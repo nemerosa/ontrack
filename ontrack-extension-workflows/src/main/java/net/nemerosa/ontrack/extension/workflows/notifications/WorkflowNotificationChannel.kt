@@ -17,13 +17,13 @@ import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.events.SerializableEventService
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.trigger.createTriggerData
 import org.springframework.stereotype.Component
 
@@ -50,6 +50,11 @@ class WorkflowNotificationChannel(
             validationWorkflowNode(config.workflow, node)
         }
     }
+
+    override fun mergeConfig(
+        a: WorkflowNotificationChannelConfig,
+        changes: JsonNode
+    ): WorkflowNotificationChannelConfig = changes.parse()
 
     private fun validationWorkflowNode(workflow: Workflow, node: WorkflowNode) {
         val executor = workflowNodeExecutorService.findExecutor(node.executorId)
@@ -149,9 +154,4 @@ class WorkflowNotificationChannel(
     override val displayName: String = "Workflow"
     override val enabled: Boolean = true
 
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun getForm(c: WorkflowNotificationChannelConfig?): Form = Form.create()
-
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: WorkflowNotificationChannelConfig): String = config.workflow.name
 }

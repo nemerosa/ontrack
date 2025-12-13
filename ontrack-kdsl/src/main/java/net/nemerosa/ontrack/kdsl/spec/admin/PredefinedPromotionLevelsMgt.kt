@@ -28,12 +28,12 @@ class PredefinedPromotionLevelsMgt(connector: Connector) : Connected(connector) 
         // Gets an existing predefined promotion level by name
         val existing = graphqlConnector.query(
             PredefinedPromotionLevelByNameQuery(name)
-        )?.predefinedPromotionLevelByName()
+        )?.predefinedPromotionLevelByName
         // Overriding?
         var create = existing == null
         if (existing != null && override) {
             create = true
-            connector.delete("/rest/admin/predefinedPromotionLevels/${existing.id()}")
+            connector.delete("/rest/admin/predefinedPromotionLevels/${existing.id}")
         }
         // Creating
         if (create) {

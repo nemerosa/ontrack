@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.environments
 
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.BuildSearchForm
 import net.nemerosa.ontrack.model.structure.BuildSearchFormExtension
 import org.junit.jupiter.api.Test
@@ -17,6 +18,7 @@ class BuildSearchEnvironmentExtensionIT : AbstractDSLTestSupport() {
     private lateinit var slotService: SlotService
 
     @Test
+    @AsAdminTest
     fun `Looking for the last deployed build in an environment`() {
         slotTestSupport.withSlot { slot ->
             // Deployment from another branch

@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.passwordField
 import org.springframework.stereotype.Component
 import java.net.http.HttpRequest
 
@@ -16,19 +14,28 @@ class BearerWebhookAuthenticator : AbstractWebhookAuthenticator<BearerWebhookAut
 
     override val displayName: String = "Bearer token authentication"
 
-    override fun getForm(config: BearerWebhookAuthenticatorConfig?): Form = Form.create()
-        .passwordField(BearerWebhookAuthenticatorConfig::token)
-
     override fun validateConfig(node: JsonNode): BearerWebhookAuthenticatorConfig = node.parse()
 
     override fun authenticate(config: BearerWebhookAuthenticatorConfig, builder: HttpRequest.Builder) {
         builder.header("Authorization", "Bearer ${config.token}")
     }
 
+    override fun obfuscate(config: BearerWebhookAuthenticatorConfig) = config.obfuscate()
+
+    override fun merge(
+        input: BearerWebhookAuthenticatorConfig,
+        existing: BearerWebhookAuthenticatorConfig
+    ) = BearerWebhookAuthenticatorConfig(
+        token = merge(input.token, existing.token),
+    )
 }
 
 data class BearerWebhookAuthenticatorConfig(
     @APILabel("Token")
     @APIDescription("Token used to connect to the webhook")
-    val token: String,
-)
+    val token: String = "",
+) {
+    fun obfuscate() = BearerWebhookAuthenticatorConfig(
+        token = "",
+    )
+}

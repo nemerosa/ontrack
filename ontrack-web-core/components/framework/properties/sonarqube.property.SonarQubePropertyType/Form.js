@@ -1,4 +1,4 @@
-import {Form, Input, InputNumber, Select, Switch} from "antd";
+import {Form, Input, Select, Switch} from "antd";
 import {prefixedFormName} from "@components/form/formUtils";
 
 export default function PropertyForm({prefix}) {

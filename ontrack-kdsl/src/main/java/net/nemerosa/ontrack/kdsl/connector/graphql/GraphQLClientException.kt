@@ -15,8 +15,9 @@ class GraphQLClientException(message: String) : RuntimeException(message) {
 
         private fun errorMessage(error: Error): String {
             val base = error.message
-            return if (error.locations.isNotEmpty()) {
-                "$base. Locations: ${error.locations.joinToString { location -> locationMessage(location) }}"
+            val locations = error.locations ?: emptyList()
+            return if (locations.isNotEmpty()) {
+                "$base. Locations: ${locations.joinToString { location -> locationMessage(location) }}"
             } else {
                 "$base."
             }

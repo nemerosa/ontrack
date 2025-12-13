@@ -1,30 +1,33 @@
 package net.nemerosa.ontrack.extension.scm.catalog.search
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.asMap
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntry
-import net.nemerosa.ontrack.extension.scm.catalog.ui.SCMCatalogController
 import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
-import java.net.URI
 
 @Component
 class SCMCatalogSearchIndexer(
     extensionFeature: SCMExtensionFeature,
     private val scmCatalog: SCMCatalog,
     private val catalogLinkService: CatalogLinkService,
-    private val uriBuilder: EntityURIBuilder
+    scmExtensionConfigProperties: SCMExtensionConfigProperties,
 ) : SearchIndexer<SCMCatalogSearchItem> {
 
     override val indexerName: String = "SCM Catalog"
 
     override val indexName: String = "scm-catalog"
+
+    override val enabled: Boolean = scmExtensionConfigProperties.catalog.enabled
 
     override val searchResultType = SearchResultType(
         feature = extensionFeature.featureDescription,
@@ -51,26 +54,18 @@ class SCMCatalogSearchIndexer(
             // Title and description
             val title: String
             val description: String
-            val uri: URI
-            val page: URI
             if (project != null) {
                 title = "${project.name} (${entry.repository})"
                 description =
                     "Project ${project.name} associated with SCM ${entry.repository} (${entry.scm} @ ${entry.config})"
-                uri = uriBuilder.getEntityURI(project)
-                page = uriBuilder.getEntityPage(project)
             } else {
                 title = entry.repository
                 description = "SCM ${entry.repository} (${entry.scm} @ ${entry.config}) not associated with any project"
-                uri = uriBuilder.build(MvcUriComponentsBuilder.on(SCMCatalogController::class.java).entries())
-                page = uriBuilder.page("extension/scm/scm-catalog")
             }
             // Result
             SearchResult(
                 title = title,
                 description = description,
-                uri = uri,
-                page = page,
                 accuracy = score,
                 type = searchResultType,
                 data = mapOf(
@@ -89,10 +84,29 @@ class SCMCatalogSearchIndexer(
 
     override val indexerSchedule: Schedule = Schedule.EVERY_WEEK
 
-    override val indexMapping: SearchIndexMapping = indexMappings<SCMCatalogSearchItem> {
-        +SCMCatalogSearchItem::scm to keyword()
-        +SCMCatalogSearchItem::config to keyword()
-        +SCMCatalogSearchItem::repository to keyword { scoreBoost = 3.0 } to text()
+    override fun initIndex(builder: CreateIndexRequest.Builder): CreateIndexRequest.Builder =
+        builder.run {
+            mappings { mappings ->
+                mappings
+                    .keyword(SCMCatalogSearchItem::scm)
+                    .keyword(SCMCatalogSearchItem::config)
+                    .keywordAndText(SCMCatalogSearchItem::repository)
+            }
+        }
+
+    override fun buildQuery(
+        q: Query.Builder,
+        token: String
+    ): ObjectBuilder<Query> {
+        return q.multiMatch { m ->
+            m.query(token)
+                .type(TextQueryType.BestFields)
+                .fields(
+                    SCMCatalogSearchItem::scm to 1.0,
+                    SCMCatalogSearchItem::config to 1.0,
+                    SCMCatalogSearchItem::repository to 2.0,
+                )
+        }
     }
 }
 

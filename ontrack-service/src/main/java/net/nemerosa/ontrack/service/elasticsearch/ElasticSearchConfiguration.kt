@@ -1,17 +1,17 @@
 package net.nemerosa.ontrack.service.elasticsearch
 
-import org.elasticsearch.client.RestHighLevelClient
-import org.springframework.boot.actuate.elasticsearch.ElasticsearchRestHealthIndicator
+import org.elasticsearch.client.RestClient
+import org.springframework.boot.actuate.elasticsearch.ElasticsearchRestClientHealthIndicator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 class ElasticSearchConfiguration(
-        val client: RestHighLevelClient
+    val restClient: RestClient,
 ) {
 
     @Bean
-    fun elasticsearchRestHealthIndicator(): ElasticsearchRestHealthIndicator =
-            ElasticsearchRestHealthIndicator(client.lowLevelClient)
+    fun elasticsearchRestHealthIndicator(): ElasticsearchRestClientHealthIndicator =
+        ElasticsearchRestClientHealthIndicator(restClient)
 
 }

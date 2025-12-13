@@ -1,21 +1,23 @@
 package net.nemerosa.ontrack.extension.git.graphql
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.WithGitPullRequestEnabled
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurator
 import net.nemerosa.ontrack.json.isNullOrNullNode
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class GitPullRequestGraphQLIT: AbstractGitTestJUnit4Support() {
+@WithGitPullRequestEnabled
+class GitPullRequestGraphQLIT: AbstractGitTestSupport() {
 
     @Autowired
     private lateinit var gitMockingConfigurator: GitMockingConfigurator
 
-    @Before
+    @BeforeEach
     fun init() {
         gitMockingConfigurator.clearPullRequests()
     }

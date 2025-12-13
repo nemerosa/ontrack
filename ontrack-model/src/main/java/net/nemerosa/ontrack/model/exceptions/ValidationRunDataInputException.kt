@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.model.exceptions
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.JsonParseException
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJsonString
 
 open class ValidationRunDataInputException(pattern: String) : InputException(pattern)
 
@@ -15,7 +15,7 @@ class ValidationRunDataStatusRequiredBecauseNoDataException : ValidationRunDataI
 )
 
 class ValidationRunDataJSONInputException(ex: JsonParseException, data: JsonNode) : ValidationRunDataInputException(
-        "Could not parse the JSON for the validation data: ${ex.message} for ${JsonUtils.toJSONString(data)}"
+        "Could not parse the JSON for the validation data: ${ex.message} for ${data.asJsonString()}"
 )
 
 class ValidationRunDataFormatException(message: String) : ValidationRunDataInputException(message)

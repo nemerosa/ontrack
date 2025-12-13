@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.indicators.computing
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
+import kotlin.jvm.optionals.getOrNull
 
 abstract class AbstractBranchIndicatorComputer(
         extension: ExtensionFeature,

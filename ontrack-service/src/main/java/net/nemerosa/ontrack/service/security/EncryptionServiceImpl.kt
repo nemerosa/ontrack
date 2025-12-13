@@ -3,8 +3,6 @@ package net.nemerosa.ontrack.service.security
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.service.security.EncryptionServiceKeys.ENCRYPTION_KEY
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.access.AccessDeniedException
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import java.io.IOException
 
@@ -12,11 +10,15 @@ import java.io.IOException
  * Default encryption service
  */
 @Component
-class EncryptionServiceImpl(private val key: ConfidentialKey) : EncryptionService {
+class EncryptionServiceImpl(
+    private val securityService: SecurityService,
+    private val key: ConfidentialKey,
+) : EncryptionService {
 
     @Autowired
     @Suppress("SpringJavaInjectionPointsAutowiringInspection")
-    constructor(confidentialStore: ConfidentialStore) : this(
+    constructor(securityService: SecurityService, confidentialStore: ConfidentialStore) : this(
+        securityService,
         CryptoConfidentialKey(
             confidentialStore,
             ENCRYPTION_KEY
@@ -46,24 +48,8 @@ class EncryptionServiceImpl(private val key: ConfidentialKey) : EncryptionServic
     }
 
     private fun checkAdmin() {
-        val authorised: Boolean
-        val context = SecurityContextHolder.getContext()
-        val authentication = context.authentication
-        authorised =
-            if (authentication != null && authentication.isAuthenticated && authentication.principal is OntrackAuthenticatedUser) {
-                val user = authentication.principal as OntrackAuthenticatedUser
-                user.isGranted(ApplicationManagement::class.java) &&
-                        user.isGranted(GlobalSettings::class.java)
-            } else {
-                false
-            }
-        // NOT GRANTED
-        if (!authorised) {
-            throw AccessDeniedException(
-                "The current used has attempted to import/export keys without being authorised: " +
-                        if (authentication != null) authentication.name else "anonymous"
-            )
-        }
+        securityService.checkGlobalFunction(ApplicationManagement::class.java)
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
     }
 
 }

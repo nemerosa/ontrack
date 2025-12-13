@@ -3,10 +3,12 @@ package net.nemerosa.ontrack.boot;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 import java.io.File;
 
 @SpringBootApplication(scanBasePackages = "net.nemerosa.ontrack")
+@EnableWebSecurity
 public class Application {
 
     /**

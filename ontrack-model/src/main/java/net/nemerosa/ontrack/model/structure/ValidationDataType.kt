@@ -2,7 +2,8 @@ package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.extension.Extension
-import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 
 /**
  * Definition and validation of some arbitrary data associated with [ValidationStamp]s
@@ -31,14 +32,6 @@ interface ValidationDataType<C, T> : Extension {
     fun configFromJson(node: JsonNode?): C?
 
     /**
-     * Gets a form to edit / create the configuration.
-     *
-     * @param config Data to edit - `null` if the form is for a creation
-     * @return A prefilled form or [Form.create] if not editable (no config)
-     */
-    fun getConfigForm(config: C?): Form
-
-    /**
      * JSON for the client (must be mapped to the fields of the form
      * defined by [getConfigForm].
      */
@@ -63,14 +56,6 @@ interface ValidationDataType<C, T> : Extension {
      * to throw an exception instead.
      */
     fun fromJson(node: JsonNode): T?
-
-    /**
-     * Gets a form to edit / create some data.
-     *
-     * @param data Data to edit - `null` if the form is for a creation
-     * @return A prefilled form
-     */
-    fun getForm(data: T?): Form
 
     /**
      * Creates the data object from the JSON returned by a form edition
@@ -104,12 +89,19 @@ interface ValidationDataType<C, T> : Extension {
     fun getMetrics(data: T): Map<String, *>?
 
     /**
+     * Creates the JSON type for the configuration
+     *
+     * @param jsonTypeBuilder Builder for the JSON types
+     */
+    fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType
+
+    /**
      * Descriptor
      */
     val descriptor
         get() = ValidationDataTypeDescriptor(
-                feature.featureDescription,
-                this::class.qualifiedName!!,
-                displayName
+            feature.featureDescription,
+            this::class.qualifiedName!!,
+            displayName
         )
 }

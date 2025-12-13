@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-@Profile(RunProfile.ACC, RunProfile.UNIT_TEST, RunProfile.DEV)
+@Profile(RunProfile.DEV)
 @APIDescription("Executor used to mock some actions for the nodes. Mostly used for testing.")
 @Documentation(MockNodeData::class)
 @Documentation(MockNodeOutput::class, section = "output")

@@ -4,12 +4,12 @@ import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLType
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.getMutationInputField
 import net.nemerosa.ontrack.graphql.support.getRequiredMutationInputField
 import net.nemerosa.ontrack.graphql.support.toTypeRef
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.structure.*
+import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.KClass
 
 /**

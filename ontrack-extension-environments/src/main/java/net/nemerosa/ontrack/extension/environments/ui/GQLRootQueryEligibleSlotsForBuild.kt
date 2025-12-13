@@ -19,10 +19,10 @@ class GQLRootQueryEligibleSlotsForBuild(
         GraphQLFieldDefinition.newFieldDefinition()
             .name("eligibleSlotsForBuild")
             .description("Getting the eligible slots for a build")
-            .argument(intArgument(ARG_BUILD_ID, "ID of the build"))
+            .argument(intArgument(ARG_BUILD_ID, "ID of the build", nullable = false))
             .type(listType(gqlTypeEligibleSlot.typeRef))
             .dataFetcher { env ->
-                val buildId: Int = env.getArgument(ARG_BUILD_ID)
+                val buildId: Int = env.getArgument(ARG_BUILD_ID)!!
                 val build = structureService.getBuild(ID.of(buildId))
                 slotService.getEligibleSlotsForBuild(build)
             }

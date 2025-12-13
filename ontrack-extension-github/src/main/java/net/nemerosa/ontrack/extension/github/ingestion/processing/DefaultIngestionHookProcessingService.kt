@@ -8,9 +8,8 @@ import net.nemerosa.ontrack.extension.github.ingestion.metrics.timeForPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,9 +19,10 @@ class DefaultIngestionHookProcessingService(
     private val meterRegistry: MeterRegistry,
     private val securityService: SecurityService,
     private val ingestionHookPayloadStorage: IngestionHookPayloadStorage,
-    private val applicationLogService: ApplicationLogService,
     ingestionEventProcessors: List<IngestionEventProcessor>,
 ) : IngestionHookProcessingService {
+
+    private val logger: Logger = LoggerFactory.getLogger(DefaultIngestionHookProcessingService::class.java)
 
     private val eventProcessors = ingestionEventProcessors.associateBy { it.event }
 
@@ -43,16 +43,9 @@ class DefaultIngestionHookProcessingService(
             } catch (any: Throwable) {
                 meterRegistry.increment(payload, IngestionMetrics.Process.errorCount)
                 ingestionHookPayloadStorage.error(payload, any)
-                applicationLogService.log(
-                    ApplicationLogEntry.error(
-                        any,
-                        NameDescription.nd("github-ingestion-error", "Error while ingesting data from GitHub"),
-                        any.message
-                    ).withDetail(
-                        "github-event", payload.gitHubEvent
-                    ).withDetail(
-                        "github-delivery", payload.gitHubDelivery
-                    )
+                logger.error(
+                    "Error while ingesting data from GitHub: event: ${payload.gitHubEvent}, delivery: ${payload.gitHubDelivery}",
+                    any
                 )
             } finally {
                 meterRegistry.increment(payload, IngestionMetrics.Process.finishedCount)

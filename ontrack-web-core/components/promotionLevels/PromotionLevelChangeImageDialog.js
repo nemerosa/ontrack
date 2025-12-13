@@ -1,5 +1,4 @@
 import {Space} from "antd";
-import {useRestClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {useContext} from "react";
 import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
@@ -8,7 +7,6 @@ import ChangeImageDialog, {useChangeImageDialog} from "@components/common/Change
 
 export const usePromotionLevelChangeImageDialog = () => {
 
-    const restClient = useRestClient()
     const eventsContext = useContext(EventsContext)
 
     return useChangeImageDialog({
@@ -23,7 +21,10 @@ export const usePromotionLevelChangeImageDialog = () => {
         `,
         queryUserNode: 'promotionLevel',
         imageCallback: (data, id) => {
-            restClient.put(`/rest/structure/promotionLevels/${id}/image`, data).then(() => {
+            fetch(`/api/protected/images/promotionLevels/${id}`, {
+                method: 'PUT',
+                body: data,
+            }).then(() => {
                 eventsContext.fireEvent("promotionLevel.image", {id})
             })
         }

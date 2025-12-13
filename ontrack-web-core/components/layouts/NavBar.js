@@ -5,6 +5,7 @@ import {UserContext} from "@components/providers/UserProvider";
 import {FaRegUser} from "react-icons/fa";
 import HomeLink from "@components/common/HomeLink";
 import NavBarSearch from "@components/search/NavBarSearch";
+import Image from "next/image";
 
 const {Text} = Typography;
 
@@ -33,26 +34,30 @@ export default function NavBar() {
                 <Space direction="horizontal" size={16}>
                     <HomeLink
                         text={
-                            <img
-                                src={`/ui/yontrack-logo.svg`}
+                            <Image
+                                src={`/yontrack-logo.svg`}
                                 alt="Yontrack Logo"
                                 width={24}
                                 height={24}
                             />
                         }
                     />
-                    <img
-                        src={`/ui/yontrack-text.svg`}
-                        alt="Yontrack"
-                        width={120}
-                        height={24}
-                    />
+                    <HomeLink
+                        text={
+                            <Image
+                                src={`/yontrack-text.svg`}
+                                alt="Yontrack"
+                                width={120}
+                                height={24}
+                            />
+                        }
+                        />
                 </Space>
                 <Space direction="horizontal" size={8}>
                     <NavBarSearch
-                        style={{ display: 'flex', alignItems: 'center' }}
+                        style={{display: 'flex', alignItems: 'center'}}
                     />
-                    <NavBarText text={user?.account?.fullName}/>
+                    <NavBarText text={user?.fullName ?? user?.email}/>
                     <Avatar icon={<FaRegUser id="user-menu"/>}
                             onClick={openUserMenu}
                             style={{

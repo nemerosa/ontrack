@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.av.audit
 
-import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.createOrder
 import net.nemerosa.ontrack.extension.av.settings.AutoVersioningSettings
@@ -39,7 +38,8 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
                     withSignatureDaysOlder(14) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "1.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onCreated(this)
+                                autoVersioningAuditService.onScheduled(this, "routing")
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 autoVersioningAuditService.onPRMerged(this, "branch", "#1", "uri:1")
                             }
@@ -49,7 +49,8 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
                     withSignatureDaysOlder(5) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onCreated(this)
+                                autoVersioningAuditService.onScheduled(this, "routing")
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 autoVersioningAuditService.onPRMerged(this, "branch", "#1", "uri:1")
                             }
@@ -95,7 +96,8 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
                     withSignatureDaysOlder(14) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "1.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onCreated(this)
+                                autoVersioningAuditService.onScheduled(this, "routing")
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 autoVersioningAuditService.onPRMerged(this, "branch", "#1", "uri:1")
                             }
@@ -105,7 +107,8 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
                     withSignatureDaysOlder(14) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onCreated(this)
+                                autoVersioningAuditService.onScheduled(this, "routing")
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 // Still processing
                             }
@@ -147,43 +150,67 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
                 try {
                     val newSettings = newSettings()
                     settingsManagerService.saveSettings(newSettings)
-                    // Creates stopped orders older than 7 days
+                    // Creates stopped orders older than 7 days - to be removed
                     withSignatureDaysOlder(14) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "1.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onCreated(this)
+                                autoVersioningAuditService.onScheduled(this, "routing")
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 autoVersioningAuditService.onPRMerged(this, "branch", "#1", "uri:1")
                             }
                         }
                     }
-                    // Creates running orders younger than 7 + 20 days
+                    // Creates running orders younger than 7 + 20 days - to be kept
                     withSignatureDaysOlder(20) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "2.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onCreated(this)
+                                autoVersioningAuditService.onScheduled(this, "routing")
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 // Still processing
                             }
                         }
                     }
-                    // Creates running orders older than 7 + 20 days
+                    // Creates running orders older than 7 + 20 days - to be removed
                     withSignatureDaysOlder(30) {
                         (1..5).map {
                             createOrder(sourceProject = source.name, targetVersion = "3.0.$it").apply {
-                                autoVersioningAuditService.onQueuing(this, "routing")
+                                autoVersioningAuditService.onCreated(this)
+                                autoVersioningAuditService.onScheduled(this, "routing")
                                 autoVersioningAuditService.onReceived(this, "queue")
                                 // Still processing
                             }
                         }
                     }
+                    // Listing all entries
+                    autoVersioningAuditQueryService.findByFilter(
+                        filter = AutoVersioningAuditQueryFilter(
+                            branch = this.name,
+                            project = this.project.name,
+                            count = 100,
+                        )
+                    ).forEach { entry -> println("[${entry.timestamp}][running=${entry.running}] $entry") }
                     // Runs the cleanup job
+                    println("----- BEFORE CLEANUP -----")
                     autoVersioningAuditCleanupJob.startingJobs.first().job.task.run(JobRunListener.out())
+                    println("----- AFTER CLEANUP  -----")
+
+                    // Listing all entries
+                    autoVersioningAuditQueryService.findByFilter(
+                        filter = AutoVersioningAuditQueryFilter(
+                            branch = this.name,
+                            project = this.project.name,
+                            count = 100,
+                        )
+                    ).forEach { entry -> println("[${entry.timestamp}][running=${entry.running}] $entry") }
+
                     // Checks that the only running entries which are kept are the ones younger than 7 + 20 days
                     val entries = autoVersioningAuditQueryService.findByFilter(
                         AutoVersioningAuditQueryFilter(
                             branch = this.name,
-                            project = this.project.name
+                            project = this.project.name,
+                            count = 100,
                         )
                     )
                     assertEquals(
@@ -210,18 +237,7 @@ class AutoVersioningAuditCleanupJobIT : AbstractAutoVersioningTestSupport() {
     )
 
     private fun <T> withSignatureDaysOlder(days: Int, code: () -> T): T {
-        val impl = autoVersioningAuditStore as AutoVersioningAuditStoreImpl
-        val oldProvider = impl.signatureProvider
-        return try {
-            impl.signatureProvider = {
-                securityService.currentSignature.withTime(
-                    Time.now().minusDays(days.toLong())
-                )
-            }
-            code()
-        } finally {
-            impl.signatureProvider = oldProvider
-        }
+        return autoVersioningAuditStore.withSignatureDaysOlder(securityService, days, code)
     }
 
 }

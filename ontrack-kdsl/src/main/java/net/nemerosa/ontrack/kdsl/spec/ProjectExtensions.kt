@@ -15,9 +15,9 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
  */
 fun ProjectFragment.toProject(connected: Connected) = Project(
     connector = connected.connector,
-    id = id().toUInt(),
-    name = name()!!,
-    description = description(),
+    id = id.toUInt(),
+    name = name!!,
+    description = description,
 )
 
 /**
@@ -31,7 +31,7 @@ fun Project.getProperty(
 ): JsonNode? =
     graphqlConnector.query(
         ProjectGetPropertyQuery(id.toInt(), type)
-    )?.projects()?.firstOrNull()?.properties()?.firstOrNull()?.value()?.asJson()
+    )?.projects?.firstOrNull()?.properties?.firstOrNull()?.value?.asJson()
 
 /**
  * Sets a generic property on a [Project].
@@ -50,7 +50,7 @@ fun Project.setProperty(
             data.asJson()
         )
     ) {
-        it?.setProjectPropertyById()?.fragments()?.payloadUserErrors()?.convert()
+        it?.setProjectPropertyById?.payloadUserErrors?.convert()
     }
     return this
 }
@@ -69,7 +69,7 @@ fun Project.deleteProperty(
             type
         )
     ) {
-        it?.setProjectPropertyById()?.fragments()?.payloadUserErrors()?.convert()
+        it?.setProjectPropertyById?.payloadUserErrors?.convert()
     }
     return this
 }

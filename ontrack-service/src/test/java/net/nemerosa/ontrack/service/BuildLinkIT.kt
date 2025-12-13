@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.it.forRecursiveLinks
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
-import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.security.BuildConfig
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.security.BuildEdit
@@ -12,13 +12,13 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class BuildLinkIT : AbstractDSLTestSupport() {
 
     @Test

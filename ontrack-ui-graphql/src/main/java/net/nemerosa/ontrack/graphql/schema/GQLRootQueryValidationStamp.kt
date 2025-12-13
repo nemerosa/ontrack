@@ -1,10 +1,8 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.Scalars.GraphQLInt
-import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
-import graphql.schema.GraphQLNonNull
+import net.nemerosa.ontrack.graphql.support.intArgument
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -25,15 +23,11 @@ class GQLRootQueryValidationStamp(
                 .name("validationStamp")
                 .type(validationStamp.typeRef)
                 .argument(
-                        newArgument()
-                                .name("id")
-                                .description("ID of the validation stamp to look for (required)")
-                                .type(GraphQLNonNull(GraphQLInt))
-                                .build()
+                    intArgument("id" , "ID of the validation stamp to look for (required)", nullable = false)
                 )
                 .dataFetcher { environment ->
                     // Gets the ID
-                    val id: Int = environment.getArgument("id")
+                    val id: Int = environment.getArgument("id")!!
                     // Gets the validation stamp
                     try {
                         structureService.getValidationStamp(ID.of(id))

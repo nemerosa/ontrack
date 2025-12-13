@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.gitlab
 
+import io.mockk.every
+import io.mockk.mockk
 import net.nemerosa.ontrack.extension.git.GitExtensionFeature
 import net.nemerosa.ontrack.extension.gitlab.client.OntrackGitLabClient
 import net.nemerosa.ontrack.extension.gitlab.client.OntrackGitLabClientFactory
@@ -8,15 +10,12 @@ import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssue
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper
 import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
-import org.gitlab4j.api.Constants
+import org.gitlab4j.models.Constants
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
 import java.util.*
 import kotlin.test.*
 
@@ -31,14 +30,17 @@ class GitLabIssueServiceExtensionTest {
 
     @BeforeEach
     fun init() {
-        configurationService = mock(GitLabConfigurationService::class.java)
-        gitHubClientFactory = mock(OntrackGitLabClientFactory::class.java)
-        val issueExportServiceFactory = mock(IssueExportServiceFactory::class.java)
+        configurationService = mockk<GitLabConfigurationService>()
+        gitHubClientFactory = mockk<OntrackGitLabClientFactory>()
         extension = GitLabIssueServiceExtension(
-            GitLabExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature())),
-            issueExportServiceFactory,
-            configurationService,
-            gitHubClientFactory
+            extensionFeature = GitLabExtensionFeature(
+                GitExtensionFeature(
+                    SCMExtensionFeature(),
+                    StaleExtensionFeature()
+                )
+            ),
+            configurationService = configurationService,
+            gitLabClientFactory = gitHubClientFactory
         )
         engineConfiguration = GitLabConfiguration(
             "test",
@@ -66,14 +68,14 @@ class GitLabIssueServiceExtensionTest {
 
     @Test
     fun list_of_configurations_is_not_exposed() {
-        assertTrue(extension.configurationList.isEmpty())
+        assertTrue(extension.getConfigurationList().isEmpty())
     }
 
     @Test
     fun get_configuration_by_name() {
-        `when`(configurationService.getConfiguration("test")).thenReturn(
-            engineConfiguration
-        )
+        every {
+            configurationService.getConfiguration("test")
+        } returns engineConfiguration
         val configuration = extension.getConfigurationByName("test:nemerosa/ontrack")
         assertNotNull(configuration) {
             assertEquals("test:nemerosa/ontrack", configuration?.name)
@@ -132,20 +134,27 @@ class GitLabIssueServiceExtensionTest {
     }
 
     private fun get_issue_test(token: String, id: Int): Issue? {
-        val client = mock(OntrackGitLabClient::class.java)
-        `when`(client.getIssue(configuration.repository, id)).thenReturn(issueWrapper)
-        `when`(gitHubClientFactory.create(configuration.configuration)).thenReturn(client)
+        val client = mockk<OntrackGitLabClient>()
+        every {
+            client.getIssue(configuration.repository, id)
+        } returns issueWrapper
+        every {
+            client.getIssue(configuration.repository, not(id))
+        } returns null
+        every {
+            gitHubClientFactory.create(configuration.configuration)
+        } returns client
         return extension.getIssue(configuration, token)
     }
 
     @Test
     fun issueServiceIdentifierContainsBothConfigurationAndRepository() {
-        `when`(configurationService.getConfiguration("Test")).thenReturn(
-            GitLabConfiguration(
-                "Test",
-                "https://gitlab.test.com", null, null,
-                false
-            )
+        every {
+            configurationService.getConfiguration("Test")
+        } returns GitLabConfiguration(
+            "Test",
+            "https://gitlab.test.com", null, null,
+            false
         )
         val configuration = extension.getConfigurationByName("Test:nemerosa/ontrack")
         assertNotNull(configuration) {

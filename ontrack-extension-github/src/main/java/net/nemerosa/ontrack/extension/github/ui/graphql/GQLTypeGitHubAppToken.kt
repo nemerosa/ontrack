@@ -21,7 +21,7 @@ class GQLTypeGitHubAppToken : GQLType {
                 .description("Is the token valid?")
                 .type(GraphQLBoolean)
                 .dataFetcher { env ->
-                    val token: GitHubAppToken = env.getSource()
+                    val token: GitHubAppToken = env.getSource()!!
                     token.isValid()
                 }
         }

@@ -9,17 +9,21 @@ import org.springframework.stereotype.Service
 
 @Service
 class CascJsonSchemaServiceImpl(
-    private val envService: EnvService,
+    envService: EnvService,
     private val jsonSchemaBuilderService: JsonSchemaBuilderService,
     private val ontrackContext: OntrackContext,
-) : CascJsonSchemaService {
+) : AbstractJsonSchemaProvider(envService), CascJsonSchemaService {
 
-    override fun createCascJsonSchema(): JsonNode {
+    override val key: String = "casc"
+    override val title: String = "Yontrack CasC"
+    override val description: String = "Configuration as code for Yontrack"
+
+    override fun createJsonSchema(): JsonNode {
         return jsonSchemaBuilderService.createSchema(
             ref = "casc",
-            id = "https://ontrack.run/${envService.version.display}/schema/casc",
-            title = "Ontrack CasC",
-            description = "Configuration as code for Ontrack",
+            id = id,
+            title = title,
+            description = description,
             root = object : JsonTypeProvider {
                 override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
                     return JsonObjectType(

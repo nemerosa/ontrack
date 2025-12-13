@@ -1,20 +1,19 @@
-import {ontrack} from "@ontrack/ontrack";
 import {login} from "../../core/login";
 import {createSlot} from "./slotFixtures";
 import {PipelinePage} from "./PipelinePage";
 
-export const prepareManualApprovalInPipelinePage = async (page) => {
-    const {project, slot} = await createSlot(ontrack())
-    const ruleConfigId = await ontrack().environments.addManualApproval({slot})
+export const prepareManualApprovalInPipelinePage = async (page, ontrack) => {
+    const {project, slot} = await createSlot(ontrack)
+    const ruleConfigId = await ontrack.environments.addManualApproval({slot})
 
     const branch = await project.createBranch()
     const build = await branch.createBuild()
 
     const pipeline = await slot.createPipeline({build})
 
-    await login(page)
+    await login(page, ontrack)
 
-    const pipelinePage = new PipelinePage(page, pipeline)
+    const pipelinePage = new PipelinePage(page, pipeline, ontrack)
     await pipelinePage.goTo()
 
     return {
@@ -26,8 +25,8 @@ export const prepareManualApprovalInPipelinePage = async (page) => {
     }
 }
 
-export const manualApprovalInPipelinePage = async (page) => {
-    const {project, slot, pipeline, pipelinePage, ruleConfigId} = await prepareManualApprovalInPipelinePage(page)
+export const manualApprovalInPipelinePage = async (page, ontrack) => {
+    const {project, slot, pipeline, pipelinePage, ruleConfigId} = await prepareManualApprovalInPipelinePage(page, ontrack)
 
     const admissionRule = await pipelinePage.getAdmissionRule(ruleConfigId)
     await admissionRule.expectManualInputButton()

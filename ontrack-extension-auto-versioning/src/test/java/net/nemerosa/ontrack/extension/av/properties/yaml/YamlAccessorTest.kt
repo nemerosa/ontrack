@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.av.properties.yaml
 
 import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue

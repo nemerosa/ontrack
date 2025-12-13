@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.model.settings;
 
-import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 
@@ -23,11 +22,6 @@ public abstract class AbstractSettingsManager<T> implements SettingsManager<T> {
     }
 
     @Override
-    public final Form getSettingsForm() {
-        return getSettingsForm(cachedSettingsService.getCachedSettings(settingsClass));
-    }
-
-    @Override
     public final void saveSettings(T settings) {
         securityService.checkGlobalFunction(GlobalSettings.class);
         cachedSettingsService.invalidate(settingsClass);
@@ -35,12 +29,6 @@ public abstract class AbstractSettingsManager<T> implements SettingsManager<T> {
     }
 
     protected abstract void doSaveSettings(T settings);
-
-    /**
-     * @deprecated Will be removed in V5. Settings form are managed in Next UI.
-     */
-    @Deprecated
-    protected abstract Form getSettingsForm(T settings);
 
     @Override
     public final Class<T> getSettingsClass() {

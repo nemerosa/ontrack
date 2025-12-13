@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
+@AsAdminTest
 class BuildServiceIT : AbstractDSLTestSupport() {
 
     @Test

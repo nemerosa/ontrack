@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
-import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

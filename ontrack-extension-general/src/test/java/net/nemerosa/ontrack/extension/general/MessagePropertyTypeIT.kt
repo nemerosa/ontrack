@@ -1,12 +1,14 @@
 package net.nemerosa.ontrack.extension.general
 
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class MessagePropertyTypeIT : AbstractPropertyTypeTestJUnit4Support() {
+@AsAdminTest
+class MessagePropertyTypeIT : AbstractPropertyTypeTestSupport() {
 
     @Autowired
     private lateinit var messagePropertyType: MessagePropertyType

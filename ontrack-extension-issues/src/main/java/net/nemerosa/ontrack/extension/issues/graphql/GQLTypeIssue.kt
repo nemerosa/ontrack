@@ -40,7 +40,7 @@ class GQLTypeIssue(
                     .description("Last update time")
                     .type(GraphQLString)
                     .dataFetcher { env ->
-                        val issue: Issue = env.getSource()
+                        val issue: Issue = env.getSource()!!
                         Time.store(issue.updateTime)
                     }
             }
@@ -49,7 +49,7 @@ class GQLTypeIssue(
                     .description("JSON representation of the issue containing custom fields")
                     .type(GQLScalarJSON.INSTANCE.toNotNull())
                     .dataFetcher { env ->
-                        val issue: Issue = env.getSource()
+                        val issue: Issue = env.getSource()!!
                         issue.asJson()
                     }
             }

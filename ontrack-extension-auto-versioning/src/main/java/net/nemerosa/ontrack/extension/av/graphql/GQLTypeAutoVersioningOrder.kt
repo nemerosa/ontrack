@@ -39,7 +39,7 @@ class GQLTypeAutoVersioningOrder(
                     .deprecate("Deprecated, use `targetPath`")
                     .type(GraphQLString)
                     .dataFetcher { env ->
-                        val order = env.getSource<AutoVersioningOrder>()
+                        val order = env.getSource<AutoVersioningOrder>()!!
                         order.defaultPath.paths
                     }
             }
@@ -79,11 +79,12 @@ class GQLTypeAutoVersioningOrder(
                     .description("Link to the target repository")
                     .type(GraphQLString)
                     .dataFetcher { env ->
-                        val order: AutoVersioningOrder = env.getSource()
+                        val order: AutoVersioningOrder = env.getSource()!!
                         scmDetector.getSCM(order.branch.project)
                             ?.repositoryHtmlURL
                     }
             }
+            .localDateTimeField(AutoVersioningOrder::schedule)
             .listField(AutoVersioningOrder::additionalPaths)
             .build()
 }

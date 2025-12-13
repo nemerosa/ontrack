@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.processing
 
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.createOrder
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -9,6 +10,7 @@ import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@AsAdminTest
 class BackValidationAutoVersioningCompletionListenerIT : AbstractDSLTestSupport() {
 
     @Autowired

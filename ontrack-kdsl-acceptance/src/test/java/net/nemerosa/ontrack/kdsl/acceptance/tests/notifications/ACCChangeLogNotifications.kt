@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.notifications
 import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
-import net.nemerosa.ontrack.kdsl.spec.extension.general.releaseProperty
+import net.nemerosa.ontrack.kdsl.spec.extension.general.release
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -36,7 +36,7 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
 
                     build {}
                     build {
-                        releaseProperty = "1.1.0"
+                        release = "1.1.0"
 
                         // Mock termination commit
                         repositoryIssue("ISS-20", "Last issue before the change log")
@@ -54,7 +54,7 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                         withRepositoryCommit("ISS-22 Fixing some bugs")
                     }
                     build {
-                        releaseProperty = "1.2.0"
+                        release = "1.2.0"
                         repositoryIssue("ISS-23", "Some nicer UI")
                         withRepositoryCommit("ISS-23 Fixing some CSS")
 

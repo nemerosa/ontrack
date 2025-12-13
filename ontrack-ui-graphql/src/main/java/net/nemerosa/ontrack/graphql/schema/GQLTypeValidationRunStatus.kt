@@ -13,8 +13,6 @@ import net.nemerosa.ontrack.model.structure.ValidationRunStatus
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
-import net.nemerosa.ontrack.ui.resource.ResourceDecoratorDelegate
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
@@ -36,7 +34,7 @@ class GQLTypeValidationRunStatus(
                 it.name("id")
                     .type(GraphQLNonNull(GraphQLInt))
                     .dataFetcher { environment ->
-                        val data = environment.getSource<Data>()
+                        val data = environment.getSource<Data>()!!
                         data.delegate.id()
                     }
             }
@@ -64,7 +62,7 @@ class GQLTypeValidationRunStatus(
                     .type(Scalars.GraphQLString)
                     .description("Description with links.")
                     .dataFetcher { env ->
-                        val data: Data = env.getSource()
+                        val data: Data = env.getSource()!!
                         annotatedDescription(data)
                     }
             }
@@ -101,11 +99,9 @@ class GQLTypeValidationRunStatus(
     class Data(
         val validationRun: ValidationRun,
         val delegate: ValidationRunStatus
-    ) : ResourceDecoratorDelegate {
+    ) {
         val statusID: ValidationRunStatusID get() = delegate.statusID
         val description: String? get() = delegate.description
-
-        override fun getLinkDelegate(): Any = delegate
     }
 
 }

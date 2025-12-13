@@ -1,9 +1,5 @@
 package net.nemerosa.ontrack.extension.stash.settings
 
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.intField
-import net.nemerosa.ontrack.model.form.longField
-import net.nemerosa.ontrack.model.form.yesNoField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -28,25 +24,6 @@ class BitbucketServerSettingsManager(
         settingsRepository.setLong<BitbucketServerSettings>(settings::autoMergeInterval)
         settingsRepository.setBoolean<BitbucketServerSettings>(settings::autoDeleteBranch)
     }
-
-    override fun getSettingsForm(settings: BitbucketServerSettings): Form =
-        Form.create()
-            .longField(
-                BitbucketServerSettings::autoMergeTimeout,
-                settings.autoMergeTimeout
-            )
-            .longField(
-                BitbucketServerSettings::autoMergeInterval,
-                settings.autoMergeInterval
-            )
-            .intField(
-                BitbucketServerSettings::maxCommits,
-                settings.maxCommits
-            )
-            .yesNoField(
-                BitbucketServerSettings::autoDeleteBranch,
-                settings.autoDeleteBranch
-            )
 
     override fun getId(): String = "bitbucket-server"
 

@@ -1,1 +1,0 @@
-angular.module('ontrack.extension.environments', []);

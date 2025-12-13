@@ -1,5 +1,4 @@
 import {Space} from "antd";
-import {useRestClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {useContext} from "react";
 import {EventsContext} from "@components/common/EventsContext";
@@ -8,7 +7,6 @@ import ValidationStampImage from "@components/validationStamps/ValidationStampIm
 
 export const useValidationStampChangeImageDialog = () => {
 
-    const restClient = useRestClient()
     const eventsContext = useContext(EventsContext)
 
     return useChangeImageDialog({
@@ -23,7 +21,10 @@ export const useValidationStampChangeImageDialog = () => {
         `,
         queryUserNode: 'validationStamp',
         imageCallback: (data, id) => {
-            restClient.put(`/rest/structure/validationStamps/${id}/image`, data).then(() => {
+            fetch(`/api/protected/images/validationStamps/${id}`, {
+                method: 'PUT',
+                body: data,
+            }).then(() => {
                 eventsContext.fireEvent("validationStamp.image", {id})
             })
         }

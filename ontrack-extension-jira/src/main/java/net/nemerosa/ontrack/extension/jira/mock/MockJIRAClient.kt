@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate
 import java.util.concurrent.atomic.AtomicInteger
 
 class MockJIRAClient(
-    private val instance: MockJIRAInstance,
+    private val instance: MockJIRAInstance
 ) : JIRAClient {
 
     private val counter = AtomicInteger(0)
@@ -19,6 +19,13 @@ class MockJIRAClient(
 
     override fun getIssue(key: String, configuration: JIRAConfiguration): JIRAIssue? =
         instance.getIssue(key)
+
+    override fun getIssueLastCommit(
+        key: String,
+        configuration: JIRAConfiguration,
+        applicationType: String,
+        repositoryName: String
+    ): String? = null
 
     override fun createIssue(
         configuration: JIRAConfiguration,
@@ -35,6 +42,7 @@ class MockJIRAClient(
         val key = "$project-$id"
         val url = "${configuration.url}/browse/$key"
         val issue = JIRAIssue(
+            id = "1",
             url = url,
             key = key,
             summary = title,
@@ -114,5 +122,5 @@ class MockJIRAClient(
         get() = instance.projectNames
 
     override val restTemplate: RestTemplate
-        get() = TODO("Not supported for the Mock Client")
+        get() = error("Not supported for MockJIRAClient")
 }

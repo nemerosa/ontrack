@@ -31,7 +31,7 @@ class GQLTypeSCMCatalogTeam(
                     .description("List of SCM catalog entries for this team")
                     .type(listType(SCMCatalogEntry::class.toTypeRef()))
                     .dataFetcher { env ->
-                        val team: SCMCatalogTeam = env.getSource()
+                        val team: SCMCatalogTeam = env.getSource()!!
                         scmCatalogFilterService.findCatalogProjectEntries(
                             SCMCatalogProjectFilter(size = Int.MAX_VALUE, team = team.id)
                         ).mapNotNull(SCMCatalogEntryOrProject::entry)
@@ -43,7 +43,7 @@ class GQLTypeSCMCatalogTeam(
                     .description("Number of SCM catalog entries for this team")
                     .type(GraphQLInt.toNotNull())
                     .dataFetcher { env ->
-                        val team: SCMCatalogTeam = env.getSource()
+                        val team: SCMCatalogTeam = env.getSource()!!
                         scmCatalogFilterService.findCatalogProjectEntries(
                             SCMCatalogProjectFilter(size = Int.MAX_VALUE, team = team.id)
                         ).mapNotNull(SCMCatalogEntryOrProject::entry).size

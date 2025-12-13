@@ -5,10 +5,11 @@ import net.nemerosa.ontrack.extension.general.BuildLinkDisplayProperty
 import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 import net.nemerosa.ontrack.extension.general.ReleaseProperty
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.test.assertPresent
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -17,7 +18,8 @@ import kotlin.test.assertTrue
 /**
  * Integration tests around the `promotionLevel` root query.
  */
-class PromotionLevelGraphQLIT : AbstractQLKTITJUnit4Support() {
+@AsAdminTest
+class PromotionLevelGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Creation of a promotion level`() {

@@ -1,16 +1,16 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.nameValues
 import net.nemerosa.ontrack.model.structure.typeName
 import net.nemerosa.ontrack.model.structure.varName
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class MessagePropertyMutationProviderIT : AbstractQLKTITJUnit4Support() {
+class MessagePropertyMutationProviderIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Setting the message property at different levels`() {

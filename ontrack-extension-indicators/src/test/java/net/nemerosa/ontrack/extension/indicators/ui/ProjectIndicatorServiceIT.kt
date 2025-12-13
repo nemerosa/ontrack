@@ -3,11 +3,10 @@ package net.nemerosa.ontrack.extension.indicators.ui
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.json.asJson
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class ProjectIndicatorServiceIT : AbstractIndicatorsTestSupport() {
@@ -79,28 +78,6 @@ class ProjectIndicatorServiceIT : AbstractIndicatorsTestSupport() {
                 val previousIndicator = projectIndicatorService.getPreviousIndicator(indicator)
                 assertEquals(this, previousIndicator.project)
                 assertEquals(mapOf("value" to "false").asJson(), previousIndicator.value)
-            }
-        }
-    }
-
-    @Test
-    fun `Update form for a project indicator always adds the comment memo field`() {
-        val category = category()
-        val type = category.booleanType()
-        project {
-            indicator(type, value = true, comment = "Some comment")
-            asAdmin {
-                val form = projectIndicatorService.getUpdateFormForIndicator(id, type.id)
-                // Checks the value field
-                assertNotNull(form.getField("value")) { f ->
-                    assertEquals("selection", f.type)
-                    assertEquals("true", f.value)
-                }
-                // Checks the comment field
-                assertNotNull(form.getField("comment")) { f ->
-                    assertEquals("memo", f.type)
-                    assertEquals("Some comment", f.value)
-                }
             }
         }
     }

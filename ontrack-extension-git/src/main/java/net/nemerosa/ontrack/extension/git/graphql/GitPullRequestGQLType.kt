@@ -37,7 +37,7 @@ class GitPullRequestGQLType(
                                 .description("Link to the Ontrack branch which is the source of this PR")
                                 .type(GraphQLTypeReference(GQLTypeBranch.BRANCH))
                                 .dataFetcher { env ->
-                                    val data: Data = env.getSource()
+                                    val data: Data = env.getSource()!!
                                     findBranchByGitBranch(data.parentBranch.project, data.pr.source)
                                 }
                     }
@@ -47,7 +47,7 @@ class GitPullRequestGQLType(
                                 .description("Link to the Ontrack branch which is the target of this PR")
                                 .type(GraphQLTypeReference(GQLTypeBranch.BRANCH))
                                 .dataFetcher { env ->
-                                    val data: Data = env.getSource()
+                                    val data: Data = env.getSource()!!
                                     findBranchByGitBranch(data.parentBranch.project, data.pr.target)
                                 }
                     }

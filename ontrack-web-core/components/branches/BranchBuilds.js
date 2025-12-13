@@ -7,14 +7,14 @@ import BuildFilterDropdown from "@components/branches/filters/builds/BuildFilter
 import ValidationStampFilterDropdown from "@components/branches/filters/validationStamps/ValidationStampFilterDropdown";
 import ValidationStampHeader from "@components/branches/ValidationStampHeader";
 import ValidationRunCell from "@components/branches/ValidationRunCell";
-import {useContext, useEffect, useState} from "react";
+import {useContext} from "react";
 import ValidationGroups from "@components/validationRuns/ValidationGroups";
 import {ValidationStampFilterContext} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
-import {useConnection, useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {buildUri, scmChangeLogUri} from "@components/common/Links";
 import EntityNotificationsBadge from "@components/extension/notifications/EntityNotificationsBadge";
 import PromotionRunStep from "@components/promotionRuns/PromotionRunStep";
+import {useQuery} from "@components/services/GraphQL";
 
 const {Column} = Table;
 
@@ -44,33 +44,28 @@ export default function BranchBuilds({
                                          onPermalinkBuildFilter,
                                      }) {
 
-    const client = useGraphQLClient()
     const router = useRouter()
-    const connection = useConnection()
     const vsfContext = useContext(ValidationStampFilterContext)
 
-    const [scmChangeLogEnabled, setScmChangeLogEnabled] = useState(false)
-    useEffect(() => {
-        if (client && branch) {
-            client.request(
-                gql`
-                    query BranchScmInfo($id: Int!) {
-                        branch(id: $id) {
-                            scmBranchInfo {
-                                changeLogs
-                            }
-                        }
+    const {data: scmChangeLogEnabled} = useQuery(
+        gql`
+            query BranchScmInfo($id: Int!) {
+                branch(id: $id) {
+                    scmBranchInfo {
+                        changeLogs
                     }
-                `,
-                {id: branch.id}
-            ).then(data => {
-                setScmChangeLogEnabled(data.branch.scmBranchInfo?.changeLogs)
-            })
+                }
+            }
+        `,
+        {
+            variables: {id: Number(branch.id)},
+            condition: branch,
+            dataFn: data => data.branch.scmBranchInfo?.changeLogs,
         }
-    }, [client, branch]);
+    )
 
     const onChangeLog = () => {
-        if (scmChangeLogEnabled && connection.environment && rangeSelection.isComplete()) {
+        if (scmChangeLogEnabled && rangeSelection.isComplete()) {
             const [from, to] = rangeSelection.selection
             router.push(scmChangeLogUri(from, to))
         }
@@ -155,12 +150,14 @@ export default function BranchBuilds({
                                 </Col>
                             </Row> : undefined
                     }}
+                    scroll={{ x: 'max-content' }}
                 >
                     <Column
                         width="2em"
                         key="header"
                         colSpan={3}
                         align="left"
+                        fixed="left"
                         title={
                             <Space>
                                 {/* Build filter */}
@@ -215,6 +212,7 @@ export default function BranchBuilds({
                     />
                     <Column
                         key="build"
+                        fixed="left"
                         colSpan={0} // Header managed by the "header" column
                         render={(_, build) =>
                             <BuildBox build={build} displayDecorations={true}>
@@ -228,6 +226,7 @@ export default function BranchBuilds({
                     />
                     <Column
                         key="promotions"
+                        fixed="left"
                         colSpan={0} // Header managed by the "header" column
                         render={(_, build) =>
                             <Space size={8}>

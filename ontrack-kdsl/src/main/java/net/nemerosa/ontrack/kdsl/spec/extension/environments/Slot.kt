@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.kdsl.spec.extension.environments
 
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.CreatePipelineMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreatePipelineMutation
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.spec.Build
 import net.nemerosa.ontrack.kdsl.spec.Project
@@ -23,16 +23,16 @@ class Slot(
                 id,
                 build.id.toInt(),
             )
-        ) { it?.startSlotPipeline()?.fragments()?.payloadUserErrors()?.convert() }
-            ?.startSlotPipeline()?.pipeline()
+        ) { it?.startSlotPipeline?.payloadUserErrors?.convert() }
+            ?.startSlotPipeline?.pipeline
             ?: error("Cannot get the create pipeline")
         return SlotPipeline(
             connector = connector,
-            id = pipeline.id(),
-            number = pipeline.number() ?: 1,
+            id = pipeline.id,
+            number = pipeline.number ?: 1,
             slot = this,
             build = build,
-            status = pipeline.status(),
+            status = pipeline.status,
         )
     }
 

@@ -118,7 +118,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
             """.trimIndent(),
         ) { _, run, repositoryName ->
             """
-                <h3>Version <a href="http://localhost:8080/#/project/${run.project.id}">${run.project.name}</a> <a href="http://localhost:8080/#/build/${run.build.id}">${run.build.name}</a> has been released</h3>
+                <h3>Version <a href="http://localhost:3000/project/${run.project.id}">${run.project.name}</a> <a href="http://localhost:3000/build/${run.build.id}">${run.build.name}</a> has been released</h3>
                 
                 <ul>
                     <li><a href="mock://${repositoryName}/issue/ISS-21">ISS-21</a> Some new feature</li>
@@ -140,7 +140,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
             """.trimIndent(),
         ) { _, run, repositoryName ->
             """
-                # Version [${run.project.name}](http://localhost:8080/#/project/${run.project.id}) [${run.build.name}](http://localhost:8080/#/build/${run.build.id}) has been released
+                # Version [${run.project.name}](http://localhost:3000/project/${run.project.id}) [${run.build.name}](http://localhost:3000/build/${run.build.id}) has been released
             
                 * [ISS-21](mock://${repositoryName}/issue/ISS-21) Some new feature
                 * [ISS-22](mock://${repositoryName}/issue/ISS-22) Some fixes are needed
@@ -160,9 +160,9 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
             """.trimIndent(),
         ) { fromBuild, run, repositoryName ->
             """
-                # Version [${run.project.name}](http://localhost:8080/#/project/${run.project.id}) [${run.build.name}](http://localhost:8080/#/build/${run.build.id}) has been released
+                # Version [${run.project.name}](http://localhost:3000/project/${run.project.id}) [${run.build.name}](http://localhost:3000/build/${run.build.id}) has been released
                 
-                ## Change log for [${run.project.name}](http://localhost:8080/#/project/${run.project.id}) from [${fromBuild.name}](http://localhost:8080/#/build/${fromBuild.id}) to [${run.build.name}](http://localhost:8080/#/build/${run.build.id})
+                ## Change log for [${run.project.name}](http://localhost:3000/project/${run.project.id}) from [${fromBuild.name}](http://localhost:3000/build/${fromBuild.id}) to [${run.build.name}](http://localhost:3000/build/${run.build.id})
             
                 * [ISS-21](mock://${repositoryName}/issue/ISS-21) Some new feature
                 * [ISS-22](mock://${repositoryName}/issue/ISS-22) Some fixes are needed

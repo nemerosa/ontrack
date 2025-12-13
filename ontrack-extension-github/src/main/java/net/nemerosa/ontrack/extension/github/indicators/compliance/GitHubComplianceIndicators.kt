@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorSource
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorSourceProviderDescription
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.templating.TemplatingService
 import org.springframework.stereotype.Component
 
 /**
@@ -20,7 +21,8 @@ class GitHubComplianceIndicators(
     configurableIndicatorService: ConfigurableIndicatorService,
     private val propertyService: PropertyService,
     private val gitHubComplianceChecks: List<GitHubComplianceCheck<*, *>>,
-) : AbstractConfigurableIndicatorComputer(extensionFeature, configurableIndicatorService) {
+    templatingService: TemplatingService,
+) : AbstractConfigurableIndicatorComputer(extensionFeature, configurableIndicatorService, templatingService) {
 
     override val name: String = "GitHub Compliance"
 

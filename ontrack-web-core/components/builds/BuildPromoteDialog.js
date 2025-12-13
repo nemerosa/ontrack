@@ -18,7 +18,7 @@ export function useBuildPromoteDialog(config) {
         prepareValues: (values, context) => {
             return {
                 ...values,
-                buildId: context.build.id,
+                buildId: Number(context.build.id),
                 promotion: values.promotionLevel,
             }
         },

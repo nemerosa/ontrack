@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.t
 import java.util.regex.Matcher
 
 class RegexMessageAnnotator(
-    private val regex: Regex,
+    regex: Regex,
     private val annotationFactory: (token: String) -> MessageAnnotation,
 ) : AbstractMessageAnnotator() {
 

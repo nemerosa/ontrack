@@ -8,8 +8,6 @@ import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.json.ObjectMapperFactory
 import net.nemerosa.ontrack.model.exceptions.JsonParsingException
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -24,13 +22,6 @@ class TagPatternBuildNameGitCommitLink(
     override val id: String = "tagPattern"
 
     override val name: String = "Tag pattern"
-
-    override val form: Form = Form.create()
-            .with(
-                    Text.of("pattern")
-                            .label("Tag pattern")
-                            .help("@file:extension/git/help.net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink.tagPattern.tpl.html")
-            )
 
     override fun clone(data: TagPattern, replacementFunction: (String) -> String): TagPattern {
         return data.clone(replacementFunction)

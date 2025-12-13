@@ -1,11 +1,12 @@
 package net.nemerosa.ontrack.service.labels
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -14,7 +15,8 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class LabelProviderServiceIT : AbstractDSLTestJUnit4Support() {
+@AsAdminTest
+class LabelProviderServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var labelProviderService: LabelProviderService
@@ -25,7 +27,7 @@ class LabelProviderServiceIT : AbstractDSLTestJUnit4Support() {
     @Autowired
     private lateinit var testCustomLabelProvider: TestCustomLabelProvider
 
-    @Before
+    @BeforeEach
     fun setup() {
         testCountLabelProvider.reset()
         testCustomLabelProvider.reset()

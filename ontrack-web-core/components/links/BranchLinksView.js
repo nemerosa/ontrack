@@ -35,7 +35,7 @@ export default function BranchLinksView({id}) {
                         }
                     }
                 `,
-                {id}
+                {id: Number(id)}
             ).then(data => {
                 const branch = data.branches[0]
                 setBranch(branch)

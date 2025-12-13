@@ -24,8 +24,8 @@ export const createBuildLink = async (source, target, qualifier = "") => {
             }
         `,
         {
-            fromBuildId: source.id,
-            toBuildId: target.id,
+            fromBuildId: Number(source.id),
+            toBuildId: Number(target.id),
             qualifier,
         }
     )

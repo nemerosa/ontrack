@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-@Profile(RunProfile.ACC, RunProfile.UNIT_TEST, RunProfile.DEV)
+@Profile(RunProfile.DEV)
 class GQLRootQueryMockWorkflowTexts(
     private val mockWorkflowNodeExecutor: MockWorkflowNodeExecutor,
 ) : GQLRootQuery {
@@ -20,9 +20,9 @@ class GQLRootQueryMockWorkflowTexts(
             .name("mockWorkflowTexts")
             .description("Getting a list of texts generated for a mock workflow")
             .type(listType(GraphQLString))
-            .argument(stringArgument("instanceId", "ID of the workflow instance"))
+            .argument(stringArgument("instanceId", "ID of the workflow instance", nullable = false))
             .dataFetcher { env ->
-                val instanceId: String = env.getArgument("instanceId")
+                val instanceId: String = env.getArgument("instanceId")!!
                 mockWorkflowNodeExecutor.getTextsByInstanceId(instanceId)
             }
             .build()

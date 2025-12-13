@@ -1,18 +1,11 @@
 package net.nemerosa.ontrack.extension.slack.service
 
-import com.slack.api.Slack
-import com.slack.api.methods.MethodsClient
-import com.slack.api.model.Attachment
-import com.slack.api.model.block.Blocks.asBlocks
-import com.slack.api.model.block.Blocks.section
 import com.slack.api.model.block.composition.BlockCompositions.markdownText
 import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.extension.slack.client.SlackClient
 import net.nemerosa.ontrack.extension.slack.client.SlackClientFactory
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,9 +13,10 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class DefaultSlackService(
     private val cachedSettingsService: CachedSettingsService,
-    private val applicationLogService: ApplicationLogService,
     private val slackClientFactory: SlackClientFactory,
 ) : SlackService {
+
+    private val logger = LoggerFactory.getLogger(DefaultSlackService::class.java)
 
     override fun sendNotification(channel: String, message: String, type: SlackNotificationType?): Boolean {
         val settings = cachedSettingsService.getCachedSettings(SlackSettings::class.java)
@@ -76,12 +70,9 @@ class DefaultSlackService(
                 }
             } catch (ex: Exception) {
                 // Logs the error
-                applicationLogService.log(
-                    ApplicationLogEntry.error(
-                        ex,
-                        NameDescription.nd("slack-error", "Slack notification error"),
-                        "Cannot send Slack message: ${ex.message}"
-                    ).withDetail("channel", channel)
+                logger.error(
+                    "Cannot send Slack message on channel ${channel}: ${ex.message}",
+                    ex
                 )
                 // OK
                 return false

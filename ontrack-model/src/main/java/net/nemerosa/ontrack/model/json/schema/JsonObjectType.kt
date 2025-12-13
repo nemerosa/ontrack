@@ -13,6 +13,10 @@ class JsonObjectType(
     val required: List<String>,
     val additionalProperties: Boolean = false,
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    val minProperties: Int? = null,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val maxProperties: Int? = null,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     val oneOf: JsonOneOf? = null,
 ) : AbstractJsonNamedType(type = "object", title = title, description = description)
 

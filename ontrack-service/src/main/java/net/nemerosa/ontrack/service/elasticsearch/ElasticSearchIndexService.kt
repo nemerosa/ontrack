@@ -1,43 +1,37 @@
 package net.nemerosa.ontrack.service.elasticsearch
 
-import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.model.search.SearchQuery
+import co.elastic.clients.elasticsearch.ElasticsearchClient
+import co.elastic.clients.elasticsearch._types.ElasticsearchException
+import co.elastic.clients.elasticsearch.core.BulkRequest
+import co.elastic.clients.elasticsearch.core.DeleteRequest
+import co.elastic.clients.elasticsearch.core.GetRequest
+import co.elastic.clients.elasticsearch.core.IndexRequest
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest
+import co.elastic.clients.elasticsearch.indices.ExistsRequest
+import co.elastic.clients.elasticsearch.indices.RefreshRequest
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
-import org.elasticsearch.ElasticsearchStatusException
-import org.elasticsearch.action.DocWriteRequest
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest
-import org.elasticsearch.action.bulk.BulkRequest
-import org.elasticsearch.action.delete.DeleteRequest
-import org.elasticsearch.action.get.GetRequest
-import org.elasticsearch.action.index.IndexRequest
-import org.elasticsearch.action.search.SearchRequest
-import org.elasticsearch.client.RequestOptions
-import org.elasticsearch.client.RestHighLevelClient
-import org.elasticsearch.client.indices.CreateIndexRequest
-import org.elasticsearch.client.indices.GetIndexRequest
-import org.elasticsearch.client.indices.PutMappingRequest
-import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
+
 @Service
 @Transactional
 class ElasticSearchIndexService(
-        private val client: RestHighLevelClient,
-        private val ontrackConfigProperties: OntrackConfigProperties
+    private val client: ElasticsearchClient,
+    private val ontrackConfigProperties: OntrackConfigProperties
 ) : SearchIndexService {
 
     private val logger: Logger = LoggerFactory.getLogger(ElasticSearchIndexService::class.java)
 
     private fun <T : SearchItem> refreshIndex(indexer: SearchIndexer<T>) {
         logger.debug("Refreshing index ${indexer.indexName}")
-        val refreshRequest = RefreshRequest(indexer.indexName)
-        client.indices().refresh(refreshRequest, RequestOptions.DEFAULT)
+        val refreshRequest = RefreshRequest.Builder().index(indexer.indexName).build()
+        client.indices().refresh(refreshRequest)
     }
 
     override fun <T : SearchItem> index(indexer: SearchIndexer<T>) {
@@ -59,27 +53,17 @@ class ElasticSearchIndexService(
 
     override fun <T : SearchItem> initIndex(indexer: SearchIndexer<T>) {
         logger.info("[elasticsearch][index][${indexer.indexName}] Init")
-        val indexExists = client.indices().exists(GetIndexRequest(indexer.indexName), RequestOptions.DEFAULT)
-        if (indexExists) {
-            logger.info("[elasticsearch][index][${indexer.indexName}] Already exists")
-            indexer.indexMapping?.let { mapping ->
-                val mappingSource = mappingToMap(mapping)
-                logger.info("[elasticsearch][index][${indexer.indexName}] Updating mapping: $mappingSource")
-                val request = PutMappingRequest(indexer.indexName).source(mappingSource)
-                client.indices().putMapping(request, RequestOptions.DEFAULT)
-            }
-        } else {
+        val indexExists = client.indices().exists(ExistsRequest.Builder().index(indexer.indexName).build()).value()
+        if (!indexExists) {
             logger.info("[elasticsearch][index][${indexer.indexName}] Creating index")
-            val request = CreateIndexRequest(indexer.indexName).run {
-                indexer.indexMapping?.let {
-                    val mappingSource = mappingToMap(it)
-                    logger.info("[elasticsearch][index][${indexer.indexName}] Mapping=$mappingSource")
-                    mapping(mappingSource)
-                } ?: this
-            }
+            val request = CreateIndexRequest.Builder()
+                .index(indexer.indexName)
+                .let { builder: CreateIndexRequest.Builder ->
+                    indexer.initIndex(builder)
+                }.build()
             try {
-                client.indices().create(request, RequestOptions.DEFAULT)
-            } catch (ex: ElasticsearchStatusException) {
+                client.indices().create(request)
+            } catch (ex: ElasticsearchException) {
                 if (ontrackConfigProperties.search.index.ignoreExisting) {
                     logger.info("[elasticsearch][index][${indexer.indexName}] Cannot create index because already existing. Ignoring issue (likely happens during test).")
                 } else {
@@ -89,49 +73,9 @@ class ElasticSearchIndexService(
         }
     }
 
-    /**
-     * Converts a generic mapping into an ElasticSearch mapping.
-     */
-    private fun mappingToMap(mapping: SearchIndexMapping): Map<String, Any> {
-        return mapOf(
-                "properties" to mapping.fields
-                        .filter { it.types.isNotEmpty() }
-                        .associate { fieldMapping ->
-                            // Property mapping
-                            val property = mutableMapOf<String, Any>()
-                            // Primary type
-                            val primary = fieldMapping.types[0]
-                            setType(property, primary, nested = false)
-                            // Other fields
-                            if (fieldMapping.types.size > 1) {
-                                val fields = mutableMapOf<String, Any>()
-                                property["fields"] = fields
-                                fieldMapping.types.drop(1)
-                                        .forEach { type ->
-                                            if (!type.type.isNullOrBlank()) {
-                                                val typeMap = mutableMapOf<String, Any>()
-                                                fields[type.type!!] = typeMap
-                                                setType(typeMap, type, nested = true)
-                                            }
-                                        }
-                            }
-                            // OK
-                            fieldMapping.name to property
-                        }
-        )
-    }
-
-    private fun setType(property: MutableMap<String, Any>, type: SearchIndexMappingFieldType, nested: Boolean) {
-        type.type?.let { property["type"] = it }
-        type.index?.let { property["index"] = it }
-        if (!nested) {
-            type.scoreBoost?.let { property["boost"] = it }
-        }
-    }
-
     override fun <T : SearchItem> resetIndex(indexer: SearchIndexer<T>, reindex: Boolean): Boolean {
         // Deletes the index
-        client.indices().delete(DeleteIndexRequest(indexer.indexName), RequestOptions.DEFAULT)
+        client.indices().delete(DeleteIndexRequest.Builder().index(indexer.indexName).build())
         // Re-creates the index
         initIndex(indexer)
         // Re-index if requested
@@ -145,13 +89,23 @@ class ElasticSearchIndexService(
     }
 
     private fun <T : SearchItem> index(indexer: SearchIndexer<T>, items: List<T>) {
-        // Bulk indexation of the items
-        val bulk = items.fold(BulkRequest(indexer.indexName)) { acc, item ->
-            acc.add(IndexRequest().id(item.id).source(item.fields))
+        val bulkRequestBuilder = BulkRequest.Builder().index(indexer.indexName)
+        var operationsCount = 0
+        items.forEach { item ->
+            val operation = BulkOperation.Builder()
+                .index<Any?> { op ->
+                    op
+                        .id(item.id)
+                        .index(indexer.indexName)
+                        .document(item.fields)
+                }.build()
+            bulkRequestBuilder.operations(operation)
+            operationsCount++
         }
-        if (bulk.numberOfActions() > 0) {
+        if (operationsCount > 0) {
+            val bulkRequest = bulkRequestBuilder.build()
             // Launching the indexation of this batch
-            client.bulk(bulk, RequestOptions.DEFAULT)
+            client.bulk(bulkRequest)
             // Refreshes the index
             immediateRefreshIfRequested(indexer)
         }
@@ -167,34 +121,40 @@ class ElasticSearchIndexService(
 
     override fun <T : SearchItem> createSearchIndex(indexer: SearchIndexer<T>, item: T) {
         logger.debug("Create index ${indexer.indexName}")
-        client.index(
-                IndexRequest(indexer.indexName).id(item.id).source(item.fields),
-                RequestOptions.DEFAULT
-        )
+        val indexRequest = IndexRequest.Builder<Any>()
+            .index(indexer.indexName)
+            .id(item.id)
+            .document(item.fields)
+            .build()
+        client.index(indexRequest)
         // Refreshes the index
         immediateRefreshIfRequested(indexer)
     }
 
     override fun <T : SearchItem> updateSearchIndex(indexer: SearchIndexer<T>, item: T) {
         logger.debug("Update index ${indexer.indexName}")
-        client.index(
-                IndexRequest(indexer.indexName).id(item.id).source(item.fields),
-                RequestOptions.DEFAULT
-        )
+        val indexRequest = IndexRequest.Builder<Any>()
+            .index(indexer.indexName)
+            .id(item.id)
+            .document(item.fields)
+            .build()
+        client.index(indexRequest)
     }
 
     override fun <T : SearchItem> deleteSearchIndex(indexer: SearchIndexer<T>, id: String) {
         logger.debug("Delete index ${indexer.indexName}")
-        client.delete(
-                DeleteRequest(indexer.indexName).id(id),
-                RequestOptions.DEFAULT
-        )
+        val deleteRequest = DeleteRequest.Builder().index(indexer.indexName).id(id).build()
+        client.delete(deleteRequest)
         // Refreshes the index
         immediateRefreshIfRequested(indexer)
     }
 
-    override fun <T : SearchItem> batchSearchIndex(indexer: SearchIndexer<T>, items: Collection<T>, mode: BatchIndexMode): BatchIndexResults {
-        logger.debug("[search][batch-index] index=${indexer.indexName},items=${items.size},mode=$mode")
+    override fun <T : SearchItem> batchSearchIndex(
+        indexer: SearchIndexer<T>,
+        items: Collection<T>,
+        mode: BatchIndexMode
+    ): BatchIndexResults {
+        logger.debug("[search][batch-index] index={},items={},mode={}", indexer.indexName, items.size, mode)
         // Building the list of actions to take
         val bulk = items.fold(BatchSearchIndexBulk(indexer.indexName)) { acc, item ->
             val action = batchSearchIndexAction(indexer, item, mode)
@@ -208,9 +168,10 @@ class ElasticSearchIndexService(
             acc + action
         }
         // Launching the indexation of this batch
-        logger.info("[search][batch-index] index=${indexer.indexName},items=${items.size},mode=$mode,actions=${bulk.bulk.numberOfActions()}")
-        if (bulk.bulk.numberOfActions() > 0) {
-            client.bulk(bulk.bulk, RequestOptions.DEFAULT)
+        val bulkRequest = bulk.bulk.build()
+        logger.info("[search][batch-index] index=${indexer.indexName},items=${items.size},mode=$mode,actions=${bulkRequest.operations().size}")
+        if (bulkRequest.operations().size > 0) {
+            client.bulk(bulkRequest)
             // Refreshes the index
             immediateRefreshIfRequested(indexer)
         }
@@ -218,61 +179,65 @@ class ElasticSearchIndexService(
         return bulk.results
     }
 
-    override fun <T : SearchItem> query(indexer: SearchIndexer<T>, size: Int, query: SearchQuery, handler: (source: JsonNode) -> Unit) {
-        val source = SearchSourceBuilder().query(ElasticSearchQuery().of(query)).size(size)
-        // Starts the pagination
-        var next = true
-        var offset = 0
-        while (next) {
-            // Gets current page
-            val request = SearchRequest(indexer.indexName).source(source.from(offset))
-            val response = client.search(request, RequestOptions.DEFAULT)
-            // Processing the hits as JSON nodes
-            val hits = response.hits.hits
-            hits.forEach { hit ->
-                handler(hit.sourceAsMap.asJson())
-            }
-            // Next page if hits' count >= size
-            next = hits.size >= size
-            offset += size
-        }
-    }
-
-    private fun <T : SearchItem> batchSearchIndexAction(indexer: SearchIndexer<T>, item: T, mode: BatchIndexMode): BatchSearchIndexAction {
+    private fun <T : SearchItem> batchSearchIndexAction(
+        indexer: SearchIndexer<T>,
+        item: T,
+        mode: BatchIndexMode
+    ): BatchSearchIndexAction {
         // Gets the existing item using its ID
-        val response = client.get(GetRequest(indexer.indexName).id(item.id), RequestOptions.DEFAULT)
+        val getRequest = GetRequest.Builder()
+            .index(indexer.indexName)
+            .id(item.id)
+            .build()
+        val response = client.get(getRequest, Any::class.java)
         // If item exists
-        return if (response.isExists) {
+        return if (response.found()) {
             when (mode) {
                 BatchIndexMode.KEEP -> BatchSearchIndexAction(null, BatchIndexResults.KEEP)
-                BatchIndexMode.UPDATE -> BatchSearchIndexAction(IndexRequest(indexer.indexName).id(item.id).source(item.fields), BatchIndexResults.UPDATE)
+                BatchIndexMode.UPDATE -> BatchSearchIndexAction(
+                    BulkOperation.Builder().index<Any> { indexBuilder ->
+                        indexBuilder.index(indexer.indexName)
+                        indexBuilder.id(item.id)
+                        indexBuilder.document(item.fields)
+                    }.build(),
+                    BatchIndexResults.UPDATE
+                )
             }
         }
         // If not existing
         else {
-            BatchSearchIndexAction(IndexRequest(indexer.indexName).id(item.id).source(item.fields), BatchIndexResults.ADD)
+            BatchSearchIndexAction(
+                BulkOperation.Builder().index<Any> { indexBuilder ->
+                    indexBuilder.index(indexer.indexName)
+                    indexBuilder.id(item.id)
+                    indexBuilder.document(item.fields)
+                }.build(),
+                BatchIndexResults.ADD
+            )
         }
     }
 
     private class BatchSearchIndexBulk private constructor(
-            val bulk: BulkRequest,
-            val results: BatchIndexResults
+        val bulk: BulkRequest.Builder,
+        val results: BatchIndexResults
     ) {
         constructor(indexName: String) : this(
-                BulkRequest(indexName),
-                BatchIndexResults.NONE
+            BulkRequest.Builder().index(indexName),
+            BatchIndexResults.NONE
         )
 
         operator fun plus(action: BatchSearchIndexAction) =
-                BatchSearchIndexBulk(
-                        bulk = action.action?.let { bulk.add(it) } ?: bulk,
-                        results = results + action.results
-                )
+            BatchSearchIndexBulk(
+                bulk = action.action?.let {
+                    bulk.operations(it)
+                } ?: bulk,
+                results = results + action.results
+            )
     }
 
     private class BatchSearchIndexAction(
-            val action: DocWriteRequest<*>?,
-            val results: BatchIndexResults
+        val action: BulkOperation?,
+        val results: BatchIndexResults
     )
 
 }

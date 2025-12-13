@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
+import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataJSONInputException
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
@@ -19,6 +20,7 @@ class ValidationRunMutations(
     private val validationRunStatusService: ValidationRunStatusService,
     private val validationDataTypeService: ValidationDataTypeService,
     private val runInfoService: RunInfoService,
+    private val buildDisplayNameService: BuildDisplayNameService,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
@@ -44,6 +46,24 @@ class ValidationRunMutations(
             outputType = ValidationRun::class
         ) { input ->
             val build = structureService.getBuild(ID.of(input.buildId))
+            validate(build, input)
+        },
+        simpleMutation(
+            name = "createValidationRunByRelease",
+            description = "Creating a validation run for a build identified by its release label",
+            input = CreateValidationRunByReleaseInput::class,
+            outputName = "validationRun",
+            outputDescription = "Created validation run",
+            outputType = ValidationRun::class
+        ) { input ->
+            val project = structureService.findProjectByName(input.project)
+                .getOrNull()
+                ?: throw ProjectNotFoundException(input.project)
+            val build = buildDisplayNameService.findBuildByDisplayName(
+                project = project,
+                name = input.buildRelease,
+                onlyDisplayName = true
+            ) ?: throw BuildReleaseNotFoundException(project, input.buildRelease)
             validate(build, input)
         },
         simpleMutation(
@@ -140,6 +160,26 @@ class CreateValidationRunInput(
     val branch: String,
     @APIDescription("Build name")
     val build: String,
+    @APIDescription("Validation stamp name")
+    override val validationStamp: String,
+    @APIDescription("Validation run status")
+    override val validationRunStatus: String?,
+    @APIDescription("Validation description")
+    override val description: String?,
+    @APIDescription("Type of the data to associated with the validation")
+    override val dataTypeId: String?,
+    @APIDescription("Data to associated with the validation")
+    override val data: JsonNode?,
+    @APIDescription("Run info")
+    @TypeRef
+    override val runInfo: RunInfoInput?,
+): ValidationRunInput
+
+class CreateValidationRunByReleaseInput(
+    @APIDescription("Project name")
+    val project: String,
+    @APIDescription("Build release")
+    val buildRelease: String,
     @APIDescription("Validation stamp name")
     override val validationStamp: String,
     @APIDescription("Validation run status")

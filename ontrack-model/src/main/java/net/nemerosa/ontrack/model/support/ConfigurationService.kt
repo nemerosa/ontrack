@@ -1,8 +1,5 @@
 package net.nemerosa.ontrack.model.support
 
-import java.util.*
-import java.util.function.Function
-
 /**
  * Defines what the management of configurations must be.
  *
@@ -21,11 +18,6 @@ interface ConfigurationService<T : Configuration<T>> {
      * Gets the list of configurations.
      */
     val configurations: List<T>
-
-    /**
-     * List of descriptors for all these configurations
-     */
-    val configurationDescriptors: List<ConfigurationDescriptor>
 
     /**
      * Saves a _new_ configuration.
@@ -56,15 +48,6 @@ interface ConfigurationService<T : Configuration<T>> {
     fun findConfiguration(name: String): T?
 
     /**
-     * Same than [getConfiguration] but returns empty if not found.
-     *
-     * @param name Name of the configuration to find
-     * @return The configuration or empty if not found
-     */
-    @Deprecated(message = "Use findConfiguration instead", replaceWith = ReplaceWith("findConfiguration"))
-    fun getOptionalConfiguration(name: String): Optional<T>
-
-    /**
      * Deletes a configuration
      *
      * @param name Name of the configuration to delete
@@ -81,28 +64,6 @@ interface ConfigurationService<T : Configuration<T>> {
      * a blank password can be accepted.
      */
     fun updateConfiguration(name: String, configuration: T)
-
-    /**
-     * Tries to replace a configuration by another based on its name.
-     *
-     *
-     * If the replacement function, applied on the configuration name, would
-     * give the same exact name, this method returns the configuration.
-     *
-     *
-     * If the names are different, there are two cases:
-     *
-     *  * If the current user is allowed to create a new configuration,
-     * the given configuration is transformed using the replacement
-     * function and a new configuration is created.
-     *  * If the current user is not allowed to create a configuration,
-     * a [ConfigurationNotFoundException]
-     * exception is thrown.
-     *
-     *
-     */
-    @Deprecated("Will be removed in V5.")
-    fun replaceConfiguration(configuration: T, replacementFunction: Function<String, String>): T
 
     /**
      * Type of configuration handled by this service

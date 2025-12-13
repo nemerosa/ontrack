@@ -1,20 +1,20 @@
-import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
-
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
-
-apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-git"))
 
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.apache.commons:commons-lang3")
+    implementation("commons-codec:commons-codec")
     implementation(project(":ontrack-extension-general"))
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-indicators"))
     implementation(project(":ontrack-extension-auto-versioning"))
+    implementation(project(":ontrack-extension-config"))
+    implementation(project(":ontrack-extension-notifications"))
     implementation("io.jsonwebtoken:jjwt-api")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("io.micrometer:micrometer-core")
@@ -29,16 +29,21 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation(project(":ontrack-repository"))
     testImplementation(project(":ontrack-extension-scm"))
-    testImplementation(project(path = ":ontrack-extension-issues", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
-    testImplementation("com.networknt:json-schema-validator")
-    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-general", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-auto-versioning", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
-
     testImplementation(project(":ontrack-extension-stale"))
+    testImplementation("com.networknt:json-schema-validator")
+    testImplementation(testFixtures(project(":ontrack-ui-graphql")))
+    testImplementation(testFixtures(project(":ontrack-extension-api")))
+    testImplementation(testFixtures(project(":ontrack-extension-auto-versioning")))
+    testImplementation(testFixtures(project(":ontrack-extension-casc")))
+    testImplementation(testFixtures(project(":ontrack-extension-general")))
+    testImplementation(testFixtures(project(":ontrack-extension-issues")))
+    testImplementation(testFixtures(project(":ontrack-extension-git")))
+    testImplementation(testFixtures(project(":ontrack-extension-config")))
+    testImplementation(testFixtures(project(":ontrack-extension-scm")))
+    testImplementation(testFixtures(project(":ontrack-extension-queue")))
+
+    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api")
+    testFixturesImplementation(project(":ontrack-test-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

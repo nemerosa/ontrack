@@ -54,7 +54,7 @@ export const createValidationRun = async (build, validationStamp, params) => {
             ${validationRunFragment}
         `,
         {
-            buildId: build.id,
+            buildId: Number(build.id),
             validationStamp: validationStampName,
             validationRunStatus: validationRunStatus,
             description,
@@ -80,7 +80,7 @@ export const getValidationRunById = async (ontrack, runId) => {
             ${validationRunFragment}
         `,
         {
-            runId,
+            runId: Number(runId),
         }
     )
 

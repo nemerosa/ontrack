@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.github.ingestion.ui
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
-import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayload
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStatus
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
@@ -23,7 +22,7 @@ class GQLRootQueryGitHubIngestionHookPayloads(
     private val ingestionHookPayloadStorage: IngestionHookPayloadStorage,
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
-        gqlPaginatedListFactory.createPaginatedField<Any?, IngestionHookPayload>(
+        gqlPaginatedListFactory.createRootPaginatedField(
             cache = GQLTypeCache(),
             fieldName = "gitHubIngestionHookPayloads",
             fieldDescription = "List of payloads received by the GitHub Ingestion Hook payload",
@@ -85,7 +84,7 @@ class GQLRootQueryGitHubIngestionHookPayloads(
                     .type(GraphQLString)
                     .build(),
             ),
-            itemPaginatedListProvider = { env, _, offset, size ->
+            itemPaginatedListProvider = { env, offset, size ->
                 val uuid: String? = env.getArgument(ARG_UUID)
                 if (uuid != null) {
                     val payload = ingestionHookPayloadStorage.findByUUID(uuid)

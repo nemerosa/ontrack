@@ -9,4 +9,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation(project(":ontrack-model"))
     implementation("org.slf4j:slf4j-api")
+
+    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
 }

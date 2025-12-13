@@ -25,41 +25,6 @@ class BitbucketServerSCMExtensionIT : AbstractDSLTestSupport() {
     private lateinit var eventFactory: EventFactory
 
     @Test
-    fun `Event based path expansion with SCM branch using the legacy template`() {
-        asAdmin {
-            withDisabledConfigurationTest {
-                bitbucketServerTestSupport.withBitbucketServerConfig { config ->
-                    project {
-                        bitbucketServerTestSupport.setStashProjectProperty(this, config, "MYPRJ", "myrepo")
-                        branch {
-                            gitTestSupport.setGitBranchConfigurationProperty(this, "any/branch")
-                            // Creating an event
-                            val pl = promotionLevel()
-                            build {
-                                val run = promote(pl)
-                                // Event
-                                val event = eventFactory.newPromotionRun(run)
-                                // Rendering
-                                val path = eventTemplatingService.renderEvent(
-                                    event = event,
-                                    template = "/my/path/{ScmBranch|urlencode}",
-                                    context = emptyMap(),
-                                    renderer = PlainEventRenderer.INSTANCE,
-                                )
-                                // Check
-                                assertEquals(
-                                    "/my/path/any%2Fbranch",
-                                    path
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @Test
     fun `Event based path expansion with SCM branch`() {
         asAdmin {
             withDisabledConfigurationTest {

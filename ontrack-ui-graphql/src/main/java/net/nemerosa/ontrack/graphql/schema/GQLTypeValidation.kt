@@ -43,7 +43,7 @@ class GQLTypeValidation(
                 }
                 .type(listType(validationRun.typeRef))
                 .dataFetcher { env ->
-                    val data: GQLTypeValidationData = env.getSource()
+                    val data: GQLTypeValidationData = env.getSource()!!
                     val count: Int? = env.getArgument("count")
                     if (count != null) {
                         data.validationRuns.take(count)

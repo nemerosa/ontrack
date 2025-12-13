@@ -4,8 +4,8 @@ import {gql} from "graphql-request";
 import Head from "next/head";
 import {projectTitle} from "@components/common/Titles";
 import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
-import {CloseCommand, LegacyLinkCommand} from "@components/common/Commands";
-import {homeUri, legacyProjectUri} from "@components/common/Links";
+import {CloseCommand} from "@components/common/Commands";
+import {homeUri} from "@components/common/Links";
 import {
     gqlDecorationFragment,
     gqlInformationFragment,
@@ -21,7 +21,6 @@ import JumpToBranch from "@components/branches/JumpToBranch";
 import ProjectFavourite from "@components/projects/ProjectFavourite";
 import {useEventForRefresh} from "@components/common/EventsContext";
 import ProjectInfoViewDrawer from "@components/projects/ProjectInfoViewDrawer";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import UserMenuActions from "@components/entities/UserMenuActions";
 import {gqlProjectContentFragment} from "@components/projects/ProjectGraphQLFragments";
 import {isAuthorized} from "@components/common/authorizations";
@@ -32,137 +31,140 @@ import NewBranchCommand from "@components/branches/NewBranchCommand";
 import ProjectEnvironmentsCommand from "@components/extension/environments/project/ProjectEnvironmentsCommand";
 import ProjectBuildSearchCommand from "@components/projects/ProjectBuildSearchCommand";
 import ProjectDeleteCommand from "@components/projects/ProjectDeleteCommand";
+import AnnotatedDescription from "@components/common/AnnotatedDescription";
+import {useQuery} from "@components/services/GraphQL";
+import {useRefresh} from "@components/common/RefreshUtils";
+import ProjectEditCommand from "@components/projects/ProjectEditCommand";
 
 export default function ProjectView({id}) {
 
-    const client = useGraphQLClient()
-
-    const [loadingProject, setLoadingProject] = useState(true)
-
-    const [project, setProject] = useState({})
-    const [branches, setBranches] = useState([])
-    const [favouriteBranches, setFavouriteBranches] = useState([])
-    const [commands, setCommands] = useState([])
+    const [refreshCount, refresh] = useRefresh()
 
     const favouriteRefreshCount = useEventForRefresh("branch.favourite")
     const projectUpdated = useEventForRefresh("project.updated")
     const branchCreated = useEventForRefresh("branch.created")
 
-    useEffect(() => {
-        if (id && client) {
-            setLoadingProject(true)
-            client.request(
-                gql`
-                    query GetProject($id: Int!) {
-                        project(id: $id) {
-                            ...ProjectContent
-                            properties {
-                                ...propertiesFragment
-                            }
-                            information {
-                                ...informationFragment
-                            }
-                            userMenuActions {
-                                ...userMenuActionFragment
-                            }
-                            authorizations {
-                                name
-                                action
-                                authorized
-                            }
-                            branches(order: true, count: 6) {
-                                ...BranchContent
-                                favourite
-                                decorations {
-                                    ...decorationContent
-                                }
-                            }
-                            favouriteBranches: branches(favourite: true, order: true) {
-                                ...BranchContent
-                                favourite
-                                decorations {
-                                    ...decorationContent
-                                }
-                                latestBuild: builds(count: 1) {
+    const {data: project, loading} = useQuery(
+        gql`
+            query GetProject($id: Int!) {
+                project(id: $id) {
+                    ...ProjectContent
+                    properties {
+                        ...propertiesFragment
+                    }
+                    information {
+                        ...informationFragment
+                    }
+                    userMenuActions {
+                        ...userMenuActionFragment
+                    }
+                    authorizations {
+                        name
+                        action
+                        authorized
+                    }
+                    branches(order: true, count: 6) {
+                        ...BranchContent
+                        favourite
+                        decorations {
+                            ...decorationContent
+                        }
+                    }
+                    favouriteBranches: branches(favourite: true, order: true) {
+                        ...BranchContent
+                        favourite
+                        decorations {
+                            ...decorationContent
+                        }
+                        latestBuild: builds(count: 1) {
+                            id
+                            name
+                            displayName
+                        }
+                        promotionLevels {
+                            id
+                            name
+                            image
+                            promotionRuns(first: 1) {
+                                build {
                                     id
                                     name
-                                }
-                                promotionLevels {
-                                    id
-                                    name
-                                    image
-                                    promotionRuns(first: 1) {
-                                        build {
-                                            id
-                                            name
-                                        }
-                                    }
+                                    displayName
                                 }
                             }
                         }
                     }
+                }
+            }
 
-                    ${gqlDecorationFragment}
-                    ${gqlPropertiesFragment}
-                    ${gqlInformationFragment}
-                    ${gqlUserMenuActionFragment}
-                    ${gqlProjectContentFragment}
-                    ${gqlBranchContentFragment}
-                `,
-                {id}
-            ).then(data => {
-                const project = data.project
-                setProject(project)
-                setFavouriteBranches(project.favouriteBranches)
-                setBranches(project.branches)
+            ${gqlDecorationFragment}
+            ${gqlPropertiesFragment}
+            ${gqlInformationFragment}
+            ${gqlUserMenuActionFragment}
+            ${gqlProjectContentFragment}
+            ${gqlBranchContentFragment}
+        `,
+        {
+            initialData: {},
+            variables: {id: Number(id)},
+            deps: [refreshCount, favouriteRefreshCount, projectUpdated, branchCreated],
+            dataFn: data => data.project,
+        }
+    )
 
-                // Commands
-                const commands = []
-                // Commands depending on the project authorizations & state
+    const [branches, setBranches] = useState([])
+    const [favouriteBranches, setFavouriteBranches] = useState([])
+    const [commands, setCommands] = useState([])
+
+    useEffect(() => {
+        if (project) {
+            setFavouriteBranches(project.favouriteBranches)
+            setBranches(project.branches)
+
+            // Commands
+            const commands = []
+            // Commands depending on the project authorizations & state
+            commands.push(
+                <NewBranchCommand
+                    key="branch-create"
+                    project={project}
+                />
+            )
+            if (isAuthorized(project, 'project', 'disable')) {
                 commands.push(
-                    <NewBranchCommand
-                        key="branch-create"
+                    <DisableProjectCommand
+                        key="disable-enable"
                         project={project}
                     />
                 )
-                if (isAuthorized(project, 'project', 'disable')) {
-                    commands.push(
-                        <DisableProjectCommand
-                            key="disable-enable"
-                            project={project}
-                        />
-                    )
-                }
-                // All the rest of commands
+            }
+            // All the rest of commands
+            commands.push(
+                <ProjectEnvironmentsCommand key="environments" id={project.id}/>,
+                <ProjectBuildSearchCommand key="search" id={project.id}/>,
+                <UserMenuActions key="userMenuActions" actions={project.userMenuActions}/>,
+                <JumpToBranch key="branch" projectName={project.name}/>,
+            )
+            // Editing the project
+            if (isAuthorized(project, 'project', 'edit')) {
                 commands.push(
-                    <ProjectEnvironmentsCommand key="environments" id={project.id}/>,
-                    <ProjectBuildSearchCommand key="search" id={project.id}/>,
-                    <UserMenuActions key="userMenuActions" actions={project.userMenuActions}/>,
-                    <JumpToBranch key="branch" projectName={project.name}/>,
+                    <ProjectEditCommand key="edit" project={project}/>
                 )
-                // Deleting the project
-                if (isAuthorized(project, 'project', 'delete')) {
-                    commands.push(
-                        <ProjectDeleteCommand key="delete" id={project.id}/>
-                    )
-                }
-                // All the rest of commands
+            }
+            // Deleting the project
+            if (isAuthorized(project, 'project', 'delete')) {
                 commands.push(
-                    <LegacyLinkCommand
-                        key="legacy"
-                        href={legacyProjectUri(project)}
-                        text="Legacy project"
-                        title="Goes to the legacy project page"
-                    />,
-                    <CloseCommand key="close" href={homeUri()}/>,
+                    <ProjectDeleteCommand key="delete" id={project.id}/>
                 )
-                // Setting the commands
-                setCommands(commands)
-            }).finally(() => {
-                setLoadingProject(false)
-            })
+            }
+            // All the rest of commands
+            commands.push(
+                <CloseCommand key="close" href={homeUri()}/>,
+            )
+            // Setting the commands
+            setCommands(commands)
         }
-    }, [client, id, favouriteRefreshCount, projectUpdated, branchCreated])
+    }, [project])
 
 
     return (
@@ -171,10 +173,12 @@ export default function ProjectView({id}) {
                 {projectTitle(project)}
             </Head>
             <MainPage
+                pageId="project"
                 title={
                     <Space>
                         {project.name}
                         <ProjectFavourite project={project}/>
+                        <AnnotatedDescription entity={project} type="secondary" disabled={false}/>
                     </Space>
                 }
                 breadcrumbs={projectBreadcrumbs(project)}
@@ -185,7 +189,7 @@ export default function ProjectView({id}) {
                     {
                         favouriteBranches && favouriteBranches.length > 0 &&
                         <PageSection
-                            loading={loadingProject}
+                            loading={loading}
                             title="Favourite branches"
                             height="250px"
                             padding={true}
@@ -197,7 +201,7 @@ export default function ProjectView({id}) {
                         </PageSection>
                     }
                     <PageSection
-                        loading={loadingProject}
+                        loading={loading}
                         title="Last active branches"
                         height="300px"
                         padding={true}
@@ -221,7 +225,7 @@ export default function ProjectView({id}) {
                             </Space>
                         }
                     </PageSection>
-                    <ProjectInfoViewDrawer project={project} loadingProject={loadingProject}/>
+                    <ProjectInfoViewDrawer project={project} loadingProject={loading}/>
                 </Space>
             </MainPage>
         </>

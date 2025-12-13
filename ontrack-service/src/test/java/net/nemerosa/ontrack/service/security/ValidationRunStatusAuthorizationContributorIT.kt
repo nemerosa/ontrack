@@ -22,7 +22,7 @@ class ValidationRunStatusAuthorizationContributorIT : AbstractDSLTestSupport() {
                         val run = validate(vs)
                         val status = run.lastStatus
                         assertTrue(contributor.appliesTo(status), "Contributor applies to VRS")
-                        val auths = contributor.getAuthorizations(securityService.currentAccount!!, status)
+                        val auths = contributor.getAuthorizations(securityService.currentUser!!, status)
                         assertNotNull(auths.find { it.name == "validation_run_status" && it.action == "comment_change" }) {
                             assertEquals(true, it.authorized, "Comment change is authorized")
                         }

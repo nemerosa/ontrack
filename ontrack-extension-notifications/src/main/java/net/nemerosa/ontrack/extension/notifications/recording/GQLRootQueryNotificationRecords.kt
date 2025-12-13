@@ -25,7 +25,7 @@ class GQLRootQueryNotificationRecords(
     private val gqlEnumNotificationResultType: GQLEnumNotificationResultType,
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
-        gqlPaginatedListFactory.createPaginatedField<Any?, NotificationRecord>(
+        gqlPaginatedListFactory.createRootPaginatedField<NotificationRecord>(
             cache = GQLTypeCache(),
             fieldName = "notificationRecords",
             fieldDescription = "Access to the notification recordings",
@@ -56,7 +56,7 @@ class GQLRootQueryNotificationRecords(
                     "Filtering on the entity ID targeted by the event (${ARG_FILTER_EVENT_ENTITY_TYPE} must be provided as well)"
                 ),
             ),
-            itemPaginatedListProvider = { env, _, offset, size ->
+            itemPaginatedListProvider = { env, offset, size ->
                 val resultType = env.getArgument<String?>(ARG_FILTER_RESULT_TYPE)?.let {
                     NotificationResultType.valueOf(it)
                 }

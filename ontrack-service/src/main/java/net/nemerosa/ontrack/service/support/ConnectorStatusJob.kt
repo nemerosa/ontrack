@@ -8,11 +8,10 @@ import net.nemerosa.ontrack.model.support.ConnectorGlobalStatusService
 import net.nemerosa.ontrack.model.support.ConnectorStatusIndicator
 import org.springframework.stereotype.Component
 import java.util.concurrent.ConcurrentHashMap
-import java.util.stream.Stream
 
 @Component
 class ConnectorStatusJob(
-        private val connectorStatusIndicators: List<ConnectorStatusIndicator>
+    private val connectorStatusIndicators: List<ConnectorStatusIndicator>
 ) : JobOrchestratorSupplier, ConnectorGlobalStatusService {
 
     internal val statuses = ConcurrentHashMap<String, List<CollectedConnectorStatus>>()
@@ -23,10 +22,16 @@ class ConnectorStatusJob(
 
     override val globalStatus: ConnectorGlobalStatus
         get() = ConnectorGlobalStatus(
-                statuses.values.flatten().sortedBy {
-                    it.status.description.connector
-                }
+            statuses.values.flatten().sortedBy {
+                it.status.description.connector
+            }
         )
+
+    override fun collect() {
+        connectorStatusIndicators.forEach { connectorStatusIndicator ->
+            statuses[connectorStatusIndicator.type] = connectorStatusIndicator.statuses.map { it.collected() }
+        }
+    }
 
     override val jobRegistrations: Collection<JobRegistration>
         get() = connectorStatusIndicators.map {
@@ -38,14 +43,14 @@ class ConnectorStatusJob(
     private fun createJob(connectorStatusIndicator: ConnectorStatusIndicator) = object : Job {
 
         override fun getKey(): JobKey =
-                CONNECTOR_STATUS_JOB.getKey(connectorStatusIndicator.type)
+            CONNECTOR_STATUS_JOB.getKey(connectorStatusIndicator.type)
 
         override fun getTask() = JobRun {
             statuses[connectorStatusIndicator.type] = connectorStatusIndicator.statuses.map { it.collected() }
         }
 
         override fun getDescription(): String =
-                "Collection of connector statuses for type ${connectorStatusIndicator.type}"
+            "Collection of connector statuses for type ${connectorStatusIndicator.type}"
 
         override fun isDisabled(): Boolean = false
 

@@ -16,9 +16,9 @@ class GQLRootQueryWorkflowInstance(
             .name("workflowInstance")
             .description("Gets an existing workflow instance using its ID")
             .type(gqlTypeWorkflowInstance.typeRef)
-            .argument(stringArgument("id", "ID of the workflow instance"))
+            .argument(stringArgument("id", "ID of the workflow instance", nullable = false))
             .dataFetcher { env ->
-                val id: String = env.getArgument("id")
+                val id: String = env.getArgument("id")!!
                 workflowEngine.findWorkflowInstance(id)
             }
             .build()

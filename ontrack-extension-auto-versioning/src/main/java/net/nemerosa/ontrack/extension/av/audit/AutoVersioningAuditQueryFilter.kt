@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.extension.av.audit
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import net.nemerosa.ontrack.model.annotations.API
 import net.nemerosa.ontrack.model.annotations.APIDescription
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class AutoVersioningAuditQueryFilter(
     val project: String? = null,
     val branch: String? = null,
+    val qualifier: String? = null,
     val uuid: String? = null,
     val state: AutoVersioningAuditState? = null,
     val states: Set<AutoVersioningAuditState>? = null,
@@ -26,6 +26,7 @@ class AutoVersioningAuditQueryFilter(
     fun withOffset(value: Int) = AutoVersioningAuditQueryFilter(
         project = project,
         branch = branch,
+        qualifier = qualifier,
         uuid = uuid,
         state = state,
         states = states,
@@ -41,6 +42,7 @@ class AutoVersioningAuditQueryFilter(
     fun withCount(value: Int) = AutoVersioningAuditQueryFilter(
         project = project,
         branch = branch,
+        qualifier = qualifier,
         uuid = uuid,
         state = state,
         states = states,

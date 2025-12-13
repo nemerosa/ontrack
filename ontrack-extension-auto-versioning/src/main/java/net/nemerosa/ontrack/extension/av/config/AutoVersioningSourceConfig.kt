@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.graphql.support.IgnoreRef
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIIgnore
+import net.nemerosa.ontrack.model.docs.DocumentationIgnore
 import org.apache.commons.codec.digest.DigestUtils
 
 @APIDescription("Configuration of the auto versioning for one source.")
@@ -60,6 +62,8 @@ data class AutoVersioningSourceConfig(
     @APIDescription("Additional paths to change")
     @ListRef(embedded = true, suffix = "Input")
     val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
+    @APIDescription("Cron schedule (when to start applying queued requests)")
+    val cronSchedule: String? = null,
 ) {
 
     /**
@@ -67,6 +71,8 @@ data class AutoVersioningSourceConfig(
      */
     @get:JsonIgnore
     @IgnoreRef
+    @DocumentationIgnore
+    @APIIgnore
     val defaultPath: AutoVersioningSourceConfigPath = AutoVersioningSourceConfigPath(
         path = targetPath,
         regex = targetRegex,
@@ -173,6 +179,7 @@ data class AutoVersioningSourceConfig(
             prBodyTemplate = prBodyTemplate,
             prBodyTemplateFormat = prBodyTemplateFormat,
             additionalPaths = additionalPaths,
+            cronSchedule = cronSchedule,
         )
 
 }

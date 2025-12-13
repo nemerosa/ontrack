@@ -5,9 +5,10 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.hook.metrics.*
 import net.nemerosa.ontrack.extension.hook.records.HookRecordService
 import net.nemerosa.ontrack.model.metrics.time
-import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.TokensService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.*
 
 /**
@@ -18,7 +19,7 @@ class HookController(
     private val extensionManager: ExtensionManager,
     private val meterRegistry: MeterRegistry,
     private val hookRecordService: HookRecordService,
-    private val securityService: SecurityService,
+    private val tokensService: TokensService,
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(HookController::class.java)
@@ -56,7 +57,12 @@ class HookController(
 
         // Checking the access
         try {
-            endpoint.checkAccess(request)
+            val token = endpoint.checkAccess(request)
+                .takeIf { it.isNotBlank() }
+                ?: throw AccessDeniedException("No token was provided by the hook: $hook")
+            if (!tokensService.useTokenForSecurityContext(token)) {
+                throw AccessDeniedException("Token provided by the hook is denied: $hook")
+            }
         } catch (any: Exception) {
             meterRegistry.hookAccessDenied(hook)
             hookRecordService.onDenied(recordId)
@@ -65,12 +71,10 @@ class HookController(
 
         // Processing
         return try {
-            // TODO #1395 Using reduced rights
-            val result = securityService.asAdmin {
+            val result =
                 meterRegistry.time(HookMetrics.time, "hook" to hook) {
                     endpoint.process(recordId, request)
-                }
-            } ?: error("Processing did not return any result")
+                } ?: error("Processing did not return any result")
             meterRegistry.hookSuccess(hook)
             hookRecordService.onSuccess(recordId, result)
             result

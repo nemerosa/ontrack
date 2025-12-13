@@ -41,7 +41,7 @@ class GQLTypeProjectIndicators(
                                     .type(GraphQLString)
                         }
                         .dataFetcher { env ->
-                            val project = env.getSource<ProjectIndicators>().project
+                            val project = env.getSource<ProjectIndicators>()!!.project
                             val category: String? = env.getArgument(ARG_CATEGORY)
                             val type: String? = env.getArgument(ARG_TYPE)
                             if (!type.isNullOrBlank()) {
@@ -61,7 +61,7 @@ class GQLTypeProjectIndicators(
                         .description("List of indicator categories")
                         .type(listType(projectCategoryIndicators.typeRef))
                         .dataFetcher { env ->
-                            val project = env.getSource<ProjectIndicators>().project
+                            val project = env.getSource<ProjectIndicators>()!!.project
                             projectIndicatorService.getProjectCategoryIndicators(project.id, true)
 
                         }

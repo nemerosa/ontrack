@@ -9,6 +9,7 @@ import java.util.stream.Stream
 /**
  * Defines a client for a Git repository.
  */
+@Deprecated("Will be removed in V6. Always use native methods of the SCM.")
 interface GitRepositoryClient {
 
     /**

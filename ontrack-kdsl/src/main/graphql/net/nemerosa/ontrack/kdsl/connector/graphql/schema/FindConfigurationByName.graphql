@@ -1,0 +1,10 @@
+query FindConfigurationByName(
+    $type: String!,
+    $name: String!,
+) {
+    configurationByName(type: $type, name: $name) {
+        name
+        data
+        extra
+    }
+}

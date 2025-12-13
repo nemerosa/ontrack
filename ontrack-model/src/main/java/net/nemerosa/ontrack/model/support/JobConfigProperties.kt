@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.model.support
 
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.springframework.boot.convert.DurationUnit
 import java.time.Duration
 import java.time.temporal.ChronoUnit
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
 
 class JobConfigProperties {
     @Min(1)

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.queue
 
 import io.micrometer.core.instrument.MeterRegistry
+import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
 import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
 import net.nemerosa.ontrack.extension.notifications.model.Notification
 import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingService
@@ -16,11 +17,14 @@ class NotificationQueueProcessor(
     private val serializableEventService: SerializableEventService,
     private val meterRegistry: MeterRegistry,
     private val notificationProcessingService: NotificationProcessingService,
+    notificationsConfigProperties: NotificationsConfigProperties,
 ) : QueueProcessor<NotificationQueuePayload> {
     override val id: String = "notification.processing"
     override val payloadType: KClass<NotificationQueuePayload> = NotificationQueuePayload::class
 
     override fun isCancelled(payload: NotificationQueuePayload): String? = null
+
+    override val defaultScale: Int? = notificationsConfigProperties.processing.queue.processingQueues
 
     override fun process(payload: NotificationQueuePayload, queueMetadata: QueueMetadata?) {
         // Extracts the notification from the payload

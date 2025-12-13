@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.support.booleanField
 import net.nemerosa.ontrack.graphql.support.classField
-import net.nemerosa.ontrack.graphql.support.jsonField
 import net.nemerosa.ontrack.graphql.support.stringField
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterForm
 import org.springframework.stereotype.Component
@@ -21,6 +20,5 @@ class GQLTypeBuildFilterForm : GQLType {
             .classField(BuildFilterForm::type)
             .stringField(BuildFilterForm::typeName)
             .booleanField(BuildFilterForm::isPredefined)
-            .jsonField(BuildFilterForm::form, deprecation = "Form is only used for the Ontrack legacy UI")
             .build()
 }

@@ -2,9 +2,7 @@ package net.nemerosa.ontrack.extension.general
 
 import io.mockk.every
 import io.mockk.mockk
-import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.model.form.MultiSelection
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.junit.jupiter.api.BeforeEach
@@ -20,11 +18,6 @@ class AutoPromotionPropertyTypeTest {
     private val branch = Branch.of(
         Project.of(nd("P", "")).withId(ID.of(1)),
         nd("B", "")
-    ).withId(ID.of(1))
-
-    private val promotionLevel = PromotionLevel.of(
-        branch,
-        nd("PL", "")
     ).withId(ID.of(1))
 
     private val validationStamp1 = ValidationStamp.of(
@@ -44,26 +37,6 @@ class AutoPromotionPropertyTypeTest {
             GeneralExtensionFeature(),
             structureService
         )
-    }
-
-    @Test
-    fun `Edition form`() {
-
-        every {
-            structureService.getValidationStampListForBranch(branch.id)
-        } returns listOf(validationStamp1, validationStamp2)
-
-        every {
-            structureService.getPromotionLevelListForBranch(branch.id)
-        } returns emptyList()
-
-        val form = type.getEditionForm(
-            promotionLevel,
-            AutoPromotionProperty(listOf(validationStamp1), "", "", emptyList())
-        )
-        val field = form.getField("validationStamps") as MultiSelection
-        assertEquals(listOf("VS1", "VS2"), field.items.map { it.name })
-        assertEquals(listOf(true, false), field.items.map { it.isSelected })
     }
 
     @Test
@@ -97,7 +70,7 @@ class AutoPromotionPropertyTypeTest {
         every { structureService.getValidationStamp(ID.of(1)) } returns validationStamp1
         every { structureService.getValidationStamp(ID.of(2)) } returns validationStamp2
         val autoPromotionProperty = type.fromStorage(
-            JsonUtils.intArray(1, 2)
+            listOf(1, 2).asJson()
         )
         assertEquals(listOf("VS1", "VS2"), autoPromotionProperty.validationStamps.map { it.name })
         assertEquals("", autoPromotionProperty.include)
