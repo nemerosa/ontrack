@@ -1,5 +1,4 @@
 import com.avast.gradle.dockercompose.ComposeExtension
-import java.io.ByteArrayOutputStream
 
 plugins {
     kotlin("jvm") version "2.1.20"
@@ -9,6 +8,8 @@ plugins {
     id("com.avast.gradle.docker-compose") version "0.17.12"
     id("com.google.cloud.tools.jib") version "3.5.1" apply false
     id("com.github.node-gradle.node") version "7.1.0" apply false
+    // Versioning logic moved into buildSrc plugin
+    id("net.nemerosa.ontrack.versioning")
 }
 
 /**
@@ -18,147 +19,8 @@ plugins {
 group = "net.nemerosa.ontrack"
 
 /**
- * Versioning
+ * Versioning is provided by the net.nemerosa.ontrack.versioning plugin in buildSrc
  */
-
-interface InjectedExecOps {
-    @get:Inject val execOps: ExecOperations
-}
-
-fun execGit(vararg command: String): String {
-    val injected = project.objects.newInstance<InjectedExecOps>()
-    val output = ByteArrayOutputStream()
-    val result = injected.execOps.exec {
-        commandLine(*command)
-        standardOutput = output
-        isIgnoreExitValue = true
-    }
-
-    if (result.exitValue != 0) {
-        return ""
-    }
-
-    return output.toString().trim()
-}
-
-fun getCurrentBranch(): String {
-    return execGit("git", "rev-parse", "--abbrev-ref", "HEAD").trim()
-}
-
-fun findLatestPatchVersion(baseVersion: String, qualifier: String = ""): Int {
-    // Get all tags
-    val tags = execGit("git", "tag", "-l").trim()
-
-    if (tags.isEmpty()) {
-        return -1 // No tags, will start at 0
-    }
-
-    // Build regex pattern based on whether we have a qualifier
-    val pattern = if (qualifier.isNotEmpty()) {
-        // Match tags like "5.0-alpha.1", "5.0-beta.2"
-        Regex("^${Regex.escape(baseVersion)}-${Regex.escape(qualifier)}\\.(\\d+)$")
-    } else {
-        // Match tags like "5.0.1", "5.0.2"
-        Regex("^${Regex.escape(baseVersion)}\\.(\\d+)$")
-    }
-
-    val matchingPatches = tags.split("\n")
-        .mapNotNull { tag ->
-            pattern.matchEntire(tag.trim())?.groupValues?.get(1)?.toIntOrNull()
-        }
-
-    return matchingPatches.maxOrNull() ?: -1
-}
-
-fun computeMainVersion(): String {
-    // Read target version from VERSION file
-    val versionFile = file("VERSION")
-    if (!versionFile.exists()) {
-        throw GradleException("VERSION file not found")
-    }
-
-    val versionContent = versionFile.readText().trim()
-
-    // Parse version - supports formats like "5.0", "5.0-alpha", "5.0-beta"
-    val versionPattern = Regex("^(\\d+\\.\\d+)(?:-(alpha|beta))?$")
-    val matchResult = versionPattern.matchEntire(versionContent)
-        ?: throw GradleException("VERSION file should contain version in format X.Y, X.Y-alpha, or X.Y-beta (e.g., 5.0, 5.0-alpha, 5.0-beta)")
-
-    val baseVersion = matchResult.groupValues[1]  // e.g., "5.0"
-    val qualifier = matchResult.groupValues[2]     // e.g., "alpha", "beta", or empty
-
-    // Find latest tag matching the pattern
-    val latestPatch = findLatestPatchVersion(baseVersion, qualifier)
-
-    // Increment patch
-    val newPatch = latestPatch + 1
-
-    // Build final version
-    return if (qualifier.isNotEmpty()) {
-        "$baseVersion-$qualifier.$newPatch"  // e.g., "5.0-alpha.3"
-    } else {
-        "$baseVersion.$newPatch"             // e.g., "5.0.3"
-    }
-}
-
-fun computeReleaseVersion(branchName: String): String {
-    // Extract version from branch name (e.g., release/5.0 -> 5.0)
-    val versionFromBranch = branchName.removePrefix("release/")
-
-    // Validate format (should be X.Y)
-    if (!versionFromBranch.matches(Regex("\\d+\\.\\d+"))) {
-        throw GradleException("Release branch should be in format release/X.Y (e.g., release/5.0)")
-    }
-
-    // Find latest tag matching the pattern (release branches don't use qualifiers)
-    val latestPatch = findLatestPatchVersion(versionFromBranch)
-
-    // Increment patch
-    val newPatch = latestPatch + 1
-
-    return "$versionFromBranch.$newPatch"
-}
-
-fun computeFeatureVersion(branchName: String): String {
-    // Read target version from VERSION file
-    val versionFile = file("VERSION")
-    if (!versionFile.exists()) {
-        throw GradleException("VERSION file not found")
-    }
-
-    val targetVersion = versionFile.readText().trim()
-
-    // Get short commit hash
-    val commitHash = execGit("git", "rev-parse", "--short", "HEAD").trim()
-
-    // Sanitize branch name (replace invalid characters with -)
-    val sanitizedBranch = branchName.replace(Regex("[^a-zA-Z0-9._-]"), "-")
-
-    return "$targetVersion-$sanitizedBranch-$commitHash"
-}
-
-fun computeVersion(): String {
-    val currentBranch = getCurrentBranch()
-
-    return when {
-        currentBranch == "main" -> computeMainVersion()
-        currentBranch.startsWith("release/") -> computeReleaseVersion(currentBranch)
-        else -> computeFeatureVersion(currentBranch)
-    }
-}
-
-version = computeVersion()
-println("Computed version: $version")
-
-tasks.register("writeVersion") {
-    description = "Called by the CI engine to write the version into a file"
-    doLast {
-        val versionFile = file("build/version.txt")
-        versionFile.parentFile.mkdirs()
-        versionFile.writeText(version.toString())
-        println("Version written to: ${versionFile.absolutePath}")
-    }
-}
 
 /**
  * Sharing all Spring Boot dependencies
