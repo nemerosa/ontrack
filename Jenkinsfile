@@ -230,6 +230,7 @@ pipeline {
         stage('Docker Hub') {
             when {
                 anyOf {
+                    branch 'main'
                     branch 'release/*'
                     branch 'feature/*publication'
                     expression {
@@ -280,6 +281,7 @@ pipeline {
             when {
                 beforeAgent true
                 anyOf {
+                    branch 'main'
                     branch 'release/*'
                 }
             }
@@ -323,13 +325,9 @@ pipeline {
             }
             when {
                 beforeAgent true
-                allOf {
-                    not {
-                        branch '*alpha'
-                    }
-                    anyOf {
-                        branch 'release/*'
-                    }
+                anyOf {
+                    branch 'main/*'
+                    branch 'release/*'
                 }
             }
             steps {
