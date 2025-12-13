@@ -66,6 +66,8 @@ pipeline {
                 }
             }
             environment {
+                // Documentation environment (see ontrack-docs/build.gradle.kts)
+                YONTRACK_DOCS_EDIT = "edit/${env.BRANCH_NAME}/ontrack-docs/docs"
                 // Bitbucket Cloud system tests
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_WORKSPACE = credentials('ontrack-test-extension-bitbucket-cloud-workspace')
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_USER = credentials('ontrack-test-extension-bitbucket-cloud-user')

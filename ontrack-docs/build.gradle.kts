@@ -78,6 +78,7 @@ tasks.register<Exec>("buildDocs") {
     workingDir = projectDir
     environment("YONTRACK_VERSION", project.version.toString())
     environment("YONTRACK_DOCS_TITLE", "Yontrack ${project.version} documentation")
+    // YONTRACK_DOCS_EDIT is set at build level
     commandLine(
         venvMkdocs.absolutePath, "build",
     )

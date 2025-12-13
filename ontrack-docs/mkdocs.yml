@@ -1,10 +1,14 @@
 site_name: !ENV [ YONTRACK_DOCS_TITLE, 'Local Yontrack documentation' ]
+repo_url: https://github.com/nemerosa/ontrack
+edit_uri: !ENV [ YONTRACK_DOCS_EDIT, 'edit/master/ontrack-docs/docs' ]
 theme:
   # https://squidfunk.github.io/mkdocs-material/
   name: material
   # Customization
   logo: img/yontrack-logo.svg
   favicon: img/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
   palette:
     # scheme: yontrack
     # Palette toggle for light mode
@@ -23,6 +27,7 @@ theme:
   features:
     - navigation.path
     - content.code.copy
+    - content.action.edit
 use_directory_urls: false
 markdown_extensions:
   - def_list
