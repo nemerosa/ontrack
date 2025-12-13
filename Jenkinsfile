@@ -1,4 +1,4 @@
-@Library("ontrack-jenkins-cli-pipeline@4.9") _
+@Library("ontrack-jenkins-cli-pipeline@v5") _
 
 pipeline {
 
@@ -68,39 +68,39 @@ pipeline {
             steps {
                 scmSkip(deleteBuild: false)
                 ontrackCliSetup(
-                    autoValidationStamps: true,
-                    validations: [
-                        [
-                            name: 'KDSL.ACCEPTANCE',
-                            tests: [
-                                warningIfSkipped: false,
-                            ],
+                        autoValidationStamps: true,
+                        validations: [
+                                [
+                                        name : 'KDSL.ACCEPTANCE',
+                                        tests: [
+                                                warningIfSkipped: false,
+                                        ],
+                                ],
                         ],
-                    ],
-                    promotions: [
-                        BRONZE: [
-                            validations: [
-                                'BUILD',
-                                'KDSL.ACCEPTANCE',
-                                'ACCEPTANCE',
-                            ],
-                        ],
-                        RELEASE: [
-                            promotions: [
-                                'BRONZE',
-                            ],
-                            validations: [
-                                'GITHUB.RELEASE',
-                            ]
-                        ],
-                    ]
+                        promotions: [
+                                BRONZE : [
+                                        validations: [
+                                                'BUILD',
+                                                'KDSL.ACCEPTANCE',
+                                                'ACCEPTANCE',
+                                        ],
+                                ],
+                                RELEASE: [
+                                        promotions : [
+                                                'BRONZE',
+                                        ],
+                                        validations: [
+                                                'GITHUB.RELEASE',
+                                        ]
+                                ],
+                        ]
                 )
                 ontrackCliSetupBranchNotifications(
                         name: 'On validation error',
                         channel: 'slack',
                         channelConfig: [
                                 channel: '#notifications',
-                                type: 'ERROR'
+                                type   : 'ERROR'
                         ],
                         events: [
                                 'new_validation_run',
@@ -116,7 +116,7 @@ pipeline {
                         channel: 'slack',
                         channelConfig: [
                                 channel: '#notifications',
-                                type: 'SUCCESS'
+                                type   : 'SUCCESS'
                         ],
                         events: [
                                 'new_promotion_run',
@@ -131,7 +131,7 @@ pipeline {
                         channel: 'slack',
                         channelConfig: [
                                 channel: env.BRANCH_NAME ==~ /^release\/\d+\.\d+$/ ? '#releases' : '#internal-releases',
-                                type: 'SUCCESS'
+                                type   : 'SUCCESS'
                         ],
                         events: [
                                 'new_promotion_run',
@@ -148,13 +148,13 @@ pipeline {
                         channel: 'workflow',
                         channelConfig: [
                                 workflow: [
-                                        name: "Deploy Demo Beta",
+                                        name : "Deploy Demo Beta",
                                         nodes: [
                                                 [
-                                                        id: "start",
+                                                        id         : "start",
                                                         description: "Start deployment",
-                                                        executorId: "slot-pipeline-creation",
-                                                        data: [
+                                                        executorId : "slot-pipeline-creation",
+                                                        data       : [
                                                                 environment: "demo-beta",
                                                         ]
                                                 ]
@@ -259,8 +259,8 @@ pipeline {
                     recordIssues(tools: [kotlin(), javaDoc(), java()])
                     // Build validation stamps
                     ontrackCliValidateTests(
-                        stamp: 'BUILD',
-                        pattern: '**/build/test-results/**/*.xml',
+                            stamp: 'BUILD',
+                            pattern: '**/build/test-results/**/*.xml',
                     )
                     ontrackCliValidateTests(
                             stamp: 'UI_UNIT',
@@ -426,9 +426,6 @@ pipeline {
         // Release
 
         stage('Release') {
-            environment {
-                GITHUB_TOKEN = credentials("github-token")
-            }
             when {
                 beforeAgent true
                 anyOf {
@@ -436,23 +433,27 @@ pipeline {
                 }
             }
             steps {
-                sh '''
-                    ./gradlew \\
-                        -Dorg.gradle.jvmargs=-Xmx6144m \\
-                        -Pdocumentation \\
-                        -PbowerOptions='--allow-root' \\
-                        --info \\
-                        --console plain \\
-                        --stacktrace \\
-                        -PontrackUser=${ONTRACK_USR} \\
-                        -PontrackToken=${ONTRACK_PSW} \\
-                        -PgitHubToken=${GITHUB_TOKEN} \\
-                        -PgitHubCommit=${GIT_COMMIT} \\
-                        -PgitHubChangeLogReleaseBranch=${ONTRACK_BRANCH_NAME} \\
-                        -PgitHubChangeLogCurrentBuild=${ONTRACK_BUILD_NAME} \\
-                        release
-                '''
-
+                script {
+                    // Getting the changelog since the last RELEASE promotion
+                    String changelog = ontrackCliChangelogSincePromotion(
+                            promotion: 'RELEASE',
+                            renderer: 'markdown',
+                            config: [
+                                    title        : true,
+                                    commitsOption: "OPTIONAL",
+                            ],
+                    )
+                    // Creating the release in GitHub
+                    createGitHubRelease(
+                            credentialId: 'github-token',
+                            repository: 'nemerosa/ontrack',
+                            name: env.VERSION,
+                            tag: env.VERSION,
+                            commitish: env.GIT_COMMIT,
+                            bodyText: changelog,
+                            prerelease: false,
+                    )
+                }
             }
             post {
                 always {
@@ -462,226 +463,5 @@ pipeline {
                 }
             }
         }
-
-        // Documentation
-
-        stage('Documentation') {
-            environment {
-                AMS3_DELIVERY = credentials("digitalocean-spaces")
-            }
-            when {
-                beforeAgent true
-                allOf {
-                    not {
-                        anyOf {
-                            branch '*alpha'
-                            branch '*beta'
-                        }
-                    }
-                    anyOf {
-                        branch 'release/*'
-                        branch 'develop'
-                    }
-                }
-            }
-            steps {
-                script {
-                    if (BRANCH_NAME == 'develop') {
-                        env.DOC_DIR = 'develop'
-                    } else {
-                        env.DOC_DIR = env.VERSION
-                    }
-                }
-
-                sh '''
-                    s3cmd \\
-                        --access_key=${AMS3_DELIVERY_USR} \\
-                        --secret_key=${AMS3_DELIVERY_PSW} \\
-                        --host=ams3.digitaloceanspaces.com \\
-                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
-                        put \\
-                        build/site/release/* \\
-                        s3://ams3-delivery-space/ontrack/release/${DOC_DIR}/docs/ \\
-                        --acl-public \\
-                        --add-header=Cache-Control:max-age=86400 \\
-                        --recursive
-                '''
-
-            }
-            post {
-                always {
-                    ontrackCliValidate(
-                            stamp: 'DOCUMENTATION',
-                    )
-                }
-            }
-        }
-
-        // Master setup
-
-        stage('Master setup') {
-            when {
-                branch 'master'
-            }
-            steps {
-                ontrackCliSetup(setup: false)
-                script {
-                    // Gets the latest tag
-                    env.ONTRACK_VERSION = sh(
-                            returnStdout: true,
-                            script: 'git describe --tags --abbrev=0'
-                    ).trim()
-                    // Trace
-                    echo "ONTRACK_VERSION=${env.ONTRACK_VERSION}"
-                    // Version components
-                    env.ONTRACK_VERSION_MAJOR_MINOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+\.\d+)(?:-beta)?\.\d.*/)
-                    env.ONTRACK_VERSION_MAJOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+)\.\d+(?:-beta)?\.\d.*/)
-                    echo "ONTRACK_VERSION_MAJOR_MINOR=${env.ONTRACK_VERSION_MAJOR_MINOR}"
-                    echo "ONTRACK_VERSION_MAJOR=${env.ONTRACK_VERSION_MAJOR}"
-                    // Gets the corresponding branch
-                    def result = ontrackCliGraphQL(
-                            query: '''
-                                query BranchLookup($project: String!, $build: String!) {
-                                  builds(project: $project, buildProjectFilter: {buildExactMatch: true, buildName: $build}) {
-                                    branch {
-                                      name
-                                    }
-                                  }
-                                }
-                            ''',
-                            variables: [
-                                project: env.ONTRACK_PROJECT_NAME as String,
-                                build  : env.ONTRACK_VERSION as String,
-                            ],
-                    )
-                    env.ONTRACK_TARGET_BRANCH_NAME = result.data.builds.first().branch.name as String
-                    // Trace
-                    echo "ONTRACK_TARGET_BRANCH_NAME=${env.ONTRACK_TARGET_BRANCH_NAME}"
-                }
-            }
-        }
-
-        // Latest documentation
-
-        stage('Latest documentation') {
-            when {
-                branch 'master'
-            }
-            environment {
-                AMS3_DELIVERY = credentials("digitalocean-spaces")
-            }
-            steps {
-                sh '''
-                    s3cmd \\
-                        --access_key=${AMS3_DELIVERY_USR} \\
-                        --secret_key=${AMS3_DELIVERY_PSW} \\
-                        --host=ams3.digitaloceanspaces.com \\
-                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
-                        --recursive \\
-                        --force \\
-                        cp \\
-                        s3://ams3-delivery-space/ontrack/release/${ONTRACK_VERSION}/docs/ \\
-                        s3://ams3-delivery-space/ontrack/release/latest/docs/
-                '''
-            }
-            post {
-                always {
-                    ontrackCliValidate(
-                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
-                            build: env.ONTRACK_VERSION as String,
-                            stamp: 'DOCUMENTATION.LATEST',
-                    )
-                }
-            }
-        }
-
-        // Docker latest images
-
-        stage('Docker Latest') {
-            when {
-                branch "master"
-            }
-            environment {
-                DOCKER_HUB = credentials("docker-hub")
-            }
-            steps {
-                sh '''\
-                    echo "Making sure the images are available on this node..."
-
-                    docker image pull nemerosa/ontrack:${ONTRACK_VERSION}
-
-                    echo "Tagging..."
-
-                    docker image tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
-                    docker image tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
-
-                    echo "Publishing latest versions in Docker Hub..."
-
-                    echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
-
-                    docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
-                    docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
-                '''
-            }
-            post {
-                always {
-                    ontrackCliValidate(
-                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
-                            build: env.ONTRACK_VERSION as String,
-                            stamp: 'DOCKER.LATEST',
-                    )
-                }
-            }
-        }
-
-        // Site generation
-
-        stage('Site generation') {
-            environment {
-                // GitHub OAuth token
-                GRGIT_USER = credentials("github-token")
-                GITHUB_URI = 'https://github.com/nemerosa/ontrack.git'
-            }
-            when {
-                branch 'master'
-            }
-            steps {
-                echo "Getting list of releases and publishing the site..."
-                sh '''\
-                    ./gradlew \\
-                        --info \\
-                        --profile \\
-                        --console plain \\
-                        --stacktrace \\
-                        -PontrackUser=${ONTRACK_USR} \\
-                        -PontrackToken=${ONTRACK_PSW} \\
-                        -PontrackVersion=${ONTRACK_VERSION} \\
-                        -PontrackGitHubUri=${GITHUB_URI} \\
-                        site
-                '''
-            }
-            post {
-                always {
-                    ontrackCliValidate(
-                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
-                            build: env.ONTRACK_VERSION as String,
-                            stamp: 'SITE',
-                    )
-                }
-            }
-        }
-
-    }
-
-}
-
-@SuppressWarnings("GrMethodMayBeStatic")
-@NonCPS
-String extractFromVersion(String version, String pattern) {
-    def matcher = (version =~ pattern)
-    if (matcher.matches()) {
-        return matcher.group(1)
-    } else {
-        error("Version $version does not match pattern: $pattern")
     }
 }
