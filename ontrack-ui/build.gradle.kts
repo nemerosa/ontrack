@@ -1,4 +1,3 @@
-import net.nemerosa.versioning.VersioningExtension
 import org.springframework.boot.gradle.dsl.SpringBootExtension
 
 plugins {
@@ -83,17 +82,9 @@ dependencies {
 }
 
 configure<SpringBootExtension> {
-    val info = rootProject.extensions.getByName<VersioningExtension>("versioning").info
     buildInfo {
         properties {
             time = null
-            additional = mapOf(
-                "full" to info.full,
-                "branch" to info.branch,
-                "build" to info.build,
-                "commit" to info.commit,
-                "dirty" to info.dirty,
-            )
         }
     }
 }

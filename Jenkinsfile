@@ -98,9 +98,7 @@ pipeline {
             }
             steps {
                 sh '''
-                    git status
-                    ./gradlew versionDisplay versionFile \\
-                        -Dorg.gradle.jvmargs=-Xmx6144m \\
+                    ./gradlew writeVersion \\
                         --stacktrace \\
                         --parallel \\
                         --console plain
@@ -110,20 +108,18 @@ pipeline {
                     env.ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_IGNORE = params.SKIP_BITBUCKET_CLOUD_IT
                     env.ONTRACK_TEST_EXTENSION_GITHUB_IGNORE = params.SKIP_GITHUB_IT
                     // Reads version information
-                    def props = readProperties(file: 'build/version.properties')
-                    env.VERSION = props.VERSION_DISPLAY
-                    env.GIT_COMMIT = props.VERSION_COMMIT
+                    env.VERSION = readFile(file: 'build/version.txt')
                     currentBuild.description = env.VERSION
                     // Setup
                     ontrackCliCIConfig(logging: true)
                 }
-                echo "Version = ${VERSION}"
+                echo "Version = ${env.VERSION}"
+                echo "Git commit = ${env.GIT_VERSION}"
                 script {
                     if (!params.JUST_BUILD_AND_PUSH) {
                         sh '''
                             ./gradlew \\
                                 build \\
-                                -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
                                 --console plain
@@ -134,7 +130,6 @@ pipeline {
                             ./gradlew \\
                                 dockerBuild \\
                                 jibDockerBuild \\
-                                -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
                                 --console plain
@@ -174,7 +169,6 @@ pipeline {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''
                         ./gradlew \\
-                            -Dorg.gradle.jvmargs=-Xmx2048m \\
                             --stacktrace \\
                             --console plain \\
                             --parallel \\
@@ -208,7 +202,6 @@ pipeline {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''
                         ./gradlew \\
-                            -Dorg.gradle.jvmargs=-Xmx3072m \\
                             --stacktrace \\
                             --console plain \\
                             --parallel \\
