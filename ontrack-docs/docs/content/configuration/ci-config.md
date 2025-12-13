@@ -496,7 +496,7 @@ Syntax:
 ```yaml
 branch:
   autoVersioning:
-    configurations: [list of configurations]
+    configurations: [ list of configurations ]
 ```
 
 For example:
@@ -510,6 +510,118 @@ branch:
         sourcePromotion: RELEASE
         targetPath: versions.properties
         targetProperty: yontrack
+```
+
+#### Auto-versioning check
+
+This extension is set at the build level to check the compliance with the latest versions using
+the [auto-versioning check](../integrations/auto-versioning/auto-versioning.md#auto-versioning-checks).
+
+Syntax:
+
+```yaml
+build:
+  autoVersioningCheck: [ true | false ]
+```
+
+For example:
+
+```yaml
+build:
+  autoVersioningCheck: true
+```
+
+When this is set (to `true),
+an [auto-versioning check](../integrations/auto-versioning/auto-versioning.md#auto-versioning-checks) will be performed
+automatically after the build is created.
+
+#### Notifications
+
+This extension is set at the branch level to configure the notifications for this branch.
+
+Syntax:
+
+```yaml
+branch:
+  notificationsConfig:
+    notifications: <list of notifications>
+```
+
+Each notification configuration has the following properties:
+
+* `name` - Unique name of the subscription in its scope.
+* `promotion` - Targeting a promotion instead of the branch. The promotion must have been configured first.
+* `events` - List of [events types](../generated/events/index.md) to subscribe to
+* `keywords` - Optional space-separated list of tokens to look for in the events
+* `channel` - Name of the channel to send the notification to
+* `channelConfig` - Configuration of the [channel](../integrations/notifications/index.md)
+* `contentTemplate` - Optional template to use for the message
+
+Example:
+
+```yaml
+branch:
+  notificationsConfig:
+    notifications:
+      - name: On validation error
+        events:
+          - new_validation_run
+        keywords: failed
+        channel: slack
+        channelConfig:
+          channel: '#notifications'
+          type: 'ERROR'
+        contentTemplate: |
+          Build ${build} has failed on ${validationStamp}.
+```
+
+#### Workflows
+
+Whereas workflows can be specified using the [`notificationsConfig`](#notifications) extension, you can also use the
+`workflows` extension to define them directly in the CI Configuration, in a more straightforward way.
+
+Syntax:
+
+```yaml
+branch:
+  workflows:
+    <PROMOTION>:
+      <workflows>
+```
+
+This configuration is used to associate a list of named workflows to some promotions.
+
+Each workflow is defined as [usual](../integrations/workflows/workflows.md).
+
+Example:
+
+```yaml
+workflows:
+  RELEASE:
+    - name: On internal release
+      nodes:
+        - id: notification
+          executorId: notification
+          data:
+            channel: slack
+            channelConfig:
+              channel: '#internal-releases'
+              type: 'SUCCESS'
+            template: |
+              Yontrack ${build} has been released.
+              
+              ${promotionRun.changelog?title=true&commitsOption=ALWAYS}
+        - id: docs.yontrack.com
+          executorId: notification
+          data:
+            channel: github-workflow
+            channelConfig:
+              config: github.com
+              owner: yontrack
+              repository: doc.yontrack.com
+              workflowId: doc.yml
+              reference: main
+              callMode: ASYNC
 ```
 
 ### Properties
