@@ -60,11 +60,6 @@ pipeline {
     stages {
 
         stage('Build') {
-            when {
-                not {
-                    branch 'master'
-                }
-            }
             environment {
                 // Documentation environment (see ontrack-docs/build.gradle.kts)
                 YONTRACK_DOCS_EDIT = "edit/${env.BRANCH_NAME}/ontrack-docs/docs"
@@ -164,9 +159,6 @@ pipeline {
 
         stage('KDSL acceptance tests') {
             when {
-                not {
-                    branch 'master'
-                }
                 expression {
                     return !params.SKIP_KDSL_ACCEPTANCE && !params.JUST_BUILD_AND_PUSH
                 }
@@ -208,9 +200,6 @@ pipeline {
 
         stage('Local UI tests') {
             when {
-                not {
-                    branch 'master'
-                }
                 expression {
                     return !params.SKIP_NEXT_UI_TESTS && !params.JUST_BUILD_AND_PUSH
                 }
@@ -378,171 +367,6 @@ pipeline {
             }
         }
 
-        // Master setup
-
-        stage('Master setup') {
-            when {
-                branch 'master'
-            }
-            steps {
-                ontrackCliSetup(setup: false)
-                script {
-                    // Gets the latest tag
-                    env.ONTRACK_VERSION = sh(
-                            returnStdout: true,
-                            script: 'git describe --tags --abbrev=0'
-                    ).trim()
-                    // Trace
-                    echo "ONTRACK_VERSION=${env.ONTRACK_VERSION}"
-                    // Version components
-                    env.ONTRACK_VERSION_MAJOR_MINOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+\.\d+)(?:-beta)?\.\d.*/)
-                    env.ONTRACK_VERSION_MAJOR = extractFromVersion(env.ONTRACK_VERSION as String, /(^\d+)\.\d+(?:-beta)?\.\d.*/)
-                    echo "ONTRACK_VERSION_MAJOR_MINOR=${env.ONTRACK_VERSION_MAJOR_MINOR}"
-                    echo "ONTRACK_VERSION_MAJOR=${env.ONTRACK_VERSION_MAJOR}"
-                    // Gets the corresponding branch
-                    def result = ontrackCliGraphQL(
-                            query: '''
-                                query BranchLookup($project: String!, $build: String!) {
-                                  builds(project: $project, buildProjectFilter: {buildExactMatch: true, buildName: $build}) {
-                                    branch {
-                                      name
-                                    }
-                                  }
-                                }
-                            ''',
-                            variables: [
-                                project: env.ONTRACK_PROJECT_NAME as String,
-                                build  : env.ONTRACK_VERSION as String,
-                            ],
-                    )
-                    env.ONTRACK_TARGET_BRANCH_NAME = result.data.builds.first().branch.name as String
-                    // Trace
-                    echo "ONTRACK_TARGET_BRANCH_NAME=${env.ONTRACK_TARGET_BRANCH_NAME}"
-                }
-            }
-        }
-
-        // Latest documentation
-
-        stage('Latest documentation') {
-            when {
-                branch 'master'
-            }
-            environment {
-                AMS3_DELIVERY = credentials("digitalocean-spaces")
-            }
-            steps {
-                sh '''
-                    s3cmd \\
-                        --access_key=${AMS3_DELIVERY_USR} \\
-                        --secret_key=${AMS3_DELIVERY_PSW} \\
-                        --host=ams3.digitaloceanspaces.com \\
-                        --host-bucket='%(bucket)s.ams3.digitaloceanspaces.com' \\
-                        --recursive \\
-                        --force \\
-                        cp \\
-                        s3://ams3-delivery-space/ontrack/release/${ONTRACK_VERSION}/docs/ \\
-                        s3://ams3-delivery-space/ontrack/release/latest/docs/
-                '''
-            }
-            post {
-                always {
-                    ontrackCliValidate(
-                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
-                            build: env.ONTRACK_VERSION as String,
-                            stamp: 'DOCUMENTATION.LATEST',
-                    )
-                }
-            }
-        }
-
-        // Docker latest images
-
-        stage('Docker Latest') {
-            when {
-                branch "master"
-            }
-            environment {
-                DOCKER_HUB = credentials("docker-hub")
-            }
-            steps {
-                sh '''\
-                    echo "Making sure the images are available on this node..."
-
-                    docker image pull nemerosa/ontrack:${ONTRACK_VERSION}
-
-                    echo "Tagging..."
-
-                    docker image tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
-                    docker image tag nemerosa/ontrack:${ONTRACK_VERSION} nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
-
-                    echo "Publishing latest versions in Docker Hub..."
-
-                    echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
-
-                    docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR_MINOR}
-                    docker image push nemerosa/ontrack:${ONTRACK_VERSION_MAJOR}
-                '''
-            }
-            post {
-                always {
-                    ontrackCliValidate(
-                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
-                            build: env.ONTRACK_VERSION as String,
-                            stamp: 'DOCKER.LATEST',
-                    )
-                }
-            }
-        }
-
-        // Site generation
-
-        stage('Site generation') {
-            environment {
-                // GitHub OAuth token
-                GRGIT_USER = credentials("github-token")
-                GITHUB_URI = 'https://github.com/nemerosa/ontrack.git'
-            }
-            when {
-                branch 'master'
-            }
-            steps {
-                echo "Getting list of releases and publishing the site..."
-                sh '''\
-                    ./gradlew \\
-                        --info \\
-                        --profile \\
-                        --console plain \\
-                        --stacktrace \\
-                        -PontrackUser=${ONTRACK_USR} \\
-                        -PontrackToken=${ONTRACK_PSW} \\
-                        -PontrackVersion=${ONTRACK_VERSION} \\
-                        -PontrackGitHubUri=${GITHUB_URI} \\
-                        site
-                '''
-            }
-            post {
-                always {
-                    ontrackCliValidate(
-                            branch: env.ONTRACK_TARGET_BRANCH_NAME as String,
-                            build: env.ONTRACK_VERSION as String,
-                            stamp: 'SITE',
-                    )
-                }
-            }
-        }
-
     }
 
-}
-
-@SuppressWarnings("GrMethodMayBeStatic")
-@NonCPS
-String extractFromVersion(String version, String pattern) {
-    def matcher = (version =~ pattern)
-    if (matcher.matches()) {
-        return matcher.group(1)
-    } else {
-        error("Version $version does not match pattern: $pattern")
-    }
 }
