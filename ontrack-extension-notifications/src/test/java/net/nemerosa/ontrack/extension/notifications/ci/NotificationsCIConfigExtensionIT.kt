@@ -58,7 +58,8 @@ class NotificationsCIConfigExtensionIT : AbstractNotificationTestSupport() {
                   custom:
                     configs:
                       - conditions:
-                          branch: '^release\/\d+\.\d+$'
+                          - name: branch
+                            config: '^release\/\d+\.\d+$'
                         branch:
                           notificationsConfig:
                             notifications:

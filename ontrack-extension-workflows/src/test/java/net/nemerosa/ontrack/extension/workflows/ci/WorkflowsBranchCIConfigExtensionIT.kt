@@ -46,7 +46,8 @@ class WorkflowsBranchCIConfigExtensionIT : AbstractWorkflowTestSupport() {
                   custom:
                     configs:
                       - conditions:
-                          branch: "release.*"
+                          - name: branch
+                            config: "release.*"
                         branch:
                           workflows:
                             BRONZE:
