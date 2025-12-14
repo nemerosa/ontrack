@@ -220,7 +220,7 @@ class CIConfigurationServiceImpl(
         // Gets the condition interface
         val condition = conditionRegistry.getCondition(conditionConfig.name)
         // Checks the condition
-        return condition.matches(ciEngine, conditionConfig.config, env)
+        return condition.matches(conditionRegistry, ciEngine, conditionConfig.config, env)
     }
 
     private fun findSCMEngine(

@@ -161,7 +161,8 @@ class CIConfigurationParserIT : AbstractDSLTestSupport() {
                   custom:
                     configs:
                       - conditions:
-                          branch: "release.*"
+                          - name: branch
+                            config: "release.*"
                         branch:
                           validations:
                             deployment: {}

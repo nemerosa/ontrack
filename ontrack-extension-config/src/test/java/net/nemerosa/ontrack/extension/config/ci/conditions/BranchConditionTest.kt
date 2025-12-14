@@ -18,6 +18,7 @@ class BranchConditionTest {
         every { ciEngine.getBranchName(any()) } returns "release/1.0"
         assertTrue(
             condition.matches(
+                conditionRegistry = mockk(),
                 ciEngine = ciEngine,
                 config = TextNode("release.*"),
                 env = emptyMap(),
@@ -31,6 +32,7 @@ class BranchConditionTest {
         every { ciEngine.getBranchName(any()) } returns "main"
         assertFalse(
             condition.matches(
+                conditionRegistry = mockk(),
                 ciEngine = ciEngine,
                 config = TextNode("release.*"),
                 env = emptyMap(),

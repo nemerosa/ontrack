@@ -6,7 +6,13 @@ import kotlin.reflect.KClass
 
 interface Condition {
     val name: String
-    fun matches(ciEngine: CIEngine, config: JsonNode, env: Map<String, String>): Boolean
+
+    fun matches(
+        conditionRegistry: ConditionRegistry,
+        ciEngine: CIEngine,
+        config: JsonNode,
+        env: Map<String, String>
+    ): Boolean
 
     /**
      * Returns a class representing the schema for this condition.

@@ -11,7 +11,8 @@ import kotlin.reflect.KClass
 @APIDescription("Checks the SCM branch name matches a regular expression.")
 @DocumentationExampleCode(
     """
-        branch: '^release/.*$'
+        name: branch
+        config: '^release/.*$'
     """
 )
 class BranchCondition : Condition {
@@ -19,6 +20,7 @@ class BranchCondition : Condition {
     override val schema: KClass<*> = String::class
     override val schemaDescription: String? = "Regular expression to match against the SCM branch name"
     override fun matches(
+        conditionRegistry: ConditionRegistry,
         ciEngine: CIEngine,
         config: JsonNode,
         env: Map<String, String>

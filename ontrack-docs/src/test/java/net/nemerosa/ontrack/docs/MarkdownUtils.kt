@@ -3,7 +3,10 @@ package net.nemerosa.ontrack.docs
 import net.nemerosa.ontrack.model.docs.FieldDocumentation
 import net.nemerosa.ontrack.model.docs.getDocumentationExampleCode
 import net.nemerosa.ontrack.model.docs.getFieldsDocumentation
+import net.nemerosa.ontrack.model.json.schema.JsonSchemaListWrapper
 import kotlin.reflect.KClass
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.memberProperties
 
 fun StringBuilder.text(text: String) {
     appendLine(text)
@@ -80,8 +83,40 @@ fun StringBuilder.configuration(type: KClass<*>, title: String? = "Configuration
         }
         text(s.toString())
     } else {
-        fields(type, title)
+        val listWrapper = type.findAnnotation<JsonSchemaListWrapper>()
+        if (listWrapper != null) {
+            if (!title.isNullOrBlank()) {
+                h2(title)
+            }
+            wrappedList(type, listWrapper.listProperty)
+        } else {
+            fields(type, title)
+        }
     }
+}
+
+fun StringBuilder.wrappedList(type: KClass<*>, propertyName: String) {
+    val property = type.memberProperties.find { it.name == propertyName }
+        ?: error("Cannot find property $propertyName in $type")
+
+    // We expect the property to be a List<T>. If not, raise an error.
+    val returnType = property.returnType
+    val classifier = returnType.classifier
+    require(classifier is KClass<*> && classifier.qualifiedName == List::class.qualifiedName) {
+        "Property $propertyName in $type is not a List"
+    }
+
+    // Extract the generic argument T from List<T>
+    val argType = returnType.arguments.firstOrNull()?.type
+        ?: error("Cannot determine the list element type for property $propertyName in $type")
+    val argClassifier = argType.classifier
+    require(argClassifier is KClass<*>) {
+        "List element type for property $propertyName in $type is not a class"
+    }
+
+    // Call fields on the element type
+    paragraph("List of elements of type:")
+    fields(argClassifier, null)
 }
 
 fun StringBuilder.fields(type: KClass<*>, title: String? = "Configuration") {

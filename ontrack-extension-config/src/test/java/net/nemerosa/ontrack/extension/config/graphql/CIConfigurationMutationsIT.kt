@@ -168,7 +168,8 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                   custom:
                     configs:
                       - conditions:
-                          branch: release.*
+                          - name: branch
+                            config: release.*
                         branch:
                           validations:
                             deploy-tests:

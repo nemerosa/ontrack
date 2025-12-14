@@ -77,7 +77,8 @@ configuration:
   custom:
     configs:
       - conditions:
-          branch: '^release/\d+\.\d+$'
+          name: branch
+          condition: '^release/\d+\.\d+$'
         branch:
           notificationsConfig:
             notifications:
@@ -360,15 +361,23 @@ Each custom configuration is associated with a list of conditions. For example:
 custom:
   configs:
     - conditions:
-        branch: '^release/\d+\.\d+$'
+        - name: branch
+          config: 'main'
+        - name: environment-regex
+          config:
+            name: VERSION
+            regex: '\d+\.\d+\.\d+'
       branch:
       # Branch configuration
 ```
 
 In this case, the `branch` configuration will be used to patch the default configuration for any SCM branch matching the
-regular expression `^release/\d+\.\d+$`.
+regular expression `main` _and_ having a `VERSION` environment variable with a value matching the regular expression
+`\d+\.\d+\.\d+`.
 
 The custom configuration is applied only if **all the conditions**   in the list are met.
+
+If you need some _or_ condition, you can use the [`or`](../generated/ci-config/conditions/or.md) condition.
 
 See the [conditions reference](../generated/ci-config/conditions/index.md) for the list of supported conditions and
 their parameters.
@@ -609,7 +618,7 @@ workflows:
               type: 'SUCCESS'
             template: |
               Yontrack ${build} has been released.
-              
+
               ${promotionRun.changelog?title=true&commitsOption=ALWAYS}
         - id: docs.yontrack.com
           executorId: notification
