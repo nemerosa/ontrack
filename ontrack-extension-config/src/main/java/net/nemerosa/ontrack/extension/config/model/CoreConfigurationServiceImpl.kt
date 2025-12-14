@@ -79,6 +79,7 @@ class CoreConfigurationServiceImpl(
         configureProperties(
             entity = project,
             defaults = configuration.properties,
+            env = env,
         )
 
         configureExtensions(
@@ -127,6 +128,7 @@ class CoreConfigurationServiceImpl(
         configureProperties(
             entity = branch,
             defaults = configuration.properties,
+            env = env,
         )
 
         configureExtensions(
@@ -168,6 +170,7 @@ class CoreConfigurationServiceImpl(
         configureProperties(
             entity = build,
             defaults = configuration.properties,
+            env = env,
         )
 
         configureExtensions(
@@ -269,9 +272,9 @@ class CoreConfigurationServiceImpl(
         }
     }
 
-    private fun renderBuildNameTemplate(template: String, env: Map<String, String>): String {
-        return templatingService.render(
-            template = template,
+    private fun templating(env: Map<String, String>): (text: String) -> String = { text ->
+        templatingService.render(
+            template = text,
             context = mapOf(
                 "env" to EnvTemplatingRenderable(env),
             ),
@@ -279,17 +282,34 @@ class CoreConfigurationServiceImpl(
         )
     }
 
+    private fun renderBuildNameTemplate(template: String, env: Map<String, String>): String {
+        return templating(env)(template)
+    }
+
     private fun configureProperties(
         entity: ProjectEntity,
         defaults: List<PropertyConfiguration>,
+        env: Map<String, String>,
     ) {
         defaults.forEach { config ->
-            propertyService.editProperty(
-                entity,
-                config.type,
-                config.data
-            )
+            val type = propertyService.getPropertyTypeByName<Any>(config.type)
+            configureProperty(entity, type, config.data, env)
         }
+    }
+
+    private fun <T> configureProperty(
+        entity: ProjectEntity,
+        type: PropertyType<T>,
+        data: JsonNode,
+        env: Map<String, String>
+    ) {
+        val value = type.fromClient(data)
+        val templatedValue = type.replaceValue(value, templating(env))
+        propertyService.editProperty(
+            entity,
+            type::class.java,
+            templatedValue
+        )
     }
 
     private fun configureExtensions(

@@ -53,7 +53,6 @@ class MetaInfoPropertyType(
         }
     }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: MetaInfoProperty,
         replacementFunction: (String) -> String
@@ -109,4 +108,5 @@ class MetaInfoPropertyType(
     private fun String.toValuePattern(): String {
         return this.replace("*", "%")
     }
+
 }

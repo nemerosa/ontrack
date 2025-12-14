@@ -173,4 +173,5 @@ interface PropertyType<T> : Extension {
      * JSON schema type for this property.
      */
     fun createConfigJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType
+
 }
