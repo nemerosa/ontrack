@@ -75,25 +75,25 @@ configuration:
               type: 'SUCCESS'
             contentTemplate: |
               Build ${build} has been promoted to ${promotionLevel}.
-#  custom:
-#    configs:
-#      - conditions:
-#          - branch: main
-#          - environment-regex:
-#              name: VERSION
-#              regex: '\d+\.\d+\.\d+'
-#        branch:
-#          notificationsConfig:
-#            notifications:
-#            - name: On RELEASE
-#              promotion: RELEASE
-#              events:
-#                - new_promotion_run
-#              channel: slack
-#              channelConfig:
-#                channel: '#releases'
-#                type: 'SUCCESS'
-#              contentTemplate: |
-#                Yontrack ${build} has been released.
-#
-#                ${promotionRun.changelog?title=true&commitsOption=OPTIONAL}
+  custom:
+    configs:
+      - conditions:
+          - name: environment-regex
+            config:
+              name: VERSION
+              regex: '\d+\.\d+\.\d+'
+        branch:
+          notificationsConfig:
+            notifications:
+            - name: On RELEASE
+              promotion: RELEASE
+              events:
+                - new_promotion_run
+              channel: slack
+              channelConfig:
+                channel: '#releases'
+                type: 'SUCCESS'
+              contentTemplate: |
+                Yontrack ${build} has been released.
+
+                ${promotionRun.changelog?title=true&commitsOption=OPTIONAL}
