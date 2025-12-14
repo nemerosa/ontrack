@@ -79,4 +79,36 @@ class CoreConfigurationServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    @AsAdminTest
+    fun `Property configurations are templates using alias`() {
+        val build = configTestSupport.configureBuild(
+            yaml = """
+                version: v1
+                configuration:
+                  defaults:
+                    build:
+                      properties:
+                        metaInfo:
+                          - name: appVersion
+                            value: ${'$'}{env.APP_VERSION}
+            """.trimIndent(),
+            ci = "generic",
+            scm = "mock",
+            env = EnvFixtures.generic() + mapOf("APP_VERSION" to "1.0.2"),
+        )
+
+        // Getting the meta-info
+        val property = propertyService.getPropertyValue(
+            build,
+            MetaInfoPropertyType::class.java
+        )
+        assertNotNull(property) {
+            assertEquals(
+                "1.0.2",
+                it.getValue("appVersion")
+            )
+        }
+    }
+
 }
