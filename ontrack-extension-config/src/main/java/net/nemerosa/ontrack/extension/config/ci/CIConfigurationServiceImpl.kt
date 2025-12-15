@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.config.ci
 
 import io.micrometer.core.instrument.MeterRegistry
+import net.nemerosa.ontrack.common.UserException
 import net.nemerosa.ontrack.extension.config.ci.conditions.ConditionRegistry
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngineNotDetectedException
@@ -144,13 +145,24 @@ class CIConfigurationServiceImpl(
         CIConfigMetrics.ciConfigBuildDuration,
     ) {
         meterRegistry.increment(CIConfigMetrics.ciConfigBuildCount)
-        val context = getConfigContext(
-            yaml = config,
-            ci = ci,
-            scm = scm,
-            env = env,
-        )
-        configureBuildWithContext(context)
+        try {
+            val context = getConfigContext(
+                yaml = config,
+                ci = ci,
+                scm = scm,
+                env = env,
+            )
+            configureBuildWithContext(context)
+        } catch (any: UserException) {
+            throw any
+        } catch (any: Exception) {
+            val message = any.message
+            if (message.isNullOrBlank()) {
+                throw any
+            } else {
+                throw CIConfigGeneralException("""Unexpected error while injecting the configuration: $message""", any)
+            }
+        }
     }
 
     private fun configureBuildWithContext(context: ConfigContext): Build {
