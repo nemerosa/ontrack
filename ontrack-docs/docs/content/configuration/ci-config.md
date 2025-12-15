@@ -686,3 +686,10 @@ in the _JSON schemas_ section:
 
 Once downloaded, you can use it to validate your CI Configuration files. See
 the [appendixes](../appendix/json-schemas.md) to learn more about using JSON schemas for edition and validation.
+
+## Metrics
+
+Yontrack exports some [operational metrics](../operations/metrics.md) about the CI config injection.
+
+See the [reference](../generated/metrics/net.nemerosa.ontrack.extension.config.ci.CIConfigMetrics.md) for the list of
+these metrics.
