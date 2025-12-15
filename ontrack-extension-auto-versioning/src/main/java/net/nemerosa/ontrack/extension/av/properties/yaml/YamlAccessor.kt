@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.av.properties.yaml
 
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.properties.support.JsonPropertyAccessor
 import net.nemerosa.ontrack.yaml.Yaml
 import org.springframework.expression.EvaluationContext
@@ -13,7 +13,7 @@ class YamlAccessor(
 ) {
 
     private val yaml = Yaml()
-    private val root: List<ObjectNode> = yaml.read(content)
+    private val root: List<JsonNode> = yaml.read(content)
 
     private val context: EvaluationContext = StandardEvaluationContext().apply {
         addPropertyAccessor(JsonPropertyAccessor())

@@ -278,11 +278,12 @@ The following types are currently supported:
 
 * `properties` (default) - Java properties file, typically used for a `gradle.properties` file
 * `npm` - NPM package file, typically used for `package.json`
-* [`maven`](#maven-pom-file) - Maven POM file
-* [`yaml`](#yaml-files) - YAML file
-* [`toml`](#toml-files) - TOML file
+* [`maven`](#maven) - Maven POM file
+* [`yaml`](#yaml) - YAML file
+* [`yaml-path`](#yaml-path) - YAML file using JSON Path
+* [`toml`](#toml) - TOML file
 
-#### Maven POM file
+#### `maven`
 
 For the `maven` type, the file to transform is a Maven `pom.xml` file. The `property` is _required_ to be one of the
 `<properties>` elements of the file.
@@ -309,7 +310,11 @@ configurations:
     property: yontrack.version
 ```
 
-#### YAML files
+#### `yaml`
+
+!!! note
+
+    See [YAML Path](#yaml-path) for a simpler alternative.
 
 When `propertyType` is set to `yaml`, `property` is expected to define a path inside the YAML file.
 
@@ -370,9 +375,40 @@ propertyRegex: '^repo\/component:(.*)$'
     The use of SpringEL can be difficult to understand for non-Spring developers. There is a task
     in Yontrack 5 to support JSON path expressions. Please contact your support if you're interested in this feature.
 
-#### TOML files
+#### `yaml-path`
 
-When `propertyType` is set to `toml`, `property` is expected to define a path inside the TOML file.
+When `propertyType` is set to `yaml-path`, `targetProperty` is expected to define
+a [JSON Path](https://goessner.net/articles/JsonPath/) inside the YAML file.
+
+Example, given the following YAML file:
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: yontrack
+  namespace: argocd
+spec:
+  project: yontrack-production-eu
+  sources:
+    - repoURL: https://github.com/yontrack/yontrack
+      targetRevision: main
+      ref: values
+    - repoURL: registry/yontrack
+      chart: yontrack-saas
+      targetRevision: 1.0.2
+```
+
+You can refer to the `targetRevision` field using:
+
+```yaml
+targetPropertyType: yaml-path
+targetProperty: '$.spec.sources[1].targetRevision'
+```
+
+#### `toml`
+
+When `propertyType` is set to `toml`, `targetProperty` is expected to define a path inside the TOML file.
 
 For example, given the following TOML file:
 

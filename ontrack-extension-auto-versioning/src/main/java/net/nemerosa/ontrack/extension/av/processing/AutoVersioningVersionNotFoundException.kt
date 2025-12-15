@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.av.processing
 
-import net.nemerosa.ontrack.common.BaseException
+import net.nemerosa.ontrack.common.UserException
 
 /**
  * Processing exception thrown if no version can be identified in target file using the
@@ -8,6 +8,6 @@ import net.nemerosa.ontrack.common.BaseException
  */
 class AutoVersioningVersionNotFoundException(
     path: String,
-) : BaseException(
+) : UserException(
     """Cannot find version in "$path""""
 )
