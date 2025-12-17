@@ -4,6 +4,7 @@ import {gql} from "graphql-request";
 import {createValidationRun} from "@ontrack/validationRun";
 import {createBuildLink} from "@ontrack/links";
 import {createPromotionRun} from "@ontrack/promotionRun";
+import {setReleaseProperty} from "@ontrack/extensions/general/release";
 
 export const createBuild = async (branch, name) => {
     const actualName = name ?? generate('b_')
@@ -46,6 +47,8 @@ const buildInstance = (branch, data) => {
         ...data,
         branch,
     }
+
+    build.setRelease = async (release) => setReleaseProperty(build, release)
 
     build.promote = async (promotionLevel, config) => createPromotionRun(build, promotionLevel, config)
     build.validate = async (validationStamp, config) => createValidationRun(build, validationStamp, config)

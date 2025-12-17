@@ -2,6 +2,7 @@ const {login} = require("../login");
 const {BuildPage} = require("../builds/BuildPage");
 const {BranchPage} = require("../branches/branch");
 const {test} = require("../../fixtures/connection");
+const {generate} = require("@ontrack/utils");
 
 test('build page', async ({page, ontrack}) => {
     // Provisioning
@@ -13,6 +14,34 @@ test('build page', async ({page, ontrack}) => {
     // Navigating to the build
     const buildPage = new BuildPage(page, build)
     await buildPage.goTo()
+})
+
+test('build display URL', async ({page, ontrack}) => {
+    const project = await ontrack.createProject()
+    const branch = await project.createBranch()
+    const build = await branch.createBuild()
+
+    await login(page, ontrack)
+
+    await page.goto(`${ontrack.connection.ui}/display/build/${project.name}/${branch.name}/${build.name}`)
+
+    const buildPage = new BuildPage(page, build)
+    await buildPage.checkOnBuildPage()
+})
+
+test('build display URL using release', async ({page, ontrack}) => {
+    const project = await ontrack.createProject()
+    const branch = await project.createBranch()
+    const build = await branch.createBuild()
+    const release = generate("release-")
+    await build.setRelease(release)
+
+    await login(page, ontrack)
+
+    await page.goto(`${ontrack.connection.ui}/display/build/${project.name}/${branch.name}/${release}`)
+
+    const buildPage = new BuildPage(page, build)
+    await buildPage.checkOnBuildPage()
 })
 
 test('build page with links', async ({page, ontrack}) => {

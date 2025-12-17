@@ -5,6 +5,7 @@ const {generate} = require("@ontrack/utils");
 const {ProjectPage} = require("./project");
 const {test} = require("../../fixtures/connection");
 const {waitUntilCondition} = require("../../support/timing");
+const {BranchPage} = require("../branches/branch");
 
 test('project creation', async ({page, ontrack}) => {
     await login(page, ontrack)
@@ -14,6 +15,17 @@ test('project creation', async ({page, ontrack}) => {
     await homePage.newProject({name: projectName})
 
     await expect(page.getByText(projectName)).toBeVisible()
+})
+
+test('project display URL', async ({page, ontrack}) => {
+    const project = await ontrack.createProject()
+
+    await login(page, ontrack)
+
+    await page.goto(`${ontrack.connection.ui}/display/project/${project.name}`)
+
+    const projectPage = new ProjectPage(page, ontrack, project)
+    await projectPage.expectOnPage()
 })
 
 test('project disabling and enabling', async ({page, ontrack}) => {

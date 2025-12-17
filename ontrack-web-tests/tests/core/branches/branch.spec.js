@@ -20,6 +20,18 @@ test('branch creation', async ({page, ontrack}) => {
     await projectPage.expectBranchToBePresent(branchName)
 })
 
+test('branch display URL', async ({page, ontrack}) => {
+    const project = await ontrack.createProject()
+    const branch = await project.createBranch()
+
+    await login(page, ontrack)
+
+    await page.goto(`${ontrack.connection.ui}/display/branch/${project.name}/${branch.name}`)
+
+    const branchPage = new BranchPage(page, branch)
+    await branchPage.checkOnPage()
+})
+
 test('branch disabling and enabling', async ({page, ontrack}) => {
     const project = await ontrack.createProject()
     let branch = await project.createBranch()
