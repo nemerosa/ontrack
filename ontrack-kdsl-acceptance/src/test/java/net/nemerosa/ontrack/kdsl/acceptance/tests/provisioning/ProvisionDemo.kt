@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.seconds
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.acceptance.tests.workflows.WorkflowTestSupport
+import net.nemerosa.ontrack.kdsl.spec.Build
 import net.nemerosa.ontrack.kdsl.spec.admin.admin
 import net.nemerosa.ontrack.kdsl.spec.extension.casc.casc
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.environments
@@ -11,6 +12,7 @@ import net.nemerosa.ontrack.kdsl.spec.extension.environments.startPipeline
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import kotlin.random.Random
 
 class ProvisionDemo : AbstractACCDSLTestSupport() {
 
@@ -24,6 +26,42 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
         const val SILVER = "SILVER"
         const val GOLD = "GOLD"
         const val DIAMOND = "DIAMOND"
+    }
+
+    @Test
+    @Disabled
+    fun `Deep dependencies`() {
+        val levels = 6
+        val dependenciesMax = 3
+
+        fun buildName(level: Int, count: Int): String = "L$level-$count"
+
+        fun generateDependencies(root: Build, level: Int) {
+            if (level >= 0) {
+                val dependenciesCount = Random.nextInt(1, dependenciesMax)
+                var count = 1
+                repeat(dependenciesCount) {
+                    project {
+                        branch {
+                            val buildName = buildName(level, count++)
+                            println("Creating build $buildName")
+                            build(buildName) {
+                                root.linkTo(this)
+                                generateDependencies(this, level - 1)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        project {
+            branch {
+                build(buildName(levels, 1)) {
+                    generateDependencies(this, levels - 1)
+                }
+            }
+        }
     }
 
     @Test
