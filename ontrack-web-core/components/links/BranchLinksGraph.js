@@ -1,4 +1,12 @@
-import {applyNodeChanges, Background, Controls, ReactFlow, ReactFlowProvider} from "reactflow";
+import {
+    applyNodeChanges,
+    Background,
+    Controls,
+    ReactFlow,
+    ReactFlowProvider,
+    useNodesInitialized,
+    useReactFlow
+} from "reactflow";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {gql} from "graphql-request";
 import BranchNode from "@components/links/BranchNode";
@@ -151,28 +159,56 @@ function BranchLinksFlow({branch}) {
     const [nodes, setNodes] = useState([])
     const [edges, setEdges] = useState([])
 
+    const nodesInitialized = useNodesInitialized();
+    const {fitView} = useReactFlow();
+
+    const [layoutDone, setLayoutDone] = useState(false)
+
+    useEffect(() => {
+        if (nodesInitialized && nodes.length > 0 && !layoutDone) {
+            // A small delay is sometimes needed to ensure that the nodes are fully rendered
+            // and their dimensions are correctly reported by React Flow.
+            const timeout = window.setTimeout(() => {
+                autoLayout({
+                    nodes,
+                    edges,
+                    setNodes,
+                    setEdges,
+                }).then(() => {
+                    setLayoutDone(true)
+                    window.setTimeout(() => {
+                        fitView()
+                    }, 100)
+                })
+            }, 100)
+            return () => window.clearTimeout(timeout)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [nodesInitialized, layoutDone, nodes, edges]);
+
     const nodeTypes = useMemo(() => ({
         branch: BranchNode,
         branchLink: BranchLinkNode,
     }), []);
 
-    const branchToNode = (branch, id) => {
+    const branchToNode = (branch, id, visible = false) => {
         return {
             id: id ? id : String(branch.id),
             position: {x: 0, y: 0},
-            data: {branch},
+            data: {branch, visible},
             type: 'branch',
         }
     }
 
-    const branchLinkToNode = (id, sourceBranch, targetBranch, link) => {
+    const branchLinkToNode = (id, sourceBranch, targetBranch, link, visible = false) => {
         return {
             id: id,
             position: {x: 0, y: 0},
             data: {
                 sourceBranch,
                 targetBranch,
-                link
+                link,
+                visible,
             },
             type: 'branchLink',
         }
@@ -305,6 +341,8 @@ function BranchLinksFlow({branch}) {
                 {branchId: Number(branch.id)}
             ).then(data => {
 
+                setLayoutDone(false)
+
                 // Root branch
                 const rootBranch = data.branch
 
@@ -325,16 +363,8 @@ function BranchLinksFlow({branch}) {
                 collectDownstreamNodes(rootNode, nodes, edges, nodesCache, edgesCache)
                 collectUpstreamNodes(rootNode, nodes, edges, nodesCache, edgesCache)
 
-                // Layout for the graph
-
-                autoLayout({
-                    nodes,
-                    edges,
-                    nodeWidth: 220,
-                    nodeHeight: (node) => node.type === 'branch' ? 220 : 100,
-                    setNodes,
-                    setEdges,
-                })
+                setNodes(nodes)
+                setEdges(edges)
             }).finally(() => {
                 setLoading(false)
             })

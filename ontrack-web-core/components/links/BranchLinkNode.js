@@ -1,6 +1,6 @@
 import {Handle, Position} from "reactflow";
 import {Card, Space, Typography} from "antd";
-import {FaCaretRight, FaLink, FaMagic} from "react-icons/fa";
+import {FaLink, FaMagic} from "react-icons/fa";
 import AutoVersioningInfo from "@components/links/AutoVersioningInfo";
 import {NodeSection} from "@components/links/NodeSection";
 import LatestLinkInfo from "@components/links/LatestLinkInfo";
@@ -8,7 +8,8 @@ import ProjectLink from "@components/projects/ProjectLink";
 
 export default function BranchLinkNode({data}) {
 
-    const {link, sourceBranch, targetBranch} = data
+    const {link, sourceBranch, targetBranch, visible} = data
+
     const {qualifier, sourceBuild, targetBuild, autoVersioning} = link
 
     const sourceBranchLatest = sourceBranch.latestBuilds ? sourceBranch.latestBuilds[0] : undefined
@@ -19,7 +20,9 @@ export default function BranchLinkNode({data}) {
         (targetBranchLatest.id === targetBuild.id)
 
     return (
-        <>
+        <div style={{
+            opacity: visible ? 1 : 0,
+        }}>
             <Handle type="target" position={Position.Left}/>
             <Handle type="source" position={Position.Right}/>
             <Handle type="target" position={Position.Top}/>
@@ -61,6 +64,6 @@ export default function BranchLinkNode({data}) {
                     }
                 </Space>
             </Card>
-        </>
+        </div>
     )
 }

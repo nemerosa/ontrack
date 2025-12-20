@@ -1,6 +1,6 @@
 import {Handle, Position} from "reactflow";
 import {Card, Space, Tooltip, Typography} from "antd";
-import {branchLinksUri, branchUri, buildLinksUri} from "@components/common/Links";
+import {branchUri, buildLinksUri} from "@components/common/Links";
 import {FaArrowCircleLeft, FaLink, FaProjectDiagram} from "react-icons/fa";
 import Timestamp from "@components/common/Timestamp";
 import Link from "next/link";
@@ -12,7 +12,7 @@ import ProjectLink from "@components/projects/ProjectLink";
 
 export default function BranchNode({data}) {
 
-    const {branch, selected} = data
+    const {branch, selected, visible} = data
 
     const linkToBranchLinks = <Link
         href={`${branchUri(branch)}/links`}
@@ -22,7 +22,9 @@ export default function BranchNode({data}) {
     const latestBuild = branch.latestBuilds ? branch.latestBuilds[0] : undefined
 
     return (
-        <>
+        <div style={{
+            opacity: visible ? 1 : 0,
+        }}>
             <Handle type="target" position={Position.Left}/>
             <Handle type="source" position={Position.Right}/>
             <Handle type="target" position={Position.Top}/>
@@ -64,6 +66,6 @@ export default function BranchNode({data}) {
                     }
                 </Space>
             </Card>
-        </>
+        </div>
     )
 }
