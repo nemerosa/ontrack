@@ -8,6 +8,7 @@ import {CloseCommand} from "@components/common/Commands";
 import PageSection from "@components/common/PageSection";
 import UserAccountCommand from "@components/core/admin/userProfile/UserAccountCommand";
 import UserProfileGroups from "@components/core/admin/userProfile/UserProfileGroups";
+import UserProfileTitle from "@components/core/admin/userProfile/UserProfileTitle";
 
 export default function UserProfileView() {
     return (
@@ -16,7 +17,7 @@ export default function UserProfileView() {
                 {title("User profile")}
             </Head>
             <MainPage
-                title="User profile"
+                title={<UserProfileTitle/>}
                 breadcrumbs={homeBreadcrumbs()}
                 commands={[
                     <UserAccountCommand key="account"/>,
