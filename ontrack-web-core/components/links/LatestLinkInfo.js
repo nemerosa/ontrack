@@ -1,4 +1,4 @@
-import {Descriptions, Popover, Space, Tooltip, Typography} from "antd";
+import {Descriptions, Popover, Space, Tooltip} from "antd";
 import BuildRef from "@components/links/BuildRef";
 import BuildPromotions from "@components/links/BuildPromotions";
 import {useEffect, useState} from "react";
@@ -31,7 +31,7 @@ export default function LatestLinkInfo({sourceBuild, latestOk, targetBuild}) {
             },
             {
                 key: "target",
-                label: <Tooltip title="Latest known child">Child</Tooltip>,
+                label: <Tooltip title="Latest known dependency">Dependency</Tooltip>,
                 span: 12,
                 children: <Space>
                     <BuildRef build={targetBuild}/>
