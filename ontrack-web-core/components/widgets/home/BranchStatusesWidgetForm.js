@@ -1,17 +1,17 @@
 import {Button, Form, Input, Space, Switch} from "antd";
 import {useContext} from "react";
-import SelectMultiplePromotionLevelNames from "@components/promotionLevels/SelectMultiplePromotionLevelNames";
-import SelectMultipleValidationStampsNames from "@components/validationStamps/SelectMultipleValidationStampsNames";
 import {FaPlus, FaTrash} from "react-icons/fa";
 import SelectProjectBranch from "@components/branches/SelectProjectBranch";
 import SelectInterval from "@components/common/SelectInterval";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import SortableList, {SortableItem} from "react-easy-sort";
 import {formFieldArraySwap} from "@components/form/formUtils";
+import PromotionWarningPeriodInput from "@components/widgets/home/PromotionWarningPeriodInput";
+import ValidationWarningPeriodInput from "@components/widgets/home/ValidationWarningPeriodInput";
 
 export default function BranchStatusesWidgetForm({
-                                                     promotions,
-                                                     validations,
+                                                     promotionConfigs,
+                                                     validationConfigs,
                                                      displayValidationResults,
                                                      displayValidationRun,
                                                      refreshInterval,
@@ -38,20 +38,92 @@ export default function BranchStatusesWidgetForm({
                 >
                     <Input/>
                 </Form.Item>
-                <Form.Item
-                    name="promotions"
-                    label="List of promotions to display"
-                    initialValue={promotions}
-                >
-                    <SelectMultiplePromotionLevelNames/>
-                </Form.Item>
-                <Form.Item
-                    name="validations"
-                    label="List of validations to display"
-                    initialValue={validations}
-                >
-                    <SelectMultipleValidationStampsNames/>
-                </Form.Item>
+                <Form.List name="promotionConfigs" initialValue={promotionConfigs}>
+                    {(fields, {add, remove}) => (
+                        <>
+                            {fields.map(({key, name, ...restField}) => (
+                                <Space
+                                    key={key}
+                                    className="ot-form-list-item"
+                                    align="baseline"
+                                >
+                                    <Form.Item
+                                        {...restField}
+                                        name={name}
+                                        label={
+                                            <Space>
+                                                <FaTrash onClick={() => remove(name)}/>
+                                                Promotion
+                                            </Space>
+                                        }
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: 'Promotion config is required',
+                                            },
+                                        ]}
+                                    >
+                                        <PromotionWarningPeriodInput/>
+                                    </Form.Item>
+                                </Space>
+                            ))}
+                            <Form.Item>
+                                <Button type="dashed"
+                                        onClick={() => add({
+                                            promotionLevel: '',
+                                            period: {count: 1, unit: 'D'}
+                                        })} block
+                                        icon={<FaPlus/>}
+                                >
+                                    Add promotion
+                                </Button>
+                            </Form.Item>
+                        </>
+                    )}
+                </Form.List>
+                <Form.List name="validationConfigs" initialValue={validationConfigs}>
+                    {(fields, {add, remove}) => (
+                        <>
+                            {fields.map(({key, name, ...restField}) => (
+                                <Space
+                                    key={key}
+                                    className="ot-form-list-item"
+                                    align="baseline"
+                                >
+                                    <Form.Item
+                                        {...restField}
+                                        name={name}
+                                        label={
+                                            <Space>
+                                                <FaTrash onClick={() => remove(name)}/>
+                                                Validation
+                                            </Space>
+                                        }
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: 'Validation config is required',
+                                            },
+                                        ]}
+                                    >
+                                        <ValidationWarningPeriodInput/>
+                                    </Form.Item>
+                                </Space>
+                            ))}
+                            <Form.Item>
+                                <Button type="dashed"
+                                        onClick={() => add({
+                                            validationStamp: '',
+                                            period: {count: 1, unit: 'D'}
+                                        })} block
+                                        icon={<FaPlus/>}
+                                >
+                                    Add validation
+                                </Button>
+                            </Form.Item>
+                        </>
+                    )}
+                </Form.List>
                 <Form.Item
                     name="displayValidationResults"
                     label="If checked, displays additional results with each validation, like test summary, etc."

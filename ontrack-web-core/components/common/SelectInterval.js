@@ -19,7 +19,10 @@ export const toMilliSeconds = ({count, unit}) => {
             return count * 60 * 1000
         }
         case 'H': {
-            return count * 24 * 60 * 1000
+            return count * 60 * 60 * 1000
+        }
+        case 'D': {
+            return count * 24 * 60 * 60 * 1000
         }
     }
     return 0
@@ -33,12 +36,23 @@ const units = [
         min: 0,
         max: 24,
     },
+    {
+        value: 'D',
+        label: 'Days',
+        min: 0,
+        max: 365,
+    },
 ]
 
 export default function SelectInterval({value, onChange}) {
 
-    const [unit, setUnit] = useState(minutes)
-    const [count, setCount] = useState(1)
+    const [unit, setUnit] = useState(() => {
+        if (value?.unit) {
+            return units.find(it => it.value === value.unit) || minutes
+        }
+        return minutes
+    })
+    const [count, setCount] = useState(value?.count !== undefined ? value.count : 1)
 
     useEffect(() => {
         if (value?.unit) {
@@ -49,23 +63,22 @@ export default function SelectInterval({value, onChange}) {
                 setUnit(minutes)
             }
         }
-    }, [value])
-
-    useEffect(() => {
-        if (value?.count) {
+        if (value?.count !== undefined) {
             setCount(value.count)
         }
-    }, [value])
+    }, [value?.unit, value?.count])
 
     const onUnitChange = (newUnit) => {
         if (unit.value !== newUnit) {
             const existingUnit = units.find(it => it.value === newUnit)
             if (existingUnit) {
                 setUnit(existingUnit)
-                setCount(existingUnit.min)
+                const newCount = existingUnit.min
+                setCount(newCount)
                 if (onChange) onChange({
                     ...value,
                     unit: existingUnit.value,
+                    count: newCount,
                 })
             }
         }
@@ -90,15 +103,15 @@ export default function SelectInterval({value, onChange}) {
                     style={{
                         width: '5em'
                     }}
-                    />
+                />
                 <Select
-                    value={unit}
+                    value={unit.value}
                     options={units}
                     onChange={onUnitChange}
                     style={{
                         width: '10em'
                     }}
-                    />
+                />
             </Space>
         </>
     )

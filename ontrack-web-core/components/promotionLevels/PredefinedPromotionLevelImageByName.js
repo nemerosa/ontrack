@@ -1,36 +1,28 @@
-import {useEffect, useState} from "react";
 import {Space, Typography} from "antd";
 import {gql} from "graphql-request";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import LoadingInline from "@components/common/LoadingInline";
 import PredefinedPromotionLevelImage from "@components/core/config/PredefinedPromotionLevelImage";
+import {useQuery} from "@components/services/GraphQL";
+import GeneratedIcon from "@components/common/icons/GeneratedIcon";
 
-export default function PredefinedPromotionLevelImageByName({name, displayName = true, size = 24}) {
+export default function PredefinedPromotionLevelImageByName({name, displayName = true, size = 24, generateIfMissing = false}) {
 
-    const client = useGraphQLClient()
-
-    const [loading, setLoading] = useState(true)
-    const [predefinedPromotionLevel, setPredefinedPromotionLevel] = useState()
-    useEffect(() => {
-        if (client) {
-            setLoading(true)
-            client.request(
-                gql`
-                    query PredefinedPromotionLevel($name: String!) {
-                        predefinedPromotionLevelByName(name: $name) {
-                            id
-                            name
-                            isImage
-                        }
-                    }
-                `, {name}
-            ).then(data => {
-                setPredefinedPromotionLevel(data.predefinedPromotionLevelByName)
-            }).finally(() => {
-                setLoading(false)
-            })
+    const {data: predefinedPromotionLevel, loading} = useQuery(
+        gql`
+            query PredefinedPromotionLevel($name: String!) {
+                predefinedPromotionLevelByName(name: $name) {
+                    id
+                    name
+                    isImage
+                }
+            }
+        `,
+        {
+            variables: {name},
+            deps: [name],
+            dataFn: data => data.predefinedPromotionLevelByName,
         }
-    }, [client, name])
+    )
 
     return (
         <LoadingInline loading={loading} text="">
@@ -43,6 +35,17 @@ export default function PredefinedPromotionLevelImageByName({name, displayName =
                         size={size}
                     />
                     {displayName && <Typography.Text>{predefinedPromotionLevel.name}</Typography.Text>}
+                </Space>
+            }
+            {
+                !predefinedPromotionLevel && generateIfMissing &&
+                <Space>
+                    <GeneratedIcon
+                        name={name}
+                        colorIndex={1}
+                        size={size}
+                    />
+                    {displayName && <Typography.Text>{name}</Typography.Text>}
                 </Space>
             }
         </LoadingInline>

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.provisioning
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.seconds
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.kdsl.spec.admin.admin
 import net.nemerosa.ontrack.kdsl.spec.extension.casc.casc
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.environments
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.startPipeline
+import net.nemerosa.ontrack.kdsl.spec.extension.general.release
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -26,6 +28,35 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
         const val SILVER = "SILVER"
         const val GOLD = "GOLD"
         const val DIAMOND = "DIAMOND"
+    }
+
+    @Test
+    @Disabled
+    fun `Branches and promotions`() {
+        val ref = Time.now.minusDays(10)
+        project {
+            branch("main") {
+                promotion(BRONZE)
+                promotion(SILVER)
+                promotion(GOLD)
+
+                (1..9).forEach { no ->
+                    build {
+                        val buildTime = ref.plusDays(no.toLong())
+                        updateCreationTime(buildTime)
+                        release = "1.0.$no"
+                        promote(BRONZE, dateTime = buildTime)
+                        if (no % 2 == 0) {
+                            promote(SILVER, dateTime = buildTime)
+                        }
+                        if (no % 4 == 0) {
+                            promote(GOLD, dateTime = buildTime)
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
     @Test

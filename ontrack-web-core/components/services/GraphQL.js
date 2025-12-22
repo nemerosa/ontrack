@@ -16,21 +16,31 @@ export const useQuery = (query, {
     const [finished, setFinished] = useState(false)
 
     useEffect(() => {
+        let active = true
         if (condition) {
             setLoading(true)
             callGraphQL({query, variables})
                 .then(data => {
-                    setData(dataFn(data))
-                    setError(null)
+                    if (active) {
+                        setData(dataFn(data))
+                        setError(null)
+                    }
                 })
                 .catch((ex) => {
-                    setError(ex.message)
-                    setData(null)
+                    if (active) {
+                        setError(ex.message)
+                        setData(null)
+                    }
                 })
                 .finally(() => {
-                    setFinished(true)
-                    setLoading(false)
+                    if (active) {
+                        setFinished(true)
+                        setLoading(false)
+                    }
                 })
+        }
+        return () => {
+            active = false
         }
     }, [condition, ...deps])
 
