@@ -30,7 +30,7 @@ export default function ProjectFavourite({project}) {
                             }
                         }
                     }
-                `, {projectId: project.id}
+                `, {projectId: Number(project.id)}
             ).then(() => {
                 setFavourite(false)
                 eventsContext.fireEvent("project.favourite", {id: project.id, value: false})
@@ -49,7 +49,7 @@ export default function ProjectFavourite({project}) {
                             }
                         }
                     }
-                `, {projectId: project.id}
+                `, {projectId: Number(project.id)}
             ).then(() => {
                 setFavourite(true)
                 eventsContext.fireEvent("project.favourite", {id: project.id, value: true})

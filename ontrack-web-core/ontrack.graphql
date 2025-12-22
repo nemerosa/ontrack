@@ -220,8 +220,6 @@ type AutoVersioningOrder {
   autoApprovalMode: AutoApprovalMode!
   "Target branch for the processing order"
   branch: Branch
-  "Maximum number of retries. If null or 0, no retry is performed."
-  maxRetries: Int
   "Post processing type"
   postProcessing: String
   "JSON configuration for the post processing"
@@ -230,12 +228,6 @@ type AutoVersioningOrder {
   qualifier: String
   "Link to the target repository"
   repositoryHtmlURL: String
-  "Number of retries already performed"
-  retries: Int
-  "Exponential factor. 1.0 means that the interval is linear. If null, default value is taken from the setings. If < 1, 1.0 is assumer."
-  retryIntervalFactor: Float
-  "Exponential interval to wait between retries. If null, default value is taken from the settings."
-  retryIntervalSeconds: Int
   "List of reviewers to always add to the pull request"
   reviewers: [String!]!
   "Schedule time"
@@ -280,8 +272,6 @@ type AutoVersioningSourceConfig {
   buildLinkCreation: Boolean
   "Cron schedule (when to start applying queued requests)"
   cronSchedule: String
-  "Maximum number of retries. If null or 0, no retry is performed."
-  maxRetries: Int
   "List of notifications subscriptions to setup for this auto versioning"
   notifications: [AutoVersioningNotification!]
   "Type of post processing to launch after the version has been updated"
@@ -296,10 +286,6 @@ type AutoVersioningSourceConfig {
   prTitleTemplate: String
   "Qualifier for the build link to create (when links are created)"
   qualifier: String
-  "Exponential factor. 1.0 means that the interval is linear. If null, default value is taken from the setings. If < 1, 1.0 is assumer."
-  retryIntervalFactor: Float
-  "Exponential interval to wait between retries. If null, default value is taken from the settings."
-  retryIntervalSeconds: Int
   "List of reviewers to always set on the pull request created by the auto versioning"
   reviewers: [String!]
   "Branches to watch using a regular expression"
@@ -318,8 +304,6 @@ type AutoVersioningSourceConfig {
   targetPropertyType: String
   "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
   targetRegex: String
-  "Number of requests to keep at one given moment. If > 0, this is an actual throttling of the requests for this configuration."
-  throttling: Int
   "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`"
   upgradeBranchPattern: String
   "Validation stamp to create on auto versioning (optional)"
@@ -4966,6 +4950,13 @@ type ProjectIndicators {
   project: Project
 }
 
+type ProjectPaginated {
+  "Information about the current page"
+  pageInfo: PageInfo
+  "Items in the current page"
+  pageItems: [Project!]!
+}
+
 type ProjectRole {
   "description field"
   description: String!
@@ -5457,6 +5448,15 @@ type Query {
   ): NotificationRecordPaginated
   "Notification settings"
   notificationSettings: NotificationSettings
+  "Paginated list of projects"
+  paginatedProjects(
+    "Fragment of the project name to filter on"
+    name: String,
+    "Offset for the page"
+    offset: Int = 0,
+    "Size of the page"
+    size: Int = 20
+  ): ProjectPaginated
   "List of permission targets"
   permissionTargets(
     "Part of the name of the permission target to look for"
@@ -8301,8 +8301,6 @@ input AutoVersioningSourceConfigInput {
   buildLinkCreation: Boolean
   "Cron schedule (when to start applying queued requests)"
   cronSchedule: String
-  "Maximum number of retries. If null or 0, no retry is performed."
-  maxRetries: Int
   "List of notifications subscriptions to setup for this auto versioning"
   notifications: [AutoVersioningNotificationInput!]
   "Type of post processing to launch after the version has been updated"
@@ -8317,10 +8315,6 @@ input AutoVersioningSourceConfigInput {
   prTitleTemplate: String
   "Qualifier for the build link to create (when links are created)"
   qualifier: String
-  "Exponential factor. 1.0 means that the interval is linear. If null, default value is taken from the setings. If < 1, 1.0 is assumer."
-  retryIntervalFactor: Float
-  "Exponential interval to wait between retries. If null, default value is taken from the settings."
-  retryIntervalSeconds: Int
   "List of reviewers to always set on the pull request created by the auto versioning"
   reviewers: [String!]
   "Branches to watch using a regular expression"
@@ -8339,8 +8333,6 @@ input AutoVersioningSourceConfigInput {
   targetPropertyType: String
   "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
   targetRegex: String
-  "Number of requests to keep at one given moment. If > 0, this is an actual throttling of the requests for this configuration."
-  throttling: Int
   "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`"
   upgradeBranchPattern: String
   "Validation stamp to create on auto versioning (optional)"

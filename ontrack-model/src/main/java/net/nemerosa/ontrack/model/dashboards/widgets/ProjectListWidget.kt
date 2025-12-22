@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 class ProjectListWidget : AbstractWidget<ProjectListWidget.ProjectListWidgetConfig>(
     key = "home/ProjectList",
     name = "Project list",
-    description = "Fixed list of projects, suitable to easily a list of projects in a dashboard.",
+    description = "Fixed list of projects, suitable to show a list of projects in a dashboard.",
     defaultConfig = ProjectListWidgetConfig(),
     preferredHeight = 30,
 ) {
