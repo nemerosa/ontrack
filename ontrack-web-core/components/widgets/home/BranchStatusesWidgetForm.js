@@ -71,7 +71,7 @@ export default function BranchStatusesWidgetForm({
                                 <Button type="dashed"
                                         onClick={() => add({
                                             promotionLevel: '',
-                                            period: {count: 1, unit: 'D'}
+                                            period: undefined,
                                         })} block
                                         icon={<FaPlus/>}
                                 >
@@ -114,7 +114,7 @@ export default function BranchStatusesWidgetForm({
                                 <Button type="dashed"
                                         onClick={() => add({
                                             validationStamp: '',
-                                            period: {count: 1, unit: 'D'}
+                                            period: undefined,
                                         })} block
                                         icon={<FaPlus/>}
                                 >
