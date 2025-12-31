@@ -15,11 +15,7 @@ class BranchStatusesWidget : AbstractWidget<BranchStatusesWidgetConfig>(
 
 data class BranchStatusesWidgetConfig(
     val title: String = "Branch statuses",
-    @Deprecated("Use promotionConfigs")
-    val promotions: List<String> = emptyList(),
     val promotionConfigs: List<PromotionConfig> = emptyList(),
-    @Deprecated("Use validationConfigs")
-    val validations: List<String> = emptyList(),
     val validationConfigs: List<ValidationConfig> = emptyList(),
     val branches: List<BranchStatusesWidgetConfigBranch> = emptyList(),
     val refreshInterval: Duration = Duration.ZERO,
