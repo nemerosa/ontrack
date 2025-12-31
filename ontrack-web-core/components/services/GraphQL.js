@@ -52,6 +52,53 @@ export const useQuery = (query, {
     }
 }
 
+export const useQueries = (queries = [], {
+    deps = [],
+    condition = true,
+} = {}) => {
+    const [data, setData] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState()
+    const [finished, setFinished] = useState(false)
+
+    useEffect(() => {
+        let active = true
+        if (condition && queries && queries.length > 0) {
+            setLoading(true)
+            const promises = queries.map(({query, variables}) => callGraphQL({query, variables}))
+            Promise.all(promises)
+                .then(results => {
+                    if (active) {
+                        setData(results)
+                        setError(null)
+                    }
+                })
+                .catch((ex) => {
+                    if (active) {
+                        setError(ex.message)
+                        setData([])
+                    }
+                })
+                .finally(() => {
+                    if (active) {
+                        setFinished(true)
+                        setLoading(false)
+                    }
+                })
+        }
+        return () => {
+            active = false
+        }
+    }, [condition, ...deps])
+
+    return {
+        data,
+        loading,
+        error,
+        finished,
+    }
+}
+
 export const useMutation = (query, {userNodeName, onSuccess}) => {
     const [data, setData] = useState({})
     const [loading, setLoading] = useState(false)
