@@ -5,44 +5,7 @@
  */
 import {InputNumber, Select, Space} from "antd";
 import {useEffect, useState} from "react";
-
-const minutes = {
-    value: 'M',
-    label: 'Minutes',
-    min: 0,
-    max: 300,
-}
-
-export const toMilliSeconds = ({count, unit}) => {
-    switch (unit) {
-        case 'M': {
-            return count * 60 * 1000
-        }
-        case 'H': {
-            return count * 60 * 60 * 1000
-        }
-        case 'D': {
-            return count * 24 * 60 * 60 * 1000
-        }
-    }
-    return 0
-}
-
-const units = [
-    minutes,
-    {
-        value: 'H',
-        label: 'Hours',
-        min: 0,
-        max: 24,
-    },
-    {
-        value: 'D',
-        label: 'Days',
-        min: 0,
-        max: 365,
-    },
-]
+import {minutes, units} from "@components/common/IntervalUtils";
 
 export default function SelectInterval({value, onChange}) {
 

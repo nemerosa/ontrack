@@ -1,6 +1,6 @@
 import {useQueries} from "@components/services/GraphQL";
 import {gql} from "graphql-request";
-import {Space, Table, Typography} from "antd";
+import {Alert, Popover, Space, Table, Typography} from "antd";
 import ProjectLink from "@components/projects/ProjectLink";
 import BranchLink from "@components/branches/BranchLink";
 import {useContext, useEffect} from "react";
@@ -15,6 +15,21 @@ import PredefinedValidationStampImageByName from "@components/validationStamps/P
 import ValidationRunStatus from "@components/validationRuns/ValidationRunStatus";
 import ValidationRunData from "@components/framework/validation-run-data/ValidationRunData";
 import RunInfo from "@components/common/RunInfo";
+import {findInterval} from "@components/common/IntervalUtils";
+import dayjs from "dayjs";
+
+function ExpirationWarning({message, description}) {
+    return (
+        <>
+            <Popover
+                title={message}
+                content={description}
+            >
+                <Alert type="warning" message={message} showIcon/>
+            </Popover>
+        </>
+    )
+}
 
 export default function BranchStatusesWidget({
                                                  promotionConfigs,
@@ -78,6 +93,9 @@ export default function BranchStatusesWidget({
                             sourceUri
                             triggerType
                             triggerData
+                        }
+                        creation {
+                            time
                         }
                         data {
                             descriptor {
@@ -147,9 +165,34 @@ export default function BranchStatusesWidget({
             </Space>
         }
     })
+
+    // Warning computation
+    const warningComputation = ({period, time, message, description}) => {
+        let warning = null
+        if (period) {
+            const interval = findInterval(period.unit)
+            if (interval) {
+                const ms = period.count * interval.millisecondsFactor
+                const warningTime = dayjs().subtract(ms, 'milliseconds')
+                const promotionTime = dayjs(time)
+                if (promotionTime.isBefore(warningTime)) {
+                    const run = dayjs.utc(time).local().format("YYYY MMM DD, HH:mm")
+                    const periodText = interval.displayPeriod(period.count)
+                    const text = description(run, periodText)
+                    warning = <ExpirationWarning
+                        message={message}
+                        description={text}
+                    />
+                }
+            }
+        }
+        return warning
+    }
+
     // Column per promotion
-    if (promotions) {
-        promotions.forEach(promotionName => {
+    if (promotionConfigs) {
+        promotionConfigs.forEach(promotionConfig => {
+            const promotionName = promotionConfig.promotionLevel
             columns.push({
                 key: promotionName,
                 title: <PredefinedPromotionLevelImageByName name={promotionName} generateIfMissing={true}/>,
@@ -157,6 +200,12 @@ export default function BranchStatusesWidget({
                     if (branch.promotionStatuses) {
                         const run = branch.promotionStatuses.find(it => it.promotionLevel.name === promotionName)
                         if (run) {
+                            const warning = warningComputation({
+                                period: promotionConfig.period,
+                                time: run.creation.time,
+                                message: "Promotion expired",
+                                description: (run, period) => `The promotion level has not been granted since ${run}. It must be granted at least every ${period}`,
+                            })
                             return <Space direction="vertical">
                                 {
                                     <Space size={8}>
@@ -169,6 +218,7 @@ export default function BranchStatusesWidget({
                                     </Space>
                                 }
                                 <Timestamp value={run.creation.time}/>
+                                {warning}
                             </Space>
                         }
                     }
@@ -178,8 +228,9 @@ export default function BranchStatusesWidget({
         })
     }
     // Column per validation
-    if (validations) {
-        validations.forEach(validationName => {
+    if (validationConfigs) {
+        validationConfigs.forEach(validationConfig => {
+            const validationName = validationConfig.validationStamp
             columns.push({
                 key: validationName,
                 title: <PredefinedValidationStampImageByName name={validationName}/>,
@@ -187,6 +238,12 @@ export default function BranchStatusesWidget({
                     if (branch.validationStatuses) {
                         const run = branch.validationStatuses.find(it => it.validationStamp.name === validationName)
                         if (run) {
+                            const warning = warningComputation({
+                                period: validationConfig.period,
+                                time: run.creation.time,
+                                message: "Validation expired",
+                                description: (run, period) => `The validation has not been run since ${run}. It must be run at least every ${period}`,
+                            })
                             return <Space direction="vertical">
                                 {
                                     <Space size={8}>
@@ -214,6 +271,7 @@ export default function BranchStatusesWidget({
                                     <RunInfo info={run.runInfo} mode="minimal"/>
                                 }
                                 <Timestamp value={run.lastStatus.creation.time}/>
+                                {warning}
                             </Space>
                         }
                     }
