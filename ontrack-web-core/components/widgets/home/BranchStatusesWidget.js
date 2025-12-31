@@ -24,6 +24,7 @@ function ExpirationWarning({message, description}) {
             <Popover
                 title={message}
                 content={description}
+                placement="bottomLeft"
             >
                 <Alert type="warning" message={message} showIcon/>
             </Popover>
