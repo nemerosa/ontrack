@@ -24,4 +24,12 @@ data class WidgetInstance(
             config = config,
             layout = migration(layout),
         )
+
+    fun adaptConfig(migration: (JsonNode) -> JsonNode) =
+        WidgetInstance(
+            uuid = uuid,
+            key = key,
+            config = migration(this.config),
+            layout = layout,
+        )
 }
