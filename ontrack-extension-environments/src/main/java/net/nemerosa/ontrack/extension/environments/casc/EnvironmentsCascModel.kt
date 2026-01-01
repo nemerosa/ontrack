@@ -39,12 +39,12 @@ data class SlotCasc(
     @APIDescription("Name of the project")
     val project: String,
     @APIDescription("Optional qualifier for this slot")
-    val qualifier: String = Slot.DEFAULT_QUALIFIER,
+    override val qualifier: String = Slot.DEFAULT_QUALIFIER,
     @APIDescription("Prefix for the description for the slots (can be overridden by description at environment level)")
-    val description: String = "",
+    override val description: String = "",
     @APIDescription("Configuration of environments for this slot")
-    val environments: List<SlotEnvironmentCasc>,
-)
+    override val environments: List<SlotEnvironmentCasc>,
+): SlotCascDef
 
 @APIDescription("Configuration of an environment for a slot")
 data class SlotEnvironmentCasc(

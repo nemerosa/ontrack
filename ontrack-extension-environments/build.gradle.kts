@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":ontrack-extension-scm"))
     implementation(project(":ontrack-repository"))
     implementation(project(":ontrack-repository-support"))
+    implementation(project(":ontrack-extension-config"))
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(":ontrack-extension-scm"))
@@ -27,6 +28,7 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-scm")))
     testImplementation(testFixtures(project(":ontrack-extension-workflows")))
     testImplementation(testFixtures(project(":ontrack-extension-license")))
+    testImplementation(testFixtures(project(":ontrack-extension-config")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
