@@ -15,7 +15,7 @@ export default function JobActions({job, onDone}) {
     const jobAction = (mutation, verb) => {
         setLoading(true)
         client.request(
-            `
+            gql`
                 mutation JobAction($id: Int!) {
                     ${mutation}(id: $id) {
                         ok
@@ -24,7 +24,7 @@ export default function JobActions({job, onDone}) {
                 }
             `,
             {
-                id: job.id
+                id: Number(job.id)
             }
         ).then(data => {
             const result = data[mutation]

@@ -39,7 +39,7 @@ export default function ValidationStampDeleteCommand({id}) {
                         }
                     `
                 }
-                gqlVariables={{id}}
+                gqlVariables={{id: Number(id)}}
                 gqlUserNode="deleteValidationStampById"
                 onSuccess={onSuccess}
             />

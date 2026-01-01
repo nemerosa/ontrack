@@ -37,7 +37,7 @@ export default function SlotPipelineCreateButton({slot, build, size, onStart, ti
                 `,
                 {
                     slotId: slot.id,
-                    buildId: build.id,
+                    buildId: Number(build.id),
                 }
             )
             if (processGraphQLErrors(data, 'startSlotPipeline', messageApi)) {

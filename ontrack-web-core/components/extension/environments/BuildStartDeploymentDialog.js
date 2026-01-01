@@ -66,7 +66,7 @@ export const useBuildStartDeploymentDialog = ({buildId}) => {
         prepareValues: (values) => {
             return {
                 slotId: values.slot,
-                buildId,
+                buildId: Number(buildId),
             }
         },
         query: gql`

@@ -39,7 +39,7 @@ export default function PromotionLevelDeleteCommand({id}) {
                         }
                     `
                 }
-                gqlVariables={{id}}
+                gqlVariables={{id: Number(id)}}
                 gqlUserNode="deletePromotionLevelById"
                 onSuccess={onSuccess}
             />

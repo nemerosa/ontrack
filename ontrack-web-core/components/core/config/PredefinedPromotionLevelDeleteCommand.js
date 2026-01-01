@@ -28,7 +28,7 @@ export default function PredefinedPromotionLevelDeleteCommand({ppl, onChange}) {
                         }
                     `
                 }
-                gqlVariables={{id: ppl?.id}}
+                gqlVariables={{id: Number(ppl?.id)}}
                 gqlUserNode="deletePredefinedPromotionLevel"
                 onSuccess={onChange}
             />

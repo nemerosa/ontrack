@@ -27,7 +27,7 @@ export default function ValidationStampBulkUpdateCommand({id}) {
                         }
                     `
                 }
-                gqlVariables={{id}}
+                gqlVariables={{id: Number(id)}}
                 gqlUserNode="bulkUpdateValidationStampById"
                 onSuccess={onSuccess}
             />

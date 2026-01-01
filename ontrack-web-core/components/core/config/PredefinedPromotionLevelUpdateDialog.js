@@ -12,7 +12,7 @@ export const usePredefinedPromotionLevelUpdateDialog = ({onChange}) => {
         prepareValues: (values, {ppl}) => {
             return {
                 ...values,
-                id: ppl.id,
+                id: Number(ppl.id),
             }
         },
         query: gql`

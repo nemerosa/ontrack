@@ -19,7 +19,7 @@ export const usePromotionLevelUpdateDialog = () => {
         prepareValues: (values, {id}) => {
             return {
                 ...values,
-                id,
+                id: Number(id),
             }
         },
         query: gql`

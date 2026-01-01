@@ -5,7 +5,6 @@ const {generate} = require("@ontrack/utils");
 const {ProjectPage} = require("./project");
 const {test} = require("../../fixtures/connection");
 const {waitUntilCondition} = require("../../support/timing");
-const {BranchPage} = require("../branches/branch");
 
 test('project creation', async ({page, ontrack}) => {
     await login(page, ontrack)

@@ -30,7 +30,7 @@ export default function PropertyDeleteButton({entityType, entityId, property}) {
             `,
             {
                 entityType,
-                entityId,
+                entityId: Number(entityId),
                 type: property.type.typeName,
             }
         ).then(() => {

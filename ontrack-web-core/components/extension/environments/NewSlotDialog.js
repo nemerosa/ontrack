@@ -12,6 +12,12 @@ export const useNewSlotDialog = () => {
         onSuccess: () => {
             eventsContext.fireEvent("slot.created")
         },
+        prepareValues: (values) => {
+            return {
+                ...values,
+                projectId: Number(values.projectId),
+            }
+        },
         query: gql`
             mutation CreateSlots(
                 $projectId: Int!,

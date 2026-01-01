@@ -53,7 +53,7 @@ export default function ValidationRunStatusList({run, onRunChanged}) {
                 }
             `,
             {
-                validationRunStatusId: vrs.id,
+                validationRunStatusId: Number(vrs.id),
                 comment: text,
             }
         )

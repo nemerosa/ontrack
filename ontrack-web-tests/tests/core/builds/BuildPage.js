@@ -56,7 +56,7 @@ export class BuildPage {
     }
 
     async assertName(name) {
-        await expect(this.page.getByText(name)).toBeVisible()
+        await expect(this.page.getByText(name).nth(0)).toBeVisible()
     }
 
     async assertDescription(description) {

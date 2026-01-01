@@ -1,5 +1,5 @@
 import {FaBullseye} from "react-icons/fa";
-import {message, Modal} from "antd";
+import {message} from "antd";
 import {gql} from "graphql-request";
 import ConfirmCommand from "@components/common/ConfirmCommand";
 
@@ -27,7 +27,7 @@ export default function PromotionLevelBulkUpdateCommand({id}) {
                         }
                     `
                 }
-                gqlVariables={{id}}
+                gqlVariables={{id: Number(id)}}
                 gqlUserNode="bulkUpdatePromotionLevelById"
                 onSuccess={onSuccess}
             />

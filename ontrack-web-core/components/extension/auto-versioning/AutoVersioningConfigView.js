@@ -112,7 +112,7 @@ export default function AutoVersioningConfigView({branchId}) {
                                     }
                                 `
                             }
-                            gqlVariables={{id: branchId}}
+                            gqlVariables={{id: Number(branchId)}}
                             gqlUserNode="deleteAutoVersioningConfig"
                             onSuccess={reload}
                         />
