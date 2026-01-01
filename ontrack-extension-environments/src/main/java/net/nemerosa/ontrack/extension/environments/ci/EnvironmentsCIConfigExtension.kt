@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.mergeList
 import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtension
 import net.nemerosa.ontrack.extension.environments.EnvironmentsExtensionFeature
-import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.casc.EnvironmentCasc
 import net.nemerosa.ontrack.extension.environments.casc.EnvironmentsInjection
-import net.nemerosa.ontrack.extension.environments.casc.SlotCascDef
+import net.nemerosa.ontrack.extension.environments.casc.SlotCasc
 import net.nemerosa.ontrack.extension.environments.casc.SlotEnvironmentCasc
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parse
@@ -15,7 +14,6 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.json.schema.JsonType
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.json.schema.toType
-import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
@@ -73,8 +71,6 @@ class EnvironmentsCIConfigExtension(
         entity: ProjectEntity,
         data: EnvironmentsCIConfigExtensionConfig
     ) {
-        val project = entity as Project
-
         // Injection of environments
         environmentsInjection.defineEnvironments(
             environments = data.environments,
@@ -82,9 +78,7 @@ class EnvironmentsCIConfigExtension(
         )
 
         // Injection of slots for this project
-        environmentsInjection.defineSlots(
-            slots = data.slots,
-        ) { project }
+        environmentsInjection.defineSlots(slots = data.slots)
     }
 
     data class EnvironmentsCIConfigExtensionConfig(
@@ -93,15 +87,5 @@ class EnvironmentsCIConfigExtension(
         @APIDescription("List of deployments slots (associated of a project and an environment)")
         val slots: List<SlotCasc> = emptyList(),
     )
-
-    @APIDescription("Definition for a slot: the association of an optional qualifier to several environments")
-    data class SlotCasc(
-        @APIDescription("Optional qualifier for this slot")
-        override val qualifier: String = Slot.DEFAULT_QUALIFIER,
-        @APIDescription("Prefix for the description for the slots (can be overridden by description at environment level)")
-        override val description: String = "",
-        @APIDescription("Configuration of environments for this slot")
-        override val environments: List<SlotEnvironmentCasc>,
-    ) : SlotCascDef
 
 }

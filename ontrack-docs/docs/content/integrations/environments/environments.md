@@ -36,7 +36,8 @@ configuration:
               - yontrack
               - release
         slots:
-          - environments:
+          - project: yontrack
+            environments:
               - name: self.yontrack.com
                 admissionRules:
                   - ruleId: promotion

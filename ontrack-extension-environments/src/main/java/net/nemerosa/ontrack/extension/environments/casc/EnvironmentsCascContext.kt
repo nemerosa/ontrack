@@ -11,17 +11,14 @@ import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.json.schema.JsonType
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.json.schema.toType
-import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlin.jvm.optionals.getOrNull
 
 @Component
 class EnvironmentsCascContext(
     private val environmentsInjection: EnvironmentsInjection,
     private val environmentService: EnvironmentService,
-    private val structureService: StructureService,
     private val slotService: SlotService,
     private val slotWorkflowService: SlotWorkflowService,
 ) : AbstractCascContext(), SubConfigContext {
@@ -41,11 +38,7 @@ class EnvironmentsCascContext(
             environments = model.environments,
             keepEnvironments = model.keepEnvironments,
         )
-        environmentsInjection.defineSlots(
-            slots = model.slots,
-        ) {
-            structureService.findProjectByName(it.project).getOrNull()
-        }
+        environmentsInjection.defineSlots(slots = model.slots)
     }
 
     @OptIn(ExperimentalEncodingApi::class)

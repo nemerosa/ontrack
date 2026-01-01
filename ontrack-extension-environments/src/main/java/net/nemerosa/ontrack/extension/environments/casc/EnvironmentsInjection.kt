@@ -12,14 +12,17 @@ import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.model.files.FileRef
 import net.nemerosa.ontrack.model.files.FileRefService
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ImageHelper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class EnvironmentsInjection(
     private val environmentService: EnvironmentService,
+    private val structureService: StructureService,
     private val slotService: SlotService,
     private val slotWorkflowService: SlotWorkflowService,
     private val fileRefService: FileRefService,
@@ -102,11 +105,11 @@ class EnvironmentsInjection(
         }
     }
 
-    fun <S : SlotCascDef> defineSlots(slots: List<S>, projectFn: (def: S) -> Project?) {
+    fun defineSlots(slots: List<SlotCasc>) {
         slots.forEach { slotCasc ->
 
             val qualifier = slotCasc.qualifier
-            val project = projectFn(slotCasc)
+            val project = structureService.findProjectByName(slotCasc.project).getOrNull()
 
             // Checking that there is no double declaration of environments
             val duplicateNames = slotCasc.environments
@@ -173,7 +176,7 @@ class EnvironmentsInjection(
 
     private fun generateSlotDescription(
         project: Project,
-        slotCasc: SlotCascDef,
+        slotCasc: SlotCasc,
         slotEnvironmentCasc: SlotEnvironmentCasc
     ): String? =
         if (slotEnvironmentCasc.description.isNotBlank()) {

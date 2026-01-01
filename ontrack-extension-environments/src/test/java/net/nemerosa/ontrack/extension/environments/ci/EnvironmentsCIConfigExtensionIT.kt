@@ -33,7 +33,10 @@ class EnvironmentsCIConfigExtensionIT : AbstractQLKTITSupport() {
         environmentService.findAll().forEach {
             environmentService.delete(it)
         }
-        val project = configTestSupport.configureProject(
+
+        val deployedProject = project()
+
+        configTestSupport.configureProject(
             yaml = """
                 version: v1
                 configuration:
@@ -48,7 +51,8 @@ class EnvironmentsCIConfigExtensionIT : AbstractQLKTITSupport() {
                               - yontrack
                               - release
                         slots:
-                          - environments:
+                          - project: ${deployedProject.name}
+                            environments:
                               - name: self.yontrack.com
                                 admissionRules:
                                   - ruleId: promotion
@@ -84,7 +88,7 @@ class EnvironmentsCIConfigExtensionIT : AbstractQLKTITSupport() {
             assertEquals(listOf("yontrack", "release"), it.tags)
         }
 
-        val slot = slotService.findSlotsByProject(project).single()
+        val slot = slotService.findSlotsByProject(deployedProject).single()
         assertEquals("self.yontrack.com", slot.environment.name)
 
         assertEquals(2, slotService.getAdmissionRuleConfigs(slot).size)
