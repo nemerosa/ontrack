@@ -76,6 +76,7 @@ nav:
           - GitHub Workflows: content/integrations/notifications/github-workflow.md
       - Auto-versioning: content/integrations/auto-versioning/auto-versioning.md
       - Workflows: content/integrations/workflows/workflows.md
+      - Environments: content/integrations/environments/environments.md
   - Reference:
       - API:
           - GraphQL API: content/api/graphql.md

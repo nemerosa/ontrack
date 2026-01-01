@@ -544,6 +544,12 @@ When this is set (to `true),
 an [auto-versioning check](../integrations/auto-versioning/auto-versioning.md#auto-versioning-checks) will be performed
 automatically after the build is created.
 
+#### Environments
+
+This extension is set at the project level to configure [environments](../integrations/environments/environments.md) and slots for this project.
+
+See the [environments reference](../integrations/environments/environments.md#configuration) for some examples.
+
 #### Notifications
 
 This extension is set at the branch level to configure the notifications for this branch.
