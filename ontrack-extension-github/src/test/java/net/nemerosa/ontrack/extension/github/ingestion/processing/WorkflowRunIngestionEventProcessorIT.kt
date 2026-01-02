@@ -709,7 +709,7 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                             getProperty(
                                 build,
                                 BuildGitHubWorkflowRunPropertyType::class.java
-                            ).workflows.firstOrNull(),
+                            )?.workflows?.firstOrNull(),
                             "GitHub workflow run URL"
                         ) {
                             assertEquals(htmlUrl, it.url)

@@ -63,9 +63,8 @@ class AutoPromotionEventListener(
     }
 
     private fun cleanPromotionLevelFromValidationStamp(promotionLevel: PromotionLevel, validationStampId: Int) {
-        val oProperty = propertyService.getProperty(promotionLevel, AutoPromotionPropertyType::class.java).option()
-        if (oProperty.isPresent) {
-            val property = oProperty.get()
+        val property = propertyService.getPropertyValue(promotionLevel, AutoPromotionPropertyType::class.java)
+        if (property != null) {
             val keptValidationStamps = property.validationStamps
                 .filter { validationStamp: ValidationStamp -> (validationStampId != validationStamp.id()) }
             if (keptValidationStamps.size < property.validationStamps.size) {
@@ -87,9 +86,8 @@ class AutoPromotionEventListener(
     }
 
     private fun cleanPromotionLevelFromPromotionLevel(promotionLevel: PromotionLevel, promotionLevelId: Int) {
-        val oProperty = propertyService.getProperty(promotionLevel, AutoPromotionPropertyType::class.java).option()
-        if (oProperty.isPresent) {
-            val property = oProperty.get()
+        val property = propertyService.getPropertyValue(promotionLevel, AutoPromotionPropertyType::class.java)
+        if (property != null) {
             val keptPromotionLevels =
                 property.promotionLevels.filter { pl: PromotionLevel -> (promotionLevelId != pl.id()) }
             if (keptPromotionLevels.size < property.promotionLevels.size) {

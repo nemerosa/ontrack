@@ -713,7 +713,7 @@ class StructureServiceImpl(
                 val properties = propertyService.getProperties(branch.project)
                 for (property in properties) {
                     val type = property.type
-                    if (type is PromotionLevelPropertyType<*> && !property.isEmpty) {
+                    if (type is PromotionLevelPropertyType<*> && property.value != null) {
                         oPromotionLevel = getPromotionLevelFromProperty(
                             property,
                             branch,
@@ -1008,7 +1008,7 @@ class StructureServiceImpl(
             val properties = propertyService.getProperties(branch.project)
             for (property in properties) {
                 val type = property.type
-                if (type is ValidationStampPropertyType<*> && !property.isEmpty) {
+                if (type is ValidationStampPropertyType<*> && property.value != null) {
                     oValidationStamp = getValidationStampFromProperty(
                         property,
                         branch,

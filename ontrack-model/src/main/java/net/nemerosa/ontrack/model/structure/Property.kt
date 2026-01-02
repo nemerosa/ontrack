@@ -1,87 +1,36 @@
-package net.nemerosa.ontrack.model.structure;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+package net.nemerosa.ontrack.model.structure
 
 /**
  * Property value, associated with its type.
+ * 
+ * @param type     Type for this property
+ * @param value    Value for this property
+ * @param editable Editable status
  */
-@Data
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Property<T> {
-
-    /**
-     * Type for this property
-     */
-    @JsonIgnore
-    private final PropertyType<T> type;
-
-    /**
-     * Value for this property
-     */
-    private final T value;
-
-    /**
-     * Editable status
-     */
-    private final boolean editable;
-
-    /**
-     * Additional decorations
-     */
-    private final Map<String,?> decorations;
+data class Property<T>(
+    val type: PropertyType<T>,
+    val value: T?,
+    val editable: Boolean = false,
+) {
 
     /**
      * Descriptor for the property type
      */
-    public PropertyTypeDescriptor getTypeDescriptor() {
-        return PropertyTypeDescriptor.of(type);
-    }
-
-    /**
-     * Empty indicator
-     */
-    public boolean isEmpty() {
-        return value == null;
-    }
-
-    /**
-     * List of additional decorations for the property
-     */
-    public Map<String, ?> getDecorations() {
-        return decorations;
-    }
-
-    /**
-     * As an option
-     */
-    public Optional<T> option() {
-        return Optional.ofNullable(value);
-    }
+    val typeDescriptor: PropertyTypeDescriptor = PropertyTypeDescriptor.of(type)
 
     /**
      * Editable property
      */
-    public Property<T> editable(boolean editable) {
-        return new Property<>(type, value, editable, decorations);
-    }
+    fun editable(editable: Boolean): Property<T> = copy(editable = editable)
 
-    public static <T> Property<T> empty(PropertyType<T> type) {
-        return new Property<>(type, null, false, Collections.emptyMap());
-    }
+    companion object {
 
-    public static <T> Property<T> of(PropertyType<T> type, T value) {
-        return new Property<>(type, value, false, Collections.emptyMap());
-    }
+        fun <T> empty(type: PropertyType<T>): Property<T> {
+            return Property(type, null, false)
+        }
 
-    public static <T> Property<T> of(PropertyType<T> type, T value, Map<String,?> decorations) {
-        return new Property<>(type, value, false, decorations);
+        fun <T> of(type: PropertyType<T>, value: T?): Property<T> {
+            return Property(type, value, false)
+        }
     }
-
 }

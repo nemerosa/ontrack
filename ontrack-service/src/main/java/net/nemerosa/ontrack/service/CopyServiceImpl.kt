@@ -263,7 +263,7 @@ class CopyServiceImpl(
         targetEntity: ProjectEntity,
         replacementFn: (String) -> String,
     ) {
-        if (!property.isEmpty && property.getType().canEdit(targetEntity, securityService)) {
+        if (property.value != null && property.type.canEdit(targetEntity, securityService)) {
             // Copy of the property
             propertyService.copyProperty(
                 sourceEntity,

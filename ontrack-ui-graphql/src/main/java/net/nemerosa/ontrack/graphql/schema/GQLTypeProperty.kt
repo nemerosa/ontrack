@@ -45,7 +45,7 @@ class GQLTypeProperty(
                                 .type(Scalars.GraphQLBoolean)
                                 .dataFetcher { env ->
                                     val property: Property<*> = env.getSource()!!
-                                    property.isEditable
+                                    property.editable
                                 }
                                 .build()
                 ) // OK

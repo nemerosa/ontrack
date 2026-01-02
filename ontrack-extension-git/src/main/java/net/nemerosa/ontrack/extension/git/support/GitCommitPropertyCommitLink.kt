@@ -34,10 +34,9 @@ class GitCommitPropertyCommitLink(
     }
 
     override fun getCommitFromBuild(build: Build, data: NoConfig): String {
-        return propertyService.getProperty(build, GitCommitPropertyType::class.java)
-            .option()
-            .map { it.commit }
-            .orElseThrow { NoGitCommitPropertyException(build.entityDisplayName) }
+        return propertyService.getPropertyValue(build, GitCommitPropertyType::class.java)
+            ?.commit
+            ?: throw NoGitCommitPropertyException(build.entityDisplayName)
     }
 
     override fun parseData(node: JsonNode?): NoConfig {

@@ -39,9 +39,10 @@ class GQLInputPropertyFilter(
         val type = propertyService.getPropertyTypeByName<T>(filter.type!!)
         val property = propertyService.getProperty<T>(e, filter.type!!)
         val filterValue = filter.value
-        return !property.isEmpty &&
+        val value = property.value
+        return value != null &&
                 (filterValue.isNullOrBlank() ||
-                        type.containsValue(property.value, filterValue))
+                        type.containsValue(value, filterValue))
     }
 
     companion object {

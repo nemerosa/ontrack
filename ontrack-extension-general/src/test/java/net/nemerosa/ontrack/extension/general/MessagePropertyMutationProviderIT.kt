@@ -46,8 +46,8 @@ class MessagePropertyMutationProviderIT : AbstractQLKTITSupport() {
 
             val property = getProperty(this, MessagePropertyType::class.java)
             assertNotNull(property) {
-                assertEquals(MessageType.INFO, property.type)
-                assertEquals("My message", property.text)
+                assertEquals(MessageType.INFO, it.type)
+                assertEquals("My message", it.text)
             }
         }
 
@@ -95,8 +95,8 @@ class MessagePropertyMutationProviderIT : AbstractQLKTITSupport() {
 
             val property = getProperty(this, MessagePropertyType::class.java)
             assertNotNull(property) {
-                assertEquals(MessageType.INFO, property.type)
-                assertEquals("My message", property.text)
+                assertEquals(MessageType.INFO, it.type)
+                assertEquals("My message", it.text)
             }
         }
 

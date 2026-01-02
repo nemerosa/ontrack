@@ -53,7 +53,7 @@ class GQLTypeProjectEntityInformation(
                     val hasValue: Boolean = env.getArgument<Boolean?>("hasValue") ?: false
                     propertyService.getProperties(data.entity)
                         .filter { property ->
-                            !hasValue || !property.isEmpty
+                            !hasValue || property.value != null
                         }
                 }
         }

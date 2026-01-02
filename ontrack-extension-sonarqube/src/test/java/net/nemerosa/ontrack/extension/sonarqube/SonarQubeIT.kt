@@ -361,7 +361,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
                         build {
                             val result = sonarQubeMeasuresCollectionService.collect(
                                 this,
-                                getProperty(project, SonarQubePropertyType::class.java)
+                                getRequiredProperty(project, SonarQubePropertyType::class.java)
                             )
                             assertFalse(result.ok, "Nothing was collected")
                             assertEquals(

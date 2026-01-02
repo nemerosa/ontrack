@@ -62,7 +62,7 @@ class GQLProjectEntityPropertyListFieldContributor(
                         } ?: true
                     }
                     .filter { property: Property<*> ->
-                        !hasValue || !property.isEmpty
+                        !hasValue || property.value != null
                     }
                     .sortedBy { it.type.name }
             } else {

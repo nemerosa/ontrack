@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Branch.Companion.of
 import net.nemerosa.ontrack.model.structure.Build.Companion.of
 import net.nemerosa.ontrack.model.structure.ID.Companion.of
-import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project.Companion.of
 import net.nemerosa.ontrack.model.structure.PromotionRun.Companion.of
 import net.nemerosa.ontrack.model.structure.Signature.Companion.of
@@ -22,6 +21,7 @@ import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import java.util.concurrent.Callable
+import kotlin.test.fail
 
 
 abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
@@ -133,11 +133,18 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         )
     }
 
-    protected fun <T> getProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): T {
+    protected fun <T> getProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): T? {
         return propertyService.getProperty(
             projectEntity,
             propertyTypeClass
         ).value
+    }
+
+    protected fun <T> getRequiredProperty(
+        projectEntity: ProjectEntity,
+        propertyTypeClass: Class<out PropertyType<T>>
+    ): T {
+        return getProperty(projectEntity, propertyTypeClass) ?: fail("Property not found")
     }
 
     @JvmOverloads
@@ -191,11 +198,6 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         )
     }
 
-    fun doValidateBuild(build: Build, vsName: String, statusId: ValidationRunStatusID): ValidationRun {
-        val vs = doCreateValidationStamp(build.branch, nd(vsName, ""))
-        return doValidateBuild(build, vs, statusId)
-    }
-
     @JvmOverloads
     protected fun doCreatePromotionLevel(
         branch: Branch = doCreateBranch(),
@@ -245,14 +247,6 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
                 signature,
                 description
             )
-        )
-    }
-
-    protected fun <T> doSetProperty(entity: ProjectEntity, propertyType: Class<out PropertyType<T>>, data: T) {
-        propertyService.editProperty(
-            entity,
-            propertyType,
-            data
         )
     }
 

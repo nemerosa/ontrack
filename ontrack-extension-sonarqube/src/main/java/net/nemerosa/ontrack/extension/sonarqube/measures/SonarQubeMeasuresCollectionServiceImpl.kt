@@ -36,7 +36,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
 
     override fun collect(project: Project, logger: (String) -> Unit) {
         // Gets the SonarQube property of the project
-        val property = propertyService.getProperty(project, SonarQubePropertyType::class.java).value
+        val property = propertyService.getPropertyValue(project, SonarQubePropertyType::class.java)
         if (property != null) {
             // List of metrics to collect
             // Configurable list of metrics
@@ -71,7 +71,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
 
     override fun getLastMeasures(branch: Branch): SonarQubeMeasures? {
         // Gets the SonarQube property of the project
-        val property = propertyService.getProperty(branch.project, SonarQubePropertyType::class.java).value
+        val property = propertyService.getPropertyValue(branch.project, SonarQubePropertyType::class.java)
         if (property != null) {
             // Gets the validation stamp for this branch
             val vs = structureService.getValidationStampListForBranch(branch.id)

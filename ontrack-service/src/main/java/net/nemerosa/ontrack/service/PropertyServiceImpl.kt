@@ -154,7 +154,7 @@ class PropertyServiceImpl(
 
     protected fun <T> getProperty(type: PropertyType<T>, entity: ProjectEntity): Property<T> {
         val value = getPropertyValue(type, entity)
-        return if (value != null) Property.of(type, value, type.getPropertyDecorations(value)) else Property.empty(type)
+        return if (value != null) Property.of(type, value) else Property.empty(type)
     }
 
     protected fun <T> getPropertyValue(type: PropertyType<T>, entity: ProjectEntity): T? {
@@ -258,10 +258,12 @@ class PropertyServiceImpl(
     }
 
     override fun <T> copyProperty(sourceEntity: ProjectEntity, property: Property<T>, targetEntity: ProjectEntity, replacementFn: (String) -> String) {
-        // Property copy
-        val data = property.type.copy(sourceEntity, property.value, targetEntity, replacementFn)
-        // Direct edition
-        editProperty(targetEntity, property.type, data)
+        property.value?.let {
+            // Property copy
+            val data = property.type.copy(sourceEntity, it, targetEntity, replacementFn)
+            // Direct edition
+            editProperty(targetEntity, property.type, data)
+        }
     }
 
 }
