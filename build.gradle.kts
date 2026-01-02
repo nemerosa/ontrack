@@ -1,8 +1,8 @@
 import com.avast.gradle.dockercompose.ComposeExtension
 
 plugins {
-    kotlin("jvm") version "2.1.20"
-    kotlin("plugin.spring") version "2.1.20"
+    kotlin("jvm") version "2.2.20"
+    kotlin("plugin.spring") version "2.2.20"
     id("org.springframework.boot") version "3.5.7" apply false
     id("io.spring.dependency-management") version "1.1.7"
     id("com.avast.gradle.docker-compose") version "0.17.12"
@@ -75,10 +75,10 @@ subprojects {
         }
     }
 
+    // Kotlin
+    extra["kotlin.version"] = "2.2.20"
     // Kotlin Coroutines
-    // - 1.8.1 for Spring Boot 3.4.4
-    // - 1.9.0 for Apollo (:ontrack-kdsl)
-    extra["kotlin-coroutines.version"] = "1.9.0"
+    extra["kotlin-coroutines.version"] = "1.10.2"
 
 }
 
@@ -127,8 +127,10 @@ configure(javaProjects) {
     }
 
     kotlin {
+        jvmToolchain(17)
         compilerOptions {
             freeCompilerArgs.addAll("-Xjsr305=strict")
+            languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
         }
     }
 
