@@ -1,38 +1,28 @@
-package net.nemerosa.ontrack.model.structure;
+package net.nemerosa.ontrack.model.structure
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-@ToString
-public class SyncResult {
+class SyncResult {
+    var unknownTargetIgnored: Int = 0
+    var unknownTargetDeleted: Int = 0
+    var created: Int = 0
+    var presentTargetIgnored: Int = 0
+    var presentTargetReplaced: Int = 0
 
-    @Getter
-    @Setter
-    private int unknownTargetIgnored = 0;
-    @Getter
-    @Setter
-    private int unknownTargetDeleted = 0;
-    @Getter
-    private int created = 0;
-    @Getter
-    private int presentTargetIgnored = 0;
-    @Getter
-    private int presentTargetReplaced = 0;
-
-    public static SyncResult empty() {
-        return new SyncResult();
+    companion object {
+        @JvmStatic
+        fun empty() = SyncResult()
     }
 
-    public void create() {
-        created++;
+    fun create() {
+        created++
     }
 
-    public void ignorePresentTarget() {
-        presentTargetIgnored++;
+    fun ignorePresentTarget() {
+        presentTargetIgnored++
     }
 
-    public void replacePresentTarget() {
-        presentTargetReplaced++;
+    fun replacePresentTarget() {
+        presentTargetReplaced++
     }
+
 }

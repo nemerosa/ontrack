@@ -186,11 +186,6 @@ configure(javaProjects) {
         // See https://github.com/junit-team/junit5/issues/4374
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-        // Lombok
-        compileOnly("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
-        annotationProcessor("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
-        testCompileOnly("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
-        testAnnotationProcessor("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
     }
 
 }

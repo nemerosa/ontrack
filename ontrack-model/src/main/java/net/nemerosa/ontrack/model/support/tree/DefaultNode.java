@@ -1,14 +1,12 @@
 package net.nemerosa.ontrack.model.support.tree;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-@ToString
 public class DefaultNode<D> implements Node<D> {
 
     private final NodeFactory<D> factory;
