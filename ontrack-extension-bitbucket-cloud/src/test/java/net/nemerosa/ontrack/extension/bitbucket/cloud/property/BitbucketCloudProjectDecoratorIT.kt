@@ -22,7 +22,7 @@ class BitbucketCloudProjectDecoratorIT : AbstractBitbucketCloudTestSupport() {
     fun `Project scope`() {
         assertEquals(
             EnumSet.of(ProjectEntityType.PROJECT),
-            decorator.scope
+            decorator.getScope()
         )
     }
 

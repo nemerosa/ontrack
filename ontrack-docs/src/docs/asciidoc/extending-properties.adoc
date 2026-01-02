@@ -13,16 +13,13 @@ render it on the screen.
 First, a property must be associated with some data. Just create an invariant
 POJO like, for example:
 
-[source,java]
+[source,kotlin]
 ----
-package net.nemerosa.ontrack.extension.myextension;
+package net.nemerosa.ontrack.extension.myextension
 
-import lombok.Data;
-
-@Data
-public class MyProperty {
-    private final String value;
-}
+data class MyProperty(
+    val value: String,
+)
 ----
 
 TIP: Note that Ontrack extensions can take benefit of using

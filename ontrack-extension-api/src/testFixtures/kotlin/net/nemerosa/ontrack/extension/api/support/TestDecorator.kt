@@ -16,9 +16,9 @@ import java.util.*
 class TestDecorator(
     extensionFeature: TestExtensionFeature,
     private val propertyService: PropertyService
-) : AbstractExtension(extensionFeature), DecorationExtension<TestDecorationData?> {
+) : AbstractExtension(extensionFeature), DecorationExtension<TestDecorationData> {
 
-    override fun getDecorations(entity: ProjectEntity): List<Decoration<TestDecorationData?>>? {
+    override fun getDecorations(entity: ProjectEntity): List<Decoration<TestDecorationData>> {
         return propertyService.getProperty(entity, TestDecoratorPropertyType::class.java)
             .value
             ?.let { data ->

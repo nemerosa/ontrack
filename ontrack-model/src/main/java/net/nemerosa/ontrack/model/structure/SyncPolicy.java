@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.model.structure;
 
-import lombok.Data;
 import net.nemerosa.ontrack.model.exceptions.SyncTargetItemPresentException;
 import net.nemerosa.ontrack.model.exceptions.SyncTargetItemUnknownException;
 
@@ -15,7 +14,6 @@ import java.util.stream.Collectors;
  *
  * @deprecated Will be removed in V6. Use syncForward instead
  */
-@Data
 @Deprecated
 public class SyncPolicy {
 
@@ -40,6 +38,11 @@ public class SyncPolicy {
      * </ul>
      */
     private final UnknownTargetPolicy unknownTargetPolicy;
+
+    public SyncPolicy(TargetPresentPolicy targetPresentPolicy, UnknownTargetPolicy unknownTargetPolicy) {
+        this.targetPresentPolicy = targetPresentPolicy;
+        this.unknownTargetPolicy = unknownTargetPolicy;
+    }
 
     /**
      * This Sync policy is conservative, making sure existing items in the target are kept as they were.

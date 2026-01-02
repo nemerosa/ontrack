@@ -719,10 +719,10 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
                         // Build link to the run as a decoration
                         val decorations = buildGitHubWorkflowRunDecorator.getDecorations(build)
                         assertEquals(1, decorations.size)
-                        val decoration = decorations.first().data.workflows.first()
-                        assertEquals(htmlUrl, decoration.url)
-                        assertEquals("CI", decoration.name)
-                        assertEquals(1, decoration.runNumber)
+                        val decoration = decorations.first().data?.workflows?.first()
+                        assertEquals(htmlUrl, decoration?.url)
+                        assertEquals("CI", decoration?.name)
+                        assertEquals(1, decoration?.runNumber)
                         // Build commit property
                         assertNotNull(
                             getProperty(build, GitCommitPropertyType::class.java),

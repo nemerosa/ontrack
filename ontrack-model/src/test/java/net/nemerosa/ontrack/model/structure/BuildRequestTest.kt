@@ -13,9 +13,8 @@ class BuildRequestTest {
         assertEquals(
             emptyList<PropertyCreationRequest>(),
             BuildRequest(
-                "12",
-                "Build 12",
-                null
+                name = "12",
+                description = "Build 12",
             ).properties
         )
     }

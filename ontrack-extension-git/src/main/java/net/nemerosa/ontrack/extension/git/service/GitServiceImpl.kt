@@ -470,7 +470,7 @@ class GitServiceImpl(
         for (tag in tags) {
             val tagName = tag.name
             // Filters the tags according to the branch tag pattern
-            link.getBuildNameFromTagName(tagName, linkData).ifPresent { buildNameCandidate ->
+            link.getBuildNameFromTagName(tagName, linkData)?.let { buildNameCandidate ->
                 val buildName = NameDescription.escapeName(buildNameCandidate)
                 listener.message(format("Build %s from tag %s", buildName, tagName))
                 // Existing build?
@@ -631,6 +631,7 @@ class GitServiceImpl(
         }
     }
 
+    @Deprecated("Will be removed in V6. Use the SCMBuildCommitIndexService instead.")
     override fun collectIndexableGitCommitForBuild(build: Build) {
         val project = build.project
         val projectConfiguration = getProjectConfiguration(project)
@@ -662,7 +663,7 @@ class GitServiceImpl(
         buildCommitLink: ConfiguredBuildGitCommitLink<*>,
         overrides: Boolean,
         listener: JobRunListener
-    ): Boolean? = transactionTemplate.execute {
+    ): Boolean = transactionTemplate.execute {
         val commit =
             try {
                 buildCommitLink.getCommitFromBuild(build)

@@ -34,8 +34,8 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         assertNotNull(record.signature)
         assertEquals(name, record.name)
         assertNull(record.groupName)
-        assertEquals(branch.projectEntityType, record.entity.projectEntityType)
-        assertEquals(branch.id, record.entity.id)
+        assertEquals(branch.projectEntityType, record.entity?.projectEntityType)
+        assertEquals(branch.id, record.entity?.id)
         assertEquals(
             IntNode(15),
             record.data
@@ -238,8 +238,8 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         assertNotNull(record.signature)
         assertEquals(name, record.name)
         assertNull(record.groupName)
-        assertEquals(branch.projectEntityType, record.entity.projectEntityType)
-        assertEquals(branch.id, record.entity.id)
+        assertEquals(branch.projectEntityType, record.entity?.projectEntityType)
+        assertEquals(branch.id, record.entity?.id)
         assertEquals(
             IntNode(15),
             record.data

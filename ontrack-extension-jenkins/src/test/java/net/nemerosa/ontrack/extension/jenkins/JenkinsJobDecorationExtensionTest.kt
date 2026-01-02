@@ -71,11 +71,11 @@ class JenkinsJobDecorationExtensionTest {
     @Test
     fun `Decoration for a branch`() {
         every {
-            propertyService.getProperty<JenkinsJobProperty>(
+            propertyService.getPropertyValue(
                 branch,
-                JenkinsJobPropertyType::class.java.name
+                JenkinsJobPropertyType::class.java
             )
-        } returns jenkinsJobProperty
+        } returns jenkinsJobProperty.value
         val decorations = extension.getDecorations(branch)
         assertNotNull(decorations) { list ->
             assertEquals(1, list.size)

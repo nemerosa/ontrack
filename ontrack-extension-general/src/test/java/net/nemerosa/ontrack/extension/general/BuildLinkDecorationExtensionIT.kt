@@ -19,7 +19,7 @@ class BuildLinkDecorationExtensionIT : AbstractGeneralExtensionTestSupport() {
                     assertEquals(1, decorations.size)
                     val decoration = decorations[0]
                     val list = decoration.data
-                    assertEquals(0, list.linksCount)
+                    assertEquals(0, list?.linksCount)
                 }
             }
         }
@@ -46,7 +46,7 @@ class BuildLinkDecorationExtensionIT : AbstractGeneralExtensionTestSupport() {
                     assertEquals(1, decorations.size)
                     val decoration = decorations[0]
                     val list = decoration.data
-                    assertEquals(2, list.linksCount)
+                    assertEquals(2, list?.linksCount)
                 }
             }
         }

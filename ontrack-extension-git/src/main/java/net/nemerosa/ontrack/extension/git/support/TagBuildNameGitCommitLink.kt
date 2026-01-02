@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class TagBuildNameGitCommitLink(
@@ -53,8 +52,8 @@ class TagBuildNameGitCommitLink(
             ?.id()
     }
 
-    override fun getBuildNameFromTagName(tagName: String, data: NoConfig): Optional<String> {
-        return Optional.of(tagName)
+    override fun getBuildNameFromTagName(tagName: String, data: NoConfig): String? {
+        return tagName
     }
 
     override fun isBuildNameValid(name: String, data: NoConfig): Boolean {

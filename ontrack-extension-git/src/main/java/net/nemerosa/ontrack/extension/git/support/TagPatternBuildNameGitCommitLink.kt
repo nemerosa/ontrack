@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class TagPatternBuildNameGitCommitLink(
@@ -29,7 +28,7 @@ class TagPatternBuildNameGitCommitLink(
 
     override fun getCommitFromBuild(build: Build, data: TagPattern): String {
         return data.getTagNameFromBuildName(build.name)
-                .orElseThrow { BuildTagPatternExcepton(data.pattern, build.name) }
+            ?: throw BuildTagPatternExcepton(data.pattern, build.name)
     }
 
     override fun parseData(node: JsonNode?): TagPattern {
@@ -65,7 +64,7 @@ class TagPatternBuildNameGitCommitLink(
                 ?.id()
     }
 
-    override fun getBuildNameFromTagName(tagName: String, data: TagPattern): Optional<String> {
+    override fun getBuildNameFromTagName(tagName: String, data: TagPattern): String? {
         return data.getBuildNameFromTagName(tagName)
     }
 

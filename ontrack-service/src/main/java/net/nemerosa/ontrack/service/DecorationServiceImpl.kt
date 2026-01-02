@@ -23,13 +23,14 @@ class DecorationServiceImpl(
 
     override fun getDecorations(entity: ProjectEntity): List<Decoration<*>> {
         // Downloading a decoration with the current security context
-        val securedDecoratorFunction = securityService.runner { decorator: Decorator<*> -> getDecorations(entity, decorator) }
+        val securedDecoratorFunction =
+            securityService.runner { decorator: Decorator<*> -> getDecorations(entity, decorator) }
         // OK
         return extensionManager.getExtensions(DecorationExtension::class.java)
-                // ... and filters per entity
-                .filter { decorator: DecorationExtension<*> -> decorator.scope.contains(entity.projectEntityType) }
-                // ... and gets the decoration
-                .flatMap(securedDecoratorFunction)
+            // ... and filters per entity
+            .filter { decorator: DecorationExtension<*> -> decorator.getScope().contains(entity.projectEntityType) }
+            // ... and gets the decoration
+            .flatMap(securedDecoratorFunction)
     }
 
     /**
@@ -44,7 +45,7 @@ class DecorationServiceImpl(
                 ex
             )
             listOf(
-                    Decoration.error(decorator, getErrorMessage(ex))
+                Decoration.error(decorator, getErrorMessage(ex))
             )
         }
     }
@@ -52,8 +53,8 @@ class DecorationServiceImpl(
     /**
      * Decoration error message
      */
-    protected fun getErrorMessage(ex: Exception): String? = if (ex is BaseException) {
-        ex.message
+    private fun getErrorMessage(ex: Exception): String = if (ex is BaseException) {
+        ex.message ?: "Problem while getting decoration"
     } else {
         "Problem while getting decoration"
     }

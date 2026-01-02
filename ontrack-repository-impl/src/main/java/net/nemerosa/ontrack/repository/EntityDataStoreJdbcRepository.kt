@@ -12,8 +12,6 @@ import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.time.LocalDateTime
-import java.util.*
-import java.util.stream.Collectors
 import javax.sql.DataSource
 
 @Repository
@@ -29,10 +27,11 @@ class EntityDataStoreJdbcRepository(
         groupName: String?,
         data: JsonNode,
     ): EntityDataStoreRecord {
-        val id = dbCreate(String.format(
-            "INSERT INTO ENTITY_DATA_STORE(%s, CATEGORY, NAME, GROUPID, JSON, CREATION, CREATOR) VALUES (:entityId, :category, :name, :groupId, CAST(:json AS JSONB), :creation, :creator)",
-            entity.projectEntityType.name
-        ),
+        val id = dbCreate(
+            String.format(
+                "INSERT INTO ENTITY_DATA_STORE(%s, CATEGORY, NAME, GROUPID, JSON, CREATION, CREATOR) VALUES (:entityId, :category, :name, :groupId, CAST(:json AS JSONB), :creation, :creator)",
+                entity.projectEntityType.name
+            ),
             params("entityId", entity.id())
                 .addValue("category", category)
                 .addValue("name", name)
@@ -63,15 +62,16 @@ class EntityDataStoreJdbcRepository(
         groupName: String?,
         data: JsonNode,
     ): EntityDataStoreRecord { // Gets the last ID by category and name
-        val id = getFirstItem(String.format(
-            "SELECT ID FROM ENTITY_DATA_STORE " +
-                    "WHERE %s = :entityId " +
-                    "AND CATEGORY = :category " +
-                    "AND NAME = :name " +
-                    "ORDER BY ID DESC " +
-                    "LIMIT 1",
-            entity.projectEntityType.name
-        ),
+        val id = getFirstItem(
+            String.format(
+                "SELECT ID FROM ENTITY_DATA_STORE " +
+                        "WHERE %s = :entityId " +
+                        "AND CATEGORY = :category " +
+                        "AND NAME = :name " +
+                        "ORDER BY ID DESC " +
+                        "LIMIT 1",
+                entity.projectEntityType.name
+            ),
             params("entityId", entity.id())
                 .addValue("category", category)
                 .addValue("name", name),
@@ -122,13 +122,14 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun deleteByName(entity: ProjectEntity, category: String, name: String) {
-        namedParameterJdbcTemplate!!.update(String.format(
-            "DELETE FROM ENTITY_DATA_STORE " +
-                    "WHERE %s = :entityId " +
-                    "AND CATEGORY = :category " +
-                    "AND NAME = :name",
-            entity.projectEntityType.name
-        ),
+        namedParameterJdbcTemplate!!.update(
+            String.format(
+                "DELETE FROM ENTITY_DATA_STORE " +
+                        "WHERE %s = :entityId " +
+                        "AND CATEGORY = :category " +
+                        "AND NAME = :name",
+                entity.projectEntityType.name
+            ),
             params("entityId", entity.id())
                 .addValue("category", category)
                 .addValue("name", name)
@@ -136,13 +137,14 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun deleteByGroup(entity: ProjectEntity, category: String, groupName: String) {
-        namedParameterJdbcTemplate!!.update(String.format(
-            "DELETE FROM ENTITY_DATA_STORE " +
-                    "WHERE %s = :entityId " +
-                    "AND CATEGORY = :category " +
-                    "AND GROUPID = :groupId",
-            entity.projectEntityType.name
-        ),
+        namedParameterJdbcTemplate!!.update(
+            String.format(
+                "DELETE FROM ENTITY_DATA_STORE " +
+                        "WHERE %s = :entityId " +
+                        "AND CATEGORY = :category " +
+                        "AND GROUPID = :groupId",
+                entity.projectEntityType.name
+            ),
             params("entityId", entity.id())
                 .addValue("category", category)
                 .addValue("groupId", groupName)
@@ -194,14 +196,15 @@ class EntityDataStoreJdbcRepository(
         name: String,
     ): EntityDataStoreRecord? {
         return getLastByName(
-            namedParameterJdbcTemplate!!.query(String.format(
-                "SELECT * FROM ENTITY_DATA_STORE " +
-                        "WHERE %s = :entityId " +
-                        "AND CATEGORY = :category " +
-                        "AND GROUPID = :groupId " +
-                        "AND NAME = :name",
-                entity.projectEntityType.name
-            ),
+            namedParameterJdbcTemplate!!.query(
+                String.format(
+                    "SELECT * FROM ENTITY_DATA_STORE " +
+                            "WHERE %s = :entityId " +
+                            "AND CATEGORY = :category " +
+                            "AND GROUPID = :groupId " +
+                            "AND NAME = :name",
+                    entity.projectEntityType.name
+                ),
                 params("entityId", entity.id())
                     .addValue("category", category)
                     .addValue("groupId", groupName)
@@ -212,13 +215,14 @@ class EntityDataStoreJdbcRepository(
 
     override fun findLastRecordsByNameInCategory(entity: ProjectEntity, category: String): List<EntityDataStoreRecord> {
         return getLastByName(
-            namedParameterJdbcTemplate!!.query(String.format(
-                "SELECT * FROM ENTITY_DATA_STORE " +
-                        "WHERE %s = :entityId " +
-                        "AND CATEGORY = :category " +
-                        "ORDER BY CREATION DESC, ID DESC",
-                entity.projectEntityType.name
-            ),
+            namedParameterJdbcTemplate!!.query(
+                String.format(
+                    "SELECT * FROM ENTITY_DATA_STORE " +
+                            "WHERE %s = :entityId " +
+                            "AND CATEGORY = :category " +
+                            "ORDER BY CREATION DESC, ID DESC",
+                    entity.projectEntityType.name
+                ),
                 params("entityId", entity.id())
                     .addValue("category", category)
             ) { rs: ResultSet, _: Int -> toEntityDataStoreRecord(entity, rs) }
@@ -226,18 +230,13 @@ class EntityDataStoreJdbcRepository(
     }
 
     private fun getLastByName(entries: List<EntityDataStoreRecord>): List<EntityDataStoreRecord> {
-        return entries.stream()
-            .collect(Collectors.groupingBy { obj: EntityDataStoreRecord -> obj.name }) // Gets each list separately
-            .values.stream() // Sorts each list from the newest to the oldest
-            .map { list: List<EntityDataStoreRecord?> ->
-                list.stream()
-                    .sorted(Comparator.naturalOrder())
-                    .findFirst()
-            } // Gets only the non empty lists
-            .filter { obj: Optional<EntityDataStoreRecord?> -> obj.isPresent }
-            .map { obj: Optional<EntityDataStoreRecord?> -> obj.get() }
-            .sorted(Comparator.naturalOrder())
-            .collect(Collectors.toList())
+        return entries
+            .groupBy { it.name }
+            .values
+            .mapNotNull { list ->
+                list.minOrNull()
+            }
+            .sorted()
     }
 
     @Throws(SQLException::class)
@@ -290,12 +289,13 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun getById(entity: ProjectEntity, id: Int): EntityDataStoreRecord? {
-        return getFirstItem(String.format(
-            "SELECT * FROM ENTITY_DATA_STORE " +
-                    "WHERE %s = :entityId " +
-                    "AND ID = :id",
-            entity.projectEntityType.name
-        ),
+        return getFirstItem(
+            String.format(
+                "SELECT * FROM ENTITY_DATA_STORE " +
+                        "WHERE %s = :entityId " +
+                        "AND ID = :id",
+                entity.projectEntityType.name
+            ),
             params("id", id).addValue("entityId", entity.id())
         ) { rs: ResultSet, _: Int -> toEntityDataStoreRecord(entity, rs) }
     }
@@ -307,15 +307,16 @@ class EntityDataStoreJdbcRepository(
         offset: Int,
         page: Int,
     ): List<EntityDataStoreRecord> {
-        return namedParameterJdbcTemplate!!.query(String.format(
-            "SELECT * FROM ENTITY_DATA_STORE " +
-                    "WHERE %s = :entityId " +
-                    "AND CATEGORY = :category " +
-                    "AND NAME = :name " +
-                    "ORDER BY CREATION DESC, ID DESC " +
-                    "LIMIT :page OFFSET :offset",
-            entity.projectEntityType.name
-        ),
+        return namedParameterJdbcTemplate!!.query(
+            String.format(
+                "SELECT * FROM ENTITY_DATA_STORE " +
+                        "WHERE %s = :entityId " +
+                        "AND CATEGORY = :category " +
+                        "AND NAME = :name " +
+                        "ORDER BY CREATION DESC, ID DESC " +
+                        "LIMIT :page OFFSET :offset",
+                entity.projectEntityType.name
+            ),
             params("entityId", entity.id())
                 .addValue("category", category)
                 .addValue("name", name)
@@ -330,14 +331,15 @@ class EntityDataStoreJdbcRepository(
         offset: Int,
         page: Int,
     ): List<EntityDataStoreRecord> {
-        return namedParameterJdbcTemplate!!.query(String.format(
-            "SELECT * FROM ENTITY_DATA_STORE " +
-                    "WHERE %s = :entityId " +
-                    "AND CATEGORY = :category " +
-                    "ORDER BY CREATION DESC, ID DESC " +
-                    "LIMIT :page OFFSET :offset",
-            entity.projectEntityType.name
-        ),
+        return namedParameterJdbcTemplate!!.query(
+            String.format(
+                "SELECT * FROM ENTITY_DATA_STORE " +
+                        "WHERE %s = :entityId " +
+                        "AND CATEGORY = :category " +
+                        "ORDER BY CREATION DESC, ID DESC " +
+                        "LIMIT :page OFFSET :offset",
+                entity.projectEntityType.name
+            ),
             params("entityId", entity.id())
                 .addValue("category", category)
                 .addValue("offset", offset)
@@ -346,13 +348,14 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun getCountByCategoryAndName(entity: ProjectEntity, category: String, name: String): Int {
-        return namedParameterJdbcTemplate!!.queryForObject(String.format(
-            "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
-                    "WHERE %s = :entityId " +
-                    "AND CATEGORY = :category " +
-                    "AND NAME = :name ",
-            entity.projectEntityType.name
-        ),
+        return namedParameterJdbcTemplate!!.queryForObject(
+            String.format(
+                "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
+                        "WHERE %s = :entityId " +
+                        "AND CATEGORY = :category " +
+                        "AND NAME = :name ",
+                entity.projectEntityType.name
+            ),
             params("entityId", entity.id())
                 .addValue("category", category)
                 .addValue("name", name),
@@ -361,12 +364,13 @@ class EntityDataStoreJdbcRepository(
     }
 
     override fun getCountByCategory(entity: ProjectEntity, category: String): Int {
-        return namedParameterJdbcTemplate!!.queryForObject(String.format(
-            "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
-                    "WHERE %s = :entityId " +
-                    "AND CATEGORY = :category ",
-            entity.projectEntityType.name
-        ),
+        return namedParameterJdbcTemplate!!.queryForObject(
+            String.format(
+                "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
+                        "WHERE %s = :entityId " +
+                        "AND CATEGORY = :category ",
+                entity.projectEntityType.name
+            ),
             params("entityId", entity.id())
                 .addValue("category", category),
             Int::class.java
@@ -440,14 +444,15 @@ class EntityDataStoreJdbcRepository(
         val params = MapSqlParameterSource()
         buildCriteria(entityDataStoreFilter, context, critera, params)
         // Runs the query
-        return namedParameterJdbcTemplate!!.queryForObject(String.format(
-            "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
-                    "$context " +
-                    "WHERE 1 = 1 " +
-                    " %s " +
-                    "LIMIT :page OFFSET :offset",
-            critera
-        ),
+        return namedParameterJdbcTemplate!!.queryForObject(
+            String.format(
+                "SELECT COUNT(*) FROM ENTITY_DATA_STORE " +
+                        "$context " +
+                        "WHERE 1 = 1 " +
+                        " %s " +
+                        "LIMIT :page OFFSET :offset",
+                critera
+            ),
             params
                 .addValue("offset", entityDataStoreFilter.offset)
                 .addValue("page", entityDataStoreFilter.count),
@@ -473,7 +478,8 @@ class EntityDataStoreJdbcRepository(
         val params = MapSqlParameterSource()
         buildCriteria(entityDataStoreFilter, context, critera, params)
         // Runs the query
-        return namedParameterJdbcTemplate!!.update("""
+        return namedParameterJdbcTemplate!!.update(
+            """
                 DELETE FROM ENTITY_DATA_STORE
                 WHERE ctid IN (
                     SELECT ctid
