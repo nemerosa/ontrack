@@ -12,7 +12,7 @@ dependencies {
     implementation("org.apache.commons:commons-math3")
     implementation(project(":ontrack-repository-support"))
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))
     testImplementation(testFixtures(project(":ontrack-extension-casc")))
     testImplementation("com.networknt:json-schema-validator")

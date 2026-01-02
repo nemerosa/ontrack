@@ -12,8 +12,4 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.commons:commons-text")
 
-    testApi(project(":ontrack-it-utils"))
-
-    testImplementation(testFixtures(project(":ontrack-model")))
-
 }

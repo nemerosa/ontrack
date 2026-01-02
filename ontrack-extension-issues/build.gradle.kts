@@ -12,7 +12,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
 
     testImplementation(project(":ontrack-test-utils"))
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
 
     testRuntimeOnly(project(":ontrack-service"))

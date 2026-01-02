@@ -37,7 +37,7 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-config")))
     testImplementation(testFixtures(project(":ontrack-extension-queue")))
     testImplementation("com.networknt:json-schema-validator")
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

@@ -9,7 +9,7 @@ dependencies {
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-casc"))
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(testFixtures(project(":ontrack-model")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
 

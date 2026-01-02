@@ -1,32 +1,34 @@
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
 
 dependencies {
-    api("org.springframework:spring-test")
-    api(project(":ontrack-common"))
-    api(project(":ontrack-model"))
-    api(project(":ontrack-test-utils"))
-    api("org.springframework:spring-jdbc")
-    api("org.springframework.security:spring-security-core")
-    api("org.springframework.security:spring-security-oauth2-jose")
-    api("org.jetbrains.kotlin:kotlin-test")
+    testFixturesApi("org.springframework:spring-test")
+    testFixturesApi(project(":ontrack-common"))
+    testFixturesApi(project(":ontrack-model"))
+    testFixturesApi(project(":ontrack-test-utils"))
+    testFixturesApi("org.springframework:spring-jdbc")
+    testFixturesApi("org.springframework.security:spring-security-core")
+    testFixturesApi("org.springframework.security:spring-security-oauth2-jose")
+    testFixturesApi("org.jetbrains.kotlin:kotlin-test")
 
-    implementation(project(":ontrack-repository"))
-    implementation(project(":ontrack-extension-support"))
-    implementation(project(":ontrack-ui-support"))
-    implementation("org.springframework:spring-context")
-    implementation("org.springframework.boot:spring-boot-starter-jdbc")
-    implementation("org.slf4j:slf4j-api")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-test")
-    implementation("io.micrometer:micrometer-core")
+    testFixturesImplementation(project(":ontrack-repository"))
+    testFixturesImplementation(project(":ontrack-extension-support"))
+    testFixturesImplementation(project(":ontrack-ui-support"))
+    testFixturesImplementation("org.springframework:spring-context")
+    testFixturesImplementation("org.springframework.boot:spring-boot-starter-jdbc")
+    testFixturesImplementation("org.slf4j:slf4j-api")
+    testFixturesImplementation("org.springframework.boot:spring-boot-starter-actuator")
+    testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
+    testFixturesImplementation("io.micrometer:micrometer-core")
+    testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
-    implementation("io.mockk:mockk")
-    implementation("io.mockk:mockk-jvm")
-    implementation("io.mockk:mockk-dsl")
-    implementation("io.mockk:mockk-dsl-jvm")
+    testFixturesImplementation("io.mockk:mockk")
+    testFixturesImplementation("io.mockk:mockk-jvm")
+    testFixturesImplementation("io.mockk:mockk-dsl")
+    testFixturesImplementation("io.mockk:mockk-dsl-jvm")
 
-    runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly("org.flywaydb:flyway-core")
+    testFixturesRuntimeOnly("org.postgresql:postgresql")
+    testFixturesRuntimeOnly("org.flywaydb:flyway-core")
 }

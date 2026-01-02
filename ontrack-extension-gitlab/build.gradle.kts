@@ -10,7 +10,7 @@ dependencies {
     implementation(project(":ontrack-ui-graphql"))
 
     testImplementation(project(":ontrack-test-utils"))
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testImplementation(testFixtures(project(":ontrack-extension-issues")))

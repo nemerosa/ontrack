@@ -13,7 +13,7 @@ dependencies {
     implementation(project(":ontrack-extension-casc"))
 
     testImplementation(project(":ontrack-test-utils"))
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("com.networknt:json-schema-validator")
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))

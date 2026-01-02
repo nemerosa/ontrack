@@ -9,7 +9,7 @@ dependencies {
     implementation("co.elastic.clients:elasticsearch-java")
     implementation("io.micrometer:micrometer-core")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(project(":ontrack-extension-general"))
     testImplementation("org.testcontainers:testcontainers")
     // testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))

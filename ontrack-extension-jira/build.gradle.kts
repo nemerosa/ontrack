@@ -11,7 +11,7 @@ dependencies {
     implementation("org.springframework:spring-tx")
     implementation("org.apache.commons:commons-lang3")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(project(":ontrack-extension-scm"))
     testImplementation(project(":ontrack-extension-recordings"))
     testImplementation("com.networknt:json-schema-validator")

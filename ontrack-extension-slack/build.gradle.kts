@@ -12,7 +12,7 @@ dependencies {
     implementation("com.slack.api:slack-api-client")
 
     testImplementation(project(":ontrack-extension-general"))
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation("com.networknt:json-schema-validator")
     testImplementation(testFixtures(project(":ontrack-model")))
     testImplementation(testFixtures(project(":ontrack-extension-casc")))

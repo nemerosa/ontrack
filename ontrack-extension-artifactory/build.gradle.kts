@@ -8,7 +8,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

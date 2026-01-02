@@ -23,7 +23,7 @@ dependencies {
 
     runtimeOnly("org.hibernate.validator:hibernate-validator")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(testFixtures(project(":ontrack-common")))
     testImplementation(testFixtures(project(":ontrack-model")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))

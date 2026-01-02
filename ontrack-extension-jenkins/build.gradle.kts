@@ -15,7 +15,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
 
     testImplementation(project(":ontrack-test-utils"))
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(project(":ontrack-extension-git"))
     testImplementation("com.networknt:json-schema-validator")
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))

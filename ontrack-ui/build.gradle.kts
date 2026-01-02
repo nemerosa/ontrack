@@ -35,7 +35,7 @@ dependencies {
     // Metric runtimes
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(testFixtures(project(":ontrack-model")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))

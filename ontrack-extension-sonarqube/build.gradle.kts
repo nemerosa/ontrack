@@ -12,7 +12,7 @@ dependencies {
     implementation(project(":ontrack-extension-indicators"))
     implementation("org.slf4j:slf4j-api")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(project(":ontrack-extension-general"))
     testImplementation("com.networknt:json-schema-validator")
     testImplementation(testFixtures(project(":ontrack-model")))

@@ -8,7 +8,7 @@ dependencies {
 
     implementation("org.slf4j:slf4j-api")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation("org.testcontainers:testcontainers")
     // testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
 

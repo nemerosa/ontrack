@@ -6,7 +6,7 @@ description = "Generation of the Yontrack documentation."
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(project(":ontrack-ui"))
 
     // Extensions needed for the docs

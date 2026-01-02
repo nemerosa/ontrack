@@ -15,7 +15,7 @@ dependencies {
     implementation(project(":ontrack-repository-support"))
     implementation("io.micrometer:micrometer-core")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
 
     testImplementation(project(":ontrack-extension-general"))

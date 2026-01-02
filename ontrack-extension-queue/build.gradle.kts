@@ -16,7 +16,7 @@ dependencies {
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("org.apache.commons:commons-lang3")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testImplementation(testFixtures(project(":ontrack-extension-recordings")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))

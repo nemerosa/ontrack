@@ -20,14 +20,14 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("io.micrometer:micrometer-core")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))
     testImplementation(testFixtures(project(":ontrack-extension-issues")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
 
     testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")
     testFixturesImplementation(project(":ontrack-test-utils"))
-    testFixturesImplementation(project(":ontrack-it-utils"))
+    testFixturesImplementation(testFixtures(project(":ontrack-it-utils")))
     testFixturesImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testFixturesImplementation(testFixtures(project(":ontrack-extension-api")))
     testFixturesImplementation(testFixtures(project(":ontrack-extension-issues")))

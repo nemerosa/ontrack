@@ -18,14 +18,14 @@ dependencies {
     implementation(project(":ontrack-repository-support"))
 
     testImplementation(project(":ontrack-test-utils"))
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation("com.networknt:json-schema-validator")
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))
     testImplementation(testFixtures(project(":ontrack-extension-casc")))
 
     testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")
-    testFixturesImplementation(project(":ontrack-it-utils"))
+    testFixturesImplementation(testFixtures(project(":ontrack-it-utils")))
     testFixturesImplementation(project(":ontrack-extension-recordings"))
     testFixturesImplementation(testFixtures(project(":ontrack-extension-api")))
 

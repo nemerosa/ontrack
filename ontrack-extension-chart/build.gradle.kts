@@ -8,7 +8,7 @@ dependencies {
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.apache.commons:commons-math3")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
 

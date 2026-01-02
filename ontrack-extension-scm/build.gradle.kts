@@ -15,11 +15,11 @@ dependencies {
     implementation("io.micrometer:micrometer-core")
     implementation("com.opencsv:opencsv")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(testFixtures(project(":ontrack-model")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
 
-    testFixturesImplementation(project(":ontrack-it-utils"))
+    testFixturesImplementation(testFixtures(project(":ontrack-it-utils")))
     testFixturesImplementation(project(":ontrack-test-utils"))
     testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")
 

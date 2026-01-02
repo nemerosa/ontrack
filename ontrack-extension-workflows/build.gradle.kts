@@ -27,11 +27,11 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-notifications")))
     testImplementation(testFixtures(project(":ontrack-extension-config")))
     testImplementation("com.networknt:json-schema-validator")
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation("com.networknt:json-schema-validator")
 
     testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")
-    testFixturesImplementation(project(":ontrack-it-utils"))
+    testFixturesImplementation(testFixtures(project(":ontrack-it-utils")))
     testFixturesImplementation(testFixtures(project(":ontrack-model")))
 
     testRuntimeOnly(project(":ontrack-service"))

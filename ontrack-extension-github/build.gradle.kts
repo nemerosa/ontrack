@@ -25,7 +25,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson")
 
     testImplementation(project(":ontrack-test-utils"))
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation(project(":ontrack-repository"))
     testImplementation(project(":ontrack-extension-scm"))

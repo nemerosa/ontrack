@@ -15,7 +15,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation("org.apache.commons:commons-lang3")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
 
     testRuntimeOnly(project(":ontrack-service"))
 }

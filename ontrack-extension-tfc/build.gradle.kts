@@ -14,7 +14,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("jakarta.annotation:jakarta.annotation-api")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation("com.networknt:json-schema-validator")
 
     testImplementation(testFixtures(project(":ontrack-extension-casc")))

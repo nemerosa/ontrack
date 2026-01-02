@@ -16,12 +16,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
 
-    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(testFixtures(project(":ontrack-extension-scm")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testImplementation("com.networknt:json-schema-validator")
 
-    testFixturesImplementation(project(":ontrack-it-utils"))
+    testFixturesImplementation(testFixtures(project(":ontrack-it-utils")))
     testFixturesImplementation("com.networknt:json-schema-validator")
 
     testRuntimeOnly(project(":ontrack-service"))
