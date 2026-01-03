@@ -37,15 +37,20 @@ This starts:
 
 > To tear down the environment, you can run `./gradlew devComposeDown`.
 
-## Running Ontrack
+## Running Yontrack
 
-Launch the backend using:
+### Backend
 
-Launch the frontend using:
+In Intellij IDEA, you can use the provided `Application (kdsl)` [run configuration](.run/Application%20(kdsl).run.xml)
+run configuration. It runs Yontrack in `dev` mode with a few environment variables set to ease the development.
+
+> The backend is available on http://localhost:8080 but should not be used directly. The Spring Boot actuator is running
+> at http://localhost:8800/manage.
+
+### Frontend
+
+In Intellij IDEA, you can use the provided (NPM) `dev` [run configuration](.run/dev.run.xml) run configuration.
+
+> This launches `npm run dev` in the `ontrack-web-core` directory.
 
 This launches Yontrack on http://localhost:3000.
-
-### Using the IDE
-
-* main class: `net.nemerosa.ontrack.boot.Application`
-* Spring profile to activate: `dev`
