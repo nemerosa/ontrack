@@ -95,6 +95,10 @@ configure<ComposeExtension> {
         useComposeFiles.addAll(listOf("compose/docker-compose-local.yml"))
         setProjectName("local")
     }
+    createNested("dev").apply {
+        useComposeFiles.addAll(listOf("compose/docker-compose-dev.yml"))
+        setProjectName("dev")
+    }
 }
 
 tasks.named("localComposeUp") {

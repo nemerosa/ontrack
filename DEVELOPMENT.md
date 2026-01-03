@@ -1,37 +1,29 @@
 # Development quick start
 
-To start developing with Ontrack, follow these instructions.
+To start developing with Yontrack, follow these instructions.
 
-## Prerequisistes
+## Prerequisites
 
 You need:
 
 * JDK 21
-* Docker running
+* Docker (Desktop)
 
 ## Getting the code
 
-Get a clean working copy of the Ontrack GitHub repository:
+Get a clean working copy of the Yntrack GitHub repository:
 
 ```bash
-git clone git@github.com:nemerosa/ontrack.git
-cd ontrack
-```
-
-## Prepares the UI code
-
-Generate the UI code in development mode:
-
-```bash
-./gradlew :ontrack-web:dev
+git clone git@github.com:nemerosa/ontrack.git yontrack
+cd yontrack
 ```
 
 ## Prepares the environment
 
-Start the middleware needed by Ontrack:
+Start the middleware needed by Yontrack:
 
 ```bash
-./gradlew devStart
+./gradlew devComposeUp
 ```
 
 This starts:
@@ -39,37 +31,21 @@ This starts:
 * a Postgres database
 * an ElasticSearch single-node instance
 * a RabbitMQ server
+* a Postgres database for Keycloak
+* a Keycloak server
+* a Kibana server
+
+> To tear down the environment, you can run `./gradlew devComposeDown`.
 
 ## Running Ontrack
 
-### Using Gradle
+Launch the backend using:
 
-```bash
-./gradlew :ontrack-ui:bootRun
-```
+Launch the frontend using:
 
-This starts Ontrack on http://localhost:8080.
-
-The default credentials are:
-
-* username: `admin`
-* password: `admin`
+This launches Yontrack on http://localhost:3000.
 
 ### Using the IDE
 
 * main class: `net.nemerosa.ontrack.boot.Application`
 * Spring profile to activate: `dev`
-
-## Developing the UI
-
-When developing UI components, you can activate an automated refresh of the web resources.
-
-For the "core" web resources under `ontrack-web`, you can launch:
-
-```bash
-./gradlew watch
-```
-
-This will refresh the application web resources on any change in the web files. The `dev` profile must be active.
-
-For web resources in any of the extensions (in `ontrack-extension-*` directories), just rebuild the application (in your IDE for example) and refresh the web page.
