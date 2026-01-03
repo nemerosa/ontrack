@@ -97,7 +97,7 @@ jib {
         tags = setOf(version as String, "latest")
     }
     from {
-        image = "azul/zulu-openjdk-alpine:17"
+        image = "azul/zulu-openjdk-alpine:21"
         platforms {
             if (isMacOS) {
                 platform {
