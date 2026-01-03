@@ -19,6 +19,7 @@ ontrack:
     jenkins:
       name: jenkins
       url: <jenkins URL>
+      username: <Jenkins user email>
       password: {{ secrets.yontrack-jenkins.token }}
 ```
 {% endraw %}
