@@ -9,4 +9,5 @@ It does this by collecting everything that happens in your CI/CD ecosystem, brin
 Where to start?
 
 * [install Yontrack](content/start/getting-started.md)
-* [configure Yontrack](content/start/configuration.md) to start ingesting data
+* [configure Yontrack](content/start/configuration.md)
+* [feed data](content/start/feeding.md) into Yontrack

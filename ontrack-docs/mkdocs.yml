@@ -26,6 +26,7 @@ theme:
     text: Hanken Grotesk
   features:
     - navigation.path
+    - navigation.indexes
     - content.code.copy
     - content.action.edit
 use_directory_urls: false
@@ -55,7 +56,14 @@ nav:
   - Home: index.md
   - Getting started:
       - Installation: content/start/getting-started.md
-      - Configuration: content/start/configuration.md
+      - Setup:
+          - content/start/configuration.md
+          - GitHub: content/start/configuration/github.md
+          - Jenkins: content/start/configuration/jenkins.md
+      - Feeding:
+          - content/start/feeding.md
+          - GitHub: content/start/feeding/github.md
+          - Jenkins: content/start/feeding/jenkins.md
   - Security:
       - OIDC: content/security/oidc.md
       - LDAP: content/security/ldap.md
