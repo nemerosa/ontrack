@@ -74,7 +74,7 @@ class CIConfigExtensionServiceTest {
             firstArg()
         }
 
-        every { m.mergeData(any(), any()) } answers {
+        every<JsonNode> { m.mergeConfig(any(), any()) } answers {
             merge(firstArg(), secondArg())
         }
 

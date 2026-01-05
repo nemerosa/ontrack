@@ -41,6 +41,7 @@ class NotificationsCIConfigExtension(
 
     override fun parseData(data: JsonNode): NotificationsCIConfig = data.parse()
 
+    @Deprecated("Use mergeData(T, JsonNode) instead", replaceWith = ReplaceWith("mergeData(defaults, custom.asJson())"))
     override fun mergeData(
         defaults: NotificationsCIConfig,
         custom: NotificationsCIConfig

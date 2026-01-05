@@ -259,6 +259,32 @@ fun JsonNode.getRequiredIntField(field: String): Int =
         ?: throw JsonParseException("Missing field $field")
 
 /**
+ * Merging a JSON node into an object.
+ *
+ * @receiver Object to merge into
+ * @param node Node to merge into this object
+ * @param priority What to do on identical leaf fields
+ * @param arrays What to do on arrays
+ * @param conflictResolution What to do when fields do not have the same type
+ * @return Result of the merge
+ */
+inline fun <reified T> T.merge(
+    node: JsonNode,
+    priority: JsonMergePriority = JsonMergePriority.RIGHT,
+    arrays: JsonArrayMergePriority = JsonArrayMergePriority.APPEND,
+    conflictResolution: JsonConflictResolution = JsonConflictResolution.ABORT,
+): T {
+    val target = asJson()
+    val result = target.merge(
+        node = node,
+        priority = priority,
+        arrays = arrays,
+        conflictResolution = conflictResolution
+    )
+    return result.parse()
+}
+
+/**
  * Merging two JSON nodes
  *
  * @receiver Left component

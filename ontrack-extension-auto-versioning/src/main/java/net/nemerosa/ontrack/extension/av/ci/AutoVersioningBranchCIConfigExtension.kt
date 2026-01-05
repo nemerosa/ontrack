@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.json.merge
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.json.schema.JsonType
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
@@ -28,10 +29,10 @@ class AutoVersioningBranchCIConfigExtension(
 
     override fun parseData(data: JsonNode): AutoVersioningConfig = data.parse()
 
-    override fun mergeData(
+    override fun mergeConfig(
         defaults: AutoVersioningConfig,
-        custom: AutoVersioningConfig
-    ): AutoVersioningConfig = custom
+        custom: JsonNode
+    ): AutoVersioningConfig = defaults.merge(custom)
 
     override val projectEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.BRANCH)
 
