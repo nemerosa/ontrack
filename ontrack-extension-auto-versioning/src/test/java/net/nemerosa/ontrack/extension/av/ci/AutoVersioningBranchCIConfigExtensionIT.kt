@@ -131,4 +131,119 @@ class AutoVersioningBranchCIConfigExtensionIT : AbstractQLKTITSupport() {
             }
         }
     }
+
+    @Test
+    @AsAdminTest
+    fun `Auto-versioning is not disabled by default`() {
+        val branch = configTestSupport.configureBranch(
+            """
+                version: v1
+                configuration:
+                  defaults:
+                    branch:
+                      autoVersioning:
+                        configurations:
+                          - sourceProject: my-project
+                            sourceBranch: main
+                            sourcePromotion: GOLD
+                            targetPath: versions.properties
+                            targetProperty: yontrackVersion
+                            validationStamp: my-chart-validator
+                """.trimIndent(),
+            ci = "generic",
+            scm = "mock",
+            env = EnvFixtures.generic()
+        )
+        assertNotNull(
+            autoVersioningConfigurationService.getAutoVersioning(branch),
+            "Auto-versioning config has been set"
+        ) { av ->
+            val avConfig = av.configurations.single()
+            avConfig.apply {
+                assertEquals("my-project", sourceProject)
+                assertEquals("main", sourceBranch)
+                assertEquals("GOLD", sourcePromotion)
+                assertEquals("versions.properties", targetPath)
+                assertEquals("yontrackVersion", targetProperty)
+                assertEquals("my-chart-validator", validationStamp)
+                assertEquals(true, disabled)
+            }
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Enabling an auto-versioning config only for release branches`() {
+        val yaml = """
+            version: v1
+            configuration:
+              defaults:
+                branch:
+                  autoVersioning:
+                    configurations:
+                      - sourceProject: my-project
+                        sourceBranch: main
+                        sourcePromotion: GOLD
+                        targetPath: versions.properties
+                        targetProperty: yontrackVersion
+                        validationStamp: my-chart-validator
+                        disabled: true
+              custom:
+                configs:
+                  - conditions:
+                      - name: branch
+                        config: release.*
+                    branch:
+                      autoVersioning:
+                        configurations:
+                          - sourceProject: my-project
+                            sourceBranch: main
+                            disabled: false
+            """.trimIndent()
+
+        val developBranch = configTestSupport.configureBranch(
+            yaml,
+            ci = "generic",
+            scm = "mock",
+            env = EnvFixtures.generic(scmBranch = "develop")
+        )
+        assertNotNull(
+            autoVersioningConfigurationService.getAutoVersioning(developBranch),
+            "Auto-versioning config has been set"
+        ) { av ->
+            val avConfig = av.configurations.single()
+            avConfig.apply {
+                assertEquals("my-project", sourceProject)
+                assertEquals("main", sourceBranch)
+                assertEquals("GOLD", sourcePromotion)
+                assertEquals("versions.properties", targetPath)
+                assertEquals("yontrackVersion", targetProperty)
+                assertEquals("my-chart-validator", validationStamp)
+                assertEquals(true, disabled)
+            }
+        }
+
+        val releaseBranch = configTestSupport.configureBranch(
+            yaml,
+            ci = "generic",
+            scm = "mock",
+            env = EnvFixtures.generic(scmBranch = "release-1.0")
+        )
+        assertNotNull(
+            autoVersioningConfigurationService.getAutoVersioning(releaseBranch),
+            "Auto-versioning config has been set"
+        ) { av ->
+            val avConfig = av.configurations.single()
+            avConfig.apply {
+                assertEquals("my-project", sourceProject)
+                assertEquals("main", sourceBranch)
+                assertEquals("GOLD", sourcePromotion)
+                assertEquals("versions.properties", targetPath)
+                assertEquals("yontrackVersion", targetProperty)
+                assertEquals("my-chart-validator", validationStamp)
+                assertEquals(false, disabled)
+            }
+        }
+    }
+
 }

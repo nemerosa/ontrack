@@ -65,7 +65,7 @@ data class AutoVersioningSourceConfig(
     @APIDescription("Cron schedule (when to start applying queued requests)")
     val cronSchedule: String? = null,
     @APIDescription("Set if this configuration is disabled")
-    val disabled: Boolean = false,
+    val disabled: Boolean? = null,
 ) {
 
     /**

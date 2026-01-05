@@ -103,7 +103,7 @@ object AutoVersioningTestFixtures {
         autoApprovalMode: AutoApprovalMode? = null,
         notifications: List<AutoVersioningNotification>? = null,
         cronSchedule: String? = null,
-        disabled: Boolean = false,
+        disabled: Boolean? = null,
     ) = AutoVersioningSourceConfig(
         sourceProject = sourceProject,
         sourceBranch = sourceBranch,

@@ -42,7 +42,7 @@ data class JsonAutoVersioningConfig(
     val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
     @APIDescription("Cron schedule (when to start applying queued requests)")
     val cronSchedule: String? = null,
-    val disabled: Boolean = false,
+    val disabled: Boolean? = null
 ) {
     fun toConfig() = AutoVersioningSourceConfig(
         sourceProject = project,
