@@ -18,6 +18,32 @@ class AutoVersioningPromotionListenerServiceIT : AbstractAutoVersioningTestSuppo
     private lateinit var autoVersioningPromotionListenerService: AutoVersioningPromotionListenerService
 
     @Test
+    fun `Checking that disabled AV sources are not processed`() {
+        withPromotionLevelTargets(disabled = true) { pl, app1, app2 ->
+            val run = pl.run()
+            assertNotNull(
+                autoVersioningTrackingService.getTrail(run),
+                "Trail registered"
+            ) { trail ->
+                assertEquals(
+                    listOf(
+                        app2,
+                        app1,
+                    ),
+                    trail.branches.map { it.branch }
+                )
+                assertNotNull(trail.branches.find { it.branch.id == app1.id }, "App 1 trail") {
+                    assertEquals(false, it.isEligible())
+                    assertEquals(it.rejectionReason, "Auto-versioning config is disabled for this branch")
+                }
+                assertNotNull(trail.branches.find { it.branch.id == app2.id }, "App 2 trail") {
+                    assertEquals(true, it.isEligible())
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Checking that AV targets only eligible project and promotion`() {
         withThreeDependencies { target, dep1, _, _ ->
             val pl1 = structureService.findPromotionLevelByName(

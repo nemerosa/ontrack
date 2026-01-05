@@ -85,6 +85,7 @@ abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
     }
 
     protected fun withPromotionLevelTargets(
+        disabled: Boolean = false,
         code: (
             pl: PromotionLevel,
             app1: Branch,
@@ -112,6 +113,7 @@ abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
                                                     sourceBranch = sourceBranch.name,
                                                     sourcePromotion = pl.name,
                                                     targetPath = "app1.properties",
+                                                    disabled = disabled,
                                                 )
                                             )
                                         )

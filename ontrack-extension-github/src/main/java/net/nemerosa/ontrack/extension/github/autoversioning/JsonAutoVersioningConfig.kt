@@ -42,6 +42,7 @@ data class JsonAutoVersioningConfig(
     val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
     @APIDescription("Cron schedule (when to start applying queued requests)")
     val cronSchedule: String? = null,
+    val disabled: Boolean = false,
 ) {
     fun toConfig() = AutoVersioningSourceConfig(
         sourceProject = project,
@@ -66,5 +67,6 @@ data class JsonAutoVersioningConfig(
         prBodyTemplateFormat = prBodyTemplateFormat,
         additionalPaths = additionalPaths,
         cronSchedule = cronSchedule,
+        disabled = disabled,
     )
 }

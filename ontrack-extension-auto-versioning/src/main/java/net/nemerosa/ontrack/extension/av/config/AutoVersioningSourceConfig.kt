@@ -64,6 +64,8 @@ data class AutoVersioningSourceConfig(
     val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
     @APIDescription("Cron schedule (when to start applying queued requests)")
     val cronSchedule: String? = null,
+    @APIDescription("Set if this configuration is disabled")
+    val disabled: Boolean = false,
 ) {
 
     /**
@@ -180,6 +182,7 @@ data class AutoVersioningSourceConfig(
             prBodyTemplateFormat = prBodyTemplateFormat,
             additionalPaths = additionalPaths,
             cronSchedule = cronSchedule,
+            disabled = disabled,
         )
 
 }
