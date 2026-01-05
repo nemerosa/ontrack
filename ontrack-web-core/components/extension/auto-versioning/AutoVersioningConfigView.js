@@ -82,6 +82,8 @@ export default function AutoVersioningConfigView({branchId}) {
                                         propertyRegex
                                         versionSource
                                     }
+                                    cronSchedule
+                                    disabled
                                 }
                             }
                         }

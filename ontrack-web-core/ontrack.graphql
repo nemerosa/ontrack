@@ -272,6 +272,8 @@ type AutoVersioningSourceConfig {
   buildLinkCreation: Boolean
   "Cron schedule (when to start applying queued requests)"
   cronSchedule: String
+  "Set if this configuration is disabled"
+  disabled: Boolean
   "List of notifications subscriptions to setup for this auto versioning"
   notifications: [AutoVersioningNotification!]
   "Type of post processing to launch after the version has been updated"
@@ -8301,6 +8303,8 @@ input AutoVersioningSourceConfigInput {
   buildLinkCreation: Boolean
   "Cron schedule (when to start applying queued requests)"
   cronSchedule: String
+  "Set if this configuration is disabled"
+  disabled: Boolean
   "List of notifications subscriptions to setup for this auto versioning"
   notifications: [AutoVersioningNotificationInput!]
   "Type of post processing to launch after the version has been updated"

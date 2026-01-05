@@ -135,9 +135,14 @@ export default function AutoVersioningConfigDetails({source, additionalItems = [
             children: <AutoVersioningAdditionalPaths additionalPaths={source.additionalPaths}/>,
         },
         {
-            key: 'schedule',
+            key: 'cronSchedule',
             label: "Schedule",
-            children: <AutoVersioningSchedule schedule={source.schedule}/>,
+            children: <AutoVersioningSchedule schedule={source.cronSchedule}/>,
+        },
+        {
+            key: 'disabled',
+            label: "Disabled",
+            children: source.disabled,
         },
     )
 
