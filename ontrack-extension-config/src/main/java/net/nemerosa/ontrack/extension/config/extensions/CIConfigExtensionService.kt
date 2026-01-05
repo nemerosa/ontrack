@@ -43,7 +43,6 @@ class CIConfigExtensionService(
 
     private fun <T> CIConfigExtension<T>.merge(defaults: JsonNode, other: JsonNode): ExtensionConfiguration {
         val parsedDefaults = parseData(defaults)
-        val parsedCustom = other
         val data = mergeConfig(parsedDefaults, other)
         return ExtensionConfiguration(
             id = id,

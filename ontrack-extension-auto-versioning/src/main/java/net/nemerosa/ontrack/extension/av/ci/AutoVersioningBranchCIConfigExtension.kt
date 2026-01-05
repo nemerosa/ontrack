@@ -1,11 +1,15 @@
 package net.nemerosa.ontrack.extension.av.ci
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.mergeList
 import net.nemerosa.ontrack.extension.av.AutoVersioningExtensionFeature
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.merge
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.json.schema.JsonType
@@ -32,7 +36,17 @@ class AutoVersioningBranchCIConfigExtension(
     override fun mergeConfig(
         defaults: AutoVersioningConfig,
         custom: JsonNode
-    ): AutoVersioningConfig = defaults.merge(custom)
+    ): AutoVersioningConfig = mergeList<JsonNode>(
+        target = defaults.configurations.map { it.asJson() },
+        changes = custom.path("configurations").map { it },
+        idFn = { cfg -> cfg.parse<AVCfgID>() }
+    ) { e, existing ->
+        existing.merge(e)
+    }.map { e ->
+        e.parse<AutoVersioningSourceConfig>()
+    }.let {
+        AutoVersioningConfig(it)
+    }
 
     override val projectEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.BRANCH)
 
@@ -42,4 +56,11 @@ class AutoVersioningBranchCIConfigExtension(
     ) {
         autoVersioningConfigurationService.setupAutoVersioning(entity as Branch, data)
     }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class AVCfgID(
+        val sourceProject: String,
+        val sourceBranch: String,
+        val qualifier: String? = null,
+    )
 }

@@ -52,13 +52,13 @@ data class AutoVersioningSourceConfig(
     val versionSource: String? = null,
     @APIDescription("List of reviewers to always set on the pull request created by the auto versioning")
     @ListRef
-    val reviewers: List<String>?,
+    val reviewers: List<String>? = null,
     @APIDescription("Template for the title of the pull request (optional)")
-    val prTitleTemplate: String?,
+    val prTitleTemplate: String? = null,
     @APIDescription("Template for the body of the pull request (optional)")
-    val prBodyTemplate: String?,
+    val prBodyTemplate: String? = null,
     @APIDescription("Template format for the body of the pull request (plain by default, html, markdown as possible values)")
-    val prBodyTemplateFormat: String?,
+    val prBodyTemplateFormat: String? = null,
     @APIDescription("Additional paths to change")
     @ListRef(embedded = true, suffix = "Input")
     val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
