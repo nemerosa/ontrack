@@ -258,7 +258,7 @@ default path & additional paths).
 
 ### Target files types
 
-Auto)versioning, in the end, works by updating a _target file_, designed in the configuration by the `targetPath` or
+Auto-versioning, in the end, works by updating a _target file_, designed in the configuration by the `targetPath` or
 `path` property.
 
 A regular expression (`regex` parameter) can be used to identify the change.
@@ -564,7 +564,7 @@ list of these metrics.
 
 ## Auto versioning checks
 
-While auto)versioning is configured to automatically upgrade branches upon the promotion of some other projects, it's
+While auto-versioning is configured to automatically upgrade branches upon the promotion of some other projects, it's
 also possible to use this very configuration to check if a given build is up-to-date or not with the latest
 dependencies.
 
@@ -584,7 +584,7 @@ the branch:
 
 ## Notifications
 
-The auto)versioning feature integrates with the [notifications](../notifications/index.md) framework by emitting several
+The auto-versioning feature integrates with the [notifications](../notifications/index.md) framework by emitting several
 events you can subscribe to:
 
 * `auto-versioning-success` - whenever an auto versioning process completes
