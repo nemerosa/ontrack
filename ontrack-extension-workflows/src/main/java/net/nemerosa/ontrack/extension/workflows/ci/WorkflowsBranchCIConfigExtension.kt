@@ -39,15 +39,18 @@ class WorkflowsBranchCIConfigExtension(
 
     override fun parseData(data: JsonNode): WorkflowsBranchCIConfig = data.parse()
 
-    override fun mergeData(
+    override fun mergeConfig(
         defaults: WorkflowsBranchCIConfig,
-        custom: WorkflowsBranchCIConfig
-    ) = WorkflowsBranchCIConfig(
-        promotions = mergeMap(
-            target = defaults.promotions,
-            changes = custom.promotions,
-        ) { e, existing -> existing + e }
-    )
+        custom: JsonNode
+    ): WorkflowsBranchCIConfig {
+        val parsedCustom = custom.parse<WorkflowsBranchCIConfig>()
+        return WorkflowsBranchCIConfig(
+            promotions = mergeMap(
+                target = defaults.promotions,
+                changes = parsedCustom.promotions,
+            ) { e, existing -> existing + e }
+        )
+    }
 
     override fun configure(
         entity: ProjectEntity,

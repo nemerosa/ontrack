@@ -41,16 +41,16 @@ class NotificationsCIConfigExtension(
 
     override fun parseData(data: JsonNode): NotificationsCIConfig = data.parse()
 
-    @Deprecated("Use mergeData(T, JsonNode) instead", replaceWith = ReplaceWith("mergeData(defaults, custom.asJson())"))
-    override fun mergeData(
+    override fun mergeConfig(
         defaults: NotificationsCIConfig,
-        custom: NotificationsCIConfig
+        custom: JsonNode
     ): NotificationsCIConfig {
+        val customConfig = custom.parse<NotificationsCIConfig>()
         val result = defaults.notifications.toMutableList()
 
         syncForward(
-            from = custom.notifications.toList(),
-            to = defaults.notifications.toList(),
+            from = customConfig.notifications,
+            to = defaults.notifications,
         ) {
             equality { i, j -> i.name == j.name }
 

@@ -64,7 +64,7 @@ class NotificationsCIConfigExtensionTest {
             )
         )
 
-        val config = extension.mergeData(defaults, custom)
+        val config = extension.mergeConfig(defaults, custom.asJson())
 
         assertEquals(
             NotificationsCIConfig(

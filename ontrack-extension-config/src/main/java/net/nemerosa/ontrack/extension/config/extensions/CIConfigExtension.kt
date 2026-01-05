@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.config.extensions
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.extension.Extension
 import net.nemerosa.ontrack.model.json.schema.JsonType
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
@@ -38,13 +38,7 @@ interface CIConfigExtension<T> : Extension {
     /**
      * Merging data together
      */
-    fun mergeConfig(defaults: T, custom: JsonNode): T = defaults
-
-    /**
-     * Merging data together
-     */
-    @Deprecated("Use mergeData(T, JsonNode) instead", replaceWith = ReplaceWith("mergeData(defaults, custom.asJson())"))
-    fun mergeData(defaults: T, custom: T): T = mergeConfig(defaults, custom.asJson())
+    fun mergeConfig(defaults: T, custom: JsonNode): T = custom.parse()
 
     /**
      * JSON type for the schema

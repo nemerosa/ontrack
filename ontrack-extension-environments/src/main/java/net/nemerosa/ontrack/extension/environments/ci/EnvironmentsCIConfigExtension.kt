@@ -31,14 +31,15 @@ class EnvironmentsCIConfigExtension(
 
     override fun parseData(data: JsonNode) = data.parse<EnvironmentsCIConfigExtensionConfig>()
 
-    override fun mergeData(
+    override fun mergeConfig(
         defaults: EnvironmentsCIConfigExtensionConfig,
-        custom: EnvironmentsCIConfigExtensionConfig
-    ): EnvironmentsCIConfigExtensionConfig =
-        EnvironmentsCIConfigExtensionConfig(
+        custom: JsonNode
+    ): EnvironmentsCIConfigExtensionConfig {
+        val parsedCustom = custom.parse<EnvironmentsCIConfigExtensionConfig>()
+        return EnvironmentsCIConfigExtensionConfig(
             environments = mergeList(
                 target = defaults.environments,
-                changes = custom.environments,
+                changes = parsedCustom.environments,
                 idFn = EnvironmentCasc::name,
             ) { e, existing ->
                 existing.copy(
@@ -51,7 +52,7 @@ class EnvironmentsCIConfigExtension(
             },
             slots = mergeList(
                 target = defaults.slots,
-                changes = custom.slots,
+                changes = parsedCustom.slots,
                 idFn = SlotCasc::qualifier,
             ) { slotChanges, slotExisting ->
                 slotExisting.copy(
@@ -63,6 +64,7 @@ class EnvironmentsCIConfigExtension(
                 )
             }
         )
+    }
 
     override fun createJsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
         jsonTypeBuilder.toType(EnvironmentsCIConfigExtensionConfig::class)
