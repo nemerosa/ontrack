@@ -77,32 +77,32 @@ class CIConfigurationParserImpl(
             conditions = customConfig.conditions.map { (name, data) ->
                 ConditionConfig(name, data)
             },
-            project = convertProject(customConfig.project),
-            branch = convertBranch(customConfig.branch),
-            build = convertBuild(customConfig.build),
+            project = convertProject(customConfig.project, custom = true),
+            branch = convertBranch(customConfig.branch, custom = true),
+            build = convertBuild(customConfig.build, custom = true),
         )
     }
 
     private fun convertConfiguration(ciConfig: CIConfig): Configuration {
         return Configuration(
-            project = convertProject(ciConfig.project),
-            branch = convertBranch(ciConfig.branch),
-            build = convertBuild(ciConfig.build),
+            project = convertProject(ciConfig.project, custom = false),
+            branch = convertBranch(ciConfig.branch, custom = false),
+            build = convertBuild(ciConfig.build, custom = false),
         )
     }
 
-    private fun convertBuild(build: CIBuildConfig): BuildConfiguration {
+    private fun convertBuild(build: CIBuildConfig, custom: Boolean): BuildConfiguration {
         return BuildConfiguration(
             buildName = build.buildName,
             properties = convertProperties(build),
-            extensions = convertExtensions(ProjectEntityType.BUILD, build),
+            extensions = convertExtensions(ProjectEntityType.BUILD, build, custom),
         )
     }
 
-    private fun convertBranch(branch: CIBranchConfig): BranchConfiguration {
+    private fun convertBranch(branch: CIBranchConfig, custom: Boolean): BranchConfiguration {
         return BranchConfiguration(
             properties = convertProperties(branch),
-            extensions = convertExtensions(ProjectEntityType.BRANCH, branch),
+            extensions = convertExtensions(ProjectEntityType.BRANCH, branch, custom),
             validations = convertValidations(branch.validations),
             promotions = convertPromotions(branch.promotions),
         )
@@ -184,10 +184,13 @@ class CIConfigurationParserImpl(
         )
     }
 
-    private fun convertProject(project: CIProjectConfig): ProjectConfiguration {
+    private fun convertProject(
+        project: CIProjectConfig,
+        custom: Boolean,
+    ): ProjectConfiguration {
         return ProjectConfiguration(
             properties = convertProperties(project),
-            extensions = convertExtensions(ProjectEntityType.PROJECT, project),
+            extensions = convertExtensions(ProjectEntityType.PROJECT, project, custom),
             projectName = project.name,
             scmConfig = project.scmConfig,
             issueServiceIdentifier = project.issueServiceIdentifier,
@@ -204,21 +207,28 @@ class CIConfigurationParserImpl(
     private fun convertExtensions(
         projectEntityType: ProjectEntityType,
         ciExtensionsConfig: CIExtensionsConfig,
+        custom: Boolean,
     ): List<ExtensionConfiguration> {
         return ciExtensionsConfig.extensions.map { (id, data) ->
-            convertExtension(projectEntityType, id, data)
+            convertExtension(projectEntityType, id, data, custom)
         }
     }
 
     private fun convertExtension(
         projectEntityType: ProjectEntityType,
         id: String,
-        data: JsonNode
+        data: JsonNode,
+        custom: Boolean,
     ): ExtensionConfiguration {
         val extension = ciExtensions[id]
             ?: throw CIConfigExtensionNotFoundException(id)
         if (projectEntityType in extension.projectEntityTypes) {
-            val extensionData = extension.parseData(data).asJson()
+            val extensionData = if (custom) {
+                data
+            } else {
+                // Validation through parsing
+                extension.parseData(data).asJson()
+            }
             return ExtensionConfiguration(
                 id = id,
                 data = extensionData,

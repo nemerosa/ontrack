@@ -166,7 +166,7 @@ class AutoVersioningBranchCIConfigExtensionIT : AbstractQLKTITSupport() {
                 assertEquals("versions.properties", targetPath)
                 assertEquals("yontrackVersion", targetProperty)
                 assertEquals("my-chart-validator", validationStamp)
-                assertEquals(true, disabled)
+                assertEquals(null, disabled)
             }
         }
     }
