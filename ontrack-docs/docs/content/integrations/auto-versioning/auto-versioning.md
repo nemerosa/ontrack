@@ -587,10 +587,37 @@ the branch:
 The auto-versioning feature integrates with the [notifications](../notifications/index.md) framework by emitting several
 events you can subscribe to:
 
-* `auto-versioning-success` - whenever an auto versioning process completes
-* `auto-versioning-error` - whenever an auto versioning process finishes with an error
-* `auto-versioning-pr-merge-timeout-error` - whenever an auto versioning process cannot merge a pull request because of
-  a timeout on its merge condition (only when `autoApprovalMode` is set to `CLIENT` - see <<auto-versioning-pr>>)
+* [`auto-versioning-error`](../../generated/events/event-auto-versioning-error.md)
+* [`auto-versioning-post-processing-error`](../../generated/events/event-auto-versioning-post-processing-error.md)
+* [`auto-versioning-pr-merge-timeout-error`](../../generated/events/event-auto-versioning-pr-merge-timeout-error.md)
+* [`auto-versioning-success`](../../generated/events/event-auto-versioning-success.md)
+
+Instead of registering notifications for these events, you can also define specific notifications directly in
+the [branch configuration](#configuration). For example, to send an email whenever a specific auto-versioning process is
+in error or has timed out:
+
+```yaml
+configurations:
+  - # AV config
+    notifications:
+      - channel: mail
+        config:
+          to: me@yontrack.com
+          subject: Auto-versioning error on project ${project}
+        notificationTemplate: |
+          Auto-versioning of ${xProject} version ${VERSION} in ${project} failed.
+        scope:
+          - ERROR
+```
+
+The `scope` is a list of events this notification should be sent for:
+
+* `ALL`
+* `SUCCESS`
+* `ERROR`
+* `PR_TIMEOUT`
+
+The `notificationTemplate` property is used if you want to send a custom message instead of the default ones.
 
 ## Throttling
 

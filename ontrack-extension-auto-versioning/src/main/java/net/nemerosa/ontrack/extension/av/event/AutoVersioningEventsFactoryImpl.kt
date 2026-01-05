@@ -68,6 +68,9 @@ class AutoVersioningEventsFactoryImpl(
     private fun Event.EventBuilder.withSourcePromotionRun(order: AutoVersioningOrder) =
         sourcePromotionRun(order)?.let {
             withExtra(it)
+            withExtra(it.build)
+            withExtra(it.build.branch)
+            withExtra(it.build.branch.project)
         } ?: this
 
     private fun sourcePromotionRun(order: AutoVersioningOrder) =
