@@ -61,7 +61,7 @@ data class AutoVersioningSourceConfig(
     @ListRef(embedded = true, suffix = "Input")
     val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
     @APIDescription("Set if this configuration is disabled")
-    val disabled: Boolean = false,
+    val disabled: Boolean? = null,
 ) {
 
     /**

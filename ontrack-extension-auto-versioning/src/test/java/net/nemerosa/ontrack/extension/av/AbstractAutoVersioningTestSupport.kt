@@ -83,7 +83,7 @@ abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
     }
 
     protected fun withPromotionLevelTargets(
-        disabled: Boolean = false,
+        disabled: Boolean? = null,
         code: (
             pl: PromotionLevel,
             app1: Branch,

@@ -98,7 +98,7 @@ object AutoVersioningTestFixtures {
         postProcessingConfig: JsonNode? = null,
         autoApprovalMode: AutoApprovalMode? = null,
         notifications: List<AutoVersioningNotification>? = null,
-        disabled: Boolean = false,
+        disabled: Boolean? = null,
     ) = AutoVersioningSourceConfig(
         sourceProject = sourceProject,
         sourceBranch = sourceBranch,
