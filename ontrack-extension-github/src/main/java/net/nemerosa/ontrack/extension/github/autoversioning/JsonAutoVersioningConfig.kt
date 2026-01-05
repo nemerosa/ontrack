@@ -39,6 +39,7 @@ data class JsonAutoVersioningConfig(
     val prBodyTemplate: String? = null,
     val prBodyTemplateFormat: String? = null,
     val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
+    val disabled: Boolean = false,
 ) {
     fun toConfig() = AutoVersioningSourceConfig(
         sourceProject = project,
@@ -62,5 +63,6 @@ data class JsonAutoVersioningConfig(
         prBodyTemplate = prBodyTemplate,
         prBodyTemplateFormat = prBodyTemplateFormat,
         additionalPaths = additionalPaths,
+        disabled = disabled,
     )
 }

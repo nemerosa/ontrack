@@ -98,6 +98,7 @@ object AutoVersioningTestFixtures {
         postProcessingConfig: JsonNode? = null,
         autoApprovalMode: AutoApprovalMode? = null,
         notifications: List<AutoVersioningNotification>? = null,
+        disabled: Boolean = false,
     ) = AutoVersioningSourceConfig(
         sourceProject = sourceProject,
         sourceBranch = sourceBranch,
@@ -119,6 +120,7 @@ object AutoVersioningTestFixtures {
         prTitleTemplate = null,
         prBodyTemplate = null,
         prBodyTemplateFormat = null,
+        disabled = disabled,
     )
 
 }

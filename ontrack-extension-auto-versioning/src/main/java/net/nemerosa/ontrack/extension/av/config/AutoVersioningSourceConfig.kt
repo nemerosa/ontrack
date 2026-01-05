@@ -60,6 +60,8 @@ data class AutoVersioningSourceConfig(
     @APIDescription("Additional paths to change")
     @ListRef(embedded = true, suffix = "Input")
     val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
+    @APIDescription("Set if this configuration is disabled")
+    val disabled: Boolean = false,
 ) {
 
     /**
@@ -173,6 +175,7 @@ data class AutoVersioningSourceConfig(
             prBodyTemplate = prBodyTemplate,
             prBodyTemplateFormat = prBodyTemplateFormat,
             additionalPaths = additionalPaths,
+            disabled = disabled,
         )
 
 }

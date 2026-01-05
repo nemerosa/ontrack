@@ -58,6 +58,8 @@ class AutoVersioningPromotionListenerServiceImpl(
             val disabled = branchTrail.branch.isDisabled || branchTrail.branch.project.isDisabled
             if (disabled) {
                 tracking.withDisabledBranch(branchTrail)
+            } else if (branchTrail.configuration.disabled) {
+                tracking.withDisabledBranchConfig(branchTrail)
             } else {
                 // Filtering on project rules
                 val accepted = acceptBranchWithProjectAVRules(branchTrail.branch)

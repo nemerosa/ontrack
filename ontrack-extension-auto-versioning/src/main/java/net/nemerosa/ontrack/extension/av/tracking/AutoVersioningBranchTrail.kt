@@ -34,6 +34,8 @@ data class AutoVersioningBranchTrail(
 
     fun disabled() = reject("Branch is disabled")
 
+    fun disabledConfig() = reject("Auto-versioning config is disabled for this branch")
+
     fun reject(rejectionReason: String) = AutoVersioningBranchTrail(
         id = id,
         branch = branch,

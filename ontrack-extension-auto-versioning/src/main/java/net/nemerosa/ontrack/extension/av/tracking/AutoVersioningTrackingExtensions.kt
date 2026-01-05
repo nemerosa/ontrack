@@ -10,6 +10,14 @@ fun AutoVersioningTracking.withDisabledBranch(branchTrail: AutoVersioningBranchT
     }
 }
 
+fun AutoVersioningTracking.withDisabledBranchConfig(branchTrail: AutoVersioningBranchTrail) {
+    withTrail {
+        it.withBranchTrail(
+            branchTrail.disabledConfig()
+        )
+    }
+}
+
 fun AutoVersioningTracking.reject(branchTrail: AutoVersioningBranchTrail, reason: String) {
     withTrail {
         it.withBranchTrail(
