@@ -12,8 +12,10 @@ class AutoVersioningConfigDocumentationIT : AbstractDocGenIT() {
             writeFile(
                 fileName = "config",
             ) { s ->
-                val fields = getFieldsDocumentation(AutoVersioningSourceConfig::class)
-                s.writeFields(fields)
+                val fields = getFieldsDocumentation(
+                    AutoVersioningSourceConfig::class,
+                )
+                s.writeFields(fields, aliasesDeprecated = true)
             }
         }
     }

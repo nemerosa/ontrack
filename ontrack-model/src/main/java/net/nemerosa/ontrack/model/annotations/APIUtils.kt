@@ -4,6 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.primaryConstructor
+
+inline fun <reified A : Annotation> findPropertyAnnotation(property: KProperty<*>): A? =
+    property.findAnnotation<A>()
+        ?: property.getter.findAnnotation<A>()
+        ?: property.javaClass.declaringClass?.kotlin?.primaryConstructor?.parameters
+            ?.find { it.name == property.name }
+            ?.findAnnotation<A>()
 
 /**
  * Getting the description for a property.
@@ -20,7 +28,7 @@ fun getPropertyDescription(property: KProperty<*>, description: String? = null):
  * Getting the description for a property.
  */
 fun getOptionalPropertyDescription(property: KProperty<*>): String? =
-    property.findAnnotation<APIDescription>()?.value
+    findPropertyAnnotation<APIDescription>(property)?.value
 
 /**
  * Getting the label for a property.
@@ -30,7 +38,7 @@ fun getOptionalPropertyDescription(property: KProperty<*>): String? =
  */
 fun getPropertyLabel(property: KProperty<*>, label: String? = null): String =
     label
-        ?: property.findAnnotation<APILabel>()?.value
+        ?: findPropertyAnnotation<APILabel>(property)?.value
         ?: getPropertyName(property)
 
 /**
@@ -44,9 +52,8 @@ fun getPropertyLabel(property: KProperty<*>, label: String? = null): String =
  * # the property name
  */
 fun getPropertyName(property: KProperty<*>): String =
-    property.findAnnotation<APIName>()?.value
-        ?: property.findAnnotation<JsonProperty>()?.value
-        ?: property.getter.findAnnotation<JsonProperty>()?.value
+    findPropertyAnnotation<APIName>(property)?.value
+        ?: findPropertyAnnotation<JsonProperty>(property)?.value
         ?: property.name
 
 /**

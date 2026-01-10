@@ -1,42 +1,57 @@
 package net.nemerosa.ontrack.model.docs
 
+import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyName
 import java.time.LocalDateTime
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.*
 
 
+inline fun <reified A : Annotation> findAnnotation(documentationClass: KClass<*>, property: KProperty<*>): A? =
+    property.findAnnotation<A>()
+        ?: property.getter.findAnnotation<A>()
+        ?: documentationClass.primaryConstructor?.parameters?.find { it.name == property.name }
+            ?.findAnnotation<A>()
+
+inline fun <reified A : Annotation> hasAnnotation(documentationClass: KClass<*>, property: KProperty<*>): Boolean =
+    findAnnotation<A>(documentationClass, property) != null
+
 fun getFieldsForDocumentationClass(documentationClass: KClass<*>): List<FieldDocumentation> {
     val fields = mutableListOf<FieldDocumentation>()
     documentationClass.memberProperties.forEach { property ->
-        if (property.visibility == KVisibility.PUBLIC && !property.hasAnnotation<DocumentationIgnore>()) {
+        if (property.visibility == KVisibility.PUBLIC && !hasAnnotation<DocumentationIgnore>(documentationClass, property)) {
 
             val name = getPropertyName(property)
             val description =
-                property.findAnnotation<DocumentationType>()
+                findAnnotation<DocumentationType>(documentationClass, property)
                     ?.description?.takeIf { it.isNotBlank() }
                     ?: getPropertyDescription(property)
 
             // Type
-            val fieldType = getFieldType(property)
+            val fieldType = getFieldType(documentationClass, property)
 
             // Required?
             val required = !property.returnType.isMarkedNullable
 
+            // Aliases
+            val jsonAlias = findAnnotation<JsonAlias>(documentationClass, property)
+            val aliases = jsonAlias?.value?.toList() ?: emptyList()
+
             // Subfields
             val propertyType = property.returnType
-            val subfields = if (propertyType.classifier == List::class && property.hasAnnotation<DocumentationList>()) {
+            val subfields = if (propertyType.classifier == List::class && hasAnnotation<DocumentationList>(documentationClass, property)) {
                 val itemType = property.returnType.arguments.firstOrNull()?.type?.classifier
                 if (itemType != null && itemType is KClass<*>) {
                     getFieldsDocumentation(itemType)
                 } else {
                     emptyList()
                 }
-            } else if (property.hasAnnotation<DocumentationField>()) {
+            } else if (hasAnnotation<DocumentationField>(documentationClass, property)) {
                 val actualPropertyType = propertyType.classifier
                 if (actualPropertyType != null && actualPropertyType is KClass<*>) {
                     getFieldsDocumentation(actualPropertyType)
@@ -47,7 +62,14 @@ fun getFieldsForDocumentationClass(documentationClass: KClass<*>): List<FieldDoc
                 emptyList()
             }
 
-            fields += FieldDocumentation(name, description, fieldType, required, subfields)
+            fields += FieldDocumentation(
+                name = name,
+                description = description,
+                type = fieldType,
+                required = required,
+                subfields = subfields,
+                aliases = aliases
+            )
         }
     }
     // Super class
@@ -68,9 +90,9 @@ fun getFieldsDocumentation(type: KClass<*>, section: String = "", required: Bool
     return getFieldsForDocumentationClass(documentationClass)
 }
 
-fun getFieldType(property: KProperty1<out Any, *>): String {
+fun getFieldType(documentationClass: KClass<*>, property: KProperty1<out Any, *>): String {
     // Explicit annotation
-    val typeAnnotation = property.findAnnotation<DocumentationType>()
+    val typeAnnotation = findAnnotation<DocumentationType>(documentationClass, property)
     if (typeAnnotation != null) {
         return typeAnnotation.value
     }
@@ -88,7 +110,7 @@ fun getFieldType(property: KProperty1<out Any, *>): String {
                 classifier.isSubclassOf(Enum::class) ->
                     (classifier.java.enumConstants ?: error("Not an enum")).joinToString(", ")
 
-                property.hasAnnotation<DocumentationField>() -> "Object"
+                hasAnnotation<DocumentationField>(documentationClass, property) -> "Object"
                 else -> error("Classifier $classifier for property $property is not supported")
             }
         } else {
@@ -117,4 +139,5 @@ data class FieldDocumentation(
     val type: String,
     val required: Boolean,
     val subfields: List<FieldDocumentation>,
+    val aliases: List<String>,
 )

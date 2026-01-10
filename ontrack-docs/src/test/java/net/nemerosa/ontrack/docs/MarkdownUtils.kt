@@ -130,21 +130,41 @@ fun StringBuilder.fields(type: KClass<*>, title: String? = "Configuration") {
 fun StringBuilder.writeFields(
     fields: List<FieldDocumentation>,
     level: Int = 1,
+    aliasesDeprecated: Boolean = false,
 ) {
     fields
         .sortedBy { it.name }
-        .forEach { (name, description, type, required, subfields) ->
+        .forEach { (name, description, type, required, subfields, aliases) ->
             append(" ".repeat(4 * (level - 1))).append("*").append(" **").append(name).append("** - ")
                 .append(type)
                 .append(" - ")
                 .append(if (required) "required" else "optional")
-                .append(" - ")
-                .append(description?.trimIndent()).append("\n")
+                .appendDescription(description)
+                .appendAliases(aliases, aliasesDeprecated)
+                .append("\n")
                 .append("\n")
             if (subfields.isNotEmpty()) {
                 writeFields(subfields, level + 1)
             }
         }
 }
+
+private fun StringBuilder.appendDescription(description: String?): StringBuilder =
+    if (!description.isNullOrBlank()) {
+        append(" - _${description.trimIndent()}_")
+    } else {
+        this
+    }
+
+private fun StringBuilder.appendAliases(aliases: List<String>, aliasesDeprecated: Boolean): StringBuilder =
+    if (aliases.isNotEmpty()) {
+        append(" (aliases: ${aliases.joinToString(", ") { "`$it`" }}")
+        if (aliasesDeprecated) {
+            append(" - deprecated")
+        }
+        append(")")
+    } else {
+        this
+    }
 
 private fun tableCell(text: String) = text.replace("\n", "<br/>")
