@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.av.config
 
+import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.graphql.support.IgnoreRef
@@ -12,20 +13,28 @@ import org.apache.commons.codec.digest.DigestUtils
 @APIDescription("Configuration of the auto versioning for one source.")
 data class AutoVersioningSourceConfig(
     @APIDescription("Project to watch")
+    @JsonAlias("project") // Compat. with old Jenkins pipeline library
     val sourceProject: String,
     @APIDescription("Branches to watch using a regular expression")
+    @JsonAlias("branch") // Compat. with the old Jenkins pipeline library
     val sourceBranch: String,
     @APIDescription("Promotion to watch")
+    @JsonAlias("promotion") // Compat. with the old Jenkins pipeline library
     val sourcePromotion: String,
     @APIDescription("Comma-separated list of file to update with the new version")
+    @JsonAlias("path") // Compat. with the old Jenkins pipeline library
     val targetPath: String,
     @APIDescription("Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version.")
+    @JsonAlias("regex") // Compat. with the old Jenkins pipeline library
     val targetRegex: String? = null,
     @APIDescription("Optional replacement for the regex, using only a property name")
+    @JsonAlias("property") // Compat. with the old Jenkins pipeline library
     val targetProperty: String? = null,
     @APIDescription("Optional regex to use on the targetProperty value")
+    @JsonAlias("propertyRegex") // Compat. with the old Jenkins pipeline library
     val targetPropertyRegex: String? = null,
     @APIDescription("When targetProperty is defined, defines the type of property (defaults to Java properties file, but could be NPM, etc.)")
+    @JsonAlias("propertyType") // Compat. with the old Jenkins pipeline library
     val targetPropertyType: String? = null,
     @APIDescription("Check if the PR must be approved automatically or not (`true` by default)")
     val autoApproval: Boolean? = null,

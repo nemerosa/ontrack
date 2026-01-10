@@ -133,7 +133,7 @@ configure(javaProjects) {
     kotlin {
         jvmToolchain(21)
         compilerOptions {
-            freeCompilerArgs.addAll("-Xjsr305=strict")
+            freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
             languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
         }
     }
