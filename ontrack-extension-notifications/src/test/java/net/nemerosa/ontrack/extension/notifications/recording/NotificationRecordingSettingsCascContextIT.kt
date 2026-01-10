@@ -24,7 +24,6 @@ internal class NotificationRecordingSettingsCascContextIT : AbstractCascTestSupp
             """
                 {
                   "title": "NotificationRecordingSettings",
-                  "description": null,
                   "properties": {
                     "cleanupIntervalSeconds": {
                       "description": "Interval between each cleanup of the recordings",

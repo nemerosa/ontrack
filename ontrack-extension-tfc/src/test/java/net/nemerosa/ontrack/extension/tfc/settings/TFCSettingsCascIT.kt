@@ -23,7 +23,6 @@ class TFCSettingsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "TFCSettings",
-                  "description": null,
                   "properties": {
                     "enabled": {
                       "description": "Is the support for TFC notifications enabled?",

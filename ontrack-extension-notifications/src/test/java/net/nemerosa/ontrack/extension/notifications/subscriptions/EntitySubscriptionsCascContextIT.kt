@@ -38,7 +38,6 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 {
                   "items": {
                     "title": "EntitySubscriptionCascContextData",
-                    "description": null,
                     "properties": {
                       "entity": {
                         "title": "EntitySubscriptionData",

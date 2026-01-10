@@ -32,7 +32,6 @@ internal class JenkinsConfigurationCascContextIT : AbstractCascTestSupport() {
                 {
                   "items": {
                     "title": "JenkinsConfigurationCasc",
-                    "description": null,
                     "properties": {
                       "name": {
                         "description": "Unique name for this configuration",

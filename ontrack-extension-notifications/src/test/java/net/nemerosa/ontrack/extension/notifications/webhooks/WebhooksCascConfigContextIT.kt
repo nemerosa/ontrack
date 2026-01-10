@@ -31,7 +31,6 @@ internal class WebhooksCascConfigContextIT : AbstractCascTestSupport() {
                 {
                   "items": {
                     "title": "CascWebhook",
-                    "description": null,
                     "properties": {
                       "authentication": {
                         "title": "CascWebhookAuthentication",

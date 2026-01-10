@@ -23,7 +23,6 @@ class WorkflowSettingsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "WorkflowSettings",
-                  "description": null,
                   "properties": {
                     "retentionDuration": {
                       "description": "Number of milliseconds before workflow instances are removed",

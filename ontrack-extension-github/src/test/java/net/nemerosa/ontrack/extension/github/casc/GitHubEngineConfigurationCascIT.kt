@@ -29,7 +29,6 @@ class GitHubEngineConfigurationCascIT : AbstractCascTestSupport() {
                 {
                   "items": {
                     "title": "GitHubEngineConfiguration",
-                    "description": null,
                     "properties": {
                       "appId": {
                         "description": "appId field",

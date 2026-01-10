@@ -24,7 +24,6 @@ class JenkinsPipelineLibraryIndicatorSettingsCascIT : AbstractCascTestSupport() 
                 {
                   "items": {
                     "title": "JenkinsPipelineLibraryIndicatorLibrarySettings",
-                    "description": null,
                     "properties": {
                       "lastDeprecated": {
                         "description": "Last deprecated version",

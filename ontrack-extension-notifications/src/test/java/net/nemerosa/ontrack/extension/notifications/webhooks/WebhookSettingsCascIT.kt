@@ -24,7 +24,6 @@ class WebhookSettingsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "WebhookSettings",
-                  "description": null,
                   "properties": {
                     "deliveriesRetentionDays": {
                       "description": "Retention time (in days) for the archiving of webhook deliveries",

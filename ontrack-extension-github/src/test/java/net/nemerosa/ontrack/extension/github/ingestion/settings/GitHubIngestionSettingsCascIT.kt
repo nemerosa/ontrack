@@ -23,7 +23,6 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "GitHubIngestionSettings",
-                  "description": null,
                   "properties": {
                     "enabled": {
                       "description": "Is the ingestion of the GitHub events enabled?",

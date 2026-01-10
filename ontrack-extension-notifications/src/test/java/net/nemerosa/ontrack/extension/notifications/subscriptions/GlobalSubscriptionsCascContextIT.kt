@@ -28,7 +28,6 @@ class GlobalSubscriptionsCascContextIT : AbstractCascTestSupport() {
                 {
                   "items": {
                     "title": "SubscriptionsCascContextData",
-                    "description": null,
                     "properties": {
                       "channel": {
                         "description": "Channel to send notifications to",

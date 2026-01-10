@@ -24,7 +24,6 @@ class SlackSettingsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "SlackSettings",
-                  "description": null,
                   "properties": {
                     "emoji": {
                       "description": "Emoji (like :ontrack:) to use for the message",

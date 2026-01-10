@@ -30,7 +30,6 @@ class JIRAConfigurationCascIT : AbstractCascTestSupport() {
                 {
                   "items": {
                     "title": "JIRAConfiguration",
-                    "description": null,
                     "properties": {
                       "apiUrl":{
                         "description":"Optional alternative URL for the JIRA API",

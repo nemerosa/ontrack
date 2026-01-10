@@ -30,7 +30,6 @@ class SonarQubeConfigurationCascIT : AbstractCascTestSupport() {
                 {
                   "items": {
                     "title": "SonarQubeConfigurationCascData",
-                    "description": null,
                     "properties": {
                       "name": {
                         "description": "Name of the configuration",

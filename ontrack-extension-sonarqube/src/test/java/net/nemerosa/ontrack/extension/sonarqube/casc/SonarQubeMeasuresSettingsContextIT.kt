@@ -24,7 +24,6 @@ class SonarQubeMeasuresSettingsContextIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "SonarQubeMeasuresSettings",
-                  "description": null,
                   "properties": {
                     "blockerThreshold": {
                       "description": "blockerThreshold field",

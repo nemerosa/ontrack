@@ -25,7 +25,6 @@ class LDAPSettingsContextIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "LDAPSettings",
-                  "description": null,
                   "properties": {
                     "emailAttribute": {
                       "description": "emailAttribute field",

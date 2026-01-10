@@ -24,7 +24,6 @@ class GitHubSCMCatalogSettingsContextIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "GitHubSCMCatalogSettings",
-                  "description": null,
                   "properties": {
                     "autoMergeInterval": {
                       "description": "Number of milliseconds to wait between each auto merge control",

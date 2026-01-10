@@ -23,7 +23,6 @@ internal class JenkinsPostProcessingSettingsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "JenkinsPostProcessingSettings",
-                  "description": null,
                   "properties": {
                     "config": {
                       "description": "Default Jenkins configuration to use for the connection",

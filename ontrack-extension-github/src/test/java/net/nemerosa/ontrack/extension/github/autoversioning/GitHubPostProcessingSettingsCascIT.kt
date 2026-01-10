@@ -23,7 +23,6 @@ internal class GitHubPostProcessingSettingsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "GitHubPostProcessingSettings",
-                  "description": null,
                   "properties": {
                     "branch": {
                       "description": "Branch to launch for the workflow",

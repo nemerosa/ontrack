@@ -30,7 +30,6 @@ class ProjectPermissionsAdminContextIT : AbstractCascTestSupport() {
                 {
                   "items": {
                     "title": "ProjectPermission",
-                    "description": null,
                     "properties": {
                       "group": {
                         "description": "Name of the group",

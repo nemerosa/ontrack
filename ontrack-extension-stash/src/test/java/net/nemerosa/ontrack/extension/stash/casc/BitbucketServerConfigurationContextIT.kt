@@ -29,7 +29,6 @@ class BitbucketServerConfigurationContextIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "BitbucketServerSettings",
-                  "description": null,
                   "properties": {
                     "autoDeleteBranch": {
                       "description": "Deleting the source branch when an auto-versioning PR is merged",
