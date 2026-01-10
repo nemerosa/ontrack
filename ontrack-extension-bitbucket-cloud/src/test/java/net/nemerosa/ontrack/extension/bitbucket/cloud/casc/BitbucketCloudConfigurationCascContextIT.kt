@@ -32,7 +32,6 @@ class BitbucketCloudConfigurationCascContextIT : AbstractCascTestSupport() {
                 {
                   "items": {
                     "title": "BitbucketCloudConfigurationCascData",
-                    "description": null,
                     "properties": {
                       "name": {
                         "description": "Name of the configuration",

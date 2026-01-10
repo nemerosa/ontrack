@@ -27,7 +27,6 @@ class AccountGroupsAdminContextIT : AbstractCascTestSupport() {
                 {
                   "items": {
                     "title": "AccountGroupInput",
-                    "description": null,
                     "properties": {
                       "description": {
                         "description": "Description of the group",

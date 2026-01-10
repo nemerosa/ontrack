@@ -23,7 +23,6 @@ class PredefinedValidationStampsAdminContextIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "PredefinedValidationStampsAdminContextType",
-                  "description": null,
                   "properties": {
                     "list": {
                       "items": {

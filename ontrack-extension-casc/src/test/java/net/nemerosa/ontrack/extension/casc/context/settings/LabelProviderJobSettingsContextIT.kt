@@ -24,7 +24,6 @@ class LabelProviderJobSettingsContextIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "LabelProviderJobSettings",
-                  "description": null,
                   "properties": {
                     "enabled": {
                       "description": "Check to enable the automated collection of labels for all projects. This can generate a high level activity in the background.",

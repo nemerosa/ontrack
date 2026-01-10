@@ -24,7 +24,6 @@ class PreviousPromotionConditionSettingsContextIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "PreviousPromotionConditionSettings",
-                  "description": null,
                   "properties": {
                     "previousPromotionRequired": {
                       "description": "Makes a promotion conditional based on the fact that a previous promotion has been granted.",

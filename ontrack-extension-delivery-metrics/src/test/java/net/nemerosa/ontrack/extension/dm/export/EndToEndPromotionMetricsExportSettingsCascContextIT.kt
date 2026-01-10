@@ -24,7 +24,6 @@ internal class EndToEndPromotionMetricsExportSettingsCascContextIT : AbstractCas
             """
                 {
                   "title": "EndToEndPromotionMetricsExportSettings",
-                  "description": null,
                   "properties": {
                     "branches": {
                       "description": "Regex for the branches eligible for the export",

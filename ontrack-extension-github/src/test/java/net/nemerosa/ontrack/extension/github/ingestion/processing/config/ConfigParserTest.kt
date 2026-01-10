@@ -215,6 +215,7 @@ class ConfigParserTest {
         assertEquals(
             """
                 ---
+                vs-name-normalization: "DEFAULT"
                 version: "v2"
                 workflows:
                   filter:
@@ -268,7 +269,6 @@ class ConfigParserTest {
                 tagging:
                   strategies: []
                   commit-property: true
-                vsNameNormalization: "DEFAULT"
             """.trimIndent().trim(),
             yaml.trim()
         )

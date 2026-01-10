@@ -23,7 +23,6 @@ class EnvironmentsSettingsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "EnvironmentsSettings",
-                  "description": null,
                   "properties": {
                     "buildDisplayOption": {
                       "enum": [

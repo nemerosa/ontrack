@@ -30,7 +30,6 @@ internal class AccountGroupGlobalPermissionsAdminContextIT : AbstractCascTestSup
                 {
                   "items": {
                     "title": "CascAccountGroupPermission",
-                    "description": null,
                     "properties": {
                       "group": {
                         "description": "Name of the group",

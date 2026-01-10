@@ -32,7 +32,6 @@ class PredefinedPromotionLevelsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "PredefinedPromotionLevelsAdminContextType",
-                  "description": null,
                   "properties": {
                     "list": {
                       "items": {

@@ -24,7 +24,6 @@ class AutoVersioningSettingsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "AutoVersioningSettings",
-                  "description": null,
                   "properties": {
                     "auditCleanupDuration": {
                       "description": "Maximum time to keep audit entries for all kinds of auto versioning requests (counted _after_ the audit retention)",

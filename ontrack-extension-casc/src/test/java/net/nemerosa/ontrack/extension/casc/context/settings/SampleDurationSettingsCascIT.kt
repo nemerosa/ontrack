@@ -24,7 +24,6 @@ class SampleDurationSettingsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "SampleDurationSettings",
-                  "description": null,
                   "properties": {
                     "duration": {
                       "description": "duration field",

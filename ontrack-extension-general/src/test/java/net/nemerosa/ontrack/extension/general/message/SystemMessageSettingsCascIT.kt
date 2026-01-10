@@ -30,7 +30,6 @@ class SystemMessageSettingsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "SystemMessageSettings",
-                  "description": null,
                   "properties": {
                     "content": {
                       "description": "Message content",

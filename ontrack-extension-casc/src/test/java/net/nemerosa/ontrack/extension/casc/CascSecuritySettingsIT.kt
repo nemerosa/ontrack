@@ -26,7 +26,6 @@ class CascSecuritySettingsIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "SecuritySettings",
-                  "description": null,
                   "properties": {
                     "builtInAuthenticationEnabled": {
                       "description": "Enabling the built-in authentication",

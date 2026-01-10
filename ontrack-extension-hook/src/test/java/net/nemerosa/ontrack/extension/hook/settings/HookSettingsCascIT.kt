@@ -24,7 +24,6 @@ class HookSettingsCascIT : AbstractCascTestSupport() {
             """
                 {
                   "title": "HookSettings",
-                  "description": null,
                   "properties": {
                     "recordCleanupDuration": {
                       "description": "Maximum time to keep queue records for all kinds of hook requests (counted _after_ the retention)",
