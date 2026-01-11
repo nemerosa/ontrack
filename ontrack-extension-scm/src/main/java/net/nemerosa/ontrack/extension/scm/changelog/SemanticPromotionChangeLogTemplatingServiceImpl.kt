@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.scm.changelog
 
-import net.nemerosa.ontrack.extension.scm.service.PromotionRunChangeLogTemplatingSourceConfig
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
@@ -11,12 +10,12 @@ import net.nemerosa.ontrack.model.templating.getBooleanTemplatingParam
 import org.springframework.stereotype.Service
 
 @Service
-class PromotionChangeLogTemplatingServiceImpl(
-    buildFilterService: BuildFilterService,
+class SemanticPromotionChangeLogTemplatingServiceImpl(
     structureService: StructureService,
-    private val changeLogTemplatingService: ChangeLogTemplatingService,
+    buildFilterService: BuildFilterService,
+    private val semanticChangeLogTemplatingService: SemanticChangeLogTemplatingService,
 ) : AbstractPromotionChangeLogTemplatingService(structureService, buildFilterService),
-    PromotionChangeLogTemplatingService {
+    SemanticPromotionChangeLogTemplatingService {
 
     override fun render(
         toBuild: Build,
@@ -26,19 +25,14 @@ class PromotionChangeLogTemplatingServiceImpl(
     ): String {
 
         val acrossBranches = configMap.getBooleanTemplatingParam(
-            PromotionRunChangeLogTemplatingSourceConfig::acrossBranches.name,
+            SemanticPromotionChangeLogTemplatingServiceConfig::acrossBranches.name,
             true
         )
 
-        val fromBuild = promotionBoundaries(
-            toBuild = toBuild,
-            promotion = promotion,
-            acrossBranches = acrossBranches,
-        ) ?: return ChangeLogTemplatingServiceConfig.emptyValue(configMap)
+        val fromBuild = promotionBoundaries(toBuild, promotion, acrossBranches) ?: return ""
 
-        val config = configMap.asJson().parse<ChangeLogTemplatingServiceConfig>()
-
-        return changeLogTemplatingService.render(
+        val config = configMap.asJson().parse<SemanticPromotionChangeLogTemplatingServiceConfig>()
+        return semanticChangeLogTemplatingService.render(
             fromBuild = fromBuild,
             toBuild = toBuild,
             config = config,

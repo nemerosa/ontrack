@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.service
 
-import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingServiceConfig
-import net.nemerosa.ontrack.extension.scm.changelog.PromotionChangeLogTemplatingService
+import net.nemerosa.ontrack.extension.scm.changelog.SemanticPromotionChangeLogTemplatingService
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Component
 @Component
 @APIDescription(
     """
-    Renders a change log for this promotion run.
+    Renders a semantic change log for this promotion run.
     
     The "to build" is the one being promoted.
      
@@ -33,25 +32,24 @@ import org.springframework.stereotype.Component
 )
 @Documentation(PromotionRunChangeLogTemplatingSourceConfig::class)
 @DocumentationQualifier("promotion-run", "PromotionRun")
-@DocumentationExampleCode($$"${promotionRun.changelog}")
-class PromotionRunChangeLogTemplatingSource(
-    private val promotionChangeLogTemplatingService: PromotionChangeLogTemplatingService,
+@DocumentationExampleCode($$"${promotionRun.semanticChangelog}")
+class SemanticPromotionRunChangeLogTemplatingSource(
+    private val semanticPromotionChangeLogTemplatingService: SemanticPromotionChangeLogTemplatingService,
 ) : AbstractTemplatingSource(
-    field = "changelog",
+    field = "semanticChangelog",
     type = ProjectEntityType.PROMOTION_RUN,
 ) {
 
     override fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String {
-        val empty = ChangeLogTemplatingServiceConfig.emptyValue(configMap)
         return if (entity is PromotionRun) {
-            promotionChangeLogTemplatingService.render(
+            semanticPromotionChangeLogTemplatingService.render(
                 toBuild = entity.build,
                 promotion = entity.promotionLevel.name,
                 configMap = configMap,
                 renderer = renderer,
             )
         } else {
-            empty
+            ""
         }
     }
 
