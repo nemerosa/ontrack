@@ -10,4 +10,7 @@ interface SemanticChangeLogConfig {
     @APIDescription("Types to exclude")
     val exclude: List<String>
 
+    @APIDescription("Use emojis in the section titles")
+    val emojis: Boolean
+
 }

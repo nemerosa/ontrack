@@ -65,6 +65,47 @@ class SemanticChangelogRenderingServiceImplTest {
     }
 
     @Test
+    fun `Default semantic changelog with emojis`() {
+        val changelog = SCMChangeLog(
+            from = BuildFixtures.testBuild(),
+            to = BuildFixtures.testBuild(),
+            fromCommit = "abcd123",
+            toCommit = "abcd456",
+            commits = listOf(
+                "feat(My feature): Some commits for a feature",
+                "feat(My feature): Some fixes for a feature",
+                "fix: Fixing some bugs",
+                "fix: Fixing some CSS"
+            ).toCommits(project),
+            issues = SCMChangeLogIssues(
+                issueServiceConfiguration = mockk(),
+                issues = emptyList()
+            )
+        )
+
+        val text = semanticChangelogRenderingService.render(
+            changelog = changelog,
+            config = SemanticChangeLogTemplatingServiceConfig(emojis = true),
+            suffix = null,
+            renderer = PlainEventRenderer.INSTANCE
+        )
+        assertEquals(
+            """
+                ✨ Features:
+                
+                * My feature - Some commits for a feature
+                * My feature - Some fixes for a feature
+                
+                🐛 Fixes:
+                
+                * Fixing some bugs
+                * Fixing some CSS
+            """.trimIndent().trim(),
+            text.trim()
+        )
+    }
+
+    @Test
     fun `Sending a semantic change log on a promotion run with some issues`() {
         val changelog = SCMChangeLog(
             from = BuildFixtures.testBuild(),

@@ -8,21 +8,6 @@ class SemanticChangelogRenderingServiceImpl(
     private val semanticChangelogService: SemanticChangelogService,
 ) : SemanticChangelogRenderingService {
 
-    companion object {
-        private val types = mapOf(
-            "build" to "Build",
-            "chore" to "Misc.",
-            "ci" to "CI",
-            "docs" to "Documentation",
-            "feat" to "Features",
-            "fix" to "Fixes",
-            "style" to "Style",
-            "refactor" to "Refactoring",
-            "perf" to "Performance",
-            "test" to "Tests",
-        )
-    }
-
     override fun render(
         changelog: SCMChangeLog,
         config: SemanticChangeLogConfig,
@@ -85,7 +70,13 @@ class SemanticChangelogRenderingServiceImpl(
     fun getTypeTitle(type: String, config: SemanticChangeLogConfig): String {
         return config.sections.find { it.type == type }
             ?.title
-            ?: types[type]
+            ?: types[type]?.let { type ->
+                if (config.emojis) {
+                    "${type.emoji} ${type.title}"
+                } else {
+                    type.title
+                }
+            }
             ?: type
     }
 
