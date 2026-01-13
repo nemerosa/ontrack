@@ -25,7 +25,9 @@ class GQLTypeSCMChangeLog(
     private val scmChangeLogExportService: SCMChangeLogExportService,
     private val eventRendererRegistry: EventRendererRegistry,
     private val gqlInputChangeLogTemplatingServiceConfig: GQLInputChangeLogTemplatingServiceConfig,
+    private val gqlInputSemanticChangeLogTemplatingServiceConfig: GQLInputSemanticChangeLogTemplatingServiceConfig,
     private val changeLogTemplatingService: ChangeLogTemplatingService,
+    private val semanticChangeLogTemplatingService: SemanticChangeLogTemplatingService,
 ) : GQLType {
 
     override fun getTypeName(): String = SCMChangeLog::class.java.simpleName
@@ -112,6 +114,38 @@ class GQLTypeSCMChangeLog(
                         val config = parseOptionalArgument<ChangeLogTemplatingServiceConfig>(RENDER_ARG_CONFIG, env)
                             ?: ChangeLogTemplatingServiceConfig()
                         changeLogTemplatingService.render(
+                            fromBuild = changeLog.from,
+                            toBuild = changeLog.to,
+                            renderer = renderer,
+                            config = config,
+                        )
+                    }
+            }
+
+            .field {
+                it.name("semantic")
+                    .description("Semantic change log")
+                    .argument(
+                        stringArgument(
+                            name = RENDER_ARG_RENDERER,
+                            description = "Renderer to use for the change log rendering",
+                        )
+                    )
+                    .argument { arg ->
+                        arg.name(RENDER_ARG_CONFIG)
+                            .description("Configuration for the rendering")
+                            .type(gqlInputSemanticChangeLogTemplatingServiceConfig.typeRef)
+                    }
+                    .type(GraphQLString)
+                    .dataFetcher { env ->
+                        val changeLog = env.getSource<SCMChangeLog>()!!
+                        val renderer = env.getArgument<String?>(RENDER_ARG_RENDERER)
+                            ?.let { eventRendererRegistry.findEventRendererById(it) }
+                            ?: PlainEventRenderer.INSTANCE
+                        val config =
+                            parseOptionalArgument<SemanticChangeLogTemplatingServiceConfig>(RENDER_ARG_CONFIG, env)
+                                ?: SemanticChangeLogTemplatingServiceConfig()
+                        semanticChangeLogTemplatingService.render(
                             fromBuild = changeLog.from,
                             toBuild = changeLog.to,
                             renderer = renderer,
