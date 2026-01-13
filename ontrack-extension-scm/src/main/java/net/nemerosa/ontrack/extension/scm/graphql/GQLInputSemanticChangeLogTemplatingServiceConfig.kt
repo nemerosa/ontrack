@@ -41,6 +41,7 @@ class GQLInputSemanticChangeLogTemplatingServiceConfig : GQLInputType<SemanticCh
                 )
             )
             .field(stringListInputField(SemanticChangeLogTemplatingServiceConfig::exclude, nullable = true))
+            .field(booleanInputField(SemanticChangeLogTemplatingServiceConfig::emojis, nullable = true))
             .build()
 
 

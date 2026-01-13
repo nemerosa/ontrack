@@ -83,6 +83,7 @@ nav:
           - Jenkins: content/integrations/notifications/jenkins.md
           - GitHub Workflows: content/integrations/notifications/github-workflow.md
       - Auto-versioning: content/integrations/auto-versioning/auto-versioning.md
+      - Changelogs: content/integrations/changelogs/changelogs.md
       - Workflows: content/integrations/workflows/workflows.md
       - Environments: content/integrations/environments/environments.md
   - Reference:
