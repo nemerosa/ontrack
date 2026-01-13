@@ -77,7 +77,7 @@ class SemanticChangelogRenderingServiceImplTest {
                 "ci: Fixing the pipeline",
                 "chore: Formatting some code",
                 "ISS-22 Fixing some bugs",
-                "doc: Updating the readme",
+                "docs: Updating the readme",
                 "ISS-23 Fixing some CSS",
             ).toCommits(project),
             issues = SCMChangeLogIssues(
@@ -133,7 +133,7 @@ class SemanticChangelogRenderingServiceImplTest {
                 "ci: Fixing the pipeline",
                 "chore: Formatting some code",
                 "ISS-22 Fixing some bugs",
-                "doc: Updating the readme",
+                "docs: Updating the readme",
                 "ISS-23 Fixing some CSS",
             ).toCommits(project),
             issues = SCMChangeLogIssues(
@@ -188,7 +188,7 @@ class SemanticChangelogRenderingServiceImplTest {
                 "ci: Fixing the pipeline",
                 "chore: Formatting some code",
                 "ISS-22 Fixing some bugs",
-                "doc: Updating the readme",
+                "docs: Updating the readme",
                 "ISS-23 Fixing some CSS",
             ).toCommits(project),
             issues = SCMChangeLogIssues(

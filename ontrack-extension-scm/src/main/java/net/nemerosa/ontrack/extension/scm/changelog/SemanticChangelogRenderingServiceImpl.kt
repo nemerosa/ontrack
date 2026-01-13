@@ -10,11 +10,16 @@ class SemanticChangelogRenderingServiceImpl(
 
     companion object {
         private val types = mapOf(
+            "build" to "Build",
             "chore" to "Misc.",
             "ci" to "CI",
-            "doc" to "Documentation",
+            "docs" to "Documentation",
             "feat" to "Features",
             "fix" to "Fixes",
+            "style" to "Style",
+            "refactor" to "Refactoring",
+            "perf" to "Performance",
+            "test" to "Tests",
         )
     }
 
