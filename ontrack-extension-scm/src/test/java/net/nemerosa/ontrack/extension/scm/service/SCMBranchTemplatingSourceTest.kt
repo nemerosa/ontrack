@@ -5,6 +5,7 @@ import io.mockk.mockk
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.structure.BranchFixtures
 import net.nemerosa.ontrack.model.structure.ProjectFixtures
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -36,7 +37,7 @@ class SCMBranchTemplatingSourceTest {
             scmDetector.getSCM(branch.project)
         } returns scm
 
-        val value = scmBranchTemplatingSource.render(branch, emptyMap(), PlainEventRenderer.INSTANCE)
+        val value = scmBranchTemplatingSource.render(branch, TemplatingSourceConfig(), PlainEventRenderer.INSTANCE)
 
         assertEquals(
             "release/1.23",
@@ -56,7 +57,7 @@ class SCMBranchTemplatingSourceTest {
             scmDetector.getSCM(branch.project)
         } returns scm
 
-        val value = scmBranchTemplatingSource.render(branch, emptyMap(), PlainEventRenderer.INSTANCE)
+        val value = scmBranchTemplatingSource.render(branch, TemplatingSourceConfig(), PlainEventRenderer.INSTANCE)
 
         assertEquals(
             "",
@@ -72,7 +73,7 @@ class SCMBranchTemplatingSourceTest {
             scmDetector.getSCM(branch.project)
         } returns null
 
-        val value = scmBranchTemplatingSource.render(branch, emptyMap(), PlainEventRenderer.INSTANCE)
+        val value = scmBranchTemplatingSource.render(branch, TemplatingSourceConfig(), PlainEventRenderer.INSTANCE)
 
         assertEquals(
             "",
@@ -84,7 +85,7 @@ class SCMBranchTemplatingSourceTest {
     fun `No extension if not a branch`() {
         val project = ProjectFixtures.testProject()
 
-        val value = scmBranchTemplatingSource.render(project, emptyMap(), PlainEventRenderer.INSTANCE)
+        val value = scmBranchTemplatingSource.render(project, TemplatingSourceConfig(), PlainEventRenderer.INSTANCE)
 
         assertEquals(
             "",

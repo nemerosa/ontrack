@@ -9,7 +9,8 @@ import net.nemerosa.ontrack.model.docs.DocumentationQualifier
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.templating.AbstractTemplatingSource
-import net.nemerosa.ontrack.model.templating.getRequiredTemplatingParam
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
+import net.nemerosa.ontrack.model.templating.getRequiredInt
 import org.springframework.stereotype.Component
 
 @Component
@@ -37,15 +38,15 @@ class BuildChangeLogTemplatingSource(
     type = ProjectEntityType.BUILD,
 ) {
 
-    override fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String {
-        val empty = ChangeLogTemplatingServiceConfig.emptyValue(configMap)
+    override fun render(entity: ProjectEntity, config: TemplatingSourceConfig, renderer: EventRenderer): String {
+        val empty = ChangeLogTemplatingServiceConfig.emptyValue(config)
         return if (entity is Build) {
-            val fromId = configMap.getRequiredTemplatingParam(BuildChangeLogTemplatingSourceConfig::from.name).toInt()
+            val fromId = config.getRequiredInt(BuildChangeLogTemplatingSourceConfig::from.name)
             val from = structureService.getBuild(ID.of(fromId))
             changeLogTemplatingService.render(
                 fromBuild = from,
                 toBuild = entity,
-                configMap = configMap,
+                config = config.parse<ChangeLogTemplatingServiceConfig>(),
                 renderer = renderer,
             )
         } else {

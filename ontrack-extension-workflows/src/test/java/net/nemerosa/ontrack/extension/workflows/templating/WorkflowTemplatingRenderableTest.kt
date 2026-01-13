@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNode
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNodeStatus
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -31,7 +32,7 @@ class WorkflowTemplatingRenderableTest {
         // workflow.ticket-creation?path=data
         val text = renderable.render(
             field = "ticket-creation",
-            configMap = mapOf("path" to "result.data"),
+            config = TemplatingSourceConfig.fromMap("path" to "result.data"),
             renderer = PlainEventRenderer.INSTANCE
         )
 

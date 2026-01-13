@@ -19,7 +19,7 @@ class TemplatingServiceImpl(
     private val entityDisplayNameService: EntityDisplayNameService,
 ) : TemplatingService {
 
-    private val sourcesPerProjectEntityType = ProjectEntityType.values().associateWith { type ->
+    private val sourcesPerProjectEntityType = ProjectEntityType.entries.associateWith { type ->
         templatingSources.filter { source ->
             type in source.types
         }
@@ -65,7 +65,8 @@ class TemplatingServiceImpl(
             if (m != null) {
                 val contextKey = m.groupValues[1]
                 val field = m.groupValues.getOrNull(2)
-                val config = m.groupValues.getOrNull(3)
+                val configQuery = m.groupValues.getOrNull(3)
+                val config = parseTemplatingSourceConfig(configQuery)
                 val filter = m.groupValues.getOrNull(4)
                 val text = if (contextKey == "#") {
                     if (field.isNullOrBlank()) {
@@ -113,27 +114,25 @@ class TemplatingServiceImpl(
 
     private fun renderFunction(
         functionId: String,
-        config: String?,
+        config: TemplatingSourceConfig,
         context: Map<String, Any>,
         renderer: EventRenderer
     ): String {
         // Gets the function
         val function = functionsById[functionId]
             ?: throw TemplatingFunctionNotFoundException(functionId)
-        // Configuration
-        val configMap: Map<String, String> = parseConfigMap(config)
         // Callback
         val expressionResolver: (String) -> String = { expression: String ->
             renderExpression(expression, context, renderer)
         }
         // Rendering of the function
-        return function.render(configMap, context, renderer, expressionResolver)
+        return function.render(config, context, renderer, expressionResolver)
     }
 
     private fun renderContext(
         contextKey: String,
         field: String?,
-        config: String?,
+        config: TemplatingSourceConfig,
         context: Map<String, Any>,
         renderer: EventRenderer
     ): String {
@@ -152,8 +151,7 @@ class TemplatingServiceImpl(
         }
         // Renderable
         else if (contextValue is TemplatingRenderable) {
-            val configMap = parseConfigMap(config)
-            contextValue.render(field, configMap, renderer)
+            contextValue.render(field, config, renderer)
         }
         // Context data
         else if (contextValue is TemplatingContextData) {
@@ -165,7 +163,7 @@ class TemplatingServiceImpl(
             )
         }
         // Else, we render as a string (if no field, config)
-        else if (field.isNullOrBlank() && config.isNullOrBlank()) {
+        else if (field.isNullOrBlank() && config.isEmpty()) {
             contextValue.toString()
         }
         // Formatting error
@@ -178,10 +176,15 @@ class TemplatingServiceImpl(
         filtersById[filter]?.apply(text, renderer)
             ?: throw TemplatingFilterNotFoundException(filter)
 
-    private fun renderEntity(entity: ProjectEntity, field: String?, config: String?, renderer: EventRenderer): String =
+    private fun renderEntity(
+        entity: ProjectEntity,
+        field: String?,
+        config: TemplatingSourceConfig,
+        renderer: EventRenderer
+    ): String =
         // If not field, using the entity name
         if (field.isNullOrBlank()) {
-            if (config.isNullOrBlank()) {
+            if (config.isEmpty()) {
                 renderer.render(entity, entityDisplayNameService.getEntityDisplayName(entity))
             } else {
                 throw TemplatingEntityNameHavingConfigException()
@@ -197,8 +200,7 @@ class TemplatingServiceImpl(
                     throw TemplatingMultipleFieldSourcesException(field)
                 } else {
                     val source = sources.first()
-                    val configMap: Map<String, String> = parseConfigMap(config)
-                    source.render(entity, configMap, renderer)
+                    source.render(entity, config, renderer)
                 }
             } else {
                 // No field source available
@@ -206,19 +208,10 @@ class TemplatingServiceImpl(
             }
         }
 
-    private fun parseConfigMap(config: String?): Map<String, String> {
-        val configMap: Map<String, String> = if (config.isNullOrBlank()) {
-            emptyMap()
-        } else {
-            parseTemplatingConfig(config)
-        }
-        return configMap
-    }
-
     private fun renderContextData(
         contextData: TemplatingContextData,
         field: String?,
-        config: String?,
+        config: TemplatingSourceConfig,
         renderer: EventRenderer,
     ): String {
         val handler = contextHandlers[contextData.id]
@@ -236,14 +229,14 @@ class TemplatingServiceImpl(
         handler: TemplatingContextHandler<T>,
         data: JsonNode,
         field: String?,
-        config: String?,
+        config: TemplatingSourceConfig,
         renderer: EventRenderer,
     ): String {
         val parsedData = handler.deserialize(data)
         return handler.render(
             data = parsedData,
             field = field,
-            config = parseConfigMap(config),
+            config = config,
             renderer = renderer,
         )
     }

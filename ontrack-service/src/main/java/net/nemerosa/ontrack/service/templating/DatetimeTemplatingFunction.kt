@@ -7,8 +7,8 @@ import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.templating.TemplatingFunction
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.springframework.stereotype.Component
-import java.time.Duration
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -27,20 +27,20 @@ class DatetimeTemplatingFunction(
     override val id: String = "datetime"
 
     override fun render(
-        configMap: Map<String, String>,
+        config: TemplatingSourceConfig,
         context: Map<String, Any>,
         renderer: EventRenderer,
         expressionResolver: (expression: String) -> String
     ): String {
-        val format = configMap[DatetimeTemplatingFunctionParameters::format.name] ?: "yyyy-MM-dd'T'HH:mm:ss"
-        val timezone = configMap[DatetimeTemplatingFunctionParameters::timezone.name]
+        val format = config.getString(DatetimeTemplatingFunctionParameters::format.name) ?: "yyyy-MM-dd'T'HH:mm:ss"
+        val timezone = config.getString(DatetimeTemplatingFunctionParameters::timezone.name)
 
-        val years = configMap[DatetimeTemplatingFunctionParameters::years.name]?.toLong() ?: 0
-        val months = configMap[DatetimeTemplatingFunctionParameters::months.name]?.toLong() ?: 0
-        val days = configMap[DatetimeTemplatingFunctionParameters::days.name]?.toLong() ?: 0
-        val hours = configMap[DatetimeTemplatingFunctionParameters::hours.name]?.toLong() ?: 0
-        val minutes = configMap[DatetimeTemplatingFunctionParameters::minutes.name]?.toLong() ?: 0
-        val seconds = configMap[DatetimeTemplatingFunctionParameters::seconds.name]?.toLong() ?: 0
+        val years = config.getLong(DatetimeTemplatingFunctionParameters::years.name) ?: 0
+        val months = config.getLong(DatetimeTemplatingFunctionParameters::months.name) ?: 0
+        val days = config.getLong(DatetimeTemplatingFunctionParameters::days.name) ?: 0
+        val hours = config.getLong(DatetimeTemplatingFunctionParameters::hours.name) ?: 0
+        val minutes = config.getLong(DatetimeTemplatingFunctionParameters::minutes.name) ?: 0
+        val seconds = config.getLong(DatetimeTemplatingFunctionParameters::seconds.name) ?: 0
 
         // Gets the actual current time
         val time = timeServer.now

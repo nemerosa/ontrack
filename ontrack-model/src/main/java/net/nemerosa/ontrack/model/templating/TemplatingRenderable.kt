@@ -12,9 +12,9 @@ interface TemplatingRenderable {
      * Renderer this element with the additional parameters.
      *
      * @param field Optional field for this renderable
-     * @param configMap Optional configuration for this renderable
+     * @param config Configuration for this renderable
      * @param renderer Target renderer
      * @return Rendered template
      */
-    fun render(field: String?, configMap: Map<String, String>, renderer: EventRenderer): String
+    fun render(field: String?, config: TemplatingSourceConfig, renderer: EventRenderer): String
 }

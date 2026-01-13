@@ -5,14 +5,6 @@ import net.nemerosa.ontrack.model.structure.Build
 
 interface ChangeLogTemplatingService {
 
-    @Deprecated("Use the typed method, without the config map.")
-    fun render(
-        fromBuild: Build,
-        toBuild: Build,
-        configMap: Map<String, String>,
-        renderer: EventRenderer,
-    ): String
-
     /**
      * Renders a changelog between two builds, given a number of options.
      *

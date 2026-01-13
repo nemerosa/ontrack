@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.events.MarkdownEventRenderer
 import net.nemerosa.ontrack.model.structure.BuildFixtures
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.templating.TemplatingContextHandlerFieldNotManagedException
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import net.nemerosa.ontrack.ui.controller.UILocations
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -98,7 +99,7 @@ class DeploymentTemplatingContextHandlerTest {
         val text = handler.render(
             data = DeploymentTemplatingContextData(deployment.id),
             field = field,
-            config = emptyMap(),
+            config = TemplatingSourceConfig(),
             renderer = MarkdownEventRenderer(OntrackConfigProperties()),
         )
 

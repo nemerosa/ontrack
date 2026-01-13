@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -64,7 +65,7 @@ class DeploymentTemplatingContextHandlerIT : AbstractDSLTestSupport() {
                     slotPipelineId = secondDeployment.id,
                 ),
                 field = "changelog",
-                config = emptyMap(),
+                config = TemplatingSourceConfig(),
                 renderer = PlainEventRenderer.INSTANCE,
             )
 

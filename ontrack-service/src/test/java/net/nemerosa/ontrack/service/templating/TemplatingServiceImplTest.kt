@@ -32,7 +32,7 @@ class TemplatingServiceImplTest {
         ) {
             override fun render(
                 entity: ProjectEntity,
-                configMap: Map<String, String>,
+                config: TemplatingSourceConfig,
                 renderer: EventRenderer
             ): String =
                 "feature/${entity.displayName}"
@@ -44,10 +44,10 @@ class TemplatingServiceImplTest {
         ) {
             override fun render(
                 entity: ProjectEntity,
-                configMap: Map<String, String>,
+                config: TemplatingSourceConfig,
                 renderer: EventRenderer
             ): String {
-                val list = configMap.getListStringsTemplatingParam("projects") ?: emptyList()
+                val list = config.getList("projects")
                 return renderer.renderList(list)
             }
         }
@@ -58,11 +58,11 @@ class TemplatingServiceImplTest {
         ) {
             override fun render(
                 entity: ProjectEntity,
-                configMap: Map<String, String>,
+                config: TemplatingSourceConfig,
                 renderer: EventRenderer
             ): String {
-                val name = configMap.getRequiredTemplatingParam("name")
-                val organization = configMap.getRequiredTemplatingParam("org")
+                val name = config.getRequiredString("name")
+                val organization = config.getRequiredString("org")
                 return "https://github.com/$organization/$name"
             }
         }

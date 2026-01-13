@@ -7,11 +7,12 @@ import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.templating.TemplatingSource
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.springframework.stereotype.Component
 
 @Component
 @APIDescription("Getting the qualified long name for an entity. For a branch, it'd look like `branch project/main`.")
-@DocumentationExampleCode("${'$'}{branch.qualifiedLongName}")
+@DocumentationExampleCode($$"${branch.qualifiedLongName}")
 @DocumentationIgnore
 class EntityQualifiedLongNameTemplatingSource : TemplatingSource {
 
@@ -19,6 +20,6 @@ class EntityQualifiedLongNameTemplatingSource : TemplatingSource {
 
     override val field: String = "qualifiedLongName"
 
-    override fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String =
+    override fun render(entity: ProjectEntity, config: TemplatingSourceConfig, renderer: EventRenderer): String =
         entity.entityDisplayName.replaceFirstChar { it.lowercase() }
 }

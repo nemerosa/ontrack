@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PromotionRun
 import net.nemerosa.ontrack.model.templating.AbstractTemplatingSource
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.springframework.stereotype.Component
 
 @Component
@@ -41,13 +42,13 @@ class PromotionRunChangeLogTemplatingSource(
     type = ProjectEntityType.PROMOTION_RUN,
 ) {
 
-    override fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String {
-        val empty = ChangeLogTemplatingServiceConfig.emptyValue(configMap)
+    override fun render(entity: ProjectEntity, config: TemplatingSourceConfig, renderer: EventRenderer): String {
+        val empty = ChangeLogTemplatingServiceConfig.emptyValue(config)
         return if (entity is PromotionRun) {
             promotionChangeLogTemplatingService.render(
                 toBuild = entity.build,
                 promotion = entity.promotionLevel.name,
-                configMap = configMap,
+                config = config,
                 renderer = renderer,
             )
         } else {

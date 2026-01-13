@@ -8,10 +8,7 @@ import net.nemerosa.ontrack.model.events.EventRendererRegistry
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.templating.TemplatingRenderable
-import net.nemerosa.ontrack.model.templating.TemplatingRenderableFieldNotFoundException
-import net.nemerosa.ontrack.model.templating.TemplatingRenderableFieldRequiredException
-import net.nemerosa.ontrack.model.templating.TemplatingService
+import net.nemerosa.ontrack.model.templating.*
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrNull
 
@@ -119,9 +116,9 @@ class AutoVersioningTemplatingServiceImpl(
         private val currentVersions: Map<String, String>,
         private val sourceProject: Project,
     ) : TemplatingRenderable {
-        override fun render(field: String?, configMap: Map<String, String>, renderer: EventRenderer): String =
+        override fun render(field: String?, config: TemplatingSourceConfig, renderer: EventRenderer): String =
             when (field) {
-                "changelog" -> renderChangeLog(order, currentVersions, sourceProject, configMap, renderer)
+                "changelog" -> renderChangeLog(order, currentVersions, sourceProject, config, renderer)
                 null -> throw TemplatingRenderableFieldRequiredException()
                 else -> throw TemplatingRenderableFieldNotFoundException(field)
             }
@@ -132,10 +129,10 @@ class AutoVersioningTemplatingServiceImpl(
         order: AutoVersioningOrder,
         currentVersions: Map<String, String>,
         sourceProject: Project,
-        configMap: Map<String, String>,
+        config: TemplatingSourceConfig,
         renderer: EventRenderer
     ): String {
-        val empty = ChangeLogTemplatingServiceConfig.emptyValue(configMap)
+        val empty = ChangeLogTemplatingServiceConfig.emptyValue(config)
         return if (order.sourceBuildId != null && !order.sourcePromotion.isNullOrBlank()) {
             // Only the first path is taken into by the change log
             val targetPath = order.defaultPath.paths.first()
@@ -149,7 +146,7 @@ class AutoVersioningTemplatingServiceImpl(
             changeLogTemplatingService.render(
                 fromBuild = fromBuild,
                 toBuild = toBuild,
-                configMap = configMap,
+                config = config.parse(),
                 renderer = renderer,
             )
         } else {

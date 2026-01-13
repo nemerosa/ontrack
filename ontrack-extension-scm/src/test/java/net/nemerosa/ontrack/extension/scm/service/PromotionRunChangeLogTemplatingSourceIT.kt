@@ -153,10 +153,10 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
     fun `Getting a Markdown change log in a template with a title`() {
         doTestRendering(
             renderer = markdownEventRenderer,
-            template = """
-                # Version ${'$'}{project} ${'$'}{build} has been released
+            template = $$"""
+                # Version ${project} ${build} has been released
                 
-                ${'$'}{promotionRun.changelog?title=true}
+                ${promotionRun.changelog?title=true}
             """.trimIndent(),
         ) { fromBuild, run, repositoryName ->
             """
@@ -426,8 +426,8 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                                 val event = eventFactory.newPromotionRun(topRun)
 
                                 // Template
-                                val template = """
-                                    ${'$'}{promotionRun.changelog?dependencies=${one.project.name},${run.project.name}}
+                                val template = $$"""
+                                    ${promotionRun.changelog?dependencies=$${one.project.name},$${run.project.name}}
                                 """.trimIndent()
 
                                 // Rendering

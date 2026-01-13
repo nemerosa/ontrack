@@ -7,7 +7,8 @@ import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.templating.AbstractTemplatingSource
-import net.nemerosa.ontrack.model.templating.getRequiredTemplatingParam
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
+import net.nemerosa.ontrack.model.templating.getRequiredString
 import org.springframework.stereotype.Component
 
 /**
@@ -24,11 +25,11 @@ class BuildLinkTemplatingSource(
     field = "linked",
     type = ProjectEntityType.BUILD,
 ) {
-    override fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String =
+    override fun render(entity: ProjectEntity, config: TemplatingSourceConfig, renderer: EventRenderer): String =
         if (entity is Build) {
-            val project = configMap.getRequiredTemplatingParam("project")
-            val qualifier = configMap["qualifier"] ?: ""
-            val mode = configMap["mode"]
+            val project = config.getRequiredString("project")
+            val qualifier = config.getString("qualifier") ?: ""
+            val mode = config.getString("mode")
                 ?.let { BuildLinkTemplatingSourceMode.valueOf(it.uppercase()) }
                 ?: BuildLinkTemplatingSourceMode.NAME
             val linked = structureService.getQualifiedBuildsUsedBy(

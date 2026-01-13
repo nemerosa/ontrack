@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.model.events.EventRenderer
 interface TemplatingFunction {
 
     fun render(
-        configMap: Map<String, String>,
+        config: TemplatingSourceConfig,
         context: Map<String, Any>,
         renderer: EventRenderer,
         expressionResolver: (expression: String) -> String,

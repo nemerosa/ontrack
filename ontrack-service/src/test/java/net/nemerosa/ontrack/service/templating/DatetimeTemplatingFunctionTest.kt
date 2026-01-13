@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.templating
 
 import net.nemerosa.ontrack.common.MockTime
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -22,7 +23,7 @@ class DatetimeTemplatingFunctionTest {
     @Test
     fun `Current default time`() {
         val text = datetimeTemplatingFunction.render(
-            configMap = emptyMap(),
+            config = TemplatingSourceConfig(),
             context = emptyMap(),
             renderer = PlainEventRenderer.INSTANCE,
             expressionResolver = { it },
@@ -36,7 +37,7 @@ class DatetimeTemplatingFunctionTest {
     @Test
     fun `Current default time for a specific time zone`() {
         val text = datetimeTemplatingFunction.render(
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "timezone" to "Europe/Brussels",
             ),
             context = emptyMap(),
@@ -52,7 +53,7 @@ class DatetimeTemplatingFunctionTest {
     @Test
     fun `Custom format`() {
         val text = datetimeTemplatingFunction.render(
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "format" to "yyyy-MM-dd"
             ),
             context = emptyMap(),
@@ -68,7 +69,7 @@ class DatetimeTemplatingFunctionTest {
     @Test
     fun `Custom format and adding one day`() {
         val text = datetimeTemplatingFunction.render(
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "format" to "yyyy-MM-dd",
                 "days" to "1",
             ),
@@ -85,7 +86,7 @@ class DatetimeTemplatingFunctionTest {
     @Test
     fun `Custom format and removing one month`() {
         val text = datetimeTemplatingFunction.render(
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "format" to "yyyy-MM-dd",
                 "months" to "-1",
             ),

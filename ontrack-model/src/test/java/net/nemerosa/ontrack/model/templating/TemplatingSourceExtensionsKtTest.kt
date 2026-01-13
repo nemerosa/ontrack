@@ -65,4 +65,27 @@ class TemplatingSourceExtensionsTest {
         )
     }
 
+    @Test
+    fun `Full parsing with repeated keys`() {
+        val config = parseTemplatingSourceConfig("root.field?name=value&sections=one&sections=two".substringAfter("?"))
+        assertEquals(
+            mapOf(
+                "name" to listOf("value"),
+                "sections" to listOf("one", "two"),
+            ),
+            config.params
+        )
+        assertEquals("value", config.getString("name"))
+        assertEquals(listOf("one", "two"), config.getList("sections"))
+    }
+
+    @Test
+    fun `Full parsing with boolean`() {
+        val config = parseTemplatingSourceConfig("valid=true&invalid=false&missing=some")
+        assertTrue(config.getBoolean("valid"))
+        assertTrue(!config.getBoolean("invalid"))
+        assertTrue(!config.getBoolean("missing"))
+        assertTrue(!config.getBoolean("none"))
+    }
+
 }

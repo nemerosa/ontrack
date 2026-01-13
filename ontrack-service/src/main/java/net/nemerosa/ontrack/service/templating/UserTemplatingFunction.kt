@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.templating.TemplatingFunction
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.springframework.stereotype.Component
 
 @Component
@@ -23,12 +24,12 @@ class UserTemplatingFunction(
     override val id: String = "user"
 
     override fun render(
-        configMap: Map<String, String>,
+        config: TemplatingSourceConfig,
         context: Map<String, Any>,
         renderer: EventRenderer,
         expressionResolver: (expression: String) -> String
     ): String {
-        val field = configMap[UserTemplatingFunctionParameters::field.name]
+        val field = config.getString(UserTemplatingFunctionParameters::field.name)
             ?.let { UserTemplatingFunctionField.valueOf(it.uppercase()) }
             ?: UserTemplatingFunctionField.NAME
         val account = securityService.currentUser?.account

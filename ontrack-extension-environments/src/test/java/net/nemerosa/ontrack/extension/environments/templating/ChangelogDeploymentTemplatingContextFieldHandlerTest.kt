@@ -6,9 +6,11 @@ import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestFixtures
 import net.nemerosa.ontrack.extension.environments.storage.SlotPipelineRepository
 import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingService
+import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingServiceConfig
 import net.nemerosa.ontrack.model.events.MarkdownEventRenderer
 import net.nemerosa.ontrack.model.structure.BuildFixtures
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -42,7 +44,7 @@ class ChangelogDeploymentTemplatingContextFieldHandlerTest {
             changeLogTemplatingService.render(
                 fromBuild = previousDeployment.build,
                 toBuild = deployment.build,
-                configMap = emptyMap(),
+                config = ChangeLogTemplatingServiceConfig(),
                 renderer = renderer,
             )
         } returns "* ISS-31 Security defect"
@@ -54,7 +56,7 @@ class ChangelogDeploymentTemplatingContextFieldHandlerTest {
 
         val text = handler.render(
             deployment = deployment,
-            config = emptyMap(),
+            config = TemplatingSourceConfig(),
             renderer = renderer,
         )
 

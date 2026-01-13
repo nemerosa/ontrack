@@ -1,12 +1,10 @@
 package net.nemerosa.ontrack.extension.scm.changelog
 
-import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.model.templating.getBooleanTemplatingParam
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.springframework.stereotype.Service
 
 @Service
@@ -20,18 +18,18 @@ class SemanticPromotionChangeLogTemplatingServiceImpl(
     override fun render(
         toBuild: Build,
         promotion: String,
-        configMap: Map<String, String>,
+        config: TemplatingSourceConfig,
         renderer: EventRenderer
     ): String {
 
-        val acrossBranches = configMap.getBooleanTemplatingParam(
+        val acrossBranches = config.getBoolean(
             SemanticPromotionChangeLogTemplatingServiceConfig::acrossBranches.name,
             true
         )
 
         val fromBuild = promotionBoundaries(toBuild, promotion, acrossBranches) ?: return ""
 
-        val config = configMap.asJson().parse<SemanticPromotionChangeLogTemplatingServiceConfig>()
+        val config = config.parse<SemanticPromotionChangeLogTemplatingServiceConfig>()
         return semanticChangeLogTemplatingService.render(
             fromBuild = fromBuild,
             toBuild = toBuild,

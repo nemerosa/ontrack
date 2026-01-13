@@ -13,7 +13,7 @@ class TestTemplatingContextHandler : AbstractTemplatingContextHandler<TestTempla
     override fun render(
         data: TestTemplatingContextData,
         field: String?,
-        config: Map<String, String>,
+        config: TemplatingSourceConfig,
         renderer: EventRenderer
     ): String = when (field) {
         "id" -> data.id

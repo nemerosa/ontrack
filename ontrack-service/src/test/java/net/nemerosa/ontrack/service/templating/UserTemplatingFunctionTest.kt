@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AuthenticatedUser
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -34,7 +35,7 @@ class UserTemplatingFunctionTest {
         assertEquals(
             "",
             userTemplatingFunction.render(
-                configMap = emptyMap(),
+                config = TemplatingSourceConfig(),
                 context = emptyMap(),
                 renderer = PlainEventRenderer.INSTANCE,
                 expressionResolver = { it }
@@ -49,7 +50,7 @@ class UserTemplatingFunctionTest {
         assertEquals(
             "test@yontrack.local",
             userTemplatingFunction.render(
-                configMap = emptyMap(),
+                config = TemplatingSourceConfig(),
                 context = emptyMap(),
                 renderer = PlainEventRenderer.INSTANCE,
                 expressionResolver = { it }
@@ -65,7 +66,7 @@ class UserTemplatingFunctionTest {
         assertEquals(
             "test@yontrack.local",
             userTemplatingFunction.render(
-                configMap = mapOf(
+                config = TemplatingSourceConfig.fromMap(
                     "field" to "name"
                 ),
                 context = emptyMap(),
@@ -82,7 +83,7 @@ class UserTemplatingFunctionTest {
         assertEquals(
             "User Test",
             userTemplatingFunction.render(
-                configMap = mapOf(
+                config = TemplatingSourceConfig.fromMap(
                     "field" to "display"
                 ),
                 context = emptyMap(),
@@ -99,7 +100,7 @@ class UserTemplatingFunctionTest {
         assertEquals(
             "user@test.com",
             userTemplatingFunction.render(
-                configMap = mapOf(
+                config = TemplatingSourceConfig.fromMap(
                     "field" to "email"
                 ),
                 context = emptyMap(),

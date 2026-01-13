@@ -5,6 +5,7 @@ import io.mockk.mockk
 import net.nemerosa.ontrack.extension.environments.SlotTestFixtures
 import net.nemerosa.ontrack.model.events.MarkdownEventRenderer
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import net.nemerosa.ontrack.ui.controller.UILocations
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -28,7 +29,7 @@ class LinkDeploymentTemplatingContextFieldHandlerTest {
 
         val text = handler.render(
             deployment = deployment,
-            config = emptyMap(),
+            config = TemplatingSourceConfig(),
             renderer = MarkdownEventRenderer(OntrackConfigProperties()),
         )
 

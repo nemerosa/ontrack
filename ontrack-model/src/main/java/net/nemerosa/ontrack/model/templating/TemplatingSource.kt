@@ -13,6 +13,6 @@ interface TemplatingSource {
 
     val field: String
 
-    fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String
+    fun render(entity: ProjectEntity, config: TemplatingSourceConfig, renderer: EventRenderer): String
 
 }

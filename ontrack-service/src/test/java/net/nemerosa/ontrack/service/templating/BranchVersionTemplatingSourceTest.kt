@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.structure.BranchDisplayNameService
 import net.nemerosa.ontrack.model.structure.BranchFixtures
 import net.nemerosa.ontrack.model.structure.BranchNamePolicy
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -32,7 +33,7 @@ class BranchVersionTemplatingSourceTest {
         } returns "release-1.8"
         val text = source.render(
             entity = branch,
-            configMap = emptyMap(),
+            config = TemplatingSourceConfig(),
             renderer = PlainEventRenderer.INSTANCE,
         )
         assertEquals("1.8", text)
@@ -46,7 +47,7 @@ class BranchVersionTemplatingSourceTest {
         } returns "release/99999.51"
         val text = source.render(
             entity = branch,
-            configMap = emptyMap(),
+            config = TemplatingSourceConfig(),
             renderer = PlainEventRenderer.INSTANCE,
         )
         assertEquals("99999.51", text)
@@ -60,7 +61,7 @@ class BranchVersionTemplatingSourceTest {
         } returns "main"
         val text = source.render(
             entity = branch,
-            configMap = emptyMap(),
+            config = TemplatingSourceConfig(),
             renderer = PlainEventRenderer.INSTANCE,
         )
         assertEquals("", text)
@@ -74,7 +75,7 @@ class BranchVersionTemplatingSourceTest {
         } returns "main"
         val text = source.render(
             entity = branch,
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "default" to "xxx",
             ),
             renderer = PlainEventRenderer.INSTANCE,
@@ -90,7 +91,7 @@ class BranchVersionTemplatingSourceTest {
         } returns "release/1.8"
         val text = source.render(
             entity = branch,
-            configMap = emptyMap(),
+            config = TemplatingSourceConfig(),
             renderer = PlainEventRenderer.INSTANCE,
         )
         assertEquals("1.8", text)
@@ -104,7 +105,7 @@ class BranchVersionTemplatingSourceTest {
         } returns "release-1.8"
         val text = source.render(
             entity = branch,
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "policy" to "NAME_ONLY"
             ),
             renderer = PlainEventRenderer.INSTANCE,
@@ -120,7 +121,7 @@ class BranchVersionTemplatingSourceTest {
         } returns "xxx"
         val text = source.render(
             entity = branch,
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "policy" to "NAME_ONLY"
             ),
             renderer = PlainEventRenderer.INSTANCE,
@@ -136,7 +137,7 @@ class BranchVersionTemplatingSourceTest {
         } returns "release/1.8"
         val text = source.render(
             entity = branch,
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "policy" to "DISPLAY_NAME_ONLY"
             ),
             renderer = PlainEventRenderer.INSTANCE,
@@ -152,7 +153,7 @@ class BranchVersionTemplatingSourceTest {
         } returns "main"
         val text = source.render(
             entity = branch,
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "policy" to "DISPLAY_NAME_ONLY"
             ),
             renderer = PlainEventRenderer.INSTANCE,
@@ -169,7 +170,7 @@ class BranchVersionTemplatingSourceTest {
         assertFailsWith<RuntimeException> {
             source.render(
                 entity = branch,
-                configMap = mapOf(
+                config = TemplatingSourceConfig.fromMap(
                     "policy" to "DISPLAY_NAME_ONLY"
                 ),
                 renderer = PlainEventRenderer.INSTANCE,

@@ -8,7 +8,8 @@ import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingServiceCo
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.EventRenderer
-import net.nemerosa.ontrack.model.templating.getEnumTemplatingParam
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
+import net.nemerosa.ontrack.model.templating.getEnum
 import org.springframework.stereotype.Component
 
 @Component
@@ -21,11 +22,11 @@ class ChangelogDeploymentTemplatingContextFieldHandler(
 
     override val field: String = "changelog"
 
-    override fun render(deployment: SlotPipeline, config: Map<String, String>, renderer: EventRenderer): String {
+    override fun render(deployment: SlotPipeline, config: TemplatingSourceConfig, renderer: EventRenderer): String {
         val empty = ChangeLogTemplatingServiceConfig.emptyValue(config)
 
         val since =
-            config.getEnumTemplatingParam<SlotPipelineStatus>(ChangelogDeploymentTemplatingContextConfig::since.name)
+            config.getEnum<SlotPipelineStatus>(ChangelogDeploymentTemplatingContextConfig::since.name)
                 ?: SlotPipelineStatus.DONE
 
         val toBuild = deployment.build
@@ -39,7 +40,7 @@ class ChangelogDeploymentTemplatingContextFieldHandler(
         return changeLogTemplatingService.render(
             fromBuild = sinceDeployment.build,
             toBuild = toBuild,
-            configMap = config,
+            config = config.parse(),
             renderer = renderer,
         )
     }

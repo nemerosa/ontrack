@@ -7,7 +7,8 @@ import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.templating.TemplatingFunction
 import net.nemerosa.ontrack.model.templating.TemplatingMisconfiguredConfigParamException
-import net.nemerosa.ontrack.model.templating.getRequiredTemplatingParam
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
+import net.nemerosa.ontrack.model.templating.getRequiredString
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.LocalDateTime
@@ -23,20 +24,20 @@ import java.time.LocalDateTime
 class SinceTemplatingFunction : TemplatingFunction {
 
     override fun render(
-        configMap: Map<String, String>,
+        config: TemplatingSourceConfig,
         context: Map<String, Any>,
         renderer: EventRenderer,
         expressionResolver: (expression: String) -> String
     ): String {
-        val format = configMap[SinceTemplatingFunctionParameters::format.name] ?: FORMAT_SECONDS
+        val format = config.getString(SinceTemplatingFunctionParameters::format.name) ?: FORMAT_SECONDS
         if (format != FORMAT_SECONDS && format != FORMAT_MILLIS) {
             throw TemplatingMisconfiguredConfigParamException(
                 SinceTemplatingFunctionParameters::format.name,
                 "Must be seconds or millis."
             )
         }
-        val fromExpression = configMap.getRequiredTemplatingParam(SinceTemplatingFunctionParameters::from.name)
-        val refExpression = configMap[SinceTemplatingFunctionParameters::ref.name]
+        val fromExpression = config.getRequiredString(SinceTemplatingFunctionParameters::from.name)
+        val refExpression = config.getString(SinceTemplatingFunctionParameters::ref.name)
 
         val fromText = expressionResolver(fromExpression)
         val refText = refExpression?.run { expressionResolver(refExpression) }

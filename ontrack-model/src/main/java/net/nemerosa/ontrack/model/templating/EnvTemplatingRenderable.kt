@@ -25,7 +25,7 @@ class EnvTemplatingRenderable(
 ) : TemplatingRenderable {
     override fun render(
         field: String?,
-        configMap: Map<String, String>,
+        config: TemplatingSourceConfig,
         renderer: EventRenderer
     ): String =
         if (field.isNullOrBlank()) {

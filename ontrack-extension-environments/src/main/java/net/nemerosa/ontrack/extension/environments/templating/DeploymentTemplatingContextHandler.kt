@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.environments.storage.SlotPipelineRepositor
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.templating.AbstractTemplatingContextHandler
 import net.nemerosa.ontrack.model.templating.TemplatingContextHandlerFieldNotManagedException
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import net.nemerosa.ontrack.ui.controller.UILocations
 import org.springframework.stereotype.Component
 
@@ -23,7 +24,7 @@ class DeploymentTemplatingContextHandler(
     override fun render(
         data: DeploymentTemplatingContextData,
         field: String?,
-        config: Map<String, String>,
+        config: TemplatingSourceConfig,
         renderer: EventRenderer
     ): String {
         // Loading the deployment

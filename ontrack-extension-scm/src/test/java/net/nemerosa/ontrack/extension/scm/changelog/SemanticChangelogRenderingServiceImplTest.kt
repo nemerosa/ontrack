@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.scm.mock.MockCommit
 import net.nemerosa.ontrack.extension.scm.mock.MockIssue
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.structure.BuildFixtures
-import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ProjectFixtures
 import org.junit.jupiter.api.BeforeEach
@@ -159,20 +158,20 @@ class SemanticChangelogRenderingServiceImplTest {
         assertEquals(
             """
                 Issues:
-                
+
                 * ISS-21 Some new feature
                 * ISS-22 Some fixes are needed
                 * ISS-23 Some nicer UI
-                
+
                 Documentation:
-                
+
                 * Updating the readme
-                
-                Other:
-                
+
+                Misc.:
+
                 * Formatting some code
             """.trimIndent(),
-            text
+            text.trim()
         )
     }
 
@@ -207,8 +206,8 @@ class SemanticChangelogRenderingServiceImplTest {
             config = SemanticChangeLogTemplatingServiceConfig(
                 issues = true,
                 sections = listOf(
-                    NameDescription("ci", "Delivery"),
-                    NameDescription("chore", "Other"),
+                    SemanticChangeLogSection("ci", "Delivery"),
+                    SemanticChangeLogSection("chore", "Other"),
                 )
             ),
             suffix = null,
@@ -217,24 +216,24 @@ class SemanticChangelogRenderingServiceImplTest {
         assertEquals(
             """
                 Issues:
-                
+
                 * ISS-21 Some new feature
                 * ISS-22 Some fixes are needed
                 * ISS-23 Some nicer UI
-                
+
                 Delivery:
-                
+
                 * Fixing the pipeline
-                
+
                 Documentation:
-                
+
                 * Updating the readme
-                
+
                 Other:
-                
+
                 * Formatting some code
             """.trimIndent(),
-            text
+            text.trim()
         )
     }
 

@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.structure.BranchFixtures
 import net.nemerosa.ontrack.model.structure.BuildFixtures
 import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -34,7 +35,7 @@ class ReleasePropertyTemplatingSourceTest {
         } returns ReleaseProperty("1.0.0")
         assertEquals(
             "1.0.0",
-            releasePropertyTemplatingSource.render(build, emptyMap(), PlainEventRenderer.INSTANCE)
+            releasePropertyTemplatingSource.render(build, TemplatingSourceConfig(), PlainEventRenderer.INSTANCE)
         )
     }
 
@@ -44,7 +45,7 @@ class ReleasePropertyTemplatingSourceTest {
         every { propertyService.getPropertyValue(build, ReleasePropertyType::class.java) } returns null
         assertEquals(
             "",
-            releasePropertyTemplatingSource.render(build, emptyMap(), PlainEventRenderer.INSTANCE)
+            releasePropertyTemplatingSource.render(build, TemplatingSourceConfig(), PlainEventRenderer.INSTANCE)
         )
     }
 
@@ -53,7 +54,7 @@ class ReleasePropertyTemplatingSourceTest {
         val build = BranchFixtures.testBranch()
         assertEquals(
             "",
-            releasePropertyTemplatingSource.render(build, emptyMap(), PlainEventRenderer.INSTANCE)
+            releasePropertyTemplatingSource.render(build, TemplatingSourceConfig(), PlainEventRenderer.INSTANCE)
         )
     }
 

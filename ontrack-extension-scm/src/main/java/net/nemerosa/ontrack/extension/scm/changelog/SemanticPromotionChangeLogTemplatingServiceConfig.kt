@@ -1,12 +1,11 @@
 package net.nemerosa.ontrack.extension.scm.changelog
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.structure.NameDescription
 
 open class SemanticPromotionChangeLogTemplatingServiceConfig(
     dependencies: List<String> = emptyList(),
     issues: Boolean = false,
-    sections: List<NameDescription> = emptyList(),
+    sections: List<SemanticChangeLogSection> = emptyList(),
     exclude: List<String> = emptyList(),
     allQualifiers: Boolean = false,
     defaultQualifierFallback: Boolean = false,

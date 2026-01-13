@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service.templating
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.structure.BranchFixtures
 import net.nemerosa.ontrack.model.templating.TemplatingSource
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -13,7 +14,7 @@ class EntityQualifiedLongNameTemplatingSourceTest {
     @Test
     fun `Branch qualified long name`() {
         val branch = BranchFixtures.testBranch()
-        val text = source.render(branch, emptyMap(), PlainEventRenderer.INSTANCE)
+        val text = source.render(branch, TemplatingSourceConfig(), PlainEventRenderer.INSTANCE)
         assertEquals(
             "branch ${branch.project.name}/${branch.name}",
             text

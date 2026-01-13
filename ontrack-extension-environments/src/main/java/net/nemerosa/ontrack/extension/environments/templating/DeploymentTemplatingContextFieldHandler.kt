@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.environments.templating
 
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.model.events.EventRenderer
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 
 /**
  * Component responsible to render the template for a deployment.
@@ -18,7 +19,7 @@ interface DeploymentTemplatingContextFieldHandler {
      */
     fun render(
         deployment: SlotPipeline,
-        config: Map<String, String>,
+        config: TemplatingSourceConfig,
         renderer: EventRenderer,
     ): String
 

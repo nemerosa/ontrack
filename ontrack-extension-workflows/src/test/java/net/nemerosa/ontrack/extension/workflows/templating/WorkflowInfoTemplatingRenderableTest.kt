@@ -5,8 +5,8 @@ import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceFixtures
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.templating.TemplatingRenderableFieldNotFoundException
 import net.nemerosa.ontrack.model.templating.TemplatingRenderableFieldRequiredException
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.Test
-import kotlin.math.exp
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
@@ -20,7 +20,7 @@ class WorkflowInfoTemplatingRenderableTest {
         assertFailsWith<TemplatingRenderableFieldRequiredException> {
             renderable.render(
                 field = null,
-                configMap = emptyMap(),
+                config = TemplatingSourceConfig(),
                 renderer = PlainEventRenderer.INSTANCE
             )
         }
@@ -34,7 +34,7 @@ class WorkflowInfoTemplatingRenderableTest {
         assertFailsWith<TemplatingRenderableFieldNotFoundException> {
             renderable.render(
                 field = "xxxx",
-                configMap = emptyMap(),
+                config = TemplatingSourceConfig(),
                 renderer = PlainEventRenderer.INSTANCE
             )
         }
@@ -48,7 +48,7 @@ class WorkflowInfoTemplatingRenderableTest {
         )
         val text = renderable.render(
             field = "start",
-            configMap = emptyMap(),
+            config = TemplatingSourceConfig(),
             renderer = PlainEventRenderer.INSTANCE
         )
         assertEquals("", text)
@@ -66,7 +66,7 @@ class WorkflowInfoTemplatingRenderableTest {
         )
         val text = renderable.render(
             field = "start",
-            configMap = emptyMap(),
+            config = TemplatingSourceConfig(),
             renderer = PlainEventRenderer.INSTANCE
         )
         assertEquals(expected, text)

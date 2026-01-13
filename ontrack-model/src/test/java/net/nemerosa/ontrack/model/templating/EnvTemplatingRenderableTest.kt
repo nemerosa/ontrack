@@ -15,7 +15,7 @@ class EnvTemplatingRenderableTest {
         assertFailsWith<TemplatingRenderableFieldRequiredException> {
             renderable.render(
                 field = null,
-                configMap = emptyMap(),
+                config = TemplatingSourceConfig(),
                 renderer = PlainEventRenderer.INSTANCE
             )
         }
@@ -23,7 +23,7 @@ class EnvTemplatingRenderableTest {
         assertFailsWith<TemplatingRenderableFieldRequiredException> {
             renderable.render(
                 field = "",
-                configMap = emptyMap(),
+                config = TemplatingSourceConfig(),
                 renderer = PlainEventRenderer.INSTANCE
             )
         }
@@ -31,7 +31,7 @@ class EnvTemplatingRenderableTest {
         assertFailsWith<TemplatingRenderableFieldNotFoundException> {
             renderable.render(
                 field = "UNKNOWN",
-                configMap = emptyMap(),
+                config = TemplatingSourceConfig(),
                 renderer = PlainEventRenderer.INSTANCE
             )
         }
@@ -40,7 +40,7 @@ class EnvTemplatingRenderableTest {
             "23",
             renderable.render(
                 field = "BUILD_NUMBER",
-                configMap = emptyMap(),
+                config = TemplatingSourceConfig(),
                 renderer = PlainEventRenderer.INSTANCE
             )
         )

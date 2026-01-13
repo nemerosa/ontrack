@@ -5,6 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.templating.TemplatingMissingConfigParam
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -37,7 +38,7 @@ class LinkTemplatingFunctionTest {
     fun `Missing text`() {
         assertFailsWith<TemplatingMissingConfigParam> {
             linkTemplatingFunction.render(
-                configMap = emptyMap(),
+                config = TemplatingSourceConfig(),
                 context = emptyMap(),
                 renderer = eventRenderer,
                 expressionResolver = expressionResolver,
@@ -49,7 +50,7 @@ class LinkTemplatingFunctionTest {
     fun `Missing link`() {
         assertFailsWith<TemplatingMissingConfigParam> {
             linkTemplatingFunction.render(
-                configMap = mapOf(
+                config = TemplatingSourceConfig.fromMap(
                     "text" to "SOME_TEXT",
                 ),
                 context = emptyMap(),
@@ -64,7 +65,7 @@ class LinkTemplatingFunctionTest {
         every { eventRenderer.renderLink("My text", "https://some.link") } returns
                 """<a href="https://some.link">My text</a>"""
         val renderedText = linkTemplatingFunction.render(
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "text" to "SOME_TEXT",
                 "href" to "SOME_HREF",
             ),

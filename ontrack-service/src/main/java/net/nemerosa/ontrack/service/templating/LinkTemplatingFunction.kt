@@ -5,7 +5,8 @@ import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.templating.TemplatingFunction
-import net.nemerosa.ontrack.model.templating.getRequiredTemplatingParam
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
+import net.nemerosa.ontrack.model.templating.getRequiredString
 import org.springframework.stereotype.Component
 
 @Component
@@ -19,13 +20,13 @@ import org.springframework.stereotype.Component
 class LinkTemplatingFunction : TemplatingFunction {
 
     override fun render(
-        configMap: Map<String, String>,
+        config: TemplatingSourceConfig,
         context: Map<String, Any>,
         renderer: EventRenderer,
         expressionResolver: (expression: String) -> String,
     ): String {
-        val textExpression = configMap.getRequiredTemplatingParam("text")
-        val hrefExpression = configMap.getRequiredTemplatingParam("href")
+        val textExpression = config.getRequiredString("text")
+        val hrefExpression = config.getRequiredString("href")
         val text = expressionResolver(textExpression)
         val href = expressionResolver(hrefExpression)
         return renderer.renderLink(text, href)

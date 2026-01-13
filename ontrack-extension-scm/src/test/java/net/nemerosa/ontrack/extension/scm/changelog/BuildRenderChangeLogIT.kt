@@ -12,23 +12,23 @@ class BuildRenderChangeLogIT: AbstractSCMChangeLogTestSupport() {
     fun `Build render change log`() {
         prepareChangeLogTestCase { _, from, to ->
             run(
-                """
+                $$"""
                     query BuildChangeLog(
-                        ${'$'}buildToId: Int!,
-                        ${'$'}template: String!,
+                        $buildToId: Int!,
+                        $template: String!,
                     ) {
-                        build(id: ${'$'}buildToId) {
+                        build(id: $buildToId) {
                             render(
                                 format: "plain",
-                                template: ${'$'}template
+                                template: $template
                             )
                         }
                     }
                 """,
                 mapOf(
                     "buildToId" to to.id(),
-                    "template" to """
-                        ${'$'}{build.changelog?from=${from.id}}
+                    "template" to $$"""
+                        ${build.changelog?from=$${from.id}}
                     """.trimIndent()
                 )
             ) { data ->

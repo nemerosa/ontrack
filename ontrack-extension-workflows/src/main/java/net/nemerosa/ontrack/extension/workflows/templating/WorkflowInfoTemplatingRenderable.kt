@@ -6,12 +6,13 @@ import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.templating.TemplatingRenderable
 import net.nemerosa.ontrack.model.templating.TemplatingRenderableFieldNotFoundException
 import net.nemerosa.ontrack.model.templating.TemplatingRenderableFieldRequiredException
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 
 class WorkflowInfoTemplatingRenderable(
     private val workflowInstance: WorkflowInstance,
 ) : TemplatingRenderable {
 
-    override fun render(field: String?, configMap: Map<String, String>, renderer: EventRenderer): String =
+    override fun render(field: String?, config: TemplatingSourceConfig, renderer: EventRenderer): String =
         if (field.isNullOrBlank()) {
             throw TemplatingRenderableFieldRequiredException()
         } else {

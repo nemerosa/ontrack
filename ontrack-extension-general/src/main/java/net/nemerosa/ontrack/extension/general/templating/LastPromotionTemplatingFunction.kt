@@ -12,8 +12,8 @@ import net.nemerosa.ontrack.model.structure.BuildSearchForm
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.templating.TemplatingFunction
 import net.nemerosa.ontrack.model.templating.TemplatingGeneralException
-import net.nemerosa.ontrack.model.templating.getBooleanTemplatingParam
-import net.nemerosa.ontrack.model.templating.getRequiredTemplatingParam
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
+import net.nemerosa.ontrack.model.templating.getRequiredString
 import org.springframework.stereotype.Component
 import kotlin.jvm.optionals.getOrNull
 
@@ -34,18 +34,18 @@ class LastPromotionTemplatingFunction(
     override val id: String = "lastPromotion"
 
     override fun render(
-        configMap: Map<String, String>,
+        config: TemplatingSourceConfig,
         context: Map<String, Any>,
         renderer: EventRenderer,
         expressionResolver: (expression: String) -> String
     ): String {
 
         // Getting the configuration
-        val projectName = configMap.getRequiredTemplatingParam(LastPromotionTemplatingFunctionParameters::project.name)
-        val branchName = configMap[LastPromotionTemplatingFunctionParameters::branch.name]
-        val promotion = configMap.getRequiredTemplatingParam(LastPromotionTemplatingFunctionParameters::promotion.name)
-        val name = configMap[LastPromotionTemplatingFunctionParameters::name.name] ?: "auto"
-        val link = configMap.getBooleanTemplatingParam(LastPromotionTemplatingFunctionParameters::link.name, true)
+        val projectName = config.getRequiredString(LastPromotionTemplatingFunctionParameters::project.name)
+        val branchName = config.getString(LastPromotionTemplatingFunctionParameters::branch.name)
+        val promotion = config.getRequiredString(LastPromotionTemplatingFunctionParameters::promotion.name)
+        val name = config.getString(LastPromotionTemplatingFunctionParameters::name.name) ?: "auto"
+        val link = config.getBoolean(LastPromotionTemplatingFunctionParameters::link.name, true)
 
         // Looking for the project
         val project = structureService.findProjectByName(projectName).getOrNull()

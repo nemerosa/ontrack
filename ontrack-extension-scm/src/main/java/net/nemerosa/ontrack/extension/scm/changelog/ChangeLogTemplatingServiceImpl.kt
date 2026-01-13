@@ -6,8 +6,6 @@ import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.EntityDisplayNameService
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.render
-import net.nemerosa.ontrack.model.templating.getBooleanTemplatingParam
-import net.nemerosa.ontrack.model.templating.getListStringsTemplatingParam
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,40 +15,6 @@ class ChangeLogTemplatingServiceImpl(
     structureService: StructureService,
 ) : AbstractChangeLogTemplatingService<ChangeLogTemplatingServiceConfig>(scmChangeLogService, structureService),
     ChangeLogTemplatingService {
-
-    @Deprecated("Use the typed method, without the config map.")
-    override fun render(
-        fromBuild: Build,
-        toBuild: Build,
-        configMap: Map<String, String>,
-        renderer: EventRenderer
-    ): String {
-
-        val config = ChangeLogTemplatingServiceConfig(
-            empty = ChangeLogTemplatingServiceConfig.emptyValue(configMap),
-            title = configMap.getBooleanTemplatingParam(ChangeLogTemplatingServiceConfig::title.name, false),
-            dependencies = configMap.getListStringsTemplatingParam(ChangeLogTemplatingServiceConfig::dependencies.name)
-                ?: emptyList(),
-            allQualifiers = configMap.getBooleanTemplatingParam(
-                ChangeLogTemplatingServiceConfig::allQualifiers.name,
-                false
-            ),
-            defaultQualifierFallback = configMap.getBooleanTemplatingParam(
-                ChangeLogTemplatingServiceConfig::defaultQualifierFallback.name,
-                false
-            ),
-            commitsOption = configMap[ChangeLogTemplatingServiceConfig::commitsOption.name]
-                ?.let { ChangeLogTemplatingCommitsOption.valueOf(it) }
-                ?: ChangeLogTemplatingCommitsOption.NONE,
-        )
-
-        return render(
-            fromBuild = fromBuild,
-            toBuild = toBuild,
-            config = config,
-            renderer = renderer,
-        )
-    }
 
     override fun render(
         fromBuild: Build,
@@ -93,15 +57,17 @@ class ChangeLogTemplatingServiceImpl(
                 val fromName = entityDisplayNameService.render(changeLog.from, renderer)
                 val toName = entityDisplayNameService.render(changeLog.to, renderer)
 
+                val actualSuffix = suffix ?: ""
+
                 val titleText = if (changeLog.from.id() != changeLog.to.id()) {
                     """
-                                    Change log for $projectName$suffix from $fromName to $toName
-                                """.trimIndent()
+                        Change log for $projectName$actualSuffix from $fromName to $toName
+                    """.trimIndent()
 
                 } else {
                     """
-                                    Project $projectName$suffix version $fromName
-                                """.trimIndent()
+                        Project $projectName$actualSuffix version $fromName
+                    """.trimIndent()
                 }
 
                 renderer.renderSection(

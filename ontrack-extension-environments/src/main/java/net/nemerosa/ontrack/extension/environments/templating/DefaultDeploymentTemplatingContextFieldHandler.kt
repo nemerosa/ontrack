@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.environments.templating
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.events.EventRenderer
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.springframework.stereotype.Component
 
 @Component
@@ -13,7 +14,7 @@ class DefaultDeploymentTemplatingContextFieldHandler(
 
     override val field: String = DeploymentTemplatingContextFieldHandler.DEFAULT_FIELD
 
-    override fun render(deployment: SlotPipeline, config: Map<String, String>, renderer: EventRenderer): String =
+    override fun render(deployment: SlotPipeline, config: TemplatingSourceConfig, renderer: EventRenderer): String =
         linkDeploymentTemplatingContextFieldHandler.render(deployment, config, renderer)
 
 }

@@ -8,8 +8,8 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.templating.AbstractTemplatingSource
-import net.nemerosa.ontrack.model.templating.getBooleanTemplatingParam
-import net.nemerosa.ontrack.model.templating.getRequiredTemplatingParam
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
+import net.nemerosa.ontrack.model.templating.getRequiredString
 import org.springframework.stereotype.Component
 
 @Component
@@ -20,13 +20,13 @@ class MetaInfoPropertyTemplatingSource(
     private val propertyService: PropertyService,
 ) : AbstractTemplatingSource(
     field = "meta",
-    types = ProjectEntityType.values().toSet(),
+    types = ProjectEntityType.entries.toSet(),
 ) {
-    override fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String {
-        val name = configMap.getRequiredTemplatingParam(MetaInfoPropertyTemplatingSourceConfig::name.name)
-        val category = configMap[MetaInfoPropertyTemplatingSourceConfig::category.name]
-        val error = configMap.getBooleanTemplatingParam(MetaInfoPropertyTemplatingSourceConfig::error.name)
-        val link = configMap.getBooleanTemplatingParam(MetaInfoPropertyTemplatingSourceConfig::link.name)
+    override fun render(entity: ProjectEntity, config: TemplatingSourceConfig, renderer: EventRenderer): String {
+        val name = config.getRequiredString(MetaInfoPropertyTemplatingSourceConfig::name.name)
+        val category = config.getString(MetaInfoPropertyTemplatingSourceConfig::category.name)
+        val error = config.getBoolean(MetaInfoPropertyTemplatingSourceConfig::error.name)
+        val link = config.getBoolean(MetaInfoPropertyTemplatingSourceConfig::link.name)
 
         val property = propertyService.getPropertyValue(entity, MetaInfoPropertyType::class.java)
         val item = property?.findMetaInfoItems(

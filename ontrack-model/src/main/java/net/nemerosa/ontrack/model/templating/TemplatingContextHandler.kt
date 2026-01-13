@@ -30,7 +30,7 @@ interface TemplatingContextHandler<T : TemplatingContext> {
     fun render(
         data: T,
         field: String?,
-        config: Map<String, String>,
+        config: TemplatingSourceConfig,
         renderer: EventRenderer,
     ): String
 

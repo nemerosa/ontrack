@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.templating.TemplatingMisconfiguredConfigParamException
 import net.nemerosa.ontrack.model.templating.TemplatingMissingConfigParam
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -29,7 +30,7 @@ class SinceTemplatingFunctionTest {
     fun `From parameter is required`() {
         assertFailsWith<TemplatingMissingConfigParam> {
             sinceTemplatingFunction.render(
-                configMap = emptyMap(),
+                config = TemplatingSourceConfig(),
                 context = emptyMap(),
                 renderer = PlainEventRenderer.INSTANCE,
                 expressionResolver = expressionResolver,
@@ -41,7 +42,7 @@ class SinceTemplatingFunctionTest {
     fun `Format parameter must be seconds or minutes`() {
         assertFailsWith<TemplatingMisconfiguredConfigParamException> {
             sinceTemplatingFunction.render(
-                configMap = mapOf(
+                config= TemplatingSourceConfig.fromMap(
                     "format" to "minutes",
                     "from" to "test",
                 ),
@@ -58,7 +59,7 @@ class SinceTemplatingFunctionTest {
         val from = ref.minusMinutes(1)
         resolvedExpressions["test"] = Time.store(from)
         val text = sinceTemplatingFunction.render(
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "format" to "seconds",
                 "from" to "test",
             ),
@@ -81,7 +82,7 @@ class SinceTemplatingFunctionTest {
         resolvedExpressions["from"] = Time.store(from)
         resolvedExpressions["ref"] = Time.store(to)
         val text = sinceTemplatingFunction.render(
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "from" to "from",
                 "ref" to "ref",
             ),
@@ -100,7 +101,7 @@ class SinceTemplatingFunctionTest {
         resolvedExpressions["from"] = Time.store(from)
         resolvedExpressions["ref"] = Time.store(to)
         val text = sinceTemplatingFunction.render(
-            configMap = mapOf(
+            config = TemplatingSourceConfig.fromMap(
                 "format" to "millis",
                 "from" to "from",
                 "ref" to "ref",

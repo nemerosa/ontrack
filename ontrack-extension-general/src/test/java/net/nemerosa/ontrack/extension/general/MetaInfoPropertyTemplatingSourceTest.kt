@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.structure.BuildFixtures
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -38,7 +39,7 @@ class MetaInfoPropertyTemplatingSourceTest {
             "",
             metaInfoPropertyTemplatingSource.render(
                 build,
-                mapOf(
+                TemplatingSourceConfig.fromMap(
                     "name" to "meta-key",
                 ),
                 PlainEventRenderer.INSTANCE
@@ -62,7 +63,7 @@ class MetaInfoPropertyTemplatingSourceTest {
             "",
             metaInfoPropertyTemplatingSource.render(
                 build,
-                mapOf(
+                TemplatingSourceConfig.fromMap(
                     "name" to "meta-key",
                 ),
                 PlainEventRenderer.INSTANCE
@@ -85,7 +86,7 @@ class MetaInfoPropertyTemplatingSourceTest {
         assertFailsWith<MetaInfoPropertyTemplatingSourceMissingKeyException> {
             metaInfoPropertyTemplatingSource.render(
                 build,
-                mapOf(
+                TemplatingSourceConfig.fromMap(
                     "name" to "meta-key",
                     "error" to "true"
                 ),
@@ -117,7 +118,7 @@ class MetaInfoPropertyTemplatingSourceTest {
             "meta-value",
             metaInfoPropertyTemplatingSource.render(
                 build,
-                mapOf(
+                TemplatingSourceConfig.fromMap(
                     "name" to "meta-key",
                 ),
                 PlainEventRenderer.INSTANCE
@@ -148,7 +149,7 @@ class MetaInfoPropertyTemplatingSourceTest {
             """<a href="uri://some-link">meta-value</a>""",
             metaInfoPropertyTemplatingSource.render(
                 build,
-                mapOf(
+                TemplatingSourceConfig.fromMap(
                     "name" to "meta-key",
                     "link" to "true",
                 ),
@@ -186,7 +187,7 @@ class MetaInfoPropertyTemplatingSourceTest {
             "meta-value-2",
             metaInfoPropertyTemplatingSource.render(
                 build,
-                mapOf(
+                TemplatingSourceConfig.fromMap(
                     "name" to "meta-key",
                     "category" to "my-cat",
                 ),

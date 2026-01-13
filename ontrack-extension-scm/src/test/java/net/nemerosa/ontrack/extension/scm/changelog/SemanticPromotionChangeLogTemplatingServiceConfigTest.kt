@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.changelog
 
-import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -10,7 +8,7 @@ class SemanticPromotionChangeLogTemplatingServiceConfigTest {
 
     @Test
     fun `No options`() {
-        val config = emptyMap<String, String>().asJson().parse<SemanticPromotionChangeLogTemplatingServiceConfig>()
+        val config = TemplatingSourceConfig().parse<SemanticPromotionChangeLogTemplatingServiceConfig>()
         config.apply {
             assertEquals(emptyList(), dependencies)
             assertEquals(false, issues)
@@ -24,9 +22,9 @@ class SemanticPromotionChangeLogTemplatingServiceConfigTest {
 
     @Test
     fun `With issues`() {
-        val config = mapOf(
+        val config = TemplatingSourceConfig.fromMap(
             "issues" to "true"
-        ).asJson().parse<SemanticPromotionChangeLogTemplatingServiceConfig>()
+        ).parse<SemanticPromotionChangeLogTemplatingServiceConfig>()
         config.apply {
             assertEquals(emptyList(), dependencies)
             assertEquals(true, issues)
@@ -40,19 +38,20 @@ class SemanticPromotionChangeLogTemplatingServiceConfigTest {
 
     @Test
     fun `With sections and issues`() {
-        val configJson = mapOf(
-            "issues" to "true",
-            "sections" to "ci=Delivery",
-            "sections" to "chore=Other",
-        ).asJson()
-        val config = configJson.parse<SemanticPromotionChangeLogTemplatingServiceConfig>()
+        val tsc = TemplatingSourceConfig(
+            params = mapOf(
+                "issues" to listOf("true"),
+                "sections" to listOf("ci=Delivery", "chore=Other"),
+            )
+        )
+        val config = tsc.parse<SemanticPromotionChangeLogTemplatingServiceConfig>()
         config.apply {
             assertEquals(emptyList(), dependencies)
             assertEquals(true, issues)
             assertEquals(
                 listOf(
-                    NameDescription("ci", "Delivery"),
-                    NameDescription("chore", "Other"),
+                    SemanticChangeLogSection("ci", "Delivery"),
+                    SemanticChangeLogSection("chore", "Other"),
                 ),
                 sections
             )

@@ -30,6 +30,7 @@ class SemanticChangelogRenderingServiceImpl(
 
         val grouped = entries
             .filter { !it.type.isNullOrBlank() }
+            .filter { it.type !in config.exclude }
             .groupBy { it.type!! }
             .mapKeys { (type, _) -> getTypeTitle(type, config) }
             .toSortedMap()
@@ -77,8 +78,8 @@ class SemanticChangelogRenderingServiceImpl(
     }
 
     fun getTypeTitle(type: String, config: SemanticChangeLogConfig): String {
-        return config.sections.find { it.name == type }
-            ?.description
+        return config.sections.find { it.type == type }
+            ?.title
             ?: types[type]
             ?: type
     }
