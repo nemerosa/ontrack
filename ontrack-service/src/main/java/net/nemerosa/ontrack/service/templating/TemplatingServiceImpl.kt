@@ -33,10 +33,6 @@ class TemplatingServiceImpl(
     private val regexExpressions =
         "(?<!\\\$)\\$\\{([^\\}]+)\\}".toRegex()
 
-    @Suppress("RegExpUnnecessaryNonCapturingGroup")
-    private val regexToken =
-        "^([a-zA-Z_]+|#)(?:\\.([a-zA-Z_\\.-]+))?(?:\\?((?:[a-zA-Z]+=[a-zA-Z0-9\\s,_\\.:-]+)(?:&[a-zA-Z]+=[a-zA-Z0-9\\s,_\\.:-]+)*))?(?:\\|([a-zA-Z_-]+))?\$".toRegex()
-
     override fun isTemplate(templating: String): Boolean {
         return regexExpressions.containsMatchIn(templating)
     }
@@ -61,13 +57,10 @@ class TemplatingServiceImpl(
         renderer: EventRenderer,
     ): String {
         try {
-            val m = regexToken.matchEntire(expression)
-            if (m != null) {
-                val contextKey = m.groupValues[1]
-                val field = m.groupValues.getOrNull(2)
-                val configQuery = m.groupValues.getOrNull(3)
+            val templatingExpression = TemplatingExpression.parse(expression)
+            if (templatingExpression != null) {
+                val (contextKey, field, configQuery, filter) = templatingExpression
                 val config = parseTemplatingSourceConfig(configQuery)
-                val filter = m.groupValues.getOrNull(4)
                 val text = if (contextKey == "#") {
                     if (field.isNullOrBlank()) {
                         throw TemplatingMissingFunctionException()

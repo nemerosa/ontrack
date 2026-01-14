@@ -370,7 +370,7 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                         contentTemplate = $$"""
                             Version ${build.release} has been released.
                             
-                            ${promotionRun.semanticChangelog?issues=true&sections=ci=Delivery&sections=chore=Other}
+                            ${promotionRun.semanticChangelog?issues=true&emojis=true&sections=ci=Delivery&sections=chore=Other}
                         """.trimIndent()
                     )
 
