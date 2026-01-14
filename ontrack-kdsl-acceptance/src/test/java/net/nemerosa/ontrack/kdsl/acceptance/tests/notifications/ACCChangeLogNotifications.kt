@@ -210,7 +210,7 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                     build {
                         repositoryIssue("ISS-22", "Some fixes are needed")
                         withRepositoryCommit("ISS-22 Fixing some bugs")
-                        withRepositoryCommit("doc: Updating the readme")
+                        withRepositoryCommit("docs: Updating the readme")
                     }
                     build {
                         release = "1.2.0"
@@ -304,7 +304,7 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                     build {
                         repositoryIssue("ISS-22", "Some fixes are needed")
                         withRepositoryCommit("ISS-22 Fixing some bugs")
-                        withRepositoryCommit("doc: Updating the readme")
+                        withRepositoryCommit("docs: Updating the readme")
                     }
                     build {
                         release = "1.2.0"
@@ -341,8 +341,8 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                                 Misc.:
                                 
                                 * Formatting some code
-                            """.trimIndent(),
-                            message
+                            """.trimIndent().trim(),
+                            message.trim()
                         )
                     }
                 }
@@ -370,7 +370,7 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                         contentTemplate = $$"""
                             Version ${build.release} has been released.
                             
-                            ${promotionRun.semanticChangelog?issues=true&section=ci=Delivery&section=chore=Other}
+                            ${promotionRun.semanticChangelog?issues=true&sections=ci=Delivery&sections=chore=Other}
                         """.trimIndent()
                     )
 
@@ -394,7 +394,7 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                     build {
                         repositoryIssue("ISS-22", "Some fixes are needed")
                         withRepositoryCommit("ISS-22 Fixing some bugs")
-                        withRepositoryCommit("doc: Updating the readme")
+                        withRepositoryCommit("docs: Updating the readme")
                     }
                     build {
                         release = "1.2.0"
