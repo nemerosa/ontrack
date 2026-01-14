@@ -19,4 +19,6 @@ private val allTypes = listOf(
     SemanticType("test", "Tests", "✅"),
 )
 
+val issuesEmoji = "📋"
+
 val types = allTypes.associateBy { it.type }

@@ -23,18 +23,23 @@ class SemanticChangelogRenderingServiceImpl(
             .filter { it.type !in config.exclude }
             .groupBy { it.type!! }
             .mapKeys { (type, _) -> getTypeTitle(type, config) }
-            .toSortedMap()
+            .toSortedMap { a, b -> a.title.compareTo(b.title) }
 
         return buildString {
 
             val hasIssues = changelog.issues?.issues != null && changelog.issues.issues.isNotEmpty()
             if (hasIssues) {
                 val issues = renderChangeLogIssues(renderer, changelog)
-                append("Issues:\n\n").append(issues).append("\n")
+                val issuesSection = if (config.emojis) {
+                    "$issuesEmoji Issues"
+                } else {
+                    "Issues"
+                }
+                append("$issuesSection:\n\n").append(issues).append("\n")
             }
 
             var no = 0
-            grouped.forEach { (title, commits) ->
+            grouped.forEach { (section, commits) ->
                 if (no++ > 0 || hasIssues) {
                     append("\n")
                 }
@@ -49,7 +54,7 @@ class SemanticChangelogRenderingServiceImpl(
                     )
                 }
 
-                append("$title:").append("\n\n").append(content).append("\n")
+                append("$section:").append("\n\n").append(content).append("\n")
             }
         }
     }
@@ -67,17 +72,27 @@ class SemanticChangelogRenderingServiceImpl(
         }
     }
 
-    fun getTypeTitle(type: String, config: SemanticChangeLogConfig): String {
-        return config.sections.find { it.type == type }
-            ?.title
+    fun getTypeTitle(type: String, config: SemanticChangeLogConfig): SectionTitle =
+        config.sections.find { it.type == type }
+            ?.title?.let { SectionTitle(it, types[type]?.takeIf { config.emojis }?.emoji) }
             ?: types[type]?.let { type ->
                 if (config.emojis) {
-                    "${type.emoji} ${type.title}"
+                    SectionTitle(type.title, type.emoji)
                 } else {
-                    type.title
+                    SectionTitle(type.title, null)
                 }
             }
-            ?: type
+            ?: SectionTitle(type, null)
+
+    data class SectionTitle(
+        val title: String,
+        val emoji: String?
+    ) {
+        override fun toString(): String = if (emoji.isNullOrBlank()) {
+            title
+        } else {
+            "$emoji $title"
+        }
     }
 
 }

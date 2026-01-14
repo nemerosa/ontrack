@@ -418,25 +418,25 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                             """
                                 Version 1.2.0 has been released.
                                 
-                                Issues:
+                                📋 Issues:
                                 
                                 * ISS-21 Some new feature
                                 * ISS-22 Some fixes are needed
                                 * ISS-23 Some nicer UI
                                 
-                                Delivery:
+                                👷 Delivery:
                                 
                                 * Fixing the pipeline
                                 
-                                Documentation:
+                                📝 Documentation:
                                 
                                 * Updating the readme
                                 
-                                Other:
+                                🧹 Other:
                                 
                                 * Formatting some code
-                            """.trimIndent(),
-                            message
+                            """.trimIndent().trim(),
+                            message.trim()
                         )
                     }
                 }

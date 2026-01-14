@@ -11,10 +11,11 @@ import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.waitUntil
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
+import kotlin.time.ExperimentalTime
 
 @QueueNoAsync
 class SlotPipelineChangelogIT : AbstractDSLTestSupport() {
@@ -37,6 +38,7 @@ class SlotPipelineChangelogIT : AbstractDSLTestSupport() {
     @Autowired
     private lateinit var mockNotificationChannel: MockNotificationChannel
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun `Sending a changelog since last deployment`() {
         val target = uid("t-")
@@ -108,13 +110,14 @@ class SlotPipelineChangelogIT : AbstractDSLTestSupport() {
                 )
 
                 // Expecting a changelog
-                val message = mockNotificationChannel.targetMessages(target).single()
-                assertEquals(
-                    """
+                waitUntil(
+                    message = "Waiting for notification to be sent",
+                ) {
+                    val message = mockNotificationChannel.targetMessages(target).firstOrNull()
+                    message != null && message.trim() == """
                         * ISS-22 Some fixes are needed
-                    """.trimIndent().trim(),
-                    message.trim()
-                )
+                    """.trimIndent().trim()
+                }
             }
         }
     }
