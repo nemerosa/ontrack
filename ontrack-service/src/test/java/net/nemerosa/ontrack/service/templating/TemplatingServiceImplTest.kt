@@ -47,7 +47,7 @@ class TemplatingServiceImplTest {
                 config: TemplatingSourceConfig,
                 renderer: EventRenderer
             ): String {
-                val list = config.getList("projects")
+                val list = config.getExpandedList("projects")
                 return renderer.renderList(list)
             }
         }
@@ -110,10 +110,10 @@ class TemplatingServiceImplTest {
     fun `Using list of strings as config parameters for a source`() {
         val project = ProjectFixtures.testProject()
         val text = templatingService.render(
-            template = """
+            template = $$"""
                 List:
                 
-                ${'$'}{project.list?projects=one,two,three}
+                ${project.list?projects=one,two,three}
             """.trimIndent(),
             context = mapOf(
                 "project" to project,

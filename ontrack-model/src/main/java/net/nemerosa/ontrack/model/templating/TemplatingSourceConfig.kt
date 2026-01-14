@@ -12,6 +12,7 @@ data class TemplatingSourceConfig(
     fun isEmpty(): Boolean = params.isEmpty()
     fun getString(name: String): String? = params[name]?.firstOrNull()
     fun getList(name: String): List<String> = params[name] ?: emptyList()
+    fun getExpandedList(name: String): List<String> = params[name]?.flatMap { it.split(",") } ?: emptyList()
     fun getBoolean(name: String, defaultValue: Boolean = false): Boolean = getString(name)?.toBoolean() ?: defaultValue
     fun getInt(name: String): Int? = getString(name)?.toInt()
     fun getLong(name: String): Long? = getString(name)?.toLong()

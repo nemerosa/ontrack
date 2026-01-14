@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestFixtures
 import net.nemerosa.ontrack.extension.environments.storage.SlotPipelineRepository
 import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingService
-import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingServiceConfig
 import net.nemerosa.ontrack.model.events.MarkdownEventRenderer
 import net.nemerosa.ontrack.model.structure.BuildFixtures
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
@@ -44,7 +43,7 @@ class ChangelogDeploymentTemplatingContextFieldHandlerTest {
             changeLogTemplatingService.render(
                 fromBuild = previousDeployment.build,
                 toBuild = deployment.build,
-                config = ChangeLogTemplatingServiceConfig(),
+                config = any(),
                 renderer = renderer,
             )
         } returns "* ISS-31 Security defect"
