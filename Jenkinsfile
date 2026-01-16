@@ -309,7 +309,6 @@ pipeline {
                             tag: env.VERSION,
                             commitish: env.GIT_COMMIT,
                             bodyText: changelog,
-                            prerelease: true, // TODO
                     )
                 }
             }
