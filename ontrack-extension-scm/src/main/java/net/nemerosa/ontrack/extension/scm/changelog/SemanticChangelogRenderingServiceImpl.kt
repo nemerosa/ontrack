@@ -27,15 +27,18 @@ class SemanticChangelogRenderingServiceImpl(
 
         return buildString {
 
-            val hasIssues = changelog.issues?.issues != null && changelog.issues.issues.isNotEmpty()
-            if (hasIssues) {
-                val issues = renderChangeLogIssues(renderer, changelog)
-                val issuesSection = if (config.emojis) {
-                    "$issuesEmoji Issues"
-                } else {
-                    "Issues"
+            var hasIssues = false
+            if (config.issues) {
+                hasIssues = changelog.issues?.issues != null && changelog.issues.issues.isNotEmpty()
+                if (hasIssues) {
+                    val issues = renderChangeLogIssues(renderer, changelog)
+                    val issuesSection = if (config.emojis) {
+                        "$issuesEmoji Issues"
+                    } else {
+                        "Issues"
+                    }
+                    append("$issuesSection:\n\n").append(issues).append("\n")
                 }
-                append("$issuesSection:\n\n").append(issues).append("\n")
             }
 
             var no = 0

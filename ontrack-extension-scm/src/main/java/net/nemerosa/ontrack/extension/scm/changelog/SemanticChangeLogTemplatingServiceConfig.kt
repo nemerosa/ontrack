@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 
 open class SemanticChangeLogTemplatingServiceConfig(
     @APIDescription("Must a section for changelog actual issues be present?")
-    val issues: Boolean = false,
+    override val issues: Boolean = false,
     dependencies: List<String> = emptyList(),
     @APIDescription("Mapping types to section titles")
     override val sections: List<SemanticChangeLogSection> = emptyList(),

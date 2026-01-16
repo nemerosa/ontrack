@@ -254,6 +254,143 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    fun `Semantic rendering of a change log using the SCM API without the issues section`() {
+        asAdmin {
+            mockSCMTester.withMockSCMRepository {
+                project {
+                    branch {
+                        configureMockSCMBranch()
+
+                        build("1.01") {}
+                        val from = build {
+                            // Mock termination commit
+                            repositoryIssue("ISS-20", "Last issue before the change log")
+                            withRepositoryCommit("ISS-20 Last commit before the change log")
+                        }
+                        build("1.02") {
+                            repositoryIssue("ISS-21", "Some new feature")
+                            withRepositoryCommit("ISS-21 Some commits for a feature", property = false)
+                            withRepositoryCommit("ISS-21 Some fixes for a feature")
+                            withRepositoryCommit("feat: Another feature")
+                        }
+                        build("1.03") {
+                            repositoryIssue("ISS-22", "Some fixes are needed")
+                            withRepositoryCommit("ISS-22 Fixing some bugs")
+                            withRepositoryCommit("fix: Some bug fixes")
+                            withRepositoryCommit("fix: Some other fixes")
+                        }
+                        build("1.04") {
+                            repositoryIssue("ISS-23", "Some nicer UI")
+                            withRepositoryCommit("ISS-23 Fixing some CSS")
+
+                            run(
+                                """
+                                {
+                                    scmChangeLog(
+                                        from: ${from.id},
+                                        to: ${this@build.id}
+                                    ) {
+                                        semantic(
+                                            renderer: "markdown",
+                                            config: {
+                                                issues: false,
+                                            },
+                                        )
+                                    }
+                                }
+                            """.trimIndent()
+                            ) { data ->
+                                val changeLog = data.path("scmChangeLog")
+                                    .path("semantic").asText()
+                                assertEquals(
+                                    """
+                                        Features:
+                                        
+                                        * Another feature
+                                        
+                                        Fixes:
+                                        
+                                        * Some other fixes
+                                        * Some bug fixes
+                                    """.trimIndent().trim(),
+                                    changeLog.trim()
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Semantic rendering of a change log using the SCM API without the issues section by default`() {
+        asAdmin {
+            mockSCMTester.withMockSCMRepository {
+                project {
+                    branch {
+                        configureMockSCMBranch()
+
+                        build("1.01") {}
+                        val from = build {
+                            // Mock termination commit
+                            repositoryIssue("ISS-20", "Last issue before the change log")
+                            withRepositoryCommit("ISS-20 Last commit before the change log")
+                        }
+                        build("1.02") {
+                            repositoryIssue("ISS-21", "Some new feature")
+                            withRepositoryCommit("ISS-21 Some commits for a feature", property = false)
+                            withRepositoryCommit("ISS-21 Some fixes for a feature")
+                            withRepositoryCommit("feat: Another feature")
+                        }
+                        build("1.03") {
+                            repositoryIssue("ISS-22", "Some fixes are needed")
+                            withRepositoryCommit("ISS-22 Fixing some bugs")
+                            withRepositoryCommit("fix: Some bug fixes")
+                            withRepositoryCommit("fix: Some other fixes")
+                        }
+                        build("1.04") {
+                            repositoryIssue("ISS-23", "Some nicer UI")
+                            withRepositoryCommit("ISS-23 Fixing some CSS")
+
+                            run(
+                                """
+                                {
+                                    scmChangeLog(
+                                        from: ${from.id},
+                                        to: ${this@build.id}
+                                    ) {
+                                        semantic(
+                                            renderer: "markdown"
+                                        )
+                                    }
+                                }
+                            """.trimIndent()
+                            ) { data ->
+                                val changeLog = data.path("scmChangeLog")
+                                    .path("semantic").asText()
+                                assertEquals(
+                                    """
+                                        Features:
+                                        
+                                        * Another feature
+                                        
+                                        Fixes:
+                                        
+                                        * Some other fixes
+                                        * Some bug fixes
+                                    """.trimIndent().trim(),
+                                    changeLog.trim()
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Rendering a change log using the SCM API`() {
         asAdmin {
             mockSCMTester.withMockSCMRepository {
