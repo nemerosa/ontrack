@@ -10,6 +10,8 @@ import PageSection from "@components/common/PageSection";
 import BranchLinksGraph from "@components/links/BranchLinksGraph";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
+import {FaTable} from "react-icons/fa";
+import BranchLinksModeButton from "@components/links/BranchLinksModeButton";
 
 export default function BranchLinksView({id}) {
 
@@ -58,6 +60,12 @@ export default function BranchLinksView({id}) {
                 breadcrumbs={downToBranchBreadcrumbs({branch})}
                 commands={commands}
             >
+                <BranchLinksModeButton
+                    icon={<FaTable/>}
+                    mode="table"
+                    title="Displays the dependencies as a table"
+                    href={`/branch/${id}/links/table`}
+                />
                 <AutoRefreshContextProvider>
                     <PageSection
                         title={undefined}
