@@ -13,6 +13,7 @@ import {useBranch} from "@components/services/fragments";
 import StandardTable from "@components/common/table/StandardTable";
 import {Space, Typography} from "antd";
 import BranchNodeComponent from "@components/links/BranchNodeComponent";
+import BranchLinkNodeComponent from "@components/links/BranchLinkNodeComponent";
 
 export default function BranchLinksTableView({id}) {
 
@@ -90,7 +91,11 @@ export default function BranchLinksTableView({id}) {
                                     <Typography.Text>depends on</Typography.Text>
                                     <FaArrowRight/>
                                 </Space>,
-                                render: (_, link) => JSON.stringify(link)
+                                render: (_, link) => <BranchLinkNodeComponent
+                                    link={link}
+                                    sourceBranch={link.branch}
+                                    targetBranch={link.targetBranch}
+                                />
                             },
                             {
                                 key: 'dependency',
