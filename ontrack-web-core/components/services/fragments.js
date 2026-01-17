@@ -136,6 +136,7 @@ export const useBranch = (id) => {
         `,
         {
             variables: {id: Number(id)},
+            initialData: {project: {}},
             dataFn: data => data.branch,
         }
     )
