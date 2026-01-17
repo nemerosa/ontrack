@@ -8,24 +8,14 @@ import {useEffect, useState} from "react";
 import {CloseCommand} from "@components/common/Commands";
 import {branchUri} from "@components/common/Links";
 import LoadingContainer from "@components/common/LoadingContainer";
-import {useQuery} from "@components/services/GraphQL";
 import {branchQuery} from "@components/links/BranchDependenciesFragments";
-import JsonDisplay from "@components/common/JsonDisplay";
+import {useBranch} from "@components/services/fragments";
+import StandardTable from "@components/common/table/StandardTable";
 
 export default function BranchLinksTableView({id}) {
 
+    const {loading, branch} = useBranch(id)
     const [commands, setCommands] = useState([])
-
-    const {loading, data: branch} = useQuery(
-        branchQuery({downstream: true}),
-        {
-            variables: {
-                branchId: Number(id),
-            },
-            dataFn: data => data.branch,
-            initialData: {project: {}},
-        }
-    )
 
     useEffect(() => {
         if (branch.id) {
@@ -34,6 +24,29 @@ export default function BranchLinksTableView({id}) {
             ])
         }
     }, [branch])
+
+    const flattenDeepDependencies = (data, links) => {
+        const branch = data.branch
+        branch.downstreamLinks.forEach(downstreamLink => {
+            const link = {
+                qualifier: downstreamLink.qualifier,
+                sourceBuild: downstreamLink.sourceBuild,
+                targetBuild: downstreamLink.targetBuild,
+                autoVersioning: downstreamLink.autoVersioning,
+            }
+            links.push(link)
+            flattenDeepDependencies(downstreamLink, links)
+        })
+    }
+
+    const flattenDependencies = (data) => {
+        const links = []
+        flattenDeepDependencies(data, links)
+        return {
+            pageInfo: {},
+            pageItems: links,
+        }
+    }
 
     return (
         <>
@@ -52,7 +65,20 @@ export default function BranchLinksTableView({id}) {
                     href={`/branch/${id}/links`}
                 />
                 <LoadingContainer loading={loading}>
-                    <JsonDisplay value={JSON.stringify(branch, null, 2)}/>
+                    <StandardTable
+                        id="branch-dependencies"
+                        filter={{}}
+                        variables={{branchId: Number(id)}}
+                        query={branchQuery({downstream: true})}
+                        queryNode={data => flattenDependencies(data)}
+                        columns={[
+                            {
+                                key: 'consumer',
+                                title: 'Consumer',
+                                render: (_, link) => JSON.stringify(link)
+                            },
+                        ]}
+                    />
                 </LoadingContainer>
             </MainPage>
         </>
