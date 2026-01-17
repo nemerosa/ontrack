@@ -160,6 +160,17 @@ function BranchLinksFlow({branch}) {
     const [edges, setEdges] = useState([])
 
     const [selectedNodeId, setSelectedNodeId] = useState(null)
+    const [focusNodeId, setFocusNodeId] = useState(null)
+
+    const onToggleFocus = useCallback((node) => {
+        setFocusNodeId(current => {
+            if (current === node.id) {
+                return null
+            } else {
+                return node.id
+            }
+        })
+    }, [])
 
     const nodesInitialized = useNodesInitialized();
     const {fitView} = useReactFlow();
@@ -193,16 +204,20 @@ function BranchLinksFlow({branch}) {
         branchLink: BranchLinkNode,
     }), []);
 
-    const branchToNode = (branch, id, visible = false) => {
+    const branchToNode = (branch, id, visible = true) => {
         return {
             id: id ? id : String(branch.id),
             position: {x: 0, y: 0},
-            data: {branch, visible},
+            data: {
+                branch,
+                visible,
+                onToggleFocus,
+            },
             type: 'branch',
         }
     }
 
-    const branchLinkToNode = (id, sourceBranch, targetBranch, link, visible = false) => {
+    const branchLinkToNode = (id, sourceBranch, targetBranch, link, visible = true) => {
         return {
             id: id,
             position: {x: 0, y: 0},
@@ -211,6 +226,7 @@ function BranchLinksFlow({branch}) {
                 targetBranch,
                 link,
                 visible,
+                onToggleFocus,
             },
             type: 'branchLink',
         }
@@ -250,6 +266,7 @@ function BranchLinksFlow({branch}) {
                     id: edgeStartId,
                     source: startNode.id,
                     target: dependencyNode.id,
+                    type: 'straight',
                     ...edgeStyle,
                 }
                 edges.push(edge)
@@ -263,6 +280,7 @@ function BranchLinksFlow({branch}) {
                     id: edgeChildId,
                     source: dependencyNode.id,
                     target: childNode.id,
+                    type: 'straight',
                     ...edgeStyle,
                 }
                 edges.push(edge)
@@ -308,6 +326,7 @@ function BranchLinksFlow({branch}) {
                     id: edgeParentId,
                     source: parentNode.id,
                     target: dependencyNode.id,
+                    type: 'straight',
                     ...edgeStyle,
                 }
                 edges.push(edge)
@@ -321,6 +340,7 @@ function BranchLinksFlow({branch}) {
                     id: edgeStartId,
                     source: dependencyNode.id,
                     target: startNode.id,
+                    type: 'straight',
                     ...edgeStyle,
                 }
                 edges.push(edge)
@@ -391,19 +411,34 @@ function BranchLinksFlow({branch}) {
             .filter(edge => edge.source === selectedNodeId || edge.target === selectedNodeId)
             .flatMap(edge => [edge.source, edge.target])
 
+        const focusedEdgeIds = edges
+            .filter(edge => edge.source === focusNodeId || edge.target === focusNodeId)
+            .map(edge => edge.id)
+
+        const focusedNodeIds = edges
+            .filter(edge => edge.source === focusNodeId || edge.target === focusNodeId)
+            .flatMap(edge => [edge.source, edge.target])
+
         setNodes((nds) => nds.map((node) => {
+            const selected = node.id === selectedNodeId || connectedNodeIds.includes(node.id)
+            const visible = !focusNodeId || (node.id === focusNodeId || focusedNodeIds.includes(node.id))
             return {
                 ...node,
                 data: {
                     ...node.data,
-                    selected: node.id === selectedNodeId || connectedNodeIds.includes(node.id),
+                    selected,
+                    visible,
+                    focused: node.id === focusNodeId,
                 }
             }
         }))
         setEdges((eds) => eds.map((edge) => {
             const selected = selectedEdgeIds.includes(edge.id)
+            const focused = focusedEdgeIds.includes(edge.id)
+            const visible = !focusNodeId || focused
             return {
                 ...edge,
+                hidden: !visible,
                 style: {
                     ...edge.style,
                     stroke: selected ? 'black' : '#999',
@@ -411,7 +446,15 @@ function BranchLinksFlow({branch}) {
                 }
             }
         }))
-    }, [selectedNodeId])
+    }, [selectedNodeId, focusNodeId])
+
+    useEffect(() => {
+        if (layoutDone) {
+            window.setTimeout(() => {
+                fitView()
+            }, 100)
+        }
+    }, [focusNodeId, layoutDone, fitView]);
 
     return (
         <>

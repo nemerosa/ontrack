@@ -1,7 +1,7 @@
 import {Handle, Position} from "reactflow";
-import {Card, Space, Tooltip, Typography} from "antd";
+import {Card, Flex, Space, Tooltip, Typography} from "antd";
 import {branchUri, buildLinksUri} from "@components/common/Links";
-import {FaArrowCircleLeft, FaLink, FaProjectDiagram} from "react-icons/fa";
+import {FaArrowCircleLeft, FaCompressArrowsAlt, FaLink, FaProjectDiagram} from "react-icons/fa";
 import Timestamp from "@components/common/Timestamp";
 import Link from "next/link";
 import BuildRef from "@components/links/BuildRef";
@@ -12,7 +12,14 @@ import ProjectLink from "@components/projects/ProjectLink";
 
 export default function BranchNode({data}) {
 
-    const {branch, selected, visible} = data
+    const {branch, selected, visible, focused, onToggleFocus} = data
+
+    const toggleFocus = (event) => {
+        event.stopPropagation()
+        if (onToggleFocus) {
+            onToggleFocus({id: String(branch.id)})
+        }
+    }
 
     const linkToBranchLinks = <Link
         href={`${branchUri(branch)}/links`}
@@ -41,10 +48,20 @@ export default function BranchNode({data}) {
                     <Typography.Text>
                         {branch && <ProjectLink project={branch.project} shorten={true}/>}
                     </Typography.Text>
-                    <BranchDisplayNameLink branch={branch}>
-                        &nbsp;
-                        {linkToBranchLinks}
-                    </BranchDisplayNameLink>
+                    <Flex justify="space-between" align="center" style={{width: '100%'}}>
+                        <BranchDisplayNameLink branch={branch}>
+                            &nbsp;
+                            {linkToBranchLinks}
+                        </BranchDisplayNameLink>
+                        <Tooltip title={focused ? "Restores the full graph" : "Focus on this project"}>
+                            <span style={{marginLeft: '8px'}}>
+                                <FaCompressArrowsAlt
+                                    color={focused ? 'blue' : undefined}
+                                    onClick={toggleFocus}
+                                />
+                            </span>
+                        </Tooltip>
+                    </Flex>
                     {
                         latestBuild &&
                         <NodeSection
