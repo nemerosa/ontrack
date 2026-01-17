@@ -6,7 +6,7 @@ import {autoVersioningAuditEntryUri} from "@components/common/Links";
 import AutoVersioningAuditEntryTarget from "@components/extension/auto-versioning/AutoVersioningAuditEntryTarget";
 import ProjectLinkByName from "@components/projects/ProjectLinkByName";
 import AutoVersioningApproval from "@components/extension/auto-versioning/AutoVersioningApproval";
-import {FaSquare} from "react-icons/fa";
+import {FaPlay, FaSquare} from "react-icons/fa";
 import AutoVersioningAuditEntryState from "@components/extension/auto-versioning/AutoVersioningAuditEntryState";
 import AutoVersioningAuditEntryPR from "@components/extension/auto-versioning/AutoVersioningAuditEntryPR";
 import TimestampText from "@components/common/TimestampText";
@@ -15,6 +15,7 @@ import SelectProject from "@components/projects/SelectProject";
 import SelectBoolean from "@components/common/SelectBoolean";
 import SelectAutoVersioningAuditState from "@components/extension/auto-versioning/SelectAutoVersioningAuditState";
 import AutoVersioningSchedule from "@components/extension/auto-versioning/AutoVersioningSchedule";
+import {FaForwardStep} from "react-icons/fa6";
 
 export default function AutoVersioningAuditView() {
     return (
@@ -49,6 +50,20 @@ export default function AutoVersioningAuditView() {
                             key="version"
                             name="version"
                             label="Version"
+                        >
+                            <Input/>
+                        </Form.Item>,
+                        <Form.Item
+                            key="routing"
+                            name="routing"
+                            label="Routing"
+                        >
+                            <Input/>
+                        </Form.Item>,
+                        <Form.Item
+                            key="queue"
+                            name="queue"
+                            label="Queue"
                         >
                             <Input/>
                         </Form.Item>,
@@ -217,6 +232,25 @@ export default function AutoVersioningAuditView() {
                             key: 'schedule',
                             title: "Schedule",
                             render: (_, entry) => <AutoVersioningSchedule schedule={entry.order.schedule}/>,
+                        },
+                        {
+                            key: 'routing',
+                            title: "Queuing",
+                            render: (_, entry) => {
+                                if (entry.queue) {
+                                    return <Space size="small" title={`Queue: ${entry.queue}`}>
+                                        <FaPlay/>
+                                        <Typography.Text ellipsis={true} copyable>{entry.queue}</Typography.Text>
+                                    </Space>
+                                } else if (entry.routing) {
+                                    return <Space size="small" title={`Routed: ${entry.routing}`}>
+                                        <FaForwardStep/>
+                                        <Typography.Text ellipsis={true} copyable>{entry.routing}</Typography.Text>
+                                    </Space>
+                                } else {
+                                    return <Typography.Text type="secondary" italic>None</Typography.Text>
+                                }
+                            }
                         },
                         {
                             key: 'running',
