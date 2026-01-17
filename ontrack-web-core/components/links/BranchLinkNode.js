@@ -1,7 +1,7 @@
 import {Handle, Position} from "reactflow";
 import {Card, Space, Typography} from "antd";
 import {FaLink, FaMagic} from "react-icons/fa";
-import AutoVersioningInfo from "@components/links/AutoVersioningInfo";
+import AutoVersioningInfo from "@components/extension/auto-versioning/AutoVersioningInfo";
 import {NodeSection} from "@components/links/NodeSection";
 import LatestLinkInfo from "@components/links/LatestLinkInfo";
 import ProjectLink from "@components/projects/ProjectLink";
@@ -31,7 +31,8 @@ export default function BranchLinkNode({data}) {
                 title={undefined}
                 size="small"
                 style={{
-                    border: 'dashed 1px gray'
+                    border: 'dashed 1px gray',
+                    backgroundColor: latestOk ? undefined : '#ffcccc'
                 }}
             >
                 <Space direction="vertical">

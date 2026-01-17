@@ -123,12 +123,12 @@ const statuses = {
     },
 }
 
-export default function AutoVersioningAuditEntryState({status, id}) {
+export default function AutoVersioningAuditEntryState({status, id, displayTooltip = true}) {
     const state = statuses[status.state]
     if (state) {
         return <>
             <Typography.Text type={state.type}>
-                <Tooltip title={state.tooltip}>
+                <Tooltip title={displayTooltip ? state.tooltip : undefined}>
                     <Space>
                         {state.icon}
                         <span data-testid={id}>{state.text}</span>

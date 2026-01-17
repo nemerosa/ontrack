@@ -1,11 +1,13 @@
 import {Space, Spin, Tooltip, Typography} from "antd";
-import {FaCalendar, FaCodeBranch, FaInfoCircle, FaMedal, FaTag, FaThumbsUp} from "react-icons/fa";
+import {FaCalendar, FaInfoCircle, FaMedal, FaTag, FaThumbsUp} from "react-icons/fa";
 import BuildRef from "@components/links/BuildRef";
 import Rows from "@components/common/Rows";
 import Columns from "@components/common/Columns";
 import Timestamp from "@components/common/Timestamp";
 import Link from "next/link";
 import CheckStatus from "@components/common/CheckStatus";
+import AutoVersioningPRLink from "@components/extension/auto-versioning/AutoVersioningPRLink";
+import AutoVersioningAuditEntryState from "@components/extension/auto-versioning/AutoVersioningAuditEntryState";
 
 export default function AutoVersioningInfo({autoVersioning, branchLink}) {
     const commonStatusText = "Indicates if the auto versioning has caught up with last eligible build or not."
@@ -55,48 +57,30 @@ export default function AutoVersioningInfo({autoVersioning, branchLink}) {
                                             <Timestamp value={autoVersioning.status.mostRecentState.creation.time}/>
                                         </Typography.Text>
                                     </Columns>
-                                    {
-                                        autoVersioning.status.mostRecentState.data?.prName &&
-                                        autoVersioning.status.mostRecentState.data?.prLink &&
-                                        <Columns>
-                                            <FaCodeBranch color="black"/>
-                                            <Typography.Text>PR</Typography.Text>
-                                            <Typography.Text>
-                                                <Link
-                                                    href={autoVersioning.status.mostRecentState.data.prLink}>{autoVersioning.status.mostRecentState.data.prName}</Link>
-                                            </Typography.Text>
-                                        </Columns>
-                                    }
+                                    <AutoVersioningPRLink
+                                        autoVersioningStatusMostRecentStateData={autoVersioning.status.mostRecentState.data}/>
                                     <Columns>
                                         <FaInfoCircle color="blue"/>
-                                        <Link href={`/extension/auto-versioning/audit/detail/${autoVersioning.status.order.uuid}`}>More info...</Link>
+                                        <Link
+                                            href={`/extension/auto-versioning/audit/detail/${autoVersioning.status.order.uuid}`}>More
+                                            info...</Link>
                                     </Columns>
                                 </Rows>
                             }
                         >
                             <Space>
-                                {autoVersioning.status.mostRecentState.state}
+                                <AutoVersioningAuditEntryState status={autoVersioning.status.mostRecentState} displayTooltip={false}/>
                             </Space>
                         </Tooltip>
                     </Space>
                 }
-                {/*
-
-                    status {
-                        order {
-                            targetVersion
-                        }
-                        running
-                        mostRecentState {
-                          state
-                          running
-                          processing
-                          creation {
-                              time
-                          }
-                        }
-                    }
-                */}
+                {
+                    autoVersioning.status &&
+                    <AutoVersioningPRLink
+                        autoVersioningStatusMostRecentStateData={autoVersioning.status.mostRecentState.data}
+                        size={8}
+                    />
+                }
             </Space>
         </>
     )

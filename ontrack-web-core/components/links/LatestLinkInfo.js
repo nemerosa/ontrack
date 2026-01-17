@@ -43,29 +43,39 @@ export default function LatestLinkInfo({sourceBuild, latestOk, targetBuild}) {
 
     return (
         <>
-            <Popover
-                title={
-                    <Space>
-                        <FaCaretRight/>
-                        Latest build
+            <Space direction="vertical" className="ot-line">
+                <Popover
+                    title={
+                        <Space>
+                            <FaCaretRight/>
+                            Latest build
+                        </Space>
+                    }
+                    content={
+                        <Descriptions
+                            style={{width: '20em'}}
+                            items={items}
+                            size="small"
+                        />
+                    }
+                >
+                    <Space direction="vertical" className="ot-line">
+                        <CheckStatus
+                            value={latestOk}
+                            text="Using latest build"
+                            noText="Not using latest build"
+                        />
+                    </Space>
+                </Popover>
+                {
+                    !latestOk && <Space>
+                        (
+                        <BuildRef build={targetBuild} displayTooltip={false} tooltipText="Current build"/>
+                        <BuildPromotions build={targetBuild}/>
+                        )
                     </Space>
                 }
-                content={
-                    <Descriptions
-                        style={{width: '20em'}}
-                        items={items}
-                        size="small"
-                    />
-                }
-            >
-                <div>
-                    <CheckStatus
-                        value={latestOk}
-                        text="Using latest build"
-                        noText="Not using latest build"
-                    />
-                </div>
-            </Popover>
+            </Space>
         </>
     )
 }

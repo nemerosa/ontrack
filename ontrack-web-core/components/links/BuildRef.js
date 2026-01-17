@@ -1,11 +1,12 @@
 import BuildLink from "@components/builds/BuildLink";
 
-export default function BuildRef({build}) {
+export default function BuildRef({build, displayTooltip = true, tooltipText}) {
     return (
         <>
             <BuildLink
                 build={build}
-                displayTooltip={true}
+                displayTooltip={displayTooltip}
+                tooltipText={tooltipText}
             />
         </>
     )

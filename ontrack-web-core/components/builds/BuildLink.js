@@ -27,7 +27,7 @@ export default function BuildLink({build, buildNameOnly, text, displayTooltip, t
             {
                 !displayTooltip && <Link
                     href={buildUri(build)}
-                    title="Link to build page"
+                    title={tooltipText}
                 >{text ?? buildKnownName(build, buildNameOnly)}</Link>
             }
         </>

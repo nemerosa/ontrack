@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.provisioning
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.seconds
+import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.acceptance.tests.workflows.WorkflowTestSupport
 import net.nemerosa.ontrack.kdsl.spec.Build
@@ -14,6 +15,9 @@ import net.nemerosa.ontrack.kdsl.spec.extension.general.release
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import kotlin.concurrent.atomics.AtomicInt
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.concurrent.atomics.fetchAndIncrement
 import kotlin.random.Random
 
 class ProvisionDemo : AbstractACCDSLTestSupport() {
@@ -59,40 +63,99 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
         }
     }
 
+    @OptIn(ExperimentalAtomicApi::class)
     @Test
     @Disabled
     fun `Deep dependencies`() {
-        val levels = 6
+        val levels = 4
         val dependenciesMax = 3
+        val buildCountMax = 4
 
-        fun buildName(level: Int, count: Int): String = "L$level-$count"
+        // Project node (branches will always be the same name in this scenario)
+        data class ProjectNode(
+            val level: Int,
+            val no: Int,
+            val dependencies: List<ProjectNode>,
+        ) {
 
-        fun generateDependencies(root: Build, level: Int) {
-            if (level >= 0) {
-                val dependenciesCount = Random.nextInt(1, dependenciesMax)
-                var count = 1
-                repeat(dependenciesCount) {
-                    project {
-                        branch {
-                            val buildName = buildName(level, count++)
-                            println("Creating build $buildName")
+            val builds = mutableListOf<Build>()
+
+            val lastBuild get() = builds.last()
+            val beforeLastBuild get() = builds.dropLast(1).lastOrNull() ?: lastBuild
+
+            fun populate() {
+                project(name = uid("L$level-$no-")) {
+                    val project = this
+                    branch("main") {
+                        dependencies.forEach { dependency ->
+                            dependency.populate()
+                        }
+
+                        // Creates the builds
+                        println("Project ${project.name}")
+                        val buildCount = Random.nextInt(1, buildCountMax)
+                        repeat(buildCount) { no ->
+                            val buildName = uid("${project.name}-$no-")
                             build(buildName) {
-                                root.linkTo(this)
-                                generateDependencies(this, level - 1)
+                                println("  * Build $buildName created")
+                                builds += this
+
+                                // Each build must be link to at least one build of each dependency.
+                                // If not on the last build, we always link to the N-1 th build of the dependency
+                                // If on the last build, there is 50% change to link to N -1, of not to the Nth (last) one
+
+                                dependencies.forEach { dependency ->
+                                    // Last build
+                                    if (no == buildCount - 1) {
+                                        if (Random.nextBoolean()) {
+                                            linkTo(dependency.beforeLastBuild)
+                                        } else {
+                                            linkTo(dependency.lastBuild)
+                                        }
+                                    }
+                                    // Not the last build
+                                    else {
+                                        linkTo(dependency.beforeLastBuild)
+                                    }
+                                }
                             }
                         }
+
                     }
                 }
             }
+
         }
 
-        project {
-            branch {
-                build(buildName(levels, 1)) {
-                    generateDependencies(this, levels - 1)
-                }
-            }
+        // Project counts per levels
+        val projectCounts = mutableMapOf<Int, AtomicInt>()
+
+        // Project count for a given level
+        fun projectCount(level: Int): Int {
+            val counter = projectCounts.getOrPut(level) { AtomicInt(0) }
+            return counter.fetchAndIncrement()
         }
+
+        // Creating one project node
+        fun createProjectNode(level: Int): ProjectNode {
+            val dependencies = if (level > 0) {
+                val dependencyCount = Random.nextInt(1, dependenciesMax)
+                (0 until dependencyCount).map {
+                    createProjectNode(level = level - 1)
+                }
+            } else {
+                emptyList()
+            }
+            return ProjectNode(
+                level = level,
+                no = projectCount(level),
+                dependencies = dependencies,
+            )
+        }
+
+        // Building the hierarchy of projects, branches & builds first
+        val root = createProjectNode(level = levels)
+        root.populate()
     }
 
     @Test
