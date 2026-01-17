@@ -8,6 +8,7 @@ import {useBranch} from "@components/services/fragments";
 import {useEffect, useState} from "react";
 import {CloseCommand} from "@components/common/Commands";
 import {branchUri} from "@components/common/Links";
+import LoadingContainer from "@components/common/LoadingContainer";
 
 export default function BranchLinksTableView({id}) {
 
@@ -38,6 +39,9 @@ export default function BranchLinksTableView({id}) {
                     title="Displays the dependencies as a graph"
                     href={`/branch/${id}/links`}
                 />
+                <LoadingContainer loading={loading}>
+
+                </LoadingContainer>
             </MainPage>
         </>
     )
