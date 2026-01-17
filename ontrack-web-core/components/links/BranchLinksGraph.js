@@ -224,7 +224,7 @@ function BranchLinksFlow({branch}) {
         if (client && branch && branch.id) {
             setLoading(true)
             client.request(
-                branchQuery,
+                branchQuery({downstream: true, upstream: true}),
                 {branchId: Number(branch.id)}
             ).then(data => {
 

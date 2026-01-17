@@ -122,12 +122,12 @@ const gqlUpstreamDependencies = (depth) => {
     }
 }
 
-export const branchQuery = `
+export const branchQuery = ({downstream, upstream}) => `
         query RootBranch($branchId: Int!) {
             branch(id: $branchId) {
                 ...BranchNodeInfo
-                ${gqlDownstreamDependencies(maxDownstreamDepth)}
-                ${gqlUpstreamDependencies(maxUpstreamDepth)}
+                ${downstream ? gqlDownstreamDependencies(maxDownstreamDepth) : ''}
+                ${upstream ? gqlUpstreamDependencies(maxUpstreamDepth) : ''}
             }
         }
         ${gqlBuildInfo}
