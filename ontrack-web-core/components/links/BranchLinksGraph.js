@@ -159,6 +159,8 @@ function BranchLinksFlow({branch}) {
     const [nodes, setNodes] = useState([])
     const [edges, setEdges] = useState([])
 
+    const [selectedNodeId, setSelectedNodeId] = useState(null)
+
     const nodesInitialized = useNodesInitialized();
     const {fitView} = useReactFlow();
 
@@ -376,6 +378,41 @@ function BranchLinksFlow({branch}) {
         [],
     );
 
+    const onNodeClick = useCallback((event, node) => {
+        setSelectedNodeId(node.id)
+    }, [])
+
+    useEffect(() => {
+        const selectedEdgeIds = edges
+            .filter(edge => edge.source === selectedNodeId || edge.target === selectedNodeId)
+            .map(edge => edge.id)
+
+        const connectedNodeIds = edges
+            .filter(edge => edge.source === selectedNodeId || edge.target === selectedNodeId)
+            .flatMap(edge => [edge.source, edge.target])
+
+        setNodes((nds) => nds.map((node) => {
+            return {
+                ...node,
+                data: {
+                    ...node.data,
+                    selected: node.id === selectedNodeId || connectedNodeIds.includes(node.id),
+                }
+            }
+        }))
+        setEdges((eds) => eds.map((edge) => {
+            const selected = selectedEdgeIds.includes(edge.id)
+            return {
+                ...edge,
+                style: {
+                    ...edge.style,
+                    stroke: selected ? 'black' : '#999',
+                    strokeWidth: selected ? 4 : 2,
+                }
+            }
+        }))
+    }, [selectedNodeId])
+
     return (
         <>
             <div style={{height: '800px'}}>
@@ -384,6 +421,7 @@ function BranchLinksFlow({branch}) {
                         nodes={nodes}
                         edges={edges}
                         onNodesChange={onNodesChange}
+                        onNodeClick={onNodeClick}
                         fitView={true}
                         nodeTypes={nodeTypes}
                     >
