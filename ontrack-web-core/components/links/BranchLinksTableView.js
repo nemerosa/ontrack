@@ -5,12 +5,22 @@ import BranchLinksModeButton from "@components/links/BranchLinksModeButton";
 import {FaProjectDiagram} from "react-icons/fa";
 import MainPage from "@components/layouts/MainPage";
 import {useBranch} from "@components/services/fragments";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {CloseCommand} from "@components/common/Commands";
+import {branchUri} from "@components/common/Links";
 
 export default function BranchLinksTableView({id}) {
 
     const {loading, branch} = useBranch(id)
     const [commands, setCommands] = useState([])
+
+    useEffect(() => {
+        if (branch.id) {
+            setCommands([
+                <CloseCommand key="close" href={branchUri(branch)}/>,
+            ])
+        }
+    }, [branch])
 
     return (
         <>
