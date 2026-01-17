@@ -8,7 +8,7 @@ import ProjectLink from "@components/projects/ProjectLink";
 
 export default function BranchLinkNode({data}) {
 
-    const {link, sourceBranch, targetBranch, visible} = data
+    const {link, sourceBranch, targetBranch, visible, selected} = data
 
     const {qualifier, sourceBuild, targetBuild, autoVersioning} = link
 
@@ -22,6 +22,7 @@ export default function BranchLinkNode({data}) {
     return (
         <div style={{
             opacity: visible ? 1 : 0,
+            cursor: 'pointer',
         }}>
             <Handle type="target" position={Position.Left}/>
             <Handle type="source" position={Position.Right}/>
@@ -31,7 +32,7 @@ export default function BranchLinkNode({data}) {
                 title={undefined}
                 size="small"
                 style={{
-                    border: 'dashed 1px gray',
+                    border: selected ? 'solid 3px black' : 'dashed 1px gray',
                     backgroundColor: latestOk ? undefined : '#ffcccc'
                 }}
             >

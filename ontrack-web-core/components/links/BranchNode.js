@@ -24,6 +24,7 @@ export default function BranchNode({data}) {
     return (
         <div style={{
             opacity: visible ? 1 : 0,
+            cursor: 'pointer',
         }}>
             <Handle type="target" position={Position.Left}/>
             <Handle type="source" position={Position.Right}/>
@@ -32,13 +33,9 @@ export default function BranchNode({data}) {
             <Card
                 title={undefined}
                 size="small"
-                style={
-                    selected ? {
-                        border: 'solid 5px blue'
-                    } : {
-                        border: 'solid 2px black'
-                    }
-                }
+                style={{
+                    border: selected ? 'solid 3px black' : 'solid 1px gray',
+                }}
             >
                 <Space direction="vertical" className="ot-line">
                     <Typography.Text>
