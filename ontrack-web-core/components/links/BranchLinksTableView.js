@@ -2,7 +2,7 @@ import Head from "next/head";
 import {subBranchTitle} from "@components/common/Titles";
 import {downToBranchBreadcrumbs} from "@components/common/Breadcrumbs";
 import BranchLinksModeButton from "@components/links/BranchLinksModeButton";
-import {FaProjectDiagram} from "react-icons/fa";
+import {FaArrowRight, FaProjectDiagram} from "react-icons/fa";
 import MainPage from "@components/layouts/MainPage";
 import {useEffect, useState} from "react";
 import {CloseCommand} from "@components/common/Commands";
@@ -11,6 +11,8 @@ import LoadingContainer from "@components/common/LoadingContainer";
 import {branchQuery} from "@components/links/BranchDependenciesFragments";
 import {useBranch} from "@components/services/fragments";
 import StandardTable from "@components/common/table/StandardTable";
+import {Space, Typography} from "antd";
+import BranchNodeComponent from "@components/links/BranchNodeComponent";
 
 export default function BranchLinksTableView({id}) {
 
@@ -29,10 +31,12 @@ export default function BranchLinksTableView({id}) {
         const branch = data.branch
         branch.downstreamLinks.forEach(downstreamLink => {
             const link = {
+                branch,
                 qualifier: downstreamLink.qualifier,
                 sourceBuild: downstreamLink.sourceBuild,
                 targetBuild: downstreamLink.targetBuild,
                 autoVersioning: downstreamLink.autoVersioning,
+                targetBranch: downstreamLink.branch,
             }
             links.push(link)
             flattenDeepDependencies(downstreamLink, links)
@@ -75,7 +79,25 @@ export default function BranchLinksTableView({id}) {
                             {
                                 key: 'consumer',
                                 title: 'Consumer',
+                                render: (_, link) => <BranchNodeComponent
+                                    branch={link.branch}
+                                />
+                            },
+                            {
+                                key: 'link',
+                                title: <Space size="small">
+                                    <FaArrowRight/>
+                                    <Typography.Text>depends on</Typography.Text>
+                                    <FaArrowRight/>
+                                </Space>,
                                 render: (_, link) => JSON.stringify(link)
+                            },
+                            {
+                                key: 'dependency',
+                                title: 'Dependency',
+                                render: (_, link) => <BranchNodeComponent
+                                    branch={link.targetBranch}
+                                />
                             },
                         ]}
                     />
