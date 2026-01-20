@@ -71,6 +71,7 @@ class EnvServiceImpl(
 
     @PostConstruct
     fun init() {
+        logger.info("[env] Home:                  {}", home)
         logger.info("[env] With JDK:              {}", System.getProperty("java.version"))
         logger.info("[env] With default profiles: {}", defaultProfiles)
         logger.info("[env] With active profiles:  {}", profiles)
