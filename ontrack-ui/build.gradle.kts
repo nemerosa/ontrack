@@ -114,6 +114,7 @@ jib {
     }
     container {
         ports = listOf("8080", "8800")
+        user = "1000:1000"
     }
 }
 
