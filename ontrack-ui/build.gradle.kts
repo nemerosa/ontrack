@@ -114,6 +114,10 @@ jib {
     }
     container {
         ports = listOf("8080", "8800")
+        volumes = listOf("/var/ontrack/data")
+        environment = mapOf(
+            "ONTRACK_CONFIG_APPLICATION_WORKING_DIR" to "/var/ontrack/data",
+        )
     }
 }
 
