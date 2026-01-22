@@ -68,7 +68,9 @@ class WorkflowRegistryImplTest {
         ).asJson()
         val validation = workflowRegistry.validateJsonWorkflow(json)
         assertTrue(validation.error)
-        assertEquals("There was a problem parsing the JSON at path 'name'", validation.errors.firstOrNull())
+        assertEquals("""
+            There was a problem parsing the JSON at path 'name': Instantiation of [simple type, class net.nemerosa.ontrack.extension.workflows.definition.Workflow] value failed for JSON property name due to missing (therefore NULL) value for creator parameter name which is a non-nullable type
+        """.trimIndent(), validation.errors.firstOrNull())
     }
 
     @Test
