@@ -61,7 +61,7 @@ class GroupMappingsCasc(
         ) {
             equality { a, b -> a.idp == b.idpGroup }
             onCreation { item -> update(item) }
-            onModification { item, existing -> update(item) }
+            onModification { item, _ -> update(item) }
             onDeletion { existing ->
                 groupMappingService.mapGroup(idpGroup = existing.idpGroup, accountGroup = null)
             }
