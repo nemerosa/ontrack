@@ -16,6 +16,7 @@ import {Divider, Space, Typography} from "antd";
 import BranchLink from "@components/branches/BranchLink";
 import ProjectLink from "@components/projects/ProjectLink";
 import BuildPromotions from "@components/links/BuildPromotions";
+import CheckStatus from "@components/common/CheckStatus";
 
 export default function BranchLinksTableView({id}) {
 
@@ -32,16 +33,17 @@ export default function BranchLinksTableView({id}) {
 
     const flattenDeepDependencies = (data, links) => {
         const branch = data.branch
-        const {downstreamLinks, ...strippedBranch} = branch
         branch.downstreamLinks.forEach(downstreamLink => {
-            const latestBuilds = strippedBranch.latestBuilds
+            const targetBranch = downstreamLink.branch
+            const latestBuilds = targetBranch.latestBuilds
             let latestBuild = undefined
             if (latestBuilds && latestBuilds.length > 0) {
                 latestBuild = latestBuilds[0]
             }
+            const latestOk = latestBuild && latestBuild.id === downstreamLink.targetBuild.id
             const link = {
-                branch: strippedBranch,
                 latestBuild,
+                latestOk,
                 qualifier: downstreamLink.qualifier,
                 sourceBuild: downstreamLink.sourceBuild,
                 targetBuild: downstreamLink.targetBuild,
@@ -85,11 +87,11 @@ export default function BranchLinksTableView({id}) {
                         query={branchQuery({downstream: true})}
                         queryNode={data => flattenDependencies(data)}
                         columns={[
-                            {
-                                key: 'data',
-                                title: 'Data',
-                                render: (_, link) => JSON.stringify(link)
-                            },
+                            // {
+                            //     key: 'data',
+                            //     title: 'Data',
+                            //     render: (_, link) => JSON.stringify(link)
+                            // },
                             {
                                 key: 'consumer',
                                 title: 'Consumer',
@@ -124,11 +126,20 @@ export default function BranchLinksTableView({id}) {
                                 </Space>,
                             },
                             {
+                                key: 'latestOk',
+                                title: 'Latest OK',
+                                render: (_, link) => <CheckStatus
+                                    value={link.latestOk}
+                                    text="Using latest"
+                                    noText="Not using latest"
+                                />
+                            },
+                            {
                                 key: 'latestBuild',
                                 title: 'Latest build',
                                 render: (_, link) => <>
                                     {
-                                        link.latestBuild &&
+                                        link.latestBuild && !link.latestOk &&
                                         <Space direction="vertical">
                                             <Space size="small">
                                                 <FaCaretRight/>
