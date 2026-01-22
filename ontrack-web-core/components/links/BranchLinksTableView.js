@@ -2,7 +2,7 @@ import Head from "next/head";
 import {subBranchTitle} from "@components/common/Titles";
 import {downToBranchBreadcrumbs} from "@components/common/Breadcrumbs";
 import BranchLinksModeButton from "@components/links/BranchLinksModeButton";
-import {FaArrowRight, FaProjectDiagram} from "react-icons/fa";
+import {FaArrowRight, FaCaretRight, FaProjectDiagram} from "react-icons/fa";
 import MainPage from "@components/layouts/MainPage";
 import {useEffect, useState} from "react";
 import {CloseCommand} from "@components/common/Commands";
@@ -32,8 +32,16 @@ export default function BranchLinksTableView({id}) {
 
     const flattenDeepDependencies = (data, links) => {
         const branch = data.branch
+        const {downstreamLinks, ...strippedBranch} = branch
         branch.downstreamLinks.forEach(downstreamLink => {
+            const latestBuilds = strippedBranch.latestBuilds
+            let latestBuild = undefined
+            if (latestBuilds && latestBuilds.length > 0) {
+                latestBuild = latestBuilds[0]
+            }
             const link = {
+                branch: strippedBranch,
+                latestBuild,
                 qualifier: downstreamLink.qualifier,
                 sourceBuild: downstreamLink.sourceBuild,
                 targetBuild: downstreamLink.targetBuild,
@@ -114,6 +122,22 @@ export default function BranchLinksTableView({id}) {
                                     </Space>
                                     <BuildPromotions build={link.targetBuild}/>
                                 </Space>,
+                            },
+                            {
+                                key: 'latestBuild',
+                                title: 'Latest build',
+                                render: (_, link) => <>
+                                    {
+                                        link.latestBuild &&
+                                        <Space direction="vertical">
+                                            <Space size="small">
+                                                <FaCaretRight/>
+                                                <BuildLink build={link.latestBuild}/>
+                                            </Space>
+                                            <BuildPromotions build={link.latestBuild}/>
+                                        </Space>
+                                    }
+                                </>,
                             },
                         ]}
                     />
