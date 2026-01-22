@@ -78,7 +78,7 @@ export default function StandardTable({
                     size: pagination.size,
                 }
             ).then(data => {
-                const userNode = typeof queryNode === 'function' ? queryNode(data) : data[queryNode]
+                const userNode = typeof queryNode === 'function' ? queryNode(data, filterFormData) : data[queryNode]
                 const newItems = userNode.pageItems;
                 setPageInfo(userNode.pageInfo)
                 if (pagination.offset > 0) {
