@@ -26,7 +26,6 @@ theme:
     text: Hanken Grotesk
   features:
     - navigation.path
-    - navigation.indexes
     - content.code.copy
     - content.action.edit
 use_directory_urls: false
