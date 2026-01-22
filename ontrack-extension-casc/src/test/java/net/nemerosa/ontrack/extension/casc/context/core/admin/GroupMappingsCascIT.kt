@@ -2,13 +2,16 @@ package net.nemerosa.ontrack.extension.casc.context.core.admin
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
+import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.model.security.AccountGroupInput
 import net.nemerosa.ontrack.model.security.GroupMappingService
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.fail
 
 @AsAdminTest
 class GroupMappingsCascIT : AbstractCascTestSupport() {
@@ -93,6 +96,36 @@ class GroupMappingsCascIT : AbstractCascTestSupport() {
             groupMappingService.getMappedGroup(idpGroupNames[2])?.name,
             "Group 2 mapped"
         )
+    }
+
+    @Test
+    fun `Parsing errors`() {
+        val groupName = uid("g-")
+        val idpGroupName = uid("idp-")
+        try {
+            casc(
+                """
+                    ontrack:
+                        admin:
+                            groups:
+                              - name: $groupName
+                                description: Test group
+                            group-mappings:
+                               - idp: $idpGroupName
+                               # Missing group
+                """.trimIndent()
+            )
+            fail("Parsing should have failed")
+        } catch (ex: IllegalStateException) {
+            assertIs<JsonParseException>(ex.cause) {
+                assertEquals(
+                    """
+                        There was a problem parsing the JSON at path 'group': Instantiation of [simple type, class net.nemerosa.ontrack.extension.casc.context.core.admin.GroupMappingsCascItem] value failed for JSON property group due to missing (therefore NULL) value for creator parameter group which is a non-nullable type
+                    """.trimIndent(),
+                    it.message
+                )
+            }
+        }
     }
 
 }

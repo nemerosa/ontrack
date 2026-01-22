@@ -116,6 +116,9 @@ fun userFriendlyMessage(ex: MismatchedInputException): String {
         if (line != null && column != null && line >= 0 && column >= 0) {
             append(" (line $line, column $column)")
         }
+        ex.originalMessage?.takeIf { it.isNotBlank() }?.let { message ->
+            append(": $message")
+        }
     }
 }
 
