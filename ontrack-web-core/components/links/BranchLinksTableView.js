@@ -12,7 +12,7 @@ import {branchQuery} from "@components/links/BranchDependenciesFragments";
 import {useBranch} from "@components/services/fragments";
 import StandardTable from "@components/common/table/StandardTable";
 import BuildLink from "@components/builds/BuildLink";
-import {Divider, Space} from "antd";
+import {Divider, Space, Typography} from "antd";
 import BranchLink from "@components/branches/BranchLink";
 import ProjectLink from "@components/projects/ProjectLink";
 import BuildPromotions from "@components/links/BuildPromotions";
@@ -78,6 +78,11 @@ export default function BranchLinksTableView({id}) {
                         queryNode={data => flattenDependencies(data)}
                         columns={[
                             {
+                                key: 'data',
+                                title: 'Data',
+                                render: (_, link) => JSON.stringify(link)
+                            },
+                            {
                                 key: 'consumer',
                                 title: 'Consumer',
                                 render: (_, link) => <Space direction="vertical">
@@ -96,6 +101,10 @@ export default function BranchLinksTableView({id}) {
                                 render: (_, link) => <Space direction="vertical">
                                     <Space size="small">
                                         <ProjectLink project={link.targetBuild.branch.project}/>
+                                        {
+                                            link.qualifier &&
+                                            <Typography.Text>[{link.qualifier}]</Typography.Text>
+                                        }
                                         <Divider type="vertical"/>
                                         <BranchLink branch={link.targetBuild.branch}/>
                                     </Space>
