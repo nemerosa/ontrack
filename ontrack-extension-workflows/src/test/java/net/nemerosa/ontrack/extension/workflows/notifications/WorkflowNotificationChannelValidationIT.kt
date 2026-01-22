@@ -29,7 +29,7 @@ class WorkflowNotificationChannelValidationIT : AbstractDSLTestSupport() {
                     promotionLevel {
                         assertFailsWithEventSubscriptionConfigException(
                             """
-                                There was a problem parsing the JSON at path 'workflow.nodes.[1].parents.[0]'
+                                There was a problem parsing the JSON at path 'workflow.nodes.[1].parents.[0]': Cannot construct instance of `net.nemerosa.ontrack.extension.workflows.definition.WorkflowParentNode` (although at least one Creator exists): no String-argument constructor/factory method to deserialize from String value ('start')
                             """.trimIndent()
                         ) {
                             eventSubscriptionService.subscribe(
@@ -338,7 +338,7 @@ class WorkflowNotificationChannelValidationIT : AbstractDSLTestSupport() {
                     promotionLevel {
                         assertFailsWithEventSubscriptionConfigException(
                             """
-                                Configuration for the notification in node "start" is not valid > There was a problem parsing the JSON at path 'target'
+                                Configuration for the notification in node "start" is not valid > There was a problem parsing the JSON at path 'target': Instantiation of [simple type, class net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig] value failed for JSON property target due to missing (therefore NULL) value for creator parameter target which is a non-nullable type
                             """.trimIndent()
                         ) {
                             eventSubscriptionService.subscribe(
