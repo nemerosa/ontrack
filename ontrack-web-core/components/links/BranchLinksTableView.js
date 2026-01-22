@@ -2,7 +2,7 @@ import Head from "next/head";
 import {subBranchTitle} from "@components/common/Titles";
 import {downToBranchBreadcrumbs} from "@components/common/Breadcrumbs";
 import BranchLinksModeButton from "@components/links/BranchLinksModeButton";
-import {FaProjectDiagram} from "react-icons/fa";
+import {FaArrowRight, FaProjectDiagram} from "react-icons/fa";
 import MainPage from "@components/layouts/MainPage";
 import {useEffect, useState} from "react";
 import {CloseCommand} from "@components/common/Commands";
@@ -11,6 +11,11 @@ import LoadingContainer from "@components/common/LoadingContainer";
 import {branchQuery} from "@components/links/BranchDependenciesFragments";
 import {useBranch} from "@components/services/fragments";
 import StandardTable from "@components/common/table/StandardTable";
+import BuildLink from "@components/builds/BuildLink";
+import {Divider, Space} from "antd";
+import BranchLink from "@components/branches/BranchLink";
+import ProjectLink from "@components/projects/ProjectLink";
+import BuildPromotions from "@components/links/BuildPromotions";
 
 export default function BranchLinksTableView({id}) {
 
@@ -75,7 +80,31 @@ export default function BranchLinksTableView({id}) {
                             {
                                 key: 'consumer',
                                 title: 'Consumer',
-                                render: (_, link) => JSON.stringify(link)
+                                render: (_, link) => <Space direction="vertical">
+                                    <Space size="small">
+                                        <ProjectLink project={link.sourceBuild.branch.project}/>
+                                        <Divider type="vertical"/>
+                                        <BranchLink branch={link.sourceBuild.branch}/>
+                                    </Space>
+                                    <BuildLink build={link.sourceBuild}/>
+                                    <BuildPromotions build={link.sourceBuild}/>
+                                </Space>,
+                            },
+                            {
+                                key: 'dependency',
+                                title: 'Dependency',
+                                render: (_, link) => <Space direction="vertical">
+                                    <Space size="small">
+                                        <ProjectLink project={link.targetBuild.branch.project}/>
+                                        <Divider type="vertical"/>
+                                        <BranchLink branch={link.targetBuild.branch}/>
+                                    </Space>
+                                    <Space size="small">
+                                        <FaArrowRight/>
+                                        <BuildLink build={link.targetBuild}/>
+                                    </Space>
+                                    <BuildPromotions build={link.targetBuild}/>
+                                </Space>,
                             },
                         ]}
                     />

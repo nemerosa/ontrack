@@ -7,6 +7,7 @@ const gqlBuildInfo = gql`
     fragment BuildInfo on Build {
         id
         name
+        displayName
         branch {
             id
             name
