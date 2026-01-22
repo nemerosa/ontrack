@@ -12,7 +12,7 @@ import {branchQuery} from "@components/links/BranchDependenciesFragments";
 import {useBranch} from "@components/services/fragments";
 import StandardTable from "@components/common/table/StandardTable";
 import BuildLink from "@components/builds/BuildLink";
-import {Divider, Space, Typography} from "antd";
+import {Divider, Form, Input, Space, Switch, Typography} from "antd";
 import BranchLink from "@components/branches/BranchLink";
 import ProjectLink from "@components/projects/ProjectLink";
 import BuildPromotions from "@components/links/BuildPromotions";
@@ -154,6 +154,27 @@ export default function BranchLinksTableView({id}) {
                                     branchLink={link}
                                 />,
                             }
+                        ]}
+                        filterForm={[
+                            <Form.Item
+                                key="consumer"
+                                name="consumer"
+                            >
+                                <Input placeholder="Consumer"/>
+                            </Form.Item>,
+                            <Form.Item
+                                key="dependency"
+                                name="dependency"
+                            >
+                                <Input placeholder="Dependency"/>
+                            </Form.Item>,
+                            <Form.Item
+                                key="errorsOnly"
+                                name="errorsOnly"
+                                label="Errors only"
+                            >
+                                <Switch/>
+                            </Form.Item>,
                         ]}
                     />
                 </LoadingContainer>
