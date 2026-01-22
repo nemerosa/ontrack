@@ -17,6 +17,7 @@ import BranchLink from "@components/branches/BranchLink";
 import ProjectLink from "@components/projects/ProjectLink";
 import BuildPromotions from "@components/links/BuildPromotions";
 import CheckStatus from "@components/common/CheckStatus";
+import AutoVersioningInfo from "@components/extension/auto-versioning/AutoVersioningInfo";
 
 export default function BranchLinksTableView({id}) {
 
@@ -87,11 +88,6 @@ export default function BranchLinksTableView({id}) {
                         query={branchQuery({downstream: true})}
                         queryNode={data => flattenDependencies(data)}
                         columns={[
-                            // {
-                            //     key: 'data',
-                            //     title: 'Data',
-                            //     render: (_, link) => JSON.stringify(link)
-                            // },
                             {
                                 key: 'consumer',
                                 title: 'Consumer',
@@ -150,6 +146,14 @@ export default function BranchLinksTableView({id}) {
                                     }
                                 </>,
                             },
+                            {
+                                key: 'autoVersioning',
+                                title: 'Auto versioning',
+                                render: (_, link) => link.autoVersioning && <AutoVersioningInfo
+                                    autoVersioning={link.autoVersioning}
+                                    branchLink={link}
+                                />,
+                            }
                         ]}
                     />
                 </LoadingContainer>
