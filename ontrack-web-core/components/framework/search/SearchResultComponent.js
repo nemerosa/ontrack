@@ -12,7 +12,10 @@ export default function SearchResultComponent({title, link, description}) {
                 {
                     !link && title
                 }
-                <Typography.Paragraph type="secondary">{description}</Typography.Paragraph>
+                {
+                    description &&
+                    <Typography.Paragraph type="secondary">{description}</Typography.Paragraph>
+                }
             </Space>
         </>
     )
