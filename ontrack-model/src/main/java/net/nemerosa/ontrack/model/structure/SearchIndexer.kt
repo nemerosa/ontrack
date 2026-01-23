@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.job.Schedule
 
 /**
- * Allows a [SearchProvider] to index some search data.
+ * Allows a provider to index some search data.
  */
 interface SearchIndexer<T : SearchItem> {
 

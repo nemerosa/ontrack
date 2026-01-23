@@ -34,8 +34,8 @@ const val PROJECT_SEARCH_RESULT_TYPE = "project"
 @Component
 class ProjectSearchProvider(
     private val structureService: StructureService,
-    private val searchIndexService: SearchIndexService
-) : SearchIndexer<ProjectSearchItem>, EventListener {
+    private val searchIndexService: SearchIndexService,
+) : SearchIndexer<ProjectSearchItem>, SearchQuery, EventListener {
 
     override val searchResultType = SearchResultType(
         feature = CoreExtensionFeature.INSTANCE.featureDescription,
@@ -59,6 +59,30 @@ class ProjectSearchProvider(
                     .text(ProjectSearchItem::description)
             }
         }
+    }
+
+    override fun query(
+        token: String,
+        offset: Int,
+        size: Int
+    ): SearchResults {
+        val projects = structureService.findProjectsByNamePattern(token)
+        return SearchResults(
+            items = projects.drop(offset).take(size).map { project ->
+                SearchResult(
+                    title = project.entityDisplayName,
+                    description = project.description ?: "",
+                    accuracy = 0.0,
+                    type = searchResultType,
+                    data = mapOf(
+                        SearchResult.SEARCH_RESULT_PROJECT to project,
+                    )
+                )
+            },
+            offset = offset,
+            total = projects.size,
+            message = null,
+        )
     }
 
     override fun buildQuery(
