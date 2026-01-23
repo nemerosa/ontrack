@@ -22,7 +22,6 @@ export default function SearchBoxTypeResults({type, query}) {
                         description
                         data
                         accuracy
-                        page
                     }
                 }
             }
@@ -74,13 +73,7 @@ export default function SearchBoxTypeResults({type, query}) {
                 }
                 {
                     items.map((item, idx) => (
-                        <div key={idx} onClick={() => {
-                            if (item.page) {
-                                window.location.href = item.page;
-                            }
-                        }} style={{cursor: 'pointer'}}>
-                            <SearchResult result={item} showType={false}/>
-                        </div>
+                        <SearchResult key={idx} result={item} showType={false}/>
                     ))
                 }
             </Space>

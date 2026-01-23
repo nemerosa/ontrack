@@ -10,7 +10,7 @@ export default function ProjectPage() {
         <>
             <main>
                 <MainLayout>
-                    <ProjectView id={Number(id)}/>
+                    <ProjectView id={Number(id)} key={router.asPath}/>
                 </MainLayout>
             </main>
         </>
