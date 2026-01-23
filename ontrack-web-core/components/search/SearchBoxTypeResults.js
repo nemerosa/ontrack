@@ -4,7 +4,7 @@ import {Space, Spin, Typography} from "antd";
 import SearchResultType from "@components/search/SearchResultType";
 import SearchResult from "@components/search/SearchResult";
 
-export default function SearchBoxTypeResults({type, query}) {
+export default function SearchBoxTypeResults({type, query, onSelect}) {
     const {data, loading, error} = useQuery(
         gql`
             query SearchByType($type: String!, $token: String!) {
@@ -73,7 +73,7 @@ export default function SearchBoxTypeResults({type, query}) {
                 }
                 {
                     items.map((item, idx) => (
-                        <SearchResult key={idx} result={item} showType={false}/>
+                        <SearchResult key={idx} result={item} showType={false} onSelect={onSelect}/>
                     ))
                 }
             </Space>

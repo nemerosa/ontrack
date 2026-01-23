@@ -3,7 +3,7 @@ import SearchBoxTypeResults from "@components/search/SearchBoxTypeResults";
 import {Divider, Space} from "antd";
 import React from "react";
 
-export default function SearchBoxResults({query}) {
+export default function SearchBoxResults({query, onSelect}) {
     const {searchResultTypes} = useRefData();
 
     if (searchResultTypes.length === 0 || !query || query.length < 3) {
@@ -18,6 +18,7 @@ export default function SearchBoxResults({query}) {
                         key={type.id}
                         type={type}
                         query={query}
+                        onSelect={onSelect}
                     />
                 ))
             }

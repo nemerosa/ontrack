@@ -37,6 +37,10 @@ export default function SearchBox({style}) {
         }
     };
 
+    const closeDropdown = () => {
+        setDropdownOpen(false);
+    };
+
     return (
         <>
             <Dropdown
@@ -56,7 +60,7 @@ export default function SearchBox({style}) {
                         overflow: 'auto',
                         minWidth: '400px',
                     }}>
-                        <SearchBoxResults query={query}/>
+                        <SearchBoxResults query={query} onSelect={closeDropdown}/>
                     </div>
                 )}
             >

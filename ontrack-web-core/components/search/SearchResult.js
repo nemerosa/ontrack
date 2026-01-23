@@ -3,9 +3,9 @@ import {Space} from "antd";
 import SearchResultType from "@components/search/SearchResultType";
 import SearchResultAccuracy from "@components/search/SearchResultAccuracy";
 
-export default function SearchResult({result, showType = true}) {
+export default function SearchResult({result, showType = true, onSelect}) {
     return (
-        <>
+        <div onClick={onSelect}>
             <Space>
                 {
                     showType &&
@@ -16,6 +16,6 @@ export default function SearchResult({result, showType = true}) {
                 }
                 <Dynamic path={`framework/search/${result.type.id}/Result`} props={result}/>
             </Space>
-        </>
+        </div>
     )
 }
