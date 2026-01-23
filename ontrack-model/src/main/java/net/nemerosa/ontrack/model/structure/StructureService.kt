@@ -8,6 +8,10 @@ import java.time.LocalDateTime
 import java.util.*
 import java.util.function.BiFunction
 
+/**
+ * Not deprecated yet, but please don't create any new method in this service, prefer more
+ * granular services.
+ */
 interface StructureService {
 
     val projectList: List<Project>

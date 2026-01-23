@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.repository
 
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchFilter
 import net.nemerosa.ontrack.model.structure.ID
@@ -18,4 +19,9 @@ interface BranchRepository {
      * @param filter Branch filter to use
      */
     fun filterBranchesForProject(project: Project, user: ID?, filter: BranchFilter): List<Branch>
+
+    /**
+     * Searching for branches by name fragment.
+     */
+    fun findBranchesByNamePattern(pattern: String, offset: Int, size: Int): PaginatedList<Branch>
 }

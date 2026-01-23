@@ -16,6 +16,10 @@ class PaginatedList<T>(
         pageItems = pageItems.map(fn)
     )
 
+    fun filter(predicate: (T) -> Boolean): PaginatedList<T> {
+
+    }
+
     companion object {
 
         fun <T> ofOne(item: T) = PaginatedList(
