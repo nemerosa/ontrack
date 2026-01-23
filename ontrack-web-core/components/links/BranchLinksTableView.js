@@ -35,34 +35,36 @@ export default function BranchLinksTableView({id}) {
     const flattenDeepDependencies = (data, filterFormData, links) => {
         const {consumer, dependency, errorsOnly} = filterFormData
         const branch = data.branch
-        branch.downstreamLinks.forEach(downstreamLink => {
-            const targetBranch = downstreamLink.branch
-            const latestBuilds = targetBranch.latestBuilds
-            let latestBuild = undefined
-            if (latestBuilds && latestBuilds.length > 0) {
-                latestBuild = latestBuilds[0]
-            }
-            const latestOk = latestBuild && latestBuild.id === downstreamLink.targetBuild.id
-
-            const keepLink =
-                (!consumer || downstreamLink.sourceBuild.branch.project.name.toLowerCase().indexOf(consumer.toLowerCase()) >= 0) &&
-                (!dependency || downstreamLink.targetBuild.branch.project.name.toLowerCase().indexOf(dependency.toLowerCase()) >= 0) &&
-                (!errorsOnly || !latestOk)
-
-            if (keepLink) {
-                const link = {
-                    latestBuild,
-                    latestOk,
-                    qualifier: downstreamLink.qualifier,
-                    sourceBuild: downstreamLink.sourceBuild,
-                    targetBuild: downstreamLink.targetBuild,
-                    autoVersioning: downstreamLink.autoVersioning,
+        if (branch.downstreamLinks) {
+            branch.downstreamLinks.forEach(downstreamLink => {
+                const targetBranch = downstreamLink.branch
+                const latestBuilds = targetBranch.latestBuilds
+                let latestBuild = undefined
+                if (latestBuilds && latestBuilds.length > 0) {
+                    latestBuild = latestBuilds[0]
                 }
-                links.push(link)
-            }
+                const latestOk = latestBuild && latestBuild.id === downstreamLink.targetBuild.id
 
-            flattenDeepDependencies(downstreamLink, filterFormData, links)
-        })
+                const keepLink =
+                    (!consumer || downstreamLink.sourceBuild.branch.project.name.toLowerCase().indexOf(consumer.toLowerCase()) >= 0) &&
+                    (!dependency || downstreamLink.targetBuild.branch.project.name.toLowerCase().indexOf(dependency.toLowerCase()) >= 0) &&
+                    (!errorsOnly || !latestOk)
+
+                if (keepLink) {
+                    const link = {
+                        latestBuild,
+                        latestOk,
+                        qualifier: downstreamLink.qualifier,
+                        sourceBuild: downstreamLink.sourceBuild,
+                        targetBuild: downstreamLink.targetBuild,
+                        autoVersioning: downstreamLink.autoVersioning,
+                    }
+                    links.push(link)
+                }
+
+                flattenDeepDependencies(downstreamLink, filterFormData, links)
+            })
+        }
     }
 
     const flattenDependencies = (data, filterFormData) => {
