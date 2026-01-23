@@ -16,31 +16,27 @@ export const useQuery = (query, {
     const [finished, setFinished] = useState(false)
 
     useEffect(() => {
-        let active = true
+        const controller = new AbortController()
         if (condition) {
             setLoading(true)
-            callGraphQL({query, variables})
+            callGraphQL({query, variables, signal: controller.signal})
                 .then(data => {
-                    if (active) {
-                        setData(dataFn(data))
-                        setError(null)
-                    }
+                    setData(dataFn(data))
+                    setError(null)
                 })
                 .catch((ex) => {
-                    if (active) {
+                    if (ex.name !== 'AbortError') {
                         setError(ex.message)
                         setData(null)
                     }
                 })
                 .finally(() => {
-                    if (active) {
-                        setFinished(true)
-                        setLoading(false)
-                    }
+                    setFinished(true)
+                    setLoading(false)
                 })
         }
         return () => {
-            active = false
+            controller.abort()
         }
     }, [condition, ...deps])
 
@@ -134,6 +130,7 @@ export const useMutation = (query, {userNodeName, onSuccess}) => {
 export async function callGraphQL({
                                       query,
                                       variables,
+                                      signal,
                                   }) {
     const res = await fetch('/api/protected/graphql', {
         method: 'POST',
@@ -144,7 +141,8 @@ export async function callGraphQL({
         body: JSON.stringify({
             query,
             variables,
-        })
+        }),
+        signal,
     })
     if (res.ok) {
         return await res.json()
