@@ -16,8 +16,7 @@ import org.springframework.stereotype.Component
 class BranchSearchProvider(
     private val structureService: StructureService,
     private val searchIndexService: SearchIndexService,
-    private val branchService: BranchService,
-) : SearchIndexer<BranchSearchItem>, SearchQuery, EventListener {
+) : SearchIndexer<BranchSearchItem>, EventListener {
 
     override val searchResultType = SearchResultType(
         feature = CoreExtensionFeature.INSTANCE.featureDescription,
@@ -64,30 +63,6 @@ class BranchSearchProvider(
                 processor(branch.asSearchItem())
             }
         }
-    }
-
-    override fun query(
-        token: String,
-        offset: Int,
-        size: Int
-    ): SearchResults {
-        val branches = branchService.findBranchesByNamePattern(token, offset, size)
-        return SearchResults(
-            items = branches.pageItems.map { branch ->
-                SearchResult(
-                    title = branch.entityDisplayName,
-                    description = branch.description ?: "",
-                    accuracy = 0.0,
-                    type = searchResultType,
-                    data = mapOf(
-                        SearchResult.SEARCH_RESULT_BRANCH to branch
-                    )
-                )
-            },
-            offset = offset,
-            total = branches.pageInfo.totalSize,
-            message = null,
-        )
     }
 
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? =
