@@ -239,6 +239,7 @@ export default function SearchBox({style}) {
                 open={dropdownOpen && dropdownMenu.items.length > 0}
                 onOpenChange={setDropdownOpen}
                 trigger={[]}
+                placement="bottomRight"
                 overlayStyle={{
                     maxHeight: '500px',
                     overflow: 'auto',
