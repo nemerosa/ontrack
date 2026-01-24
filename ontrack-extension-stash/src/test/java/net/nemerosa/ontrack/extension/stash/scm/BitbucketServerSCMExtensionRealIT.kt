@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.stash.scm
 
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
@@ -9,6 +11,7 @@ import net.nemerosa.ontrack.extension.stash.bitbucketServerEnv
 import net.nemerosa.ontrack.extension.stash.client.BitbucketClientFactory
 import net.nemerosa.ontrack.extension.stash.model.BitbucketRepository
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.files.FileRefService
 import net.nemerosa.ontrack.model.files.downloadDocument
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -17,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
 @TestOnBitbucketServer
+@AsAdminTest
 class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
 
     @Autowired
@@ -199,6 +203,21 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
             // Checking the branch has been deleted
             assertNull(scm.getBranchLastCommit(head), "Branch has been deleted")
 
+        }
+    }
+
+    @Test
+    fun `Listing all commits`() {
+        withScm { scm, _ ->
+            if (scm is SCMChangeLogEnabled) {
+                val commits = mutableListOf<SCMCommit>()
+                scm.forAllCommits {
+                    commits += it
+                }
+                assertTrue(commits.isNotEmpty(), "At least one commit must be present")
+            } else {
+                fail("SCM should be SCMChangeLogEnabled")
+            }
         }
     }
 

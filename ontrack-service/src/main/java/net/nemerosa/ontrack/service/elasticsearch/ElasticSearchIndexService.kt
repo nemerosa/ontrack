@@ -168,9 +168,9 @@ class ElasticSearchIndexService(
             acc + action
         }
         // Launching the indexation of this batch
-        val bulkRequest = bulk.bulk.build()
-        logger.info("[search][batch-index] index=${indexer.indexName},items=${items.size},mode=$mode,actions=${bulkRequest.operations().size}")
-        if (bulkRequest.operations().size > 0) {
+        if (bulk.hasOperations) {
+            val bulkRequest = bulk.bulk.build()
+            logger.info("[search][batch-index] index=${indexer.indexName},items=${items.size},mode=$mode,actions=${bulkRequest.operations().size}")
             client.bulk(bulkRequest)
             // Refreshes the index
             immediateRefreshIfRequested(indexer)
@@ -219,11 +219,13 @@ class ElasticSearchIndexService(
 
     private class BatchSearchIndexBulk private constructor(
         val bulk: BulkRequest.Builder,
-        val results: BatchIndexResults
+        val results: BatchIndexResults,
+        val hasOperations: Boolean
     ) {
         constructor(indexName: String) : this(
             BulkRequest.Builder().index(indexName),
-            BatchIndexResults.NONE
+            BatchIndexResults.NONE,
+            false
         )
 
         operator fun plus(action: BatchSearchIndexAction) =
@@ -231,7 +233,8 @@ class ElasticSearchIndexService(
                 bulk = action.action?.let {
                     bulk.operations(it)
                 } ?: bulk,
-                results = results + action.results
+                results = results + action.results,
+                hasOperations = hasOperations || (action.action != null)
             )
     }
 

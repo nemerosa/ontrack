@@ -1,16 +1,16 @@
 import {useRouter} from "next/router";
 import MainLayout from "@components/layouts/MainLayout";
-import GitCommitInfoView from "@components/extension/git/GitCommitInfoView";
+import SCMCommitInfoView from "@components/extension/scm/SCMCommitInfoView";
 
-export default function GitCommitInfoPage() {
+export default function SCMCommitInfoPage() {
     const router = useRouter()
-    const {projectId, commit} = router.query
+    const {project: projectName, commit} = router.query
 
     return (
         <>
             <main>
                 <MainLayout>
-                    <GitCommitInfoView projectId={projectId} commit={commit}/>
+                    <SCMCommitInfoView projectName={projectName} commit={commit}/>
                 </MainLayout>
             </main>
         </>

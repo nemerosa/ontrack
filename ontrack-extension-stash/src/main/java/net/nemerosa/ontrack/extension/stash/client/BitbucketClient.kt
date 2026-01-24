@@ -147,4 +147,9 @@ interface BitbucketClient {
      */
     fun getBranchesForCommit(repo: BitbucketRepository, commit: String): List<String>
 
+    /**
+     * Iterates over all commits.
+     */
+    fun forEachCommit(repo: BitbucketRepository, code: (BitbucketServerCommit) -> Unit)
+
 }

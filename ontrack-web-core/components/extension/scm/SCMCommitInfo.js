@@ -14,6 +14,7 @@ export default function SCMCommitInfo({scmCommitInfo}) {
                         <Typography.Link
                             code
                             href={scmCommitInfo.scmDecoratedCommit.commit.link}
+                            copyable
                         >{scmCommitInfo.scmDecoratedCommit.commit.id}</Typography.Link>
                     </Space>
                 }
@@ -33,12 +34,15 @@ export default function SCMCommitInfo({scmCommitInfo}) {
                         </Typography.Text>
                     </Space>
 
-                    <Typography.Paragraph>
-                        This commit is available in the following branches:
-                    </Typography.Paragraph>
+                    {
+                        scmCommitInfo.branchInfos && scmCommitInfo.branchInfos.length > 0 && <>
+                            <Typography.Paragraph>
+                                This commit is available in the following branches:
+                            </Typography.Paragraph>
 
-                    <SCMBranchInfos branchInfos={scmCommitInfo.branchInfos}/>
-
+                            <SCMBranchInfos branchInfos={scmCommitInfo.branchInfos}/>
+                        </>
+                    }
                 </Space>
             </PageSection>
         </>

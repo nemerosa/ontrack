@@ -144,6 +144,11 @@ class ElasticSearchServiceImpl(
         return Ack(ok)
     }
 
+    override fun reindex(resultType: String) {
+        val searchIndexer = indexerByResultType[resultType] ?: return
+        searchIndexService.index(searchIndexer)
+    }
+
     override fun indexInit() {
         indexers.forEach { (_, indexer) -> searchIndexService.initIndex(indexer) }
     }

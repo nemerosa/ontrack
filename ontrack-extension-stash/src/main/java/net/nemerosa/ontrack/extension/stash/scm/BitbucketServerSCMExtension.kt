@@ -249,6 +249,18 @@ class BitbucketServerSCMExtension(
         override fun getBranchesForCommit(project: Project, commit: String): List<String> =
             client.getBranchesForCommit(repo, commit)
 
+        override fun forAllCommits(code: (commit: SCMCommit) -> Unit) {
+            client.forEachCommit(repo) { commit ->
+                code(
+                    BitbucketServerSCMCommit(
+                        root = configuration.url,
+                        repo = repo,
+                        commit = commit
+                    )
+                )
+            }
+        }
+
         private fun waitAndMerge(prId: Int, from: String, message: String): Boolean {
             // Waits for the PR checks to be OK
             val autoApprovalTimeoutMillis = settings.autoMergeTimeout

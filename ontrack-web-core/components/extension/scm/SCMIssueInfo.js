@@ -14,6 +14,7 @@ export default function SCMIssueInfo({scmIssueInfo}) {
                             <Typography.Link
                                 code
                                 href={scmIssueInfo.issue.url}
+                                copyable
                             >{scmIssueInfo.issue.displayKey}</Typography.Link>
                             <Divider type="vertical"/>
                             <Typography.Text type="secondary">{scmIssueInfo.issue.summary}</Typography.Text>

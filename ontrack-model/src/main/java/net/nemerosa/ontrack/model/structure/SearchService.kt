@@ -34,4 +34,11 @@ interface SearchService {
      */
     fun indexReset(reindex: Boolean): Ack
 
+    /**
+     * Launching the indexation for a given result type. Waits until the indexation is completed.
+     *
+     * @param resultType Result type to index
+     */
+    fun reindex(resultType: String)
+
 }

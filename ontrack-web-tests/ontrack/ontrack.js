@@ -6,6 +6,7 @@ import {getBranchById} from "@ontrack/branch";
 import {EnvironmentsExtension} from "@ontrack/extensions/environments/environments";
 import {OntrackSettings} from "@ontrack/settings";
 import {AutoVersioningExtension} from "@ontrack/extensions/auto-versioning/AutoVersioningExtension";
+import {SearchMgt} from "@ontrack/search";
 
 /**
  * Ontrack service
@@ -18,6 +19,7 @@ export class Ontrack {
     admin = () => admin(this)
     configurations = new OntrackConfigurations(this)
     settings = new OntrackSettings(this)
+    search = new SearchMgt(this)
 
     createProject = async (name) => createProject(this, name)
     getProjectById = async (id) => getProjectById(this, id)

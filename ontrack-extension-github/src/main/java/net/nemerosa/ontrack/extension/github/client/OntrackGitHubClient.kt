@@ -313,6 +313,14 @@ interface OntrackGitHubClient {
      */
     fun getIssueLastCommit(repository: String, key: Int): String?
 
+    /**
+     * Iterates over all commits of a repository.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param code Code to run for each commit
+     */
+    fun forAllCommits(repository: String, code: (commit: GitHubCommit) -> Unit)
+
     companion object {
         const val PROPERTY_GITHUB_CLIENT_TYPE = "ontrack.extension.github.client.type"
         const val PROPERTY_GITHUB_CLIENT_TYPE_DEFAULT = "default"

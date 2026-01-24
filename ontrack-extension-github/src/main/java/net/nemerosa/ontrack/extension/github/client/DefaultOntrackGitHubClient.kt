@@ -917,6 +917,79 @@ class DefaultOntrackGitHubClient(
         }
     }
 
+    override fun forAllCommits(repository: String, code: (commit: GitHubCommit) -> Unit) {
+        val (owner, name) = getRepositoryParts(repository)
+        paginateGraphQL(
+            message = "Iterating over all commits for $repository",
+            query = $$"""
+                query AllCommits($owner: String!, $name: String!, $after: String) {
+                    repository(owner: $owner, name: $name) {
+                        defaultBranchRef {
+                            target {
+                                ... on Commit {
+                                    history(first: 100, after: $after) {
+                                        pageInfo {
+                                            hasNextPage
+                                            endCursor
+                                        }
+                                        edges {
+                                            node {
+                                                oid
+                                                url
+                                                message
+                                                author {
+                                                    name
+                                                    email
+                                                    date
+                                                }
+                                                committer {
+                                                    name
+                                                    email
+                                                    date
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            """,
+            variables = mapOf(
+                "owner" to owner,
+                "name" to name
+            ),
+            collectionAt = listOf("repository", "defaultBranchRef", "target", "history"),
+            nodes = false,
+        ) { n ->
+            val node = n.path("node")
+            val sha = node.path("oid").asText()
+            val url = node.path("url").asText()
+            val message = node.path("message").asText()
+            val author = node.path("author").toGitHubAuthor()
+            val committer = node.path("committer").toGitHubAuthor()
+            code(
+                GitHubCommit(
+                    sha = sha,
+                    url = url,
+                    commit = GitHubCommitInfo(
+                        author = author,
+                        committer = committer,
+                        message = message
+                    ),
+                    parents = null // Not needed for now
+                )
+            )
+        }
+    }
+
+    private fun JsonNode.toGitHubAuthor() = GitHubAuthor(
+        name = path("name").asText(),
+        email = path("email").asText(),
+        date = path("date").asText().let { parseLocalDateTime(it) }
+    )
+
     private fun getWorkflowRuns(
         client: RestTemplate,
         repository: String,

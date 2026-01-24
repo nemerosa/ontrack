@@ -117,6 +117,12 @@ class GitHubSCMExtension(
             return client.getBranchLastCommit(repository, branch, retryOnNotFound = false)
         }
 
+        override fun forAllCommits(code: (commit: SCMCommit) -> Unit) {
+            client.forAllCommits(repository) {
+                code(GitHubSCMCommit(it))
+            }
+        }
+
         override fun deleteBranch(branch: String) {
             if (client.getBranchLastCommit(repository, branch, retryOnNotFound = false) != null) {
                 client.deleteBranch(repository, branch)

@@ -1,16 +1,16 @@
 import {useRouter} from "next/router";
 import MainLayout from "@components/layouts/MainLayout";
-import GitIssueInfoView from "@components/extension/git/GitIssueInfoView";
+import SCMIssueInfoView from "@components/extension/scm/SCMIssueInfoView";
 
 export default function GitIssueInfoPage() {
     const router = useRouter()
-    const {projectId, key} = router.query
+    const {project: projectName, issue} = router.query
 
     return (
         <>
             <main>
                 <MainLayout>
-                    <GitIssueInfoView projectId={projectId} issueKey={key}/>
+                    <SCMIssueInfoView projectName={projectName} issueKey={issue}/>
                 </MainLayout>
             </main>
         </>

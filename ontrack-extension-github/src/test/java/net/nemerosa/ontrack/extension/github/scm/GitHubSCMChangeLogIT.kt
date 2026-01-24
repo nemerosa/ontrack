@@ -5,13 +5,40 @@ import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.AbstractGitHubTestSupport
 import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.extension.github.githubTestEnv
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
+import net.nemerosa.ontrack.extension.scm.service.SCMExtension
 import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @TestOnGitHub
 class GitHubSCMChangeLogIT : AbstractGitHubTestSupport() {
+
+    @Autowired
+    @Qualifier("gitHubSCMExtension")
+    private lateinit var scmExtension: SCMExtension
+
+    @Test
+    fun `GitHub SCM for all commits`() {
+        asAdmin {
+            project {
+                gitHubRealConfig()
+                val scm = scmExtension.getSCM(this)
+                if (scm is SCMChangeLogEnabled) {
+                    val messages = mutableListOf<String>()
+                    scm.forAllCommits { commit ->
+                        messages += commit.message
+                    }
+                    assertTrue(messages.isNotEmpty(), "At least one commit must be found")
+                    assertContains(messages, githubTestEnv.issues.messages.first())
+                }
+            }
+        }
+    }
 
     @Test
     fun `Getting a change log for GitHub using GraphQL`() {

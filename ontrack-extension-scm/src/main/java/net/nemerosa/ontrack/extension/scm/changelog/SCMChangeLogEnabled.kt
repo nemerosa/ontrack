@@ -62,4 +62,9 @@ interface SCMChangeLogEnabled : SCM {
      */
     fun getCommit(id: String): SCMCommit?
 
+    /**
+     * Looping over all the commits in the repository
+     */
+    fun forAllCommits(code: (commit: SCMCommit) -> Unit)
+
 }

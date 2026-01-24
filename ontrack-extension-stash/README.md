@@ -21,6 +21,8 @@ Go to http://localhost:7990 and follow the setup instructions. In particular,
 you need to request an evaluation license for 90 days using your
 Atlassian account.
 
+In the settings, enable Basic Authentication in Settings > Authentication methods, switch "Allow basic authentication on API calls" on.
+
 Create a `TEST` project and a `test` repository, with a `main` default branch.
 
 At the root, create a `test.txt` file with `This is a test` as a content.

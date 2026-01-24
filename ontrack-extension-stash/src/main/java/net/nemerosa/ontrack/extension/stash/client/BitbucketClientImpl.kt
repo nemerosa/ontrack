@@ -248,6 +248,23 @@ class BitbucketClientImpl(
             null
         }
 
+    override fun forEachCommit(repo: BitbucketRepository, code: (BitbucketServerCommit) -> Unit) {
+        var start = 0
+        var isLastPage = false
+        while (!isLastPage) {
+            val response = template.getForObject<JsonNode>(
+                "/rest/api/latest/projects/${repo.project}/repos/${repo.repository}/commits?start=$start&limit=$maxCommits"
+            )
+            response.path("values").forEach {
+                code(it.parse<BitbucketServerCommit>())
+            }
+            isLastPage = response.path("isLastPage").asBoolean(true)
+            if (!isLastPage) {
+                start = response.path("nextPageStart").asInt()
+            }
+        }
+    }
+
     private val template = RestTemplateBuilder()
         .rootUri(configuration.url)
         .basicAuthentication(

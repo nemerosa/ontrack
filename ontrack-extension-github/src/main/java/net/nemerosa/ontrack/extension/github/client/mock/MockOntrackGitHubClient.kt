@@ -204,4 +204,7 @@ class MockOntrackGitHubClient(
     override fun getIssueLastCommit(repository: String, key: Int): String? {
         TODO("Not yet implemented")
     }
+
+    override fun forAllCommits(repository: String, code: (commit: GitHubCommit) -> Unit) {
+    }
 }

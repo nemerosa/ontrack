@@ -102,7 +102,7 @@ class BranchInfoServiceImpl(
             }
 
             // Wrapping into a result
-            return branchInfos.map { (type, branchInfoList) ->
+            branchInfos.map { (type, branchInfoList) ->
                 BranchInfos(
                     type = type,
                     branchInfoList = branchInfoList,

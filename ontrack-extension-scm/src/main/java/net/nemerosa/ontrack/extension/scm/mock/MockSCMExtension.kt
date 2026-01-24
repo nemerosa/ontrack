@@ -292,6 +292,10 @@ class MockSCMExtension(
                 branch.commits.any { it.id == commit }
             }.map { it.name }
 
+        fun forAllCommits(code: (SCMCommit) -> Unit) {
+            branches.flatMap { it.commits }.forEach(code)
+        }
+
     }
 
     private inner class MockSCM(
@@ -399,6 +403,9 @@ class MockSCMExtension(
         override fun getBranchesForCommit(project: Project, commit: String): List<String> =
             repository(mockScmProjectProperty.name).getBranchesForCommit(commit)
 
+        override fun forAllCommits(code: (commit: SCMCommit) -> Unit) {
+            repository(mockScmProjectProperty.name).forAllCommits(code)
+        }
     }
 
     class MockIssueServiceConfiguration : IssueServiceConfiguration {

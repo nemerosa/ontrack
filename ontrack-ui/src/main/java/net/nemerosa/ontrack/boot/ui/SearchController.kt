@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.model.structure.SearchResultType
 import net.nemerosa.ontrack.model.structure.SearchResults
 import net.nemerosa.ontrack.model.structure.SearchService
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -13,18 +14,24 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/rest/search")
 class SearchController(
-        private val searchService: SearchService
+    private val searchService: SearchService
 ) {
 
     @PostMapping("")
     fun search(@RequestBody request: SearchRequest): ResponseEntity<SearchResults> =
-            ResponseEntity.ok(searchService.paginatedSearch(request))
+        ResponseEntity.ok(searchService.paginatedSearch(request))
 
     /**
      * Gets the list of search types
      */
     @GetMapping("types")
     fun getSearchTypes(): List<SearchResultType> = searchService.searchResultTypes
+
+    @PostMapping("index/type/{type}")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun searchReindex(@PathVariable type: String) {
+        searchService.reindex(type)
+    }
 
     @PostMapping("index/reset")
     fun searchIndexReset(@RequestBody request: SearchIndexResetRequest) = searchService.indexReset(request.reindex)

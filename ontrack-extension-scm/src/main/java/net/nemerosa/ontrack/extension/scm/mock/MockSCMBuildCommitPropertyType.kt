@@ -3,12 +3,14 @@ package net.nemerosa.ontrack.extension.scm.mock
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
+import net.nemerosa.ontrack.extension.scm.index.SCMBuildCommitIndexService
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.json.schema.JsonType
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.context.annotation.Profile
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component
 @Profile(RunProfile.DEV)
 class MockSCMBuildCommitPropertyType(
     extensionFeature: SCMExtensionFeature,
+    private val scmBuildCommitIndexService: SCMBuildCommitIndexService,
 ) : AbstractPropertyType<MockSCMBuildCommitProperty>(extensionFeature) {
 
     override val name: String = "Mock SCM commit"
@@ -36,6 +39,15 @@ class MockSCMBuildCommitPropertyType(
     override fun fromClient(node: JsonNode): MockSCMBuildCommitProperty = node.parse()
 
     override fun fromStorage(node: JsonNode): MockSCMBuildCommitProperty = node.parse()
+
+    /**
+     * Makes sure to reindex the build
+     */
+    override fun onPropertyChanged(entity: ProjectEntity, value: MockSCMBuildCommitProperty) {
+        if (entity is Build) {
+            scmBuildCommitIndexService.indexBuildCommit(entity, value.id)
+        }
+    }
 
     override fun replaceValue(
         value: MockSCMBuildCommitProperty,
