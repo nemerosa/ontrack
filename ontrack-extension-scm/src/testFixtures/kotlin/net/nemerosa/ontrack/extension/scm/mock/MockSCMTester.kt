@@ -22,6 +22,19 @@ class MockSCMTester(
         return context.code()
     }
 
+    fun withIssuePattern(
+        pattern: String,
+        code: () -> Unit,
+    ) {
+        val oldIssueRegex = MockSCMExtension.issueRegex
+        MockSCMExtension.issueRegex = pattern.toRegex()
+        try {
+            code()
+        } finally {
+            MockSCMExtension.issueRegex = oldIssueRegex
+        }
+    }
+
     inner class MockSCMRepositoryContext(
         val repositoryName: String,
     ) {

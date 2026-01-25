@@ -11,8 +11,10 @@ import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
 import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest
 import co.elastic.clients.elasticsearch.indices.ExistsRequest
 import co.elastic.clients.elasticsearch.indices.RefreshRequest
+import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.model.support.time
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -23,7 +25,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class ElasticSearchIndexService(
     private val client: ElasticsearchClient,
-    private val ontrackConfigProperties: OntrackConfigProperties
+    private val ontrackConfigProperties: OntrackConfigProperties,
+    private val meterRegistry: MeterRegistry,
 ) : SearchIndexService {
 
     private val logger: Logger = LoggerFactory.getLogger(ElasticSearchIndexService::class.java)
@@ -38,17 +41,22 @@ class ElasticSearchIndexService(
         val batchSize = indexer.indexBatch ?: ontrackConfigProperties.search.index.batch
         logger.debug("Full indexation for ${indexer.indexName} with batch size = $batchSize")
         val buffer = mutableListOf<T>()
-        indexer.indexAll { item ->
-            buffer.add(item)
-            if (buffer.size == batchSize) {
-                index(indexer, buffer)
-                buffer.clear()
+        meterRegistry.time(
+            name = ElasticSearchIndexMetrics.esIndexAll,
+            ElasticSearchIndexMetrics.METRIC_INDEX to indexer.indexName,
+        ) {
+            indexer.indexAll { item ->
+                buffer.add(item)
+                if (buffer.size == batchSize) {
+                    index(indexer, buffer)
+                    buffer.clear()
+                }
             }
+            // Remaining items
+            index(indexer, buffer)
+            // Refreshes the index
+            immediateRefreshIfRequested(indexer)
         }
-        // Remaining items
-        index(indexer, buffer)
-        // Refreshes the index
-        immediateRefreshIfRequested(indexer)
     }
 
     override fun <T : SearchItem> initIndex(indexer: SearchIndexer<T>) {

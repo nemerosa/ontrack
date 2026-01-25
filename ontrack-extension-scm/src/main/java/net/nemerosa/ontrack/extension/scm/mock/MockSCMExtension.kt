@@ -445,7 +445,7 @@ class MockSCMExtension(
             }.toSet()
 
         override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator {
-            return RegexMessageAnnotator(issuePattern.toRegex()) { key: String? ->
+            return RegexMessageAnnotator(issueRegex) { key: String? ->
                 of("a")
                     .attr("href", "mock://$name/issue/$key")
                     .text(key)
@@ -475,8 +475,10 @@ class MockSCMExtension(
             get() = TODO("Not yet implemented")
 
     }
+
+    companion object {
+        var issueRegex = "([A-Z]+-\\d+)".toRegex()
+    }
 }
 
 
-private const val issuePattern = "([A-Z]+-\\d+)"
-private val issueRegex = issuePattern.toRegex()

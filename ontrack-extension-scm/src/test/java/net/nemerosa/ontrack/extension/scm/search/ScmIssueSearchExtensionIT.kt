@@ -77,4 +77,45 @@ class ScmIssueSearchExtensionIT: AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Searching issues with a hash as a prefix`() {
+        mockSCMTester.withIssuePattern("(#(\\d+))") {
+            mockSCMTester.withMockSCMRepository {
+                project {
+                    branch {
+                        configureMockSCMBranch()
+                        build {
+
+                            val issueKey = "#1234"
+                            repositoryIssue(key = issueKey, message = "Sample issue")
+                            val commit = withRepositoryCommit("$issueKey Commit 1")
+                            setProperty(
+                                this,
+                                MockSCMBuildCommitPropertyType::class.java,
+                                MockSCMBuildCommitProperty(commit)
+                            )
+                            searchIndexService.index(scmCommitSearchExtension) // This includes the indexation of issues!
+
+                            val results = searchService.paginatedSearch(
+                                SearchRequest(
+                                    token = issueKey,
+                                    type = ScmIssueSearchExtension.SCM_ISSUE_SEARCH_RESULT_TYPE,
+                                )
+                            )
+
+                            assertEquals(1, results.items.size, "One result expected")
+                            val item = results.items.single().data?.get(SearchResult.SEARCH_RESULT_ITEM)
+                            assertNotNull(item, "Result found") {
+                                assertIs<ScmIssueSearchItem>(it) { si ->
+                                    assertEquals(issueKey, si.displayKey)
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
