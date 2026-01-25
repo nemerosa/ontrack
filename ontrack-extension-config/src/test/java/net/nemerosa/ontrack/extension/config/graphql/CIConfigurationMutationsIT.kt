@@ -8,10 +8,12 @@ import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationCo
 import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMBuildCommitPropertyType
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMProjectPropertyType
+import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.BuildDisplayNameService
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
@@ -23,6 +25,14 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var buildDisplayNameService: BuildDisplayNameService
+
+    @Autowired
+    private lateinit var mockSCMTester: MockSCMTester
+
+    @BeforeEach
+    fun init() {
+        mockSCMTester.registerRepository("yontrack")
+    }
 
     @Test
     @AsAdminTest

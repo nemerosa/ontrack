@@ -5,8 +5,10 @@ import net.nemerosa.ontrack.extension.config.EnvFixtures
 import net.nemerosa.ontrack.extension.config.EnvFixtures.TEST_BUILD_NUMBER
 import net.nemerosa.ontrack.extension.config.EnvFixtures.TEST_VERSION
 import net.nemerosa.ontrack.extension.general.MetaInfoPropertyType
+import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -17,6 +19,14 @@ class CoreConfigurationServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var configTestSupport: ConfigTestSupport
+
+    @Autowired
+    private lateinit var mockSCMTester: MockSCMTester
+
+    @BeforeEach
+    fun init() {
+        mockSCMTester.registerRepository("yontrack")
+    }
 
     @Test
     @AsAdminTest

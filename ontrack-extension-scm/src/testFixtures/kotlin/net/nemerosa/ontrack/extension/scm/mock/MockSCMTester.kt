@@ -14,6 +14,10 @@ class MockSCMTester(
     private val propertyService: PropertyService,
 ) {
 
+    fun registerRepository(repositoryName: String) {
+        mockSCMExtension.registerRepository(repositoryName)
+    }
+
     fun deleteRepository(repoName: String) {
         mockSCMExtension.deleteRepository(repoName)
     }

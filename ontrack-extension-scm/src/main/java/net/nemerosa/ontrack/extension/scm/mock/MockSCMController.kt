@@ -19,7 +19,7 @@ class MockSCMController(
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping("/file")
     fun registerFile(@RequestBody registration: FileContentRegistration) {
-        mockSCMExtension.repository(registration.name)
+        mockSCMExtension.repositoryOrCreate(registration.name)
             .registerFile(registration.scmBranch, registration.path, registration.content)
     }
 
@@ -29,7 +29,7 @@ class MockSCMController(
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping("/issue")
     fun registerIssue(@RequestBody registration: IssueRegistration) {
-        mockSCMExtension.repository(registration.name)
+        mockSCMExtension.repositoryOrCreate(registration.name)
             .registerIssue(
                 registration.key,
                 registration.message,
@@ -42,7 +42,7 @@ class MockSCMController(
      */
     @PostMapping("/commit")
     fun registerCommit(@RequestBody registration: CommitRegistration) = CommitResponse(
-        commitId = mockSCMExtension.repository(registration.name)
+        commitId = mockSCMExtension.repositoryOrCreate(registration.name)
             .registerCommit(registration.scmBranch, registration.message)
     )
 
@@ -55,7 +55,7 @@ class MockSCMController(
         @RequestParam scmBranch: String,
         @RequestParam path: String,
     ): FileContent? =
-        mockSCMExtension.repository(repository).getFile(scmBranch, path)?.let {
+        mockSCMExtension.repositoryOrCreate(repository).getFile(scmBranch, path)?.let {
             FileContent(it)
         }
 
@@ -67,7 +67,7 @@ class MockSCMController(
         @RequestParam repository: String,
         @RequestParam scmBranch: String,
     ): MockBranch =
-        mockSCMExtension.repository(repository).getBranch(namePattern = scmBranch)
+        mockSCMExtension.repositoryOrCreate(repository).getBranch(namePattern = scmBranch)
             ?: throw MockSCMBranchNotFoundException(scmBranch)
 
     /**
@@ -79,7 +79,7 @@ class MockSCMController(
         @RequestParam from: String?,
         @RequestParam to: String?,
     ): MockSCMExtension.MockPullRequest =
-        mockSCMExtension.repository(repository).findPR(from, to)
+        mockSCMExtension.repositoryOrCreate(repository).findPR(from, to)
             ?: throw MockSCMPullRequestNotFoundException()
 
     data class FileContentRegistration(

@@ -51,6 +51,8 @@ class MockSCMExtension(
         repositories[name] = MockRepository(name)
     }
 
+    fun repositoryOrCreate(name: String): MockRepository = repositories.getOrPut(name) { MockRepository(name) }
+
     fun repository(name: String): MockRepository = repositories[name]
         ?: error("Repository $name not found")
 
