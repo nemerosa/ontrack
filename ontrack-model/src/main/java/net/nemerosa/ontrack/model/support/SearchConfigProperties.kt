@@ -28,5 +28,8 @@ class SearchConfigProperties {
 
         @APIDescription("Option to ignore errors when creating indexes. For test only, allowing for concurrent testing.")
         var ignoreExisting = false
+
+        @APIDescription("Forces a reset of all indexes at startup")
+        var reset = false
     }
 }

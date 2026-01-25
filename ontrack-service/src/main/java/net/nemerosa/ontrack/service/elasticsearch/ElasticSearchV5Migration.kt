@@ -1,8 +1,13 @@
 package net.nemerosa.ontrack.service.elasticsearch
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchService
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.support.StartupService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.slf4j.Logger
@@ -18,9 +23,12 @@ class ElasticSearchV5Migration(
     private val searchService: SearchService,
     private val searchIndexService: SearchIndexService,
     private val securityService: SecurityService,
+    private val ontrackConfigProperties: OntrackConfigProperties,
 ) : StartupService {
 
     private val logger: Logger = LoggerFactory.getLogger(ElasticSearchV5Migration::class.java)
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun getName(): String? = "ElasticSearch V5 migration"
 
@@ -33,20 +41,28 @@ class ElasticSearchV5Migration(
         val migrated = storageService
             .find(store, KEY, ElasticSearchV5MigrationStatus::class)
             ?.migrated ?: false
-        if (!migrated) {
-            logger.info("Removing all ElasticSearch indexes for migration to V5 (ES9)...")
-            securityService.asAdmin {
-                searchService.indexReset(reindex = true, logErrors = true)
-                logger.info("Removing obsolete indexes")
-                searchIndexService.deleteIndex("git-commit")
-                searchIndexService.deleteIndex("git-issues")
+        if (!migrated || ontrackConfigProperties.search.index.reset) {
+            logger.info("Launching the reset of all ElasticSearch indexes for migration to V5 (ES9)...")
+            scope.launch {
+                logger.info("Removing all ElasticSearch indexes for migration to V5 (ES9)...")
+                try {
+                    securityService.asAdmin {
+                        searchService.indexReset(reindex = true, logErrors = true)
+                        logger.info("Removing obsolete indexes")
+                        searchIndexService.deleteIndex("git-commit")
+                        searchIndexService.deleteIndex("git-issues")
+                    }
+                    storageService.store(
+                        store = store,
+                        key = KEY,
+                        data = ElasticSearchV5MigrationStatus(migrated = true)
+                    )
+                    logger.info("Removed and repopulated all ElasticSearch indexes for migration to V5 (ES9).")
+                } catch (ex: Exception) {
+                    logger.error("Error during ElasticSearch V5 migration", ex)
+                }
             }
-            logger.info("Removed and repopulated all ElasticSearch indexes for migration to V5 (ES9).")
-            storageService.store(
-                store = store,
-                key = KEY,
-                data = ElasticSearchV5MigrationStatus(migrated = true)
-            )
+            logger.info("Launched the reset of all ElasticSearch indexes for migration to V5 (ES9) asynchronously.")
         } else {
             logger.info("ElasticSearch indexes have already been migrated to V5 (ES9).")
         }
