@@ -83,39 +83,51 @@ class ScmCommitSearchExtension(
                 logger.isDebugEnabled
         securityService.asAdmin {
             structureService.projectList.forEach { project ->
-                val scm = scmDetector.getSCM(project)
-                if (scm is SCMChangeLogEnabled) {
-                    logger.debug("[search][indexation][scm-commits] Indexing ${project.name} commits")
-                    var commitCount = 0
-                    val projectIssueKeys = mutableSetOf<String>()
-                    val issueConfig = scm.getConfiguredIssueService()
-                    scm.forAllCommits { commit ->
-                        commitCount++
-                        // Logging
-                        if (traceCommits) {
-                            logger.debug("[search][indexation][scm-commits] project=${project.name} commit=${commit.shortId} message=${commit.message}")
-                        }
-                        // Indexation of the message
-                        val item = ScmCommitSearchItem(
-                            projectName = project.name,
-                            id = commit.id,
-                            shortId = commit.shortId,
-                            author = commit.author,
-                            message = commit.message,
-                        )
-                        processor(item)
-                        // Indexes the list of issues for this commit
-                        if (issueConfig != null) {
-                            val keys = issueConfig.extractIssueKeysFromMessage(commit.message)
-                            projectIssueKeys.addAll(keys)
-                        }
-                    }
-                    // Processing of issues
-                    if (issueConfig != null && projectIssueKeys.isNotEmpty()) {
-                        logger.debug("[search][indexation][scm-commits] project=${project.name} issues=${projectIssueKeys.size} SCM issues have been found.")
-                        scmIssueSearchExtension.processIssueKeys(project, issueConfig, projectIssueKeys)
-                    }
+                try {
+                    indexProjectCommits(project, traceCommits, processor)
+                } catch (any: Exception) {
+                    logger.error("[search][indexation][scm-commits] Cannot index commits for project ${project.name}", any)
                 }
+            }
+        }
+    }
+
+    private fun indexProjectCommits(
+        project: Project,
+        traceCommits: Boolean,
+        processor: (ScmCommitSearchItem) -> Unit
+    ) {
+        val scm = scmDetector.getSCM(project)
+        if (scm is SCMChangeLogEnabled) {
+            logger.debug("[search][indexation][scm-commits] Indexing ${project.name} commits")
+            var commitCount = 0
+            val projectIssueKeys = mutableSetOf<String>()
+            val issueConfig = scm.getConfiguredIssueService()
+            scm.forAllCommits { commit ->
+                commitCount++
+                // Logging
+                if (traceCommits) {
+                    logger.debug("[search][indexation][scm-commits] project=${project.name} commit=${commit.shortId} message=${commit.message}")
+                }
+                // Indexation of the message
+                val item = ScmCommitSearchItem(
+                    projectName = project.name,
+                    id = commit.id,
+                    shortId = commit.shortId,
+                    author = commit.author,
+                    message = commit.message,
+                )
+                processor(item)
+                // Indexes the list of issues for this commit
+                if (issueConfig != null) {
+                    val keys = issueConfig.extractIssueKeysFromMessage(commit.message)
+                    projectIssueKeys.addAll(keys)
+                }
+            }
+            // Processing of issues
+            if (issueConfig != null && projectIssueKeys.isNotEmpty()) {
+                logger.debug("[search][indexation][scm-commits] project=${project.name} issues=${projectIssueKeys.size} SCM issues have been found.")
+                scmIssueSearchExtension.processIssueKeys(project, issueConfig, projectIssueKeys)
             }
         }
     }
