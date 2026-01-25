@@ -137,9 +137,9 @@ class ElasticSearchServiceImpl(
                 .mapNotNull { (_, indexer) -> indexer.searchResultType }
                 .sortedBy { it.order }
 
-    override fun indexReset(reindex: Boolean): Ack {
+    override fun indexReset(reindex: Boolean, logErrors: Boolean): Ack {
         val ok = indexers.all { (_, indexer) ->
-            searchIndexService.resetIndex(indexer, reindex)
+            searchIndexService.resetIndex(indexer = indexer, reindex = reindex, logErrors = logErrors)
         }
         return Ack(ok)
     }

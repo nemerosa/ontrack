@@ -82,7 +82,7 @@ class ElasticSearchIndexationJobs(
 
             override fun getTask() = JobRun { listener ->
                 listener.message("Clearing all search indexes...")
-                searchService.indexReset(reindex = false)
+                searchService.indexReset(reindex = false, logErrors = false)
             }
         }
     )

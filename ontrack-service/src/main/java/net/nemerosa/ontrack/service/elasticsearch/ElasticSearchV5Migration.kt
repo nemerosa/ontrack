@@ -36,7 +36,7 @@ class ElasticSearchV5Migration(
         if (!migrated) {
             logger.info("Removing all ElasticSearch indexes for migration to V5 (ES9)...")
             securityService.asAdmin {
-                searchService.indexReset(reindex = true)
+                searchService.indexReset(reindex = true, logErrors = true)
                 logger.info("Removing obsolete indexes")
                 searchIndexService.deleteIndex("git-commit")
                 searchIndexService.deleteIndex("git-issues")

@@ -19,7 +19,7 @@ class GitBranchSearchIndexerIT : AbstractGitSearchTestSupport() {
 
     @Before
     fun before() {
-        searchIndexService.resetIndex(gitBranchSearchIndexer, reindex = false)
+        searchIndexService.resetIndex(gitBranchSearchIndexer, reindex = false, logErrors = false)
     }
 
     @Test

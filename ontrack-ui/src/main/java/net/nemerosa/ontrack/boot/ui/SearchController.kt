@@ -34,7 +34,10 @@ class SearchController(
     }
 
     @PostMapping("index/reset")
-    fun searchIndexReset(@RequestBody request: SearchIndexResetRequest) = searchService.indexReset(request.reindex)
+    fun searchIndexReset(@RequestBody request: SearchIndexResetRequest) = searchService.indexReset(
+        reindex = request.reindex,
+        logErrors = false,
+    )
 
     data class SearchIndexResetRequest(val reindex: Boolean = false)
 

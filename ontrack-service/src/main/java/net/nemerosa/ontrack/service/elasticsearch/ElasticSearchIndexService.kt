@@ -88,14 +88,23 @@ class ElasticSearchIndexService(
         }
     }
 
-    override fun <T : SearchItem> resetIndex(indexer: SearchIndexer<T>, reindex: Boolean): Boolean {
+    override fun <T : SearchItem> resetIndex(indexer: SearchIndexer<T>, reindex: Boolean, logErrors: Boolean): Boolean {
         // Deletes the index
         client.indices().delete(DeleteIndexRequest.Builder().index(indexer.indexName).build())
         // Re-creates the index
         initIndex(indexer)
         // Re-index if requested
         if (reindex) {
-            index(indexer)
+            try {
+                index(indexer)
+            } catch (any: Exception) {
+                if (logErrors) {
+                    logger.error("[elasticsearch][reset][${indexer.indexName}] Cannot re-index data", any)
+                    return false
+                } else {
+                    throw any
+                }
+            }
         }
         // Refreshes the index always
         refreshIndex(indexer)
