@@ -47,8 +47,15 @@ class MockSCMExtension(
 
     private val repositories = mutableMapOf<String, MockRepository>()
 
-    fun repository(name: String) = repositories.getOrPut(name) {
-        MockRepository(name)
+    fun registerRepository(name: String) {
+        repositories[name] = MockRepository(name)
+    }
+
+    fun repository(name: String): MockRepository = repositories[name]
+        ?: error("Repository $name not found")
+
+    fun deleteRepository(repoName: String) {
+        repositories.remove(repoName)
     }
 
     data class MockPullRequest(

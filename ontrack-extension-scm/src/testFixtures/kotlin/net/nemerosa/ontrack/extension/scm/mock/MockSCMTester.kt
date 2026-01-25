@@ -14,6 +14,10 @@ class MockSCMTester(
     private val propertyService: PropertyService,
 ) {
 
+    fun deleteRepository(repoName: String) {
+        mockSCMExtension.deleteRepository(repoName)
+    }
+
     fun <T> withMockSCMRepository(
         name: String = uid(""),
         code: MockSCMRepositoryContext.() -> T,
@@ -38,6 +42,10 @@ class MockSCMTester(
     inner class MockSCMRepositoryContext(
         val repositoryName: String,
     ) {
+
+        init {
+            mockSCMExtension.registerRepository(repositoryName)
+        }
 
         private fun Project.configureMockSCMProject(
             issueServiceIdentifier: String? = null
