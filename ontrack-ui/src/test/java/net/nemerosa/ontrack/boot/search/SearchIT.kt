@@ -13,7 +13,7 @@ class SearchIT : AbstractSearchTestSupport() {
             listOf(
                 "Project", "Branch", "Build",
                 "Build with Release", "Linked Build",
-                "Git Branch", "Git Commit", "Git Issue",
+                "SCM Issue", "Git Branch", "SCM Commit",
             ),
             names
         )

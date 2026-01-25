@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.elasticsearch
 
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.structure.SearchIndexService
 import net.nemerosa.ontrack.model.structure.SearchService
 import net.nemerosa.ontrack.model.support.StartupService
 import net.nemerosa.ontrack.model.support.StorageService
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component
 class ElasticSearchV5Migration(
     private val storageService: StorageService,
     private val searchService: SearchService,
+    private val searchIndexService: SearchIndexService,
     private val securityService: SecurityService,
 ) : StartupService {
 
@@ -35,6 +37,9 @@ class ElasticSearchV5Migration(
             logger.info("Removing all ElasticSearch indexes for migration to V5 (ES9)...")
             securityService.asAdmin {
                 searchService.indexReset(reindex = true)
+                logger.info("Removing obsolete indexes")
+                searchIndexService.deleteIndex("git-commit")
+                searchIndexService.deleteIndex("git-issues")
             }
             logger.info("Removed and repopulated all ElasticSearch indexes for migration to V5 (ES9).")
             storageService.store(

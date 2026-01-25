@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import net.nemerosa.ontrack.repository.support.queryForObjectOrNull
 import net.nemerosa.ontrack.repository.support.readLocalDateTimeNotNull
@@ -19,7 +18,6 @@ class SCMBuildCommitIndexServiceImpl(
     private val scmDetector: SCMDetector,
     private val entityStore: EntityStore,
     private val structureService: StructureService,
-    private val ontrackConfigProperties: OntrackConfigProperties,
 ) : SCMBuildCommitIndexService, AbstractJdbcRepository(dataSource) {
 
     override fun clearBuildCommits() {
@@ -117,11 +115,6 @@ class SCMBuildCommitIndexServiceImpl(
 
     override fun indexBuildCommit(build: Build, commit: String?) {
 
-        // Not indexing when configurations are disabled.
-        if (!ontrackConfigProperties.configurationTest) {
-            return
-        }
-
         // Not indexing anything if no commit
         if (commit.isNullOrBlank()) return
 
@@ -132,7 +125,7 @@ class SCMBuildCommitIndexServiceImpl(
         // Getting the existing commit for this build
         val existingCommit = getIndexedCommit(build.id())?.commitId
 
-        // Not re-indexing if same commit
+        // Not re-indexing if the same commit
         if (existingCommit != null && existingCommit == commit) return
 
         // Getting information about the commit

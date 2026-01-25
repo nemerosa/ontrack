@@ -109,9 +109,6 @@ class SCMBuildCommitIndexServiceIT : AbstractDSLTestSupport() {
                     }
                 }
 
-                val count = scmBuildCommitIndexService.indexBuildCommits(this)
-                assertEquals(3, count, "3 commits have been indexed")
-
                 val foundBuild = scmBuildCommitIndexService.findEarliestBuildAfterCommit(
                     branch = branch,
                     commit = commit!!,

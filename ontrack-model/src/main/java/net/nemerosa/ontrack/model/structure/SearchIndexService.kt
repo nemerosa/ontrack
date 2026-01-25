@@ -14,6 +14,11 @@ interface SearchIndexService {
 
     fun <T : SearchItem> index(indexer: SearchIndexer<T>)
 
+    /**
+     * Deletes an index by name
+     */
+    fun deleteIndex(indexName: String)
+
     fun <T : SearchItem> resetIndex(indexer: SearchIndexer<T>, reindex: Boolean): Boolean
 
     fun <T : SearchItem> createSearchIndex(indexer: SearchIndexer<T>, item: T)

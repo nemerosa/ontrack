@@ -14,7 +14,11 @@ export class SCMIssuePage {
         await expect(this.page.getByRole('link', {name: this.issueKey})).toBeVisible()
         await expect(this.page.getByRole('link', {name: this.project.name, exact: true})).toBeVisible()
         await expect(this.page.getByRole('link', {name: commitId})).toBeVisible()
+    }
 
+    async expectBranchInfo({scmBranch, build}) {
+        await expect(this.page.getByRole('link', {name: scmBranch, exact: true})).toBeVisible()
+        await expect(this.page.getByRole('link', {name: build, exact: true})).toBeVisible()
     }
 
 }

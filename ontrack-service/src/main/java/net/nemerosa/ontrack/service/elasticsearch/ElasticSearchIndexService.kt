@@ -73,6 +73,13 @@ class ElasticSearchIndexService(
         }
     }
 
+    override fun deleteIndex(indexName: String) {
+        val indexExists = client.indices().exists(ExistsRequest.Builder().index(indexName).build()).value()
+        if (indexExists) {
+            client.indices().delete(DeleteIndexRequest.Builder().index(indexName).build())
+        }
+    }
+
     override fun <T : SearchItem> resetIndex(indexer: SearchIndexer<T>, reindex: Boolean): Boolean {
         // Deletes the index
         client.indices().delete(DeleteIndexRequest.Builder().index(indexer.indexName).build())

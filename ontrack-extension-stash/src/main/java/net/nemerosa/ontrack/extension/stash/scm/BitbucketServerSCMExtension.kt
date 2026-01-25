@@ -29,6 +29,7 @@ import net.nemerosa.ontrack.extension.stash.settings.BitbucketServerSettings
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.stereotype.Component
 
 @Component
@@ -40,6 +41,7 @@ class BitbucketServerSCMExtension(
     private val cachedSettingsService: CachedSettingsService,
     private val stashConfigurationService: StashConfigurationService,
     private val issueServiceRegistry: IssueServiceRegistry,
+    private val ontrackConfigProperties: OntrackConfigProperties,
 ) : AbstractExtension(extensionFeature), SCMExtension {
 
     override val type: String = "bitbucket-server"
@@ -208,12 +210,16 @@ class BitbucketServerSCMExtension(
         }
 
         override fun getCommit(id: String): SCMCommit? =
-            client.getCommit(repo, id)?.let {
-                BitbucketServerSCMCommit(
-                    root = configuration.url,
-                    repo = repo,
-                    commit = it
-                )
+            if (ontrackConfigProperties.configurationTest) {
+                client.getCommit(repo, id)?.let {
+                    BitbucketServerSCMCommit(
+                        root = configuration.url,
+                        repo = repo,
+                        commit = it
+                    )
+                }
+            } else {
+                null
             }
 
         override fun getConfiguredIssueService(): ConfiguredIssueService? =

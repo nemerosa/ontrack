@@ -29,12 +29,12 @@ test('searching for a commit', async ({page, ontrack}) => {
     await mockSCMContext.configureProjectForMockSCM(project)
     const branch = await project.createBranch()
     const build = await branch.createBuild()
-    await mockSCMContext.configureBranchForMockSCM(branch)
+    const scmBranch = "main"
+    await mockSCMContext.configureBranchForMockSCM(branch, scmBranch)
 
     const commitMessage = "Build commit message"
-    const branchName = generate("b-")
 
-    const commitId = await mockSCMContext.repositoryCommit({branch: branchName, message: commitMessage})
+    const commitId = await mockSCMContext.repositoryCommit({branch: scmBranch, message: commitMessage})
     console.log(`Commit ID: ${commitId}`)
     await mockSCMContext.configureBuildForMockSCM(build, commitId)
 
@@ -51,6 +51,7 @@ test('searching for a commit', async ({page, ontrack}) => {
 
     const scmCommitPage = new SCMCommitPage(page, ontrack, commitId, project)
     await scmCommitPage.expectOnPage(commitMessage)
+    await scmCommitPage.expectBranchInfo({scmBranch: "main", build: build.name})
 })
 
 test('searching for an issue', async ({page, ontrack}) => {
@@ -59,16 +60,16 @@ test('searching for an issue', async ({page, ontrack}) => {
     await mockSCMContext.configureProjectForMockSCM(project)
     const branch = await project.createBranch()
     const build = await branch.createBuild()
-    await mockSCMContext.configureBranchForMockSCM(branch)
+    const scmBranch = "main"
+    await mockSCMContext.configureBranchForMockSCM(branch, scmBranch)
 
     const issueKey = generate("ISS-")
     console.log(`Issue key: ${issueKey}`)
     const issueTitle = "Sample issue"
     const commitMessage = `${issueKey} Build commit message`
-    const branchName = generate("b-")
 
     await mockSCMContext.repositoryIssue({key: issueKey, summary: issueTitle, type: "defect"})
-    const commitId = await mockSCMContext.repositoryCommit({branch: branchName, message: commitMessage})
+    const commitId = await mockSCMContext.repositoryCommit({branch: scmBranch, message: commitMessage})
     await mockSCMContext.configureBuildForMockSCM(build, commitId)
 
     await ontrack.search.forceIndexation({type: "scm-commit"}) // Includes the indexation of issues
@@ -84,4 +85,5 @@ test('searching for an issue', async ({page, ontrack}) => {
 
     const scmIssuePage = new SCMIssuePage(page, ontrack, issueKey, project)
     await scmIssuePage.expectOnPage({issueTitle, commitId})
+    await scmIssuePage.expectBranchInfo({scmBranch: "main", build: build.name})
 })
