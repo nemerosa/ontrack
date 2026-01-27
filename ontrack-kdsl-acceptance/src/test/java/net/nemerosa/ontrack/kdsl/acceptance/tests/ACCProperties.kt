@@ -22,7 +22,7 @@ object ACCProperties {
         val username: String? by fromEnv()
 
         object Mgt {
-            @DefaultValue("http://localhost:8800")
+            @DefaultValue("http://localhost:8800/manage")
             val url: String by fromEnv()
         }
 
@@ -79,8 +79,7 @@ object ACCProperties {
     fun getOrCreateToken(username: String = Connection.username ?: Connection.DEFAULT_USERNAME): String {
         // Creating a management connector
         val connector = DefaultConnector(url = Connection.Mgt.url)
-        // return connector.get("/manage/account/${URLEncoder.encode(username, Charsets.UTF_8)}")
-        return connector.get("/manage/account/$username")
+        return connector.get("/account/$username")
             .apply {
                 if (statusCode != 200) {
                     error("Cannot get a new token")

@@ -7,11 +7,11 @@
       <env name="ONTRACK_ACCEPTANCE_GITHUB_TOKEN" value="${ONTRACK_ACCEPTANCE_GITHUB_TOKEN}" />
       <env name="ONTRACK_CONFIG_CONFIGURATION_TEST" value="false" />
       <env name="ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE" value="true" />
+      <env name="ONTRACK_CONFIG_TEMPLATING_ERRORS" value="LOGGING_STACK" />
       <env name="ONTRACK_EXTENSION_GITHUB_INGESTION_HOOK_SIGNATURE_DISABLED" value="true" />
       <env name="ONTRACK_EXTENSION_GITHUB_INGESTION_PROCESSING_REPOSITORIES_TEST_REPOSITORY" value="test-routing-repository" />
       <env name="ONTRACK_EXTENSION_JIRA_CLIENT_TYPE" value="mock" />
       <env name="ONTRACK_INFLUXDB_ENABLED" value="true" />
-      <env name="ONTRACK_CONFIG_TEMPLATING_ERRORS" value="LOGGING_STACK" />
     </envs>
     <module name="ontrack.ontrack-ui.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="net.nemerosa.ontrack.boot.Application" />

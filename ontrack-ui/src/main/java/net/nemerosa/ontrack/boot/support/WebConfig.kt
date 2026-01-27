@@ -4,6 +4,7 @@ import jakarta.servlet.DispatcherType
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.converter.ByteArrayHttpMessageConverter
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
@@ -37,6 +38,8 @@ class WebConfig : WebMvcConfigurer {
 
     override fun configureMessageConverters(converters: MutableList<HttpMessageConverter<*>>) {
         converters.clear()
+        // Byte arrays
+        converters.add(ByteArrayHttpMessageConverter())
         // Plain text
         converters.add(StringHttpMessageConverter())
         // Documents
