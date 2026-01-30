@@ -5,10 +5,8 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.job.*
 import org.apache.commons.lang3.Validate
 import org.slf4j.LoggerFactory
-import org.springframework.scheduling.support.CronTrigger
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.*
@@ -43,11 +41,11 @@ constructor(
     private val idGenerator = AtomicLong()
 
     private fun MeterRegistry.statusGauge(
-        name: String,
+        metricName: String,
         statusFilterFn: (JobStatus) -> Boolean,
     ) {
         gauge(
-            "ontrack_job_${name}_total",
+            metricName,
             services
         ) {
             it.filter { (_, service) -> statusFilterFn(service.jobStatus) }
@@ -62,28 +60,16 @@ constructor(
         if (meterRegistry != null) {
             // count
             meterRegistry.gaugeMapSize(
-                "ontrack_job_count_total",
+                JobMetrics.ontrack_job_count_total,
                 emptyList(),
                 services
             )
-            meterRegistry.statusGauge("running") { it.isRunning }
-            meterRegistry.statusGauge("disabled") { it.isDisabled }
-            meterRegistry.statusGauge("paused") { it.isPaused }
-            meterRegistry.statusGauge("error") { it.isError }
-            meterRegistry.statusGauge("timeout") { it.isTimeout }
-            meterRegistry.statusGauge("invalid") { !it.isValid }
-            meterRegistry.gauge(
-                "ontrack_job_error_count_total",
-                services
-            ) { schedulerMap ->
-                schedulerMap.values.sumOf { it.jobStatus.lastErrorCount }.toDouble()
-            }
-            meterRegistry.gauge(
-                "ontrack_job_timeout_count_total",
-                services
-            ) { schedulerMap ->
-                schedulerMap.values.sumOf { it.jobStatus.lastTimeoutCount }.toDouble()
-            }
+            meterRegistry.statusGauge(JobMetrics.ontrack_job_running_total) { it.isRunning }
+            meterRegistry.statusGauge(JobMetrics.ontrack_job_disabled_total) { it.isDisabled }
+            meterRegistry.statusGauge(JobMetrics.ontrack_job_paused_total) { it.isPaused }
+            meterRegistry.statusGauge(JobMetrics.ontrack_job_error_total) { it.isError }
+            meterRegistry.statusGauge(JobMetrics.ontrack_job_timeout_total) { it.isTimeout }
+            meterRegistry.statusGauge(JobMetrics.ontrack_job_invalid_total) { !it.isValid }
         }
         // Scheduling the timeout controller job
         if (timeoutControllerInterval != null) {
