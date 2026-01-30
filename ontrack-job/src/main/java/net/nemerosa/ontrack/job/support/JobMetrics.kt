@@ -53,4 +53,14 @@ object JobMetrics {
         type = MetricsMeterType.COUNT
     )
     const val ontrack_job_timeout_total = "ontrack_job_timeout_total"
+
+    @APIDescription("Duration of the last job execution")
+    @MetricsMeterDocumentation(
+        type = MetricsMeterType.TIMER,
+    )
+    const val ontrack_job_duration = "ontrack_job_duration"
+
+    const val tag_job_category = "job_category"
+    const val tag_job_type = "job_type"
+    const val tag_job_key = "job_key"
 }

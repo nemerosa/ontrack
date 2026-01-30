@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.job.support
 
 import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tag
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.job.*
 import org.apache.commons.lang3.Validate
@@ -251,7 +252,7 @@ constructor(
 
         private fun createSchedule() {
             val cron = schedule.cron
-            if (cron == null || cron.isBlank()) {
+            if (cron.isNullOrBlank()) {
                 // Converting all units to milliseconds
                 var initialPeriod = TimeUnit.MILLISECONDS.convert(schedule.initialPeriod, schedule.unit)
                 val period = TimeUnit.MILLISECONDS.convert(schedule.period, schedule.unit)
@@ -300,9 +301,11 @@ constructor(
         ) {
             // Checks the key of the job
             if (job.key != newJob.key) {
-                throw IllegalStateException("The job assigned to a job service " +
-                        "cannot have a different key. " +
-                        "Expected=${job.key}, Actual=${newJob.key}")
+                throw IllegalStateException(
+                    "The job assigned to a job service " +
+                            "cannot have a different key. " +
+                            "Expected=${job.key}, Actual=${newJob.key}"
+                )
             }
             // Adapting the schedule if needed
             if (newSchedule != schedule) {
@@ -325,9 +328,29 @@ constructor(
                 val rootTask = { job.task.run(jobRunListener) }
                 val decoratedTask = jobDecorator.decorate(job, rootTask)
                 val runnable = MonitoredRun(decoratedTask, object : MonitoredRunListenerAdapter() {
+
+                    var start: LocalDateTime? = null
+
+                    override fun onStart() {
+                        start = Time.now
+                    }
+
                     override fun onCompletion() {
                         logger.debug("[job][task]{} Removed job execution", job.key)
                         currentExecution.set(null)
+                        // Recording the metrics
+                        val end = Time.now
+                        start?.let {
+                            val duration = Duration.between(it, end)
+                            meterRegistry?.timer(
+                                JobMetrics.ontrack_job_duration,
+                                listOf(
+                                    Tag.of(JobMetrics.tag_job_category, jobKey.type.category.key),
+                                    Tag.of(JobMetrics.tag_job_type, jobKey.type.key),
+                                    Tag.of(JobMetrics.tag_job_key, jobKey.id),
+                                )
+                            )?.record(duration.toMillis(), TimeUnit.MILLISECONDS)
+                        }
                     }
                 })
                 val monitoredRunListener = object : MonitoredRunListener {
@@ -528,7 +551,8 @@ constructor(
 
             override fun progress(progress: JobRunProgress) {
                 jobListener.onJobProgress(job.key, progress)
-                logger.debug("[job][progress]{} {}",
+                logger.debug(
+                    "[job][progress]{} {}",
                     job.key,
                     progress.text
                 )
