@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.docs
 
-import net.nemerosa.ontrack.model.metrics.MetricsMeterDocumentation
-import net.nemerosa.ontrack.model.metrics.MetricsMeterType
+import net.nemerosa.ontrack.common.doc.MetricsMeterDocumentation
+import net.nemerosa.ontrack.common.doc.MetricsMeterType
 import org.junit.jupiter.api.Test
 import kotlin.reflect.full.findAnnotation
 import kotlin.test.assertEquals

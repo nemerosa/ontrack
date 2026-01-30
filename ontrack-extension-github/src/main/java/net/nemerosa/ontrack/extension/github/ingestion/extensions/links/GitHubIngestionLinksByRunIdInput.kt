@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.extensions.links
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Input for the links for a build identified by GHA workflow run ID

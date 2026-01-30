@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.changelog
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.ListRef
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 open class SemanticChangeLogTemplatingServiceConfig(
     @APIDescription("Must a section for changelog actual issues be present?")

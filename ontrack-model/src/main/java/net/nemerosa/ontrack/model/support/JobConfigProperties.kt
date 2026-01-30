@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.model.support
 
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import org.springframework.boot.convert.DurationUnit
 import java.time.Duration
 import java.time.temporal.ChronoUnit

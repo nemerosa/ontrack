@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.av.processing
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingServiceConfig
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.templating.TemplatingRenderableDoc
 import net.nemerosa.ontrack.model.templating.TemplatingRenderableDocField
 import org.springframework.stereotype.Component

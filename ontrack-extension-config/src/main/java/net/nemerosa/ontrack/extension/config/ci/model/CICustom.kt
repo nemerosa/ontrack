@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.config.ci.model
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 @APIDescription("Custom configurations")
 data class CICustom(

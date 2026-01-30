@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.config.ci
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.annotations.APIName
-import net.nemerosa.ontrack.model.metrics.MetricsDocumentation
-import net.nemerosa.ontrack.model.metrics.MetricsMeterDocumentation
-import net.nemerosa.ontrack.model.metrics.MetricsMeterType
+import net.nemerosa.ontrack.common.api.APIDescription
+import net.nemerosa.ontrack.common.api.APIName
+import net.nemerosa.ontrack.common.doc.MetricsDocumentation
+import net.nemerosa.ontrack.common.doc.MetricsMeterDocumentation
+import net.nemerosa.ontrack.common.doc.MetricsMeterType
 
 /**
  * List of metrics for the CI configuration.

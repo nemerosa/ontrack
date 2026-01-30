@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.graphql
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.ListRef
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 @APIDescription("File change filter to share/edit in a project")
 data class ShareSCMFileChangeFilterInput(

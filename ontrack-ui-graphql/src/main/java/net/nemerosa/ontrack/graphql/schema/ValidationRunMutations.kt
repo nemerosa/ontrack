@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.json.JsonParseException
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataJSONInputException

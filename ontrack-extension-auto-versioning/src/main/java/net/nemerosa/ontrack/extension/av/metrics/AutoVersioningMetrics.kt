@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.av.metrics
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.annotations.APIName
+import net.nemerosa.ontrack.common.api.APIDescription
+import net.nemerosa.ontrack.common.api.APIName
+import net.nemerosa.ontrack.common.doc.MetricsDocumentation
+import net.nemerosa.ontrack.common.doc.MetricsMeterDocumentation
+import net.nemerosa.ontrack.common.doc.MetricsMeterTag
+import net.nemerosa.ontrack.common.doc.MetricsMeterType
 import net.nemerosa.ontrack.model.docs.DocumentationIgnore
-import net.nemerosa.ontrack.model.metrics.MetricsDocumentation
-import net.nemerosa.ontrack.model.metrics.MetricsMeterDocumentation
-import net.nemerosa.ontrack.model.metrics.MetricsMeterTag
-import net.nemerosa.ontrack.model.metrics.MetricsMeterType
 
 @Suppress("ConstPropertyName")
 @MetricsDocumentation

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.graphql.support
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 

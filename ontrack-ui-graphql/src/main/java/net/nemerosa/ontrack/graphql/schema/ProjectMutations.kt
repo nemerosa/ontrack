@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.graphql.schema
 
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService

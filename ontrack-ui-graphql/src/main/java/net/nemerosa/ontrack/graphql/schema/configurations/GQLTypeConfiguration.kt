@@ -2,11 +2,11 @@ package net.nemerosa.ontrack.graphql.schema.configurations
 
 import com.fasterxml.jackson.databind.JsonNode
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.jsonField
 import net.nemerosa.ontrack.graphql.support.stringField
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.springframework.stereotype.Component
 
 @Component

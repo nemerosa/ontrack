@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.av.project
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.json.schema.JsonSchemaIgnore
 import java.time.LocalDateTime
 

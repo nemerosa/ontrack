@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.git.property
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationField
 import net.nemerosa.ontrack.model.json.schema.JsonSchemaIgnore
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments

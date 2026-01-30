@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.jenkins.notifications
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory
 import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationLink
 import net.nemerosa.ontrack.model.events.EventTemplatingService

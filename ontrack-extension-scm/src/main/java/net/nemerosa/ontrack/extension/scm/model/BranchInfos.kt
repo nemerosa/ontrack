@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.model
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * List of [BranchInfo] associated with a type.

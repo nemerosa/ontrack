@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorSource
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorType
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 class ProjectIndicatorType(
         val id: String,

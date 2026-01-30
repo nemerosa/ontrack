@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Result for a research

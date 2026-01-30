@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.metrics
+package net.nemerosa.ontrack.common.doc
 
 import org.springframework.stereotype.Component
 

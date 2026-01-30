@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.environments.events.EnvironmentsEvents
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.service.getPipelineById
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventRenderer

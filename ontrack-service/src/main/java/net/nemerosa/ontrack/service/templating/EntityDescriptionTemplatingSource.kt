@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.templating
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventRenderer

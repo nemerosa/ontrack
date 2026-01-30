@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.general.templating
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class BuildLinkTemplatingSourceDocumentation(
     @APIDescription("Name of the project to get a link to.")

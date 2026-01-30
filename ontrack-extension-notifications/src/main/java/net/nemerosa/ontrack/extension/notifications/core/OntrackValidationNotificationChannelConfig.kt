@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.core
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class OntrackValidationNotificationChannelConfig(
     @APIDescription("[template] Name of the project to validate. If not provided, looks for the event's project if available.")

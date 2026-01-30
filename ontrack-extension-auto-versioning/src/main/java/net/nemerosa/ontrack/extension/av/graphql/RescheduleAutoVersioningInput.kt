@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.av.graphql
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class RescheduleAutoVersioningInput(
     @APIDescription("UUID of the order to reschedule")

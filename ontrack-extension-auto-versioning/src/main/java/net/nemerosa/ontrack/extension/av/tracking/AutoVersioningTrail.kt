@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.av.tracking
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfiguredBranch
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 @APIDescription("Describes the history of an auto-versioning decision process")
 data class AutoVersioningTrail(

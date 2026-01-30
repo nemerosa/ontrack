@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.templating
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class LinkTemplatingFunctionParameters(
     @APIDescription("Text of the link. This must be a value which is part of the templating context.")

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.annotations
+package net.nemerosa.ontrack.common.api
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FIELD, AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)

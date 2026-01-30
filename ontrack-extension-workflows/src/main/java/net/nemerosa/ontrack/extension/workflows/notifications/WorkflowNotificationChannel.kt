@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
@@ -18,7 +19,6 @@ import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorSe
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService

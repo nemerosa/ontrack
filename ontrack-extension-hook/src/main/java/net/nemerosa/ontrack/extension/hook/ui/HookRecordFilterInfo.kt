@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.hook.ui
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class HookRecordFilterInfo(
     @APIDescription("List of endpoints")

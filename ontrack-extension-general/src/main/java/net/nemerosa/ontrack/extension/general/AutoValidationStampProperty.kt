@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.annotations.APIName
+import net.nemerosa.ontrack.common.api.APIDescription
+import net.nemerosa.ontrack.common.api.APIName
 
 data class AutoValidationStampProperty @JvmOverloads constructor(
     @JsonProperty("autoCreate")

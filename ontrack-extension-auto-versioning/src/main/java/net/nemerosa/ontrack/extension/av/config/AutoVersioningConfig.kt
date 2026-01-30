@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.av.config
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.ListRef
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 /**
  * Configuration of the autoversioning on a branch.

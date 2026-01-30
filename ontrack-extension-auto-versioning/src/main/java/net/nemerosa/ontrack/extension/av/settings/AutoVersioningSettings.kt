@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.av.settings
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
 import net.nemerosa.ontrack.model.json.DurationDeserializer
 import net.nemerosa.ontrack.model.json.DurationSerializer

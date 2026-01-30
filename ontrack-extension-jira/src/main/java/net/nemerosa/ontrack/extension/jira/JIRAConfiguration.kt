@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.jira
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIIgnore
 import net.nemerosa.ontrack.model.annotations.APILabel
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration

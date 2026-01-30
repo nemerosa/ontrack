@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.metrics
+package net.nemerosa.ontrack.common.doc
 
 /**
  * This annotation is used to annotate the definition of a metrics meter.

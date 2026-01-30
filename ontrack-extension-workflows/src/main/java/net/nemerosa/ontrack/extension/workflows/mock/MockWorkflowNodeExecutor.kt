@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.RunProfile
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
@@ -13,7 +14,6 @@ import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorRe
 import net.nemerosa.ontrack.extension.workflows.templating.WorkflowTemplatingContext
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventTemplatingService

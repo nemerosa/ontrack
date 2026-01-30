@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.model.annotations
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import net.nemerosa.ontrack.common.api.APIDescription
+import net.nemerosa.ontrack.common.api.APIName
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
@@ -16,7 +18,7 @@ inline fun <reified A : Annotation> findPropertyAnnotation(property: KProperty<*
 /**
  * Getting the description for a property.
  *
- * Will use first the provided [description], then any [APIDescription] attached to the property
+ * Will use first the provided [description], then any [net.nemerosa.ontrack.common.api.APIDescription] attached to the property
  * and as a fallback, a generated string based on the property name.
  */
 fun getPropertyDescription(property: KProperty<*>, description: String? = null): String =
@@ -46,7 +48,7 @@ fun getPropertyLabel(property: KProperty<*>, label: String? = null): String =
  *
  * Will use in order:
  *
- * # any [APIName] annotation
+ * # any [net.nemerosa.ontrack.common.api.APIName] annotation
  * # any [JsonProperty] annotation on the property
  * # any [JsonProperty] annotation on the getter
  * # the property name

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
-import net.nemerosa.ontrack.model.annotations.API
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationType
 import net.nemerosa.ontrack.model.docs.SelfDocumented
 import java.util.*

@@ -11,4 +11,5 @@ dependencies {
     implementation("commons-io:commons-io")
     implementation("org.slf4j:slf4j-api")
     implementation("org.jsoup:jsoup")
+    implementation("org.springframework:spring-context")
 }

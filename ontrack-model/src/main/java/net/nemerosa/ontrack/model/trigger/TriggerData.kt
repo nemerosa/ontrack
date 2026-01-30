@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.model.trigger
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Associate the ID of a [Trigger] to some data

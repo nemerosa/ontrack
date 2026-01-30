@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.av.tracking
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.Branch
 import java.util.*
 

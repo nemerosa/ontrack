@@ -1,9 +1,8 @@
 package net.nemerosa.ontrack.extension.jira.servicedesk
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssueStub
 import net.nemerosa.ontrack.extension.jira.notifications.JiraCustomField
-import net.nemerosa.ontrack.model.annotations.API
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationList
 
 data class JiraServiceDeskNotificationChannelOutput(

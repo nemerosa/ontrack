@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.git.model
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.git.GitRepositoryClient
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 

@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.service.elasticsearch
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.annotations.APIName
-import net.nemerosa.ontrack.model.metrics.MetricsDocumentation
-import net.nemerosa.ontrack.model.metrics.MetricsMeterDocumentation
-import net.nemerosa.ontrack.model.metrics.MetricsMeterTag
-import net.nemerosa.ontrack.model.metrics.MetricsMeterType
+import net.nemerosa.ontrack.common.api.APIDescription
+import net.nemerosa.ontrack.common.api.APIName
+import net.nemerosa.ontrack.common.doc.MetricsDocumentation
+import net.nemerosa.ontrack.common.doc.MetricsMeterDocumentation
+import net.nemerosa.ontrack.common.doc.MetricsMeterTag
+import net.nemerosa.ontrack.common.doc.MetricsMeterType
 
 @Suppress("ConstPropertyName")
 @MetricsDocumentation

@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.github.ingestion.config.model.support
 
+import net.nemerosa.ontrack.common.api.APIDescription
+import net.nemerosa.ontrack.common.api.APIName
 import net.nemerosa.ontrack.extension.github.ingestion.support.FilterHelper
-import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.annotations.APIName
 
 /**
  * Filter rule

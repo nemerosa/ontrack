@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks.auth
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
 import org.springframework.stereotype.Component
 import java.net.http.HttpRequest

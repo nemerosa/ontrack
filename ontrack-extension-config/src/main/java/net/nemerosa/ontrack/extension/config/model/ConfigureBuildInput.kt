@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.config.model
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.ListRef
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 @APIDescription("Input for the `configureBuild` mutation")
 data class ConfigureBuildInput(

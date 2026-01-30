@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.extension.api.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.StringUtils.split
-import java.util.*
 
 /**
  * Request for the export of a change log.

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.config.model
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 @APIDescription("CI environment variable")
 data class CIEnv(

@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.av.graphql
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.graphql.support.ListRef
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 @APIDescription("Auto versioning configuration")
 data class SetAutoVersioningConfigInput(

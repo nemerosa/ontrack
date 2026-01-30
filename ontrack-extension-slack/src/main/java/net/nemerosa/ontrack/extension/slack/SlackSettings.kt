@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.slack
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
 
 @APIDescription("Settings to connect Ontrack to a Slack instance")

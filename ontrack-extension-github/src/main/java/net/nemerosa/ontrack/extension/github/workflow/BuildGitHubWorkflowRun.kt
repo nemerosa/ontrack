@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github.workflow
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Link between a Build and a GitHub Workflow run.

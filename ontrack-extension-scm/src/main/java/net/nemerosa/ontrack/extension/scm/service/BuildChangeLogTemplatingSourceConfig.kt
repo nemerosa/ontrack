@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.scm.service
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingCommitsOption
 import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingServiceConfig
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 class BuildChangeLogTemplatingSourceConfig(
     empty: String = "",

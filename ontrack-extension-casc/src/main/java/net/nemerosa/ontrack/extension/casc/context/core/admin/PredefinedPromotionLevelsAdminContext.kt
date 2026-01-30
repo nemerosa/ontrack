@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.casc.context.core.admin
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.files.FileRefService
 import net.nemerosa.ontrack.model.files.downloadDocument
 import net.nemerosa.ontrack.model.json.schema.JsonType

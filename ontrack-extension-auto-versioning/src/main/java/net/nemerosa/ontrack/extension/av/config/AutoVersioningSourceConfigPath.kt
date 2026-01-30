@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.av.config
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.IgnoreRef
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIIgnore
 
 @APIDescription("Configuration for an additional path in an auto-versioning configuration.")

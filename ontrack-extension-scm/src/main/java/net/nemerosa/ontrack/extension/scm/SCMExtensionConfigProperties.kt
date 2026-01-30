@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.scm
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.job.Schedule
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.convert.DurationUnit
 import org.springframework.stereotype.Component

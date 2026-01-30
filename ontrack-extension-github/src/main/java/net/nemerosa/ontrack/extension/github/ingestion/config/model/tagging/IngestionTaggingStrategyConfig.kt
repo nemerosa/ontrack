@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.config.model.tagging
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 @APIDescription("Configuration for a tagging strategy")
 data class IngestionTaggingStrategyConfig(

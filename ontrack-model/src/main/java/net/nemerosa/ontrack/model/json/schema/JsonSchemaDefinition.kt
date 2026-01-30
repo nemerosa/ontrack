@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.json.schema
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 @APIDescription("Available JSON schema")
 data class JsonSchemaDefinition(

@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.workflows.execution
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.extension.Extension
 
 /**

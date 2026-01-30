@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.slack.notifications
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.slack.service.SlackNotificationType
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
 
 data class SlackNotificationChannelConfig(

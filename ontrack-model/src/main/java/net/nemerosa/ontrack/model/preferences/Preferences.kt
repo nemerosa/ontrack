@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.model.preferences
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Representation for the preferences of a user.

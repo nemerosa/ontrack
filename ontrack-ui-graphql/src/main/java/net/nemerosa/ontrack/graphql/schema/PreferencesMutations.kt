@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import jakarta.validation.Validator
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.preferences.Preferences
 import net.nemerosa.ontrack.model.preferences.PreferencesService
 import net.nemerosa.ontrack.model.security.SecurityService

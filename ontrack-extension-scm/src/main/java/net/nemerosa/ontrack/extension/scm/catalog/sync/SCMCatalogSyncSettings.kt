@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.catalog.sync
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
 
 /**

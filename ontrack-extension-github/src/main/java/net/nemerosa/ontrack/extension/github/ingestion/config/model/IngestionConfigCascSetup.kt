@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.config.model
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * CasC for a given entity.

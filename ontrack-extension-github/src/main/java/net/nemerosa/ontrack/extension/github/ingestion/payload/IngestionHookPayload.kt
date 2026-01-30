@@ -2,9 +2,9 @@ package net.nemerosa.ontrack.extension.github.ingestion.payload
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResult
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.Repository
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.LocalDateTime
 import java.util.*
 

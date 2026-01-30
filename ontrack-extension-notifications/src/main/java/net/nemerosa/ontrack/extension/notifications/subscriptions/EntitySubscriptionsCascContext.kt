@@ -2,13 +2,13 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.extension.notifications.casc.NotificationsSubCascContext
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIIgnore
 import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.json.schema.JsonArrayType

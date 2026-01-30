@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.TypeRef
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.LocalDateTime
 import java.util.*
 

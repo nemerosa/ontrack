@@ -3,8 +3,8 @@ package net.nemerosa.ontrack.graphql.schema
 import com.fasterxml.jackson.databind.JsonNode
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*

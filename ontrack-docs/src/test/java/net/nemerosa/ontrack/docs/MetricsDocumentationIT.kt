@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.docs
 
+import net.nemerosa.ontrack.common.doc.MetricsDocumentation
+import net.nemerosa.ontrack.common.doc.MetricsMeterDocumentation
 import net.nemerosa.ontrack.model.annotations.getAPITypeDescription
 import net.nemerosa.ontrack.model.annotations.getAPITypeName
-import net.nemerosa.ontrack.model.metrics.MetricsDocumentation
-import net.nemerosa.ontrack.model.metrics.MetricsMeterDocumentation
 import org.junit.jupiter.api.Test
 import kotlin.reflect.jvm.jvmName
 

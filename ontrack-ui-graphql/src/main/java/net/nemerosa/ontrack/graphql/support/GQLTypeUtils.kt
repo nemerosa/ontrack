@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.graphql.support
 
 import graphql.schema.GraphQLTypeReference
-import net.nemerosa.ontrack.model.annotations.APIName
+import net.nemerosa.ontrack.common.api.APIName
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 

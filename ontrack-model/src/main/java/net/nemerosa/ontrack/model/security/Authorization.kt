@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.security
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 @APIDescription("Declaration of authorization on a domain for a given action")
 data class Authorization(

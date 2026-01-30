@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github.workflow
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Property which links a GitHub Workflow job to an Ontrack validation run.

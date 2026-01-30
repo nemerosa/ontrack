@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Configuration of the display options for build links

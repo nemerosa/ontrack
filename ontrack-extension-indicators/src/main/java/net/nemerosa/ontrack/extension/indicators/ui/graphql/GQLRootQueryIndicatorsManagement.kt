@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorPortfolioAccess
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorViewManagement
@@ -10,7 +11,6 @@ import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.booleanField
 import net.nemerosa.ontrack.graphql.support.toNotNull
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 

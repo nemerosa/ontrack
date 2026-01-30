@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.autoversioning
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.ListRef
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 /**
  * Configuration of the post-processing for GitHub.

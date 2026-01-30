@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.settings
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
 
 /**

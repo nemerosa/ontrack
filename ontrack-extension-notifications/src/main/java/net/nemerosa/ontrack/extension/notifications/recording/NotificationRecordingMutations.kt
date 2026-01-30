@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.notifications.recording
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.springframework.stereotype.Component
 
 @Component

@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.extensions.links
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.ListRef
-import net.nemerosa.ontrack.graphql.support.TypeRef
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 /**
  * Common data between all the inputs

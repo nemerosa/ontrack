@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.config.model
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 /**
  * Configuration for the ingestion of the jobs

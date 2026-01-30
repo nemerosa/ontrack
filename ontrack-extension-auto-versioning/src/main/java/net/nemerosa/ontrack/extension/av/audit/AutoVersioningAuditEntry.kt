@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.av.audit
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.Duration
 import java.time.LocalDateTime
 

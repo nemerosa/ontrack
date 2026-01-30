@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.github.ingestion.processing.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Repository(

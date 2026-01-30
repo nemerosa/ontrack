@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.stringField
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.springframework.stereotype.Component
 
 /**

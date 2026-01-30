@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.queue.record
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class QueueRecordQueryFilter(
         @APIDescription("Unique ID for the record")

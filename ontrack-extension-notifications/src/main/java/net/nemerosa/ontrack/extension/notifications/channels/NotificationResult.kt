@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.channels
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class NotificationResult<R>(
     @APIDescription("Type of result")

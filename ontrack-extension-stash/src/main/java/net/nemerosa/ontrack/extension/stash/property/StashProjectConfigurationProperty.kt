@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.stash.property
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.extension.stash.model.getRepositoryUrl
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationIgnore
 import net.nemerosa.ontrack.model.docs.DocumentationType
 import net.nemerosa.ontrack.model.json.schema.JsonSchemaString

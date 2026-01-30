@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.queue.record
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import java.time.LocalDateTime
 
 @APIDescription("Change of state for a queue message")

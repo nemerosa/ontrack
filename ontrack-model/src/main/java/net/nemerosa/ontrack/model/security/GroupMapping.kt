@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.security
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 @APIDescription("Mapping between an IdP group and a Yontrack group")
 data class GroupMapping(

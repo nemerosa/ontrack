@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.av.graphql
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 @APIDescription("Description of a build")
 data class CheckAutoVersioningInput(

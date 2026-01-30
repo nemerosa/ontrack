@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.computing
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Stored state for a [configurable indicator][ConfigurableIndicatorType].

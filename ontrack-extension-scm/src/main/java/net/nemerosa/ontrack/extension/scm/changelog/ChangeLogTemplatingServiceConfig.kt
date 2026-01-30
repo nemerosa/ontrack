@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.scm.changelog
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.ListRef
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.templating.TemplatingSourceConfig
 
 @JsonIgnoreProperties(ignoreUnknown = true)

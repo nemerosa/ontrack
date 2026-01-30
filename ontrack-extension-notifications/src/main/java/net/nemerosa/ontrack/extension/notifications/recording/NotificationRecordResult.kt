@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.extension.notifications.recording
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class NotificationRecordResult(

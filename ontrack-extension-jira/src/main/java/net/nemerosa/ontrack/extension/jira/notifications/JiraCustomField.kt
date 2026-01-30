@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.jira.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.docs.SelfDocumented
 
 @SelfDocumented

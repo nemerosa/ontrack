@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.git.property
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationType
 import net.nemerosa.ontrack.model.support.ConfigurationProperty
 

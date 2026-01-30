@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.hook
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.JSONType
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 /**
  * Data returned by a hook.

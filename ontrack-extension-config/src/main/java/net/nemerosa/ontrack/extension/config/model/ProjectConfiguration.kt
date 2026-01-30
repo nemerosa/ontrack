@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.config.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtensionService
-import net.nemerosa.ontrack.model.annotations.APIDescription
 
 @APIDescription("Project configuration")
 data class ProjectConfiguration(

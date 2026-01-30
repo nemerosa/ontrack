@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.hook
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Contains information linked to a hook response. Used in hook records to follow-up on more information.

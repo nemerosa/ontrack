@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.graphql
 
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditEntry
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryFilter
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryService
@@ -11,7 +12,6 @@ import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.field
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build

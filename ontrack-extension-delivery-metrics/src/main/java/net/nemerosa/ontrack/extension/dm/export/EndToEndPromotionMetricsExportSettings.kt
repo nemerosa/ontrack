@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.dm.export
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Settings for the export of the end-to-end promotion metrics.

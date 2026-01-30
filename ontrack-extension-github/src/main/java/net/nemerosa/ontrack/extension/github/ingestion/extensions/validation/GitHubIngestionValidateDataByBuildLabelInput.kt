@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion.extensions.validation
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.annotations.APIName
+import net.nemerosa.ontrack.common.api.APIDescription
+import net.nemerosa.ontrack.common.api.APIName
 
 /**
  * Input for the data validation for a build identified by its label

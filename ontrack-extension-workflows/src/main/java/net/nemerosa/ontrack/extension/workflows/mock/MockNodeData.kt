@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.mock
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class MockNodeData(
     @APIDescription("Text associated with the node")

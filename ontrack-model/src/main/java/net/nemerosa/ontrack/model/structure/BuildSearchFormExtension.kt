@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.structure
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 @APIDescription("Part of the BuildSearchForm that delegates to some extension.")
 data class BuildSearchFormExtension(

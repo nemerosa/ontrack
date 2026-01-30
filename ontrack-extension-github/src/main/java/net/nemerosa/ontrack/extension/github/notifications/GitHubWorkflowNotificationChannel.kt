@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.client.WorkflowRun
@@ -14,7 +15,6 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.patchEnum
 import net.nemerosa.ontrack.json.patchInt
 import net.nemerosa.ontrack.json.patchString
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationLink
 import net.nemerosa.ontrack.model.events.Event

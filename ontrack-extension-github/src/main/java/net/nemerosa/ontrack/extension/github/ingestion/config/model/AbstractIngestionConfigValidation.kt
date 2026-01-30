@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.config.model
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Configuration between a job or step and a validation stamp

@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.definition
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowNodeNotFoundException
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationList
 import net.nemerosa.ontrack.model.docs.SelfDocumented
 

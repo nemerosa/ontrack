@@ -2,9 +2,9 @@ package net.nemerosa.ontrack.extension.chart
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.chart.support.Interval
 import net.nemerosa.ontrack.graphql.support.IgnoreRef
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.LocalDateTime
 
 @APIDescription("General options for getting some data for a chart")

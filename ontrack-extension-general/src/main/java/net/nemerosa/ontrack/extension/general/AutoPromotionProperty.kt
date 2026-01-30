@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import java.util.regex.Pattern

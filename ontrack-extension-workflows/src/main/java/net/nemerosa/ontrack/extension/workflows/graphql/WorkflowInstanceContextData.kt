@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.graphql
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.templating.TemplatingContextData
 
 @APIDescription("Templating context data associated with a workflow instance")

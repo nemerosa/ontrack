@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.notifications.recording
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.notifications.model.NotificationSourceData
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.LocalDateTime
 
 data class NotificationRecord(

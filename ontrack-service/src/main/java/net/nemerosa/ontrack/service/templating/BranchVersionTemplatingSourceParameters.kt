@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.templating
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.structure.BranchNamePolicy
 
 data class BranchVersionTemplatingSourceParameters(

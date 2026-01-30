@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.hook
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Types of responses returned by hooks.

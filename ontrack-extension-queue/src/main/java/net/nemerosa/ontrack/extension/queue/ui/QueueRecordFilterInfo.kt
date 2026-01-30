@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.queue.ui
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class QueueRecordFilterInfo(
     @APIDescription("List of processors")

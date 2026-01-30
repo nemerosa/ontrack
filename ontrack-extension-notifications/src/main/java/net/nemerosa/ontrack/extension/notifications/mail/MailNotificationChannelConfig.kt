@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.mail
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class MailNotificationChannelConfig(
     @APIDescription("Comma-separated list of mail targets (to)")

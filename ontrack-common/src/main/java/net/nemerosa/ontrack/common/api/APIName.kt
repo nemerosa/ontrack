@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.model.annotations
+package net.nemerosa.ontrack.common.api
 
 /**
  * Annotates an API element to give it a name which would be different than the default

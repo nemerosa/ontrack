@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.config.ci.model
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 @APIDescription("Condition configuration")
 data class CIConditionConfig(

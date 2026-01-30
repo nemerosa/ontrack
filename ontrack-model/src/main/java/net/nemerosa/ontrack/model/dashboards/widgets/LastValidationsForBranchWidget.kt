@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.dashboards.widgets
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import org.springframework.stereotype.Component
 
 @Component

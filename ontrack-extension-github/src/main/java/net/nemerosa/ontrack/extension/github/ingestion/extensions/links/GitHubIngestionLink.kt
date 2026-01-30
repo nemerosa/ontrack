@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.extensions.links
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 @APIDescription("Link to a build")
 data class GitHubIngestionLink(

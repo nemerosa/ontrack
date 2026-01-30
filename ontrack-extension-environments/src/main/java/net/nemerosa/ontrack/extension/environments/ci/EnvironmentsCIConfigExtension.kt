@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.environments.ci
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.common.mergeList
 import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtension
 import net.nemerosa.ontrack.extension.environments.EnvironmentsExtensionFeature
@@ -10,7 +11,6 @@ import net.nemerosa.ontrack.extension.environments.casc.SlotCasc
 import net.nemerosa.ontrack.extension.environments.casc.SlotEnvironmentCasc
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.json.schema.JsonType
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.json.schema.toType

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class MetaInfoPropertyTemplatingSourceConfig(
     @APIDescription("Name of the key of the meta information to get")

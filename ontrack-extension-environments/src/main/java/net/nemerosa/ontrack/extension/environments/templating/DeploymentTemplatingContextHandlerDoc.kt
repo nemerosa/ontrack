@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.environments.templating
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.getTypeDescription
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.templating.TemplatingRenderableDoc
 import net.nemerosa.ontrack.model.templating.TemplatingRenderableDocField

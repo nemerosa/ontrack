@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.config.ci.conditions
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.ci.model.CIConditionConfig
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.json.schema.JsonSchemaListWrapper
 import org.springframework.stereotype.Component

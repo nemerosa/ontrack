@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.model.settings
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * General security settings.

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.recordings
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import java.time.LocalDateTime
 
 /**

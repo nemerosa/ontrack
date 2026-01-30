@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.ValidationStampFilter
 import net.nemerosa.ontrack.model.structure.ValidationStampFilterService

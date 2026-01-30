@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.github.ingestion.extensions.validation
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.annotations.APIName
+import net.nemerosa.ontrack.common.api.APIDescription
+import net.nemerosa.ontrack.common.api.APIName
 
 /**
  * Validation data input

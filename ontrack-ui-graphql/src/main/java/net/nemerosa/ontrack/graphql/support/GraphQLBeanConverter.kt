@@ -3,10 +3,10 @@ package net.nemerosa.ontrack.graphql.support
 import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars.*
 import graphql.schema.*
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.listInputType
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.getAPITypeName
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyName

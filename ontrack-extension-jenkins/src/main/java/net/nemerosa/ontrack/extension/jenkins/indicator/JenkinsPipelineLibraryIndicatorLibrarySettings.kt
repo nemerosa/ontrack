@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.jenkins.indicator
 
 import net.nemerosa.ontrack.common.Version
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
 import kotlin.math.floor
 import kotlin.math.roundToInt

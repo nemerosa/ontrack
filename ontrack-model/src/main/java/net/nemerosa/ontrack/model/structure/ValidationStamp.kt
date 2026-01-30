@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.model.structure
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonView
 import jakarta.validation.constraints.Size
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  *

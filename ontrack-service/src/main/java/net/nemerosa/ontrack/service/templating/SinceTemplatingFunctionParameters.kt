@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.service.templating
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class SinceTemplatingFunctionParameters(
     @APIDescription("How to render the period. Supported values are: seconds, millis. Defaults to seconds.")

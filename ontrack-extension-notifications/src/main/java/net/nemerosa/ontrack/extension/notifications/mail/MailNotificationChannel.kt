@@ -3,13 +3,13 @@ package net.nemerosa.ontrack.extension.notifications.mail
 import com.fasterxml.jackson.databind.JsonNode
 import jakarta.annotation.PostConstruct
 import net.nemerosa.ontrack.common.RunProfile
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.patchNullableString
 import net.nemerosa.ontrack.json.patchString
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService

@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.git
 
+import net.nemerosa.ontrack.common.api.APIDescription
+import net.nemerosa.ontrack.common.api.APIName
 import net.nemerosa.ontrack.job.Schedule
-import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.annotations.APIName
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.convert.DurationUnit

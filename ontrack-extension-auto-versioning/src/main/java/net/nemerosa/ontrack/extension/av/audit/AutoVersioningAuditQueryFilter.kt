@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.av.audit
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class AutoVersioningAuditQueryFilter(

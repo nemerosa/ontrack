@@ -2,10 +2,10 @@ package net.nemerosa.ontrack.graphql.schema.security
 
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.security.AccountGroup
 import net.nemerosa.ontrack.model.security.AccountGroupInput
 import net.nemerosa.ontrack.model.security.AccountInput

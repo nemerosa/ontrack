@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.util.*
 
 data class SlotWorkflow(

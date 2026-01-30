@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.buildfilter
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class BuildFilterForm(
     @APIDescription("FQCN for the build filter provider")

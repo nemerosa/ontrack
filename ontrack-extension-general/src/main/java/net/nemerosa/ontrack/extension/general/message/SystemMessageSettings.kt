@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.general.message
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
 import net.nemerosa.ontrack.model.message.MessageType
 

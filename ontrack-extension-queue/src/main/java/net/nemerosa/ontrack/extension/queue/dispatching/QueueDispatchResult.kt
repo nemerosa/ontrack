@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.queue.dispatching
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Result of the dispatching of a message to a queue.

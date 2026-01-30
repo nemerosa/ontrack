@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.av.config
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.model.structure.Branch
 
 @APIDescription("Association of a branch with its auto versioning configuration")

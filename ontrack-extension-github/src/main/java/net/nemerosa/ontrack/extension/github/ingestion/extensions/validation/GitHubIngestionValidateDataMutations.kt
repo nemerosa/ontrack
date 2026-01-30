@@ -1,16 +1,12 @@
 package net.nemerosa.ontrack.extension.github.ingestion.extensions.validation
 
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.extension.github.ingestion.extensions.validation.GitHubIngestionValidateDataByBuildLabelInput
-import net.nemerosa.ontrack.extension.github.ingestion.extensions.validation.GitHubIngestionValidateDataByBuildNameInput
-import net.nemerosa.ontrack.extension.github.ingestion.extensions.validation.GitHubIngestionValidateDataByRunIdInput
-import net.nemerosa.ontrack.extension.github.ingestion.extensions.validation.IngestionValidateDataService
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.springframework.stereotype.Component
 
 /**

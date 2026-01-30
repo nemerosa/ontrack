@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.workflows.definition
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.extension.workflows.schema.WorkflowDynamicJsonSchemaProvider
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationList
 import net.nemerosa.ontrack.model.docs.SelfDocumented
 import net.nemerosa.ontrack.model.json.schema.DynamicJsonSchema

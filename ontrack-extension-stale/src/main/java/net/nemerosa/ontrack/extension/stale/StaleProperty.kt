@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.stale
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Defines a stale policy for branches. A branch last activity is the date its last build was created.

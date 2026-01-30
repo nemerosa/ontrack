@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.settings
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 /**
  * Configuration of the label provider job settings.

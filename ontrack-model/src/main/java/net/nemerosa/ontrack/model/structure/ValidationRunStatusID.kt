@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import net.nemerosa.ontrack.model.annotations.APIName
+import net.nemerosa.ontrack.common.api.APIName
 
 class ValidationRunStatusID(
         val id: String,

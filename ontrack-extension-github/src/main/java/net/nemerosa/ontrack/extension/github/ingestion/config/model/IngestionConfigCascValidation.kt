@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.config.model
 
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.common.api.APIDescription
 
 data class IngestionConfigCascValidation(
     @APIDescription("Unique name for the validation stamp in the branch")
