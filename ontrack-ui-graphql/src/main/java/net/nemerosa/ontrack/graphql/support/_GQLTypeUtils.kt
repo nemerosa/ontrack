@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.annotations.getPropertyName
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.support.NameValue
 import net.nemerosa.ontrack.model.support.toNameValues
+import java.time.Duration
 import java.time.LocalDateTime
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -115,6 +116,16 @@ fun TypeBuilder.localDateTimeField(
         it.name(getPropertyName(property))
             .description(getPropertyDescription(property, description))
             .type(nullableOutputType(GQLScalarLocalDateTime.INSTANCE, property.returnType.isMarkedNullable))
+    }
+
+fun TypeBuilder.durationField(
+    property: KProperty<Duration?>,
+    description: String? = null,
+): GraphQLObjectType.Builder =
+    field {
+        it.name(getPropertyName(property))
+            .description(getPropertyDescription(property, description))
+            .type(nullableOutputType(GraphQLString, property.returnType.isMarkedNullable))
     }
 
 fun TypeBuilder.jsonField(

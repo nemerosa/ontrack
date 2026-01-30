@@ -82,6 +82,14 @@ export default function JobsView() {
                     lastTimeoutCount
                     lastRunDate
                     nextRunDate
+                    jobHistogram(interval: "1d", period: "7d") {
+                        items {
+                            from
+                            to
+                            error
+                            avgDurationMs
+                        }
+                    }
                 }
             }
         }

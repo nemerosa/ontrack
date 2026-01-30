@@ -6,6 +6,6 @@ import net.nemerosa.ontrack.model.structure.Project
 
 interface BranchJdbcRepositoryAccessor {
 
-    fun getBranch(id: ID, branch: Project? = null): Branch
+    fun getBranch(id: ID, project: Project? = null): Branch
 
 }

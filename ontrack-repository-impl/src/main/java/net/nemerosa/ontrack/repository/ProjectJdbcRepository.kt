@@ -26,7 +26,7 @@ class ProjectJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(dat
                 isDisabled = rs.getBoolean("disabled"),
                 signature = readSignature(rs),
             )
-        }
+        } ?: error("Project not found: $id")
 
     override fun lastActiveProjects(): List<Project> {
         return jdbcTemplate!!.query(

@@ -31,7 +31,7 @@ class BranchJdbcRepository(
                 project = project ?: projectJdbcRepositoryAccessor.getProject(id(rs, "projectid")),
                 signature = readSignature(rs)
             )
-        }
+        } ?: error("Branch not found: $id")
 
     override fun filterBranchesForProject(
         project: Project,

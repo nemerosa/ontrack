@@ -25,7 +25,7 @@ class JobOrchestrationConfig(
     fun jobOrchestrator() =
         JobOrchestrator(
             jobScheduler,
-            "Collection of jobs",
+            "collection",
             jobOrchestratorSuppliers ?: emptyList(),
             platformTransactionManager
         )

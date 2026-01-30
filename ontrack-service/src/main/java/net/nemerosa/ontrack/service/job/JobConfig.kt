@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.job.JobListener
 import net.nemerosa.ontrack.job.JobScheduler
 import net.nemerosa.ontrack.job.support.DefaultJobScheduler
 import net.nemerosa.ontrack.job.support.TaskExecutor
+import net.nemerosa.ontrack.model.job.JobHistoryService
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
@@ -24,6 +25,7 @@ class JobConfig(
     private val jobDecorator: DefaultJobDecorator,
     private val meterRegistry: MeterRegistry,
     private val settingsRepository: SettingsRepository,
+    private val jobHistoryService: JobHistoryService,
 ) {
     @Bean
     fun jobListener(): JobListener = DefaultJobListener(
@@ -72,6 +74,7 @@ class JobConfig(
             meterRegistry = meterRegistry,
             timeout = jobConfigProperties.timeout,
             timeoutControllerInterval = jobConfigProperties.timeoutControllerInterval,
+            jobHistoryRecorder = jobHistoryService,
         )
     }
 }

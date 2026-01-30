@@ -25,7 +25,7 @@ class PromotionLevelJdbcRepository(
             params("id", id.value)
         ) { rs, _ ->
             toPromotionLevel(rs, branch)
-        }
+        } ?: error("Promotion level with ID ${id.value} not found")
 
     override fun findNamesByToken(token: String?): List<String> =
         if (token.isNullOrBlank()) {

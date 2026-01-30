@@ -31,6 +31,7 @@ constructor(
     private val scatteringRatio: Double,
     private val meterRegistry: MeterRegistry? = null,
     private val timeout: Duration? = null,
+    private val jobHistoryRecorder: JobHistoryRecorder? = null,
     timeoutControllerInterval: Duration? = null,
 ) : JobScheduler {
 
@@ -330,9 +331,15 @@ constructor(
                 val runnable = MonitoredRun(decoratedTask, object : MonitoredRunListenerAdapter() {
 
                     var start: LocalDateTime? = null
+                    var error: String? = null
 
                     override fun onStart() {
                         start = Time.now
+                        error = null
+                    }
+
+                    override fun onFailure(ex: Exception) {
+                        error = ex.message ?: ex::class.java.name
                     }
 
                     override fun onCompletion() {
@@ -350,6 +357,13 @@ constructor(
                                     Tag.of(JobMetrics.tag_job_key, jobKey.id),
                                 )
                             )?.record(duration.toMillis(), TimeUnit.MILLISECONDS)
+                            // Recording the history
+                            jobHistoryRecorder?.record(
+                                jobKey = jobKey,
+                                startedAt = it,
+                                endedAt = end,
+                                error = error,
+                            )
                         }
                     }
                 })

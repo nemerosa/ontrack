@@ -2779,6 +2779,58 @@ type JobExecutionStatus {
   paused: Boolean!
 }
 
+"Histogram of run durations and status for a job"
+type JobHistogram {
+  "from field"
+  from: LocalDateTime!
+  "interval field"
+  interval: String!
+  "items field"
+  items: [JobHistogramItem!]!
+  "to field"
+  to: LocalDateTime!
+}
+
+"Histogram item for a job"
+type JobHistogramItem {
+  "avgDurationMs field"
+  avgDurationMs: Int
+  "count field"
+  count: Int
+  "error field"
+  error: Boolean
+  "errorCount field"
+  errorCount: Int
+  "from field"
+  from: LocalDateTime!
+  "to field"
+  to: LocalDateTime!
+}
+
+"History item for a job"
+type JobHistoryItem {
+  "duration field"
+  duration: String!
+  "Duration in milliseconds"
+  durationMs: Int
+  "endedAt field"
+  endedAt: LocalDateTime!
+  "id field"
+  id: Int
+  "jobCategory field"
+  jobCategory: String!
+  "jobKey field"
+  jobKey: String!
+  "jobType field"
+  jobType: String!
+  "message field"
+  message: String
+  "startedAt field"
+  startedAt: LocalDateTime!
+  "status field"
+  status: JobHistoryItemStatus!
+}
+
 "JobIngestionConfigValidation"
 type JobIngestionConfigValidation {
   "Description for the validation stamp"
@@ -2847,6 +2899,26 @@ type JobStatus {
   isTimeout: Boolean
   "isValid field"
   isValid: Boolean
+  "Histogram of run durations and statuses for this job"
+  jobHistogram(
+    "Start of the history"
+    from: LocalDateTime,
+    "Interval for the histogram"
+    interval: String,
+    "Skipping the runs in error"
+    skipErrors: Boolean,
+    "End of the history"
+    to: LocalDateTime
+  ): JobHistogram
+  "List of runs for this job"
+  jobHistory(
+    "Start of the history"
+    from: LocalDateTime,
+    "Skipping the runs in error"
+    skipErrors: Boolean,
+    "End of the history"
+    to: LocalDateTime
+  ): [JobHistoryItem!]!
   "key field"
   key: JobKey!
   "lastError field"
@@ -5987,6 +6059,13 @@ type SCMChangeLog {
     "Renderer to use for the change log rendering"
     renderer: String
   ): String
+  "Semantic change log"
+  semantic(
+    "Configuration for the rendering"
+    config: SemanticChangeLogTemplatingServiceConfig,
+    "Renderer to use for the change log rendering"
+    renderer: String
+  ): String
   "Boundary for the change log"
   to: Build!
 }
@@ -8113,6 +8192,12 @@ enum IngestionHookPayloadStatus {
   SCHEDULED
 }
 
+"Status of a job history item"
+enum JobHistoryItemStatus {
+  ERROR
+  SUCCESS
+}
+
 "Global state of a job"
 enum JobState {
   DISABLED
@@ -10085,6 +10170,24 @@ input ScheduleAutoVersioningInput {
 input SelectDashboardInput {
   "UUID of the dashboard to select"
   uuid: String!
+}
+
+"SemanticChangeLogTemplatingServiceConfig"
+input SemanticChangeLogTemplatingServiceConfig {
+  "Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence."
+  allQualifiers: Boolean
+  "If a qualifier has no previous link, uses the default qualifier (empty) qualifier."
+  defaultQualifierFallback: Boolean
+  "Comma-separated list of project links to follow one by one for a get deep change log. Each item in the list is either a project name, or a project name and qualifier separated by a colon (:)."
+  dependencies: [String!]
+  "Use emojis in the section titles"
+  emojis: Boolean
+  "Types to exclude"
+  exclude: [String!]
+  "Must a section for changelog actual issues be present?"
+  issues: Boolean
+  "List of type=title sections"
+  sections: [String!]
 }
 
 "Input type for the setAutoVersioningConfigByName mutation."
