@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.createOrder
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetrics
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
@@ -188,7 +189,7 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 }
                 // Collects the metrics
                 val gauges =
-                    meterRegistry.find(AutoVersioningAuditMetrics.autoVersioningAuditState)
+                    meterRegistry.find(AutoVersioningMetrics.States.stateCount)
                         .gauges()
                 val taggedGauges = gauges.associateBy {
                     val tag = it.id.getTag("state") ?: throw IllegalStateException("Null tag")

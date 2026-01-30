@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.runIf
 import net.nemerosa.ontrack.common.untilTimeout
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
-import net.nemerosa.ontrack.extension.github.app.GitHubAppRateLimitMetrics
+import net.nemerosa.ontrack.extension.github.app.GitHubAppRateLimitMetricsNames
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.model.*
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
@@ -907,7 +907,7 @@ class DefaultOntrackGitHubClient(
             if (error != null && "rate limit exceeded" in error.message) {
                 // The search API has very restrictive API rate limits
                 meterRegistry.increment(
-                    GitHubAppRateLimitMetrics.RATE_LIMIT_SEARCH_EXCEEDED,
+                    GitHubAppRateLimitMetricsNames.Search.ontrack_extension_github_ratelimit_search_exceeded,
                     "repository" to repository
                 )
                 null

@@ -47,12 +47,12 @@ class GitHubAppRateLimitMetrics(
 
     override fun onDeletedConfiguration(configuration: GitHubEngineConfiguration) {
         logger.info("Unregistering metrics for configuration ${configuration.name}")
-        unregisterMetric(configuration, RATE_LIMIT_CORE_LIMIT_METRIC)
-        unregisterMetric(configuration, RATE_LIMIT_CORE_REMAINING_METRIC)
-        unregisterMetric(configuration, RATE_LIMIT_CORE_USED_METRIC)
-        unregisterMetric(configuration, RATE_LIMIT_GRAPHQL_LIMIT_METRIC)
-        unregisterMetric(configuration, RATE_LIMIT_GRAPHQL_REMAINING_METRIC)
-        unregisterMetric(configuration, RATE_LIMIT_GRAPHQL_USED_METRIC)
+        unregisterMetric(configuration, GitHubAppRateLimitMetricsNames.Core.ontrack_extension_github_ratelimit_core_limit)
+        unregisterMetric(configuration, GitHubAppRateLimitMetricsNames.Core.ontrack_extension_github_ratelimit_core_remaining)
+        unregisterMetric(configuration, GitHubAppRateLimitMetricsNames.Core.ontrack_extension_github_ratelimit_core_used)
+        unregisterMetric(configuration, GitHubAppRateLimitMetricsNames.GraphQL.ontrack_extension_github_ratelimit_graphql_limit)
+        unregisterMetric(configuration, GitHubAppRateLimitMetricsNames.GraphQL.ontrack_extension_github_ratelimit_graphql_remaining)
+        unregisterMetric(configuration, GitHubAppRateLimitMetricsNames.GraphQL.ontrack_extension_github_ratelimit_graphql_used)
     }
 
     private fun registerMetrics(configuration: GitHubEngineConfiguration) {
@@ -67,37 +67,37 @@ class GitHubAppRateLimitMetrics(
         registerMetric(
             configuration,
             rateLimitFn,
-            RATE_LIMIT_CORE_LIMIT_METRIC
+            GitHubAppRateLimitMetricsNames.Core.ontrack_extension_github_ratelimit_core_limit
         ) { core.limit }
 
         registerMetric(
             configuration,
             rateLimitFn,
-            RATE_LIMIT_CORE_REMAINING_METRIC
+            GitHubAppRateLimitMetricsNames.Core.ontrack_extension_github_ratelimit_core_remaining
         ) { core.remaining }
 
         registerMetric(
             configuration,
             rateLimitFn,
-            RATE_LIMIT_CORE_USED_METRIC
+            GitHubAppRateLimitMetricsNames.Core.ontrack_extension_github_ratelimit_core_used
         ) { core.used }
 
         registerMetric(
             configuration,
             rateLimitFn,
-            RATE_LIMIT_GRAPHQL_LIMIT_METRIC
+            GitHubAppRateLimitMetricsNames.GraphQL.ontrack_extension_github_ratelimit_graphql_limit
         ) { graphql.limit }
 
         registerMetric(
             configuration,
             rateLimitFn,
-            RATE_LIMIT_GRAPHQL_REMAINING_METRIC
+            GitHubAppRateLimitMetricsNames.GraphQL.ontrack_extension_github_ratelimit_graphql_remaining
         ) { graphql.remaining }
 
         registerMetric(
             configuration,
             rateLimitFn,
-            RATE_LIMIT_GRAPHQL_USED_METRIC
+            GitHubAppRateLimitMetricsNames.GraphQL.ontrack_extension_github_ratelimit_graphql_used
         ) { graphql.used }
     }
 
@@ -121,15 +121,4 @@ class GitHubAppRateLimitMetrics(
         }
     }
 
-    companion object {
-        private const val RATE_LIMIT_METRIC = "ontrack_extension_github_ratelimit"
-        private const val RATE_LIMIT_CORE_LIMIT_METRIC = "${RATE_LIMIT_METRIC}_core_limit"
-        private const val RATE_LIMIT_CORE_REMAINING_METRIC = "${RATE_LIMIT_METRIC}_core_remaining"
-        private const val RATE_LIMIT_CORE_USED_METRIC = "${RATE_LIMIT_METRIC}_core_used"
-        private const val RATE_LIMIT_GRAPHQL_LIMIT_METRIC = "${RATE_LIMIT_METRIC}_graphql_limit"
-        private const val RATE_LIMIT_GRAPHQL_REMAINING_METRIC = "${RATE_LIMIT_METRIC}_graphql_remaining_limit"
-        private const val RATE_LIMIT_GRAPHQL_USED_METRIC = "${RATE_LIMIT_METRIC}_graphql_used"
-
-        const val RATE_LIMIT_SEARCH_EXCEEDED = "${RATE_LIMIT_METRIC}_search_exceeded"
-    }
 }

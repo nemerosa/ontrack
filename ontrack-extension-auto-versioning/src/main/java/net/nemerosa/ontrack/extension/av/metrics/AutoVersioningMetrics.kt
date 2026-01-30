@@ -19,6 +19,18 @@ object AutoVersioningMetrics {
         description = "Queue name"
     )
 
+    object States {
+
+        @APIDescription("Number of audit entries in a given state.")
+        @MetricsMeterDocumentation(
+            type = MetricsMeterType.COUNT,
+            tags = [
+                MetricsMeterTag("state", "State of the audit entry."),
+            ]
+        )
+        const val stateCount = "ontrack_extension_auto_versioning_audit_state"
+    }
+
     object Scheduling {
         @APIDescription("Number of auto-versioning requests being actually scheduled")
         @MetricsMeterDocumentation(

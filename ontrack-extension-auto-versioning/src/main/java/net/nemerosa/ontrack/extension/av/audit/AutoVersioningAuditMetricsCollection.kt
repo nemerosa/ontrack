@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.av.audit
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import jakarta.annotation.PostConstruct
+import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetrics
 import org.springframework.stereotype.Component
 
 @Component
@@ -14,9 +15,9 @@ class AutoVersioningAuditMetricsCollection(
     @PostConstruct
     fun init() {
         // For each possible state
-        AutoVersioningAuditState.values().forEach { state ->
+        AutoVersioningAuditState.entries.forEach { state ->
             meterRegistry.gauge(
-                AutoVersioningAuditMetrics.autoVersioningAuditState,
+                AutoVersioningMetrics.States.stateCount,
                 listOf(
                     Tag.of("state", state.name)
                 ),

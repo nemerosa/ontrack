@@ -23,6 +23,7 @@ annotation class MetricsMeterTag(
 )
 
 enum class MetricsMeterType(val type: String) {
+    GAUGE("gauge"),
     COUNT("count"),
     TIMER("timer"),
 }
