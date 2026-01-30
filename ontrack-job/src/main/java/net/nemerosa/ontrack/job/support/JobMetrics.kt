@@ -8,8 +8,8 @@ import net.nemerosa.ontrack.common.doc.MetricsMeterType
 
 @Suppress("ConstPropertyName")
 @MetricsDocumentation
-@APIName("CI config metrics")
-@APIDescription("Metrics for the CI configuration")
+@APIName("Background jobs metrics")
+@APIDescription("Metrics for the execution of background jobs.")
 object JobMetrics {
 
     @APIDescription("Total number of registered background jobs.")
