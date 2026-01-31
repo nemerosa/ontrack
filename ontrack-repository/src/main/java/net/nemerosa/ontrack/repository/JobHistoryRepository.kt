@@ -16,4 +16,6 @@ interface JobHistoryRepository {
         skipErrors: Boolean
     ): List<JobHistoryItem>
 
+    fun cleanup(cutoffTime: LocalDateTime)
+
 }

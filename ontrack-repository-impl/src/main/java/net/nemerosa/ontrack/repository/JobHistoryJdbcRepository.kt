@@ -85,6 +85,15 @@ class JobHistoryJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(
         }
     }
 
+    override fun cleanup(cutoffTime: LocalDateTime) {
+        namedParameterJdbcTemplate!!.update(
+            """
+                DELETE FROM JOB_HISTORY WHERE STARTED_AT < :cutoffTime
+            """.trimIndent(),
+            params("cutoffTime", dateTimeForDB(cutoffTime))
+        )
+    }
+
     private fun readItem(rs: ResultSet): JobHistoryItem = JobHistoryItem(
         id = rs.getInt("id"),
         jobCategory = rs.getString("job_category"),

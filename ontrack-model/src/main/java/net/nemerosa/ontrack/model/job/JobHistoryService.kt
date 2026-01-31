@@ -19,4 +19,6 @@ interface JobHistoryService : JobHistoryRecorder {
         skipErrors: Boolean
     ): JobHistogram
 
+    fun cleanup()
+
 }

@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.service.job
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.job.JobKey
 import net.nemerosa.ontrack.model.job.*
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.settings.JobHistorySettings
 import net.nemerosa.ontrack.repository.JobHistoryRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -12,6 +15,7 @@ import java.time.LocalDateTime
 @Transactional
 class JobHistoryServiceImpl(
     private val jobHistoryRepository: JobHistoryRepository,
+    private val cachedSettingsService: CachedSettingsService,
 ) : JobHistoryService {
 
     override fun record(
@@ -33,6 +37,12 @@ class JobHistoryServiceImpl(
                 message = error,
             )
         )
+    }
+
+    override fun cleanup() {
+        val retention = cachedSettingsService.getCachedSettings(JobHistorySettings::class.java).retention
+        val cutoffTime = Time.now.minus(retention)
+        jobHistoryRepository.cleanup(cutoffTime)
     }
 
     override fun findById(itemId: Int): JobHistoryItem? =
