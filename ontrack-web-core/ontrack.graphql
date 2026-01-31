@@ -7126,6 +7126,8 @@ type SlotPipeline {
   changes: [SlotPipelineChange!]!
   "end field"
   end: LocalDateTime
+  "Error message if any"
+  errorMessage: String
   "Can this deployment be completed?"
   finishAction: SlotPipelineDeploymentStatusProgress
   "Is the pipeline finished?"

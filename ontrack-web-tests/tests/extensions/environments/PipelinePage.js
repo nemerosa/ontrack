@@ -45,6 +45,17 @@ export class PipelinePage {
         }
     }
 
+    async expectPipelineErrorMessage(message) {
+        const errorStep = this.page.getByTestId(`deployment-error-${this.pipeline.id}`)
+        await expect(errorStep).toBeVisible()
+        await expect(errorStep.getByText(message)).toBeVisible()
+    }
+
+    async expectNoPipelineErrorMessage() {
+        const errorStep = this.page.getByTestId(`deployment-error-${this.pipeline.id}`)
+        await expect(errorStep).not.toBeVisible()
+    }
+
     /**
      * Gets a workflow step given the ID of the slot workflow
      */

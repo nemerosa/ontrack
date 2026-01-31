@@ -73,7 +73,8 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             )
 
             val event = environmentsEventsFactory.pipelineCreation(pipeline)
-            val startedSlotWorkflowInstance = slotWorkflowService.startWorkflow(pipeline, slotWorkflow, event, SlotPipelineStatus.CANDIDATE)
+            val startedSlotWorkflowInstance =
+                slotWorkflowService.startWorkflow(pipeline, slotWorkflow, event, SlotPipelineStatus.CANDIDATE)
 
             workflowTestSupport.waitForWorkflowInstance(startedSlotWorkflowInstance.workflowInstance.id)
 
@@ -90,7 +91,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Running a workflow on pipeline creation`() {
-        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotPipelineStatus.CANDIDATE) { slot, slotWorkflow ->
+        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotPipelineStatus.CANDIDATE) { slot, _ ->
             val pipeline = slotTestSupport.createPipeline(slot = slot)
 
             val slotWorkflowInstance = slotWorkflowService.getSlotWorkflowInstancesByPipeline(pipeline).firstOrNull()
@@ -105,7 +106,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Running a workflow on pipeline deploying`() {
-        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotPipelineStatus.RUNNING) { slot, slotWorkflow ->
+        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotPipelineStatus.RUNNING) { slot, _ ->
             val pipeline = slotTestSupport.createPipeline(slot = slot)
             slotService.runDeployment(pipeline.id, dryRun = false)
 
@@ -256,6 +257,33 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             // Reloading the pipeline's status
             val deployedPipeline = slotService.getPipelineById(pipeline.id)
             assertEquals(SlotPipelineStatus.DONE, deployedPipeline.status)
+        }
+    }
+
+    @Test
+    fun `A failing workflow on a running deployment must mark it as errored`() {
+        slotWorkflowTestSupport.withSlotWorkflow(
+            trigger = SlotPipelineStatus.RUNNING,
+            error = true,
+        ) { slot, _ ->
+
+            // Creating a pipeline
+            val pipeline = slotTestSupport.createPipeline(slot = slot)
+
+            // Launching the pipeline, this will create a failed workflow
+            val status = slotService.runDeployment(pipeline.id, dryRun = false)
+            assertTrue(status.ok, "Pipeline has started its deployment")
+
+            // Waiting for the pipeline's workflows to finish
+            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.RUNNING)
+
+            // The deployment is still in running state
+            val currentPipeline = slotService.getPipelineById(pipeline.id)
+            assertEquals(SlotPipelineStatus.RUNNING, currentPipeline.status)
+
+            // The pipeline may still be running, but is associated with errors
+            val message = slotService.getPipelineErrorMessage(currentPipeline)
+            assertEquals("Workflow is in error", message)
         }
     }
 

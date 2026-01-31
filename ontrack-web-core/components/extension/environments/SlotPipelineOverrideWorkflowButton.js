@@ -1,8 +1,8 @@
 import {Button} from "antd";
-import {FaExclamationCircle} from "react-icons/fa";
 import SlotPipelineOverrideWorkflowDialog, {
     useSlotPipelineOverrideWorkflowDialog
 } from "@components/extension/environments/SlotPipelineOverrideWorkflowDialog";
+import {FaHand} from "react-icons/fa6";
 
 export default function SlotPipelineOverrideWorkflowButton({deployment, slotWorkflow, slotWorkflowInstance, onChange}) {
 
@@ -23,7 +23,7 @@ export default function SlotPipelineOverrideWorkflowButton({deployment, slotWork
                         data-testid={`override-${slotWorkflow.id}`}
                         onClick={onOverride}
                     >
-                        <FaExclamationCircle color="red"/>
+                        <FaHand color="gray"/>
                     </Button>
                     <SlotPipelineOverrideWorkflowDialog dialog={dialog}/>
                 </>

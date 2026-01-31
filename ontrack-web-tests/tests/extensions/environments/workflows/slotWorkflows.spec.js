@@ -99,6 +99,7 @@ test('workflows on creation participate into the pipeline check list', async ({p
 
     await pipelinePage.expectRuleStatusProgress({value: 100})
     await pipelinePage.checkRunAction({})
+    await pipelinePage.expectNoPipelineErrorMessage()
 
     // Check workflow state in the UI
     const pipelineWorkflow = await pipelinePage.getWorkflow(slotWorkflow.id)
@@ -148,6 +149,7 @@ test('workflows on creation participate into the pipeline progress', async ({pag
     await pipelinePage.goTo()
 
     await pipelinePage.expectRuleStatusProgress({value: 50})
+    await pipelinePage.expectPipelineErrorMessage("Workflow is in error")
 })
 
 test('API - workflow on promotion leading to the deployment of a build', async ({page, ontrack}) => {

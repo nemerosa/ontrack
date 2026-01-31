@@ -6,6 +6,20 @@ import {FaExclamationTriangle} from "react-icons/fa";
 
 export const findChange = (deployment, status) => deployment.changes.find(it => it.type === 'STATUS' && it.status === status)
 
+export function DeploymentErrorStep({deployment, errorMessage}) {
+    if (deployment.errorMessage) {
+        return <DeploymentStep
+            id={`deployment-error-${deployment.id}`}
+            avatar={<FaExclamationTriangle color="red"/>}
+            title={deployment.errorMessage}
+            description=""
+            style={{background: "#FEE"}}
+        />
+    } else {
+        return undefined
+    }
+}
+
 function DeploymentStatusSignature({deployment, status}) {
     const change = findChange(deployment, status)
     return (
@@ -37,10 +51,10 @@ function DeploymentStatusMessage({deployment, status}) {
     )
 }
 
-export function DeploymentStep({id, avatar, title, description}) {
+export function DeploymentStep({id, avatar, title, description, style = {}}) {
     return (
         <>
-            <List.Item className="ot-list-item" data-testid={id} style={{paddingLeft: "3em"}}>
+            <List.Item className="ot-list-item" data-testid={id} style={{paddingLeft: "3em", ...style}}>
                 <List.Item.Meta
                     avatar={avatar}
                     title={title}

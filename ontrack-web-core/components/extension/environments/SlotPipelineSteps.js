@@ -6,6 +6,7 @@ import {
     DeploymentCancelledStatusStep,
     DeploymentCandidateStatusStep,
     DeploymentDoneStatusStep,
+    DeploymentErrorStep,
     DeploymentRunningStatusStep,
     findChange
 } from "@components/extension/environments/deployment/steps/deploymentStatusSteps";
@@ -21,6 +22,10 @@ import {DeploymentWorkflowStep} from "@components/extension/environments/deploym
 
 function CandidateStatus({deployment}) {
     return <DeploymentCandidateStatusStep deployment={deployment}/>
+}
+
+const deploymentError = (deployment) => {
+    return <DeploymentErrorStep deployment={deployment}/>
 }
 
 const candidateAdmissionRules = (pipeline, disabled = true, onChange) => {
@@ -84,6 +89,7 @@ const generateItems = (pipeline, reloadState, onChange) => {
     if (pipeline.status === 'CANDIDATE') {
         const items = [
             <CandidateStatus key="status" deployment={pipeline}/>,
+            deploymentError(pipeline),
             ...candidateAdmissionRules(pipeline, false, onChange),
             ...candidateWorkflows(pipeline, onChange),
         ]
@@ -99,6 +105,7 @@ const generateItems = (pipeline, reloadState, onChange) => {
     else if (pipeline.status === 'RUNNING') {
         const items = [
             <CandidateStatus key="status-candidate" deployment={pipeline}/>,
+            deploymentError(pipeline),
             ...candidateAdmissionRules(pipeline),
             ...candidateWorkflows(pipeline, onChange, true),
             <RunningStatus key="status-running" deployment={pipeline}/>,
@@ -116,6 +123,7 @@ const generateItems = (pipeline, reloadState, onChange) => {
     else if (pipeline.status === 'CANCELLED') {
         const items = [
             <CandidateStatus key="status-candidate" deployment={pipeline}/>,
+            deploymentError(pipeline),
             ...candidateAdmissionRules(pipeline),
             ...candidateWorkflows(pipeline, onChange, true),
         ]
@@ -135,6 +143,7 @@ const generateItems = (pipeline, reloadState, onChange) => {
     else if (pipeline.status === 'DONE') {
         return [
             <CandidateStatus key="status-candidate" deployment={pipeline}/>,
+            deploymentError(pipeline),
             ...candidateAdmissionRules(pipeline),
             ...candidateWorkflows(pipeline, onChange, true),
             <RunningStatus key="status-running" deployment={pipeline}/>,
@@ -190,6 +199,7 @@ export default function SlotPipelineSteps({pipelineId, reloadState, onChange}) {
                 slotPipelineById(id: $pipelineId) {
                     id
                     status
+                    errorMessage
                     changes {
                         user
                         timestamp

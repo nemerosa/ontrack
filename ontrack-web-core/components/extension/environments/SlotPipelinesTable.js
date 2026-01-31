@@ -1,7 +1,7 @@
 import StandardTable from "@components/common/table/StandardTable";
 import {gql} from "graphql-request";
 import {gqlSlotPipelineData} from "@components/extension/environments/EnvironmentGraphQL";
-import {Space} from "antd";
+import {Space, Tooltip} from "antd";
 import BuildLink from "@components/builds/BuildLink";
 import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 import TimestampText from "@components/common/TimestampText";
@@ -12,6 +12,7 @@ import {slotPipelineUri} from "@components/extension/environments/EnvironmentsLi
 import SlotPipelineStatus from "@components/extension/environments/SlotPipelineStatus";
 import SlotPipelineDeploymentStatusProgress
     from "@components/extension/environments/SlotPipelineDeploymentStatusProgress";
+import {FaBan, FaExclamationCircle} from "react-icons/fa";
 
 export default function SlotPipelinesTable({slot}) {
 
@@ -33,8 +34,8 @@ export default function SlotPipelinesTable({slot}) {
                                     pageInfo {
                                         nextPage {
                                             offset
-                                            size                                    
-                                        }                                    
+                                            size
+                                        }
                                     }
                                     pageItems {
                                         ...SlotPipelineData
@@ -71,6 +72,24 @@ export default function SlotPipelinesTable({slot}) {
                         title: 'Status',
                         render: (_, item) =>
                             <SlotPipelineStatus pipeline={item}/>
+                    },
+                    {
+                        key: 'error',
+                        title: 'Error',
+                        render: (_, item) => <>
+                            {
+                                item.errorMessage &&
+                                <Tooltip title={item.errorMessage}>
+                                    <FaExclamationCircle color="red"/>
+                                </Tooltip>
+                            }
+                            {
+                                !item.errorMessage &&
+                                <Tooltip title="No error">
+                                    <FaBan color="gray"/>
+                                </Tooltip>
+                            }
+                        </>
                     },
                     {
                         key: 'progress',

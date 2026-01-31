@@ -106,6 +106,14 @@ class GQLTypeSlotPipeline(
             ) { pipeline, _ ->
                 slotService.getDeploymentFinishActionProgress(pipeline.id)
             }
+            // Error message
+            .fieldGetter<SlotPipeline, String>(
+                name = "errorMessage",
+                description = "Error message if any",
+                nullable = true,
+            ) { pipeline, _ ->
+                slotService.getPipelineErrorMessage(pipeline)
+            }
             // OK
             .build()
 }

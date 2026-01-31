@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
@@ -989,6 +990,77 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `A failing workflow on a running deployment must mark it as errored`() {
+        slotWorkflowTestSupport.withSlotWorkflow(
+            trigger = SlotPipelineStatus.RUNNING,
+            error = true,
+        ) { slot, _ ->
+
+            // Creating a pipeline
+            val pipeline = slotTestSupport.createPipeline(slot = slot)
+
+            // Launching the pipeline, this will create a failed workflow
+            val status = slotService.runDeployment(pipeline.id, dryRun = false)
+            assertTrue(status.ok, "Pipeline has started its deployment")
+
+            // Waiting for the pipeline's workflows to finish
+            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.RUNNING)
+
+            // Getting the workflow status & error message
+            run(
+                """
+                    {
+                        slotPipelineById(id: "${pipeline.id}") {
+                            status
+                            errorMessage
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+
+                val dataPipeline = data.path("slotPipelineById")
+                assertEquals("RUNNING", dataPipeline.path("status").asText())
+                assertEquals("Workflow is in error", dataPipeline.path("errorMessage").asText())
+            }
+        }
+    }
+
+    @Test
+    fun `A successful workflow on a running deployment must not mark it as errored`() {
+        slotWorkflowTestSupport.withSlotWorkflow(
+            trigger = SlotPipelineStatus.RUNNING,
+            error = false,
+        ) { slot, _ ->
+
+            // Creating a pipeline
+            val pipeline = slotTestSupport.createPipeline(slot = slot)
+
+            // Launching the pipeline, this will create a failed workflow
+            val status = slotService.runDeployment(pipeline.id, dryRun = false)
+            assertTrue(status.ok, "Pipeline has started its deployment")
+
+            // Waiting for the pipeline's workflows to finish
+            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.RUNNING)
+
+            // Getting the workflow status & error message
+            run(
+                """
+                    {
+                        slotPipelineById(id: "${pipeline.id}") {
+                            status
+                            errorMessage
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+                val dataPipeline = data.path("slotPipelineById")
+                assertEquals("RUNNING", dataPipeline.path("status").asText())
+                assertJsonNull(dataPipeline.path("errorMessage"), "Workflow is not in error")
             }
         }
     }

@@ -704,6 +704,34 @@ class SlotServiceImpl(
         return SlotDeploymentActionStatus.ok(actualMessage)
     }
 
+    override fun getPipelineErrorMessage(pipeline: SlotPipeline): String? {
+        val checks = mutableListOf<SlotDeploymentCheck>()
+        when (pipeline.status) {
+            SlotPipelineStatus.CANDIDATE -> {
+                checks += getPipelineAdmissionRuleChecksForAllRules(pipeline)
+                checks += slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.CANDIDATE, null)
+            }
+
+            SlotPipelineStatus.RUNNING -> {
+                checks += slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.RUNNING, null)
+            }
+
+            SlotPipelineStatus.DONE -> {
+                checks += slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.DONE, null)
+            }
+
+            SlotPipelineStatus.CANCELLED -> {
+                // No error message
+            }
+        }
+        return if (checks.any { !it.ok }) {
+            val check = checks.first { !it.ok }
+            check.reason
+        } else {
+            null
+        }
+    }
+
     override fun getCurrentPipeline(slot: Slot): SlotPipeline? {
         securityService.checkSlotAccess<SlotView>(slot)
         return findPipelines(slot).pageItems.firstOrNull()

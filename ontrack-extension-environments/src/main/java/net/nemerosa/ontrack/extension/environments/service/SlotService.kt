@@ -167,6 +167,14 @@ interface SlotService {
     fun getPipelineAdmissionRuleStatuses(pipeline: SlotPipeline): List<SlotPipelineAdmissionRuleStatus>
 
     /**
+     * Get any error message associated with a pipeline.
+     *
+     * @param pipeline Pipeline to check
+     * @return Error message or null if none
+     */
+    fun getPipelineErrorMessage(pipeline: SlotPipeline): String?
+
+    /**
      * Gets the status (data, override) of a rule for a given pipeline
      */
     fun findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(

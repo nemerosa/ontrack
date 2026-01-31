@@ -1,6 +1,6 @@
 import {Popover, Space, Typography} from "antd";
-import {FaExclamationCircle} from "react-icons/fa";
 import TimestampText from "@components/common/TimestampText";
+import {FaHand} from "react-icons/fa6";
 
 export default function SlotPipelineOverrideIndicator({container, id, message}) {
     return (
@@ -26,7 +26,7 @@ export default function SlotPipelineOverrideIndicator({container, id, message}) 
                         </>
                     }
                 >
-                    <FaExclamationCircle data-testid={`overridden-${id}`} color="red"/>
+                    <FaHand data-testid={`overridden-${id}`} color="orange"/>
                 </Popover>
             }
         </>
