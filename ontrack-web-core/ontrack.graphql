@@ -2905,6 +2905,8 @@ type JobStatus {
     from: LocalDateTime,
     "Interval for the histogram"
     interval: String,
+    "Period for the histogram (used instead of from/to"
+    period: String,
     "Skipping the runs in error"
     skipErrors: Boolean,
     "End of the history"

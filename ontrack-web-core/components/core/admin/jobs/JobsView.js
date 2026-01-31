@@ -22,6 +22,7 @@ import SelectJobCategory from "@components/core/admin/jobs/SelectJobCategory";
 import SelectJobType from "@components/core/admin/jobs/SelectJobType";
 import JobExecutionStatus from "@components/core/admin/jobs/JobExecutionStatus";
 import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
+import JobHistogramChart from "@components/core/admin/jobs/JobHistogramChart";
 
 export default function JobsView() {
 
@@ -82,7 +83,7 @@ export default function JobsView() {
                     lastTimeoutCount
                     lastRunDate
                     nextRunDate
-                    jobHistogram(interval: "1d", period: "7d") {
+                    jobHistogram(interval: "1d", period: "14d") {
                         items {
                             from
                             to
@@ -254,6 +255,12 @@ export default function JobsView() {
                                         title: 'Last run',
                                         render: (_, job) => <TimestampText value={job.lastRunDate}/>,
                                     },
+                                    {
+                                        key: 'history',
+                                        title: "History",
+                                        width: '200px',
+                                        render: (_, job) => <JobHistogramChart histogram={job.jobHistogram}/>
+                                    }
                                 ]}
                                 expandable={{
                                     expandedRowRender: (job) => (
