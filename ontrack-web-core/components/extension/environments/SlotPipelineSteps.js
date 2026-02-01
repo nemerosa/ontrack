@@ -105,10 +105,10 @@ const generateItems = (pipeline, reloadState, onChange) => {
     else if (pipeline.status === 'RUNNING') {
         const items = [
             <CandidateStatus key="status-candidate" deployment={pipeline}/>,
-            deploymentError(pipeline),
             ...candidateAdmissionRules(pipeline),
             ...candidateWorkflows(pipeline, onChange, true),
             <RunningStatus key="status-running" deployment={pipeline}/>,
+            deploymentError(pipeline),
             ...runningWorkflows(pipeline, onChange),
         ]
         if (pipeline.finishAction) {
@@ -123,7 +123,6 @@ const generateItems = (pipeline, reloadState, onChange) => {
     else if (pipeline.status === 'CANCELLED') {
         const items = [
             <CandidateStatus key="status-candidate" deployment={pipeline}/>,
-            deploymentError(pipeline),
             ...candidateAdmissionRules(pipeline),
             ...candidateWorkflows(pipeline, onChange, true),
         ]
@@ -134,7 +133,8 @@ const generateItems = (pipeline, reloadState, onChange) => {
                 ...runningWorkflows(pipeline, onChange, true),
             )
         }
-        items.push(<CancelledStatus key="status-cancelled" deployment={pipeline}/>,)
+        items.push(<CancelledStatus key="status-cancelled" deployment={pipeline}/>)
+        items.push(deploymentError(pipeline))
         return items
     }
 
@@ -143,12 +143,12 @@ const generateItems = (pipeline, reloadState, onChange) => {
     else if (pipeline.status === 'DONE') {
         return [
             <CandidateStatus key="status-candidate" deployment={pipeline}/>,
-            deploymentError(pipeline),
             ...candidateAdmissionRules(pipeline),
             ...candidateWorkflows(pipeline, onChange, true),
             <RunningStatus key="status-running" deployment={pipeline}/>,
             ...runningWorkflows(pipeline, onChange, true),
             <FinishStatus key="status-done" deployment={pipeline}/>,
+            deploymentError(pipeline),
             ...doneWorkflows(pipeline, onChange),
         ]
     }
