@@ -2,6 +2,33 @@ import {Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis} from "recharts
 import {useEffect, useState} from "react";
 import dayjs from "dayjs";
 
+function formatDuration(durationMs) {
+    if (durationMs < 1000) {
+        return `${durationMs} ms`
+    } else {
+        return dayjs.duration(durationMs, 'milliseconds').format('H[h] m[m] s[s]')
+    }
+}
+
+const JobHistogramTooltip = ({active, payload}) => {
+    if (active && payload && payload.length) {
+        const {date, displayValue} = payload[0].payload;
+        return (
+            <div style={{
+                backgroundColor: 'white',
+                border: '1px solid #ccc',
+                padding: '5px',
+            }}>
+                <div>{dayjs(date).format('YYYY-MM-DD')}</div>
+                <div>
+                    Duration (avg): {displayValue}
+                </div>
+            </div>
+        )
+    }
+    return null;
+}
+
 export default function JobHistogramChart({histogram}) {
 
     const [dataPoints, setDataPoints] = useState([])
@@ -11,6 +38,7 @@ export default function JobHistogramChart({histogram}) {
                 return {
                     date: item.from,
                     value: item.avgDurationMs,
+                    displayValue: formatDuration(item.avgDurationMs),
                     error: item.error,
                 }
             })
@@ -29,8 +57,8 @@ export default function JobHistogramChart({histogram}) {
                     data={dataPoints}
                 >
                     <XAxis dataKey="date" hide={true}/>
-                    <Tooltip labelFormatter={(value) => dayjs(value).format('YYYY-MM-DD')}/>
-                    <Bar name="Duration (avg ms)" dataKey="value">
+                    <Tooltip content={<JobHistogramTooltip/>}/>
+                    <Bar name="Duration (avg)" dataKey="value">
                         {
                             dataPoints.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={entry.error ? '#CC3333' : '#33CC33'}/>
