@@ -12,19 +12,36 @@ function formatDuration(durationMs) {
 
 const JobHistogramTooltip = ({active, payload}) => {
     if (active && payload && payload.length) {
-        const {date, displayValue} = payload[0].payload;
-        return (
-            <div style={{
+        const {date, displayValue, count, errorCount} = payload[0].payload;
+        if (count > 0) {
+            return (
+                <div style={{
+                    backgroundColor: 'white',
+                    border: '1px solid #ccc',
+                    padding: '5px',
+                }}>
+                    <div>{dayjs(date).format('YYYY-MM-DD')}</div>
+                    <div>
+                        Duration (avg): {displayValue}
+                    </div>
+                    <div>
+                        Measures: {count}
+                    </div>
+                    <div>
+                        Errors: {errorCount}
+                    </div>
+                </div>
+            )
+        } else {
+            return <div style={{
                 backgroundColor: 'white',
                 border: '1px solid #ccc',
                 padding: '5px',
+                fontStyle: 'italic',
             }}>
-                <div>{dayjs(date).format('YYYY-MM-DD')}</div>
-                <div>
-                    Duration (avg): {displayValue}
-                </div>
+                No measures
             </div>
-        )
+        }
     }
     return null;
 }
@@ -39,6 +56,8 @@ export default function JobHistogramChart({histogram}) {
                     date: item.from,
                     value: item.avgDurationMs,
                     displayValue: formatDuration(item.avgDurationMs),
+                    count: item.count,
+                    errorCount: item.errorCount,
                     error: item.error,
                 }
             })

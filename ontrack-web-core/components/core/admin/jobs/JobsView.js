@@ -87,6 +87,8 @@ export default function JobsView() {
                         items {
                             from
                             to
+                            count
+                            errorCount
                             error
                             avgDurationMs
                         }
