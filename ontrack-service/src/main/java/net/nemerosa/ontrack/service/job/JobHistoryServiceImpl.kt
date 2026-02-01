@@ -88,11 +88,14 @@ class JobHistoryServiceImpl(
             }
 
             val count = itemsInPeriod.size
+            val durations = itemsInPeriod.map { historyItem -> historyItem.duration.toMillis() }
             val averageDurationMs = if (count > 0) {
-                itemsInPeriod.map { historyItem -> historyItem.duration.toMillis() }.average().toLong()
+                durations.average().toLong()
             } else {
                 0L
             }
+            val minDurationMs = durations.minOrNull() ?: 0L
+            val maxDurationMs = durations.maxOrNull() ?: 0L
 
             histogramItems.add(
                 0,
@@ -101,7 +104,9 @@ class JobHistoryServiceImpl(
                     to = currentPeriodEnd,
                     count = count,
                     errorCount = itemsInPeriod.count { it.status == JobHistoryItemStatus.ERROR },
-                    avgDurationMs = averageDurationMs
+                    avgDurationMs = averageDurationMs,
+                    minDurationMs = minDurationMs,
+                    maxDurationMs = maxDurationMs,
                 )
             )
 

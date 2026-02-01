@@ -2803,6 +2803,10 @@ type JobHistogramItem {
   errorCount: Int
   "from field"
   from: LocalDateTime!
+  "maxDurationMs field"
+  maxDurationMs: Int
+  "minDurationMs field"
+  minDurationMs: Int
   "to field"
   to: LocalDateTime!
 }

@@ -24,6 +24,8 @@ class GQLTypeJobHistogramItem : GQLType {
             .intField(JobHistogramItem::count)
             .intField(JobHistogramItem::errorCount)
             .longField(JobHistogramItem::avgDurationMs)
+            .longField(JobHistogramItem::minDurationMs)
+            .longField(JobHistogramItem::maxDurationMs)
             .booleanField(JobHistogramItem::error)
             .build()
 }

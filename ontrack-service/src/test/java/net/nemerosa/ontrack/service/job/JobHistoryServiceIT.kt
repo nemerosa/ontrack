@@ -79,6 +79,13 @@ class JobHistoryServiceIT : AbstractDSLTestSupport() {
             )
             val items = histogram.items
             assertEquals(3, items.size)
+
+            val lastPeriod = items.last()
+            assertTrue(lastPeriod.avgDurationMs > 0, "Average duration > 0")
+            assertTrue(lastPeriod.minDurationMs > 0, "Min duration > 0")
+            assertTrue(lastPeriod.maxDurationMs > 0, "Max duration > 0")
+            assertTrue(lastPeriod.minDurationMs <= lastPeriod.avgDurationMs, "Min <= Avg")
+            assertTrue(lastPeriod.avgDurationMs <= lastPeriod.maxDurationMs, "Avg <= Max")
         }
     }
 

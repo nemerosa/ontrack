@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 import kotlin.random.Random
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @AsAdminTest
 class GQLTypeJobStatusIT : AbstractQLKTITSupport() {
@@ -109,6 +110,8 @@ class GQLTypeJobStatusIT : AbstractQLKTITSupport() {
                                         count
                                         errorCount
                                         avgDurationMs
+                                        minDurationMs
+                                        maxDurationMs
                                         error
                                     }
                                 }
@@ -120,6 +123,9 @@ class GQLTypeJobStatusIT : AbstractQLKTITSupport() {
                 val items = data.path("jobs").path("pageItems")[0]
                     .path("jobHistogram").path("items")
                 assertEquals(3, items.size())
+                val item = items[0]
+                assertTrue(item.path("minDurationMs").asLong() >= 0)
+                assertTrue(item.path("maxDurationMs").asLong() >= 0)
             }
         }
     }

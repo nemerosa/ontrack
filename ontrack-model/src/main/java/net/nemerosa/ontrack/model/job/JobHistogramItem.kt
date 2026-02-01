@@ -8,6 +8,8 @@ data class JobHistogramItem(
     val count: Int,
     val errorCount: Int,
     val avgDurationMs: Long,
+    val minDurationMs: Long,
+    val maxDurationMs: Long,
 ) {
     val error = errorCount > 0
 }

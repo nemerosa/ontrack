@@ -91,6 +91,8 @@ export default function JobsView() {
                             errorCount
                             error
                             avgDurationMs
+                            minDurationMs
+                            maxDurationMs
                         }
                     }
                 }
