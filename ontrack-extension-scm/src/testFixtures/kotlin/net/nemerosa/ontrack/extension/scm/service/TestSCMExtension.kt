@@ -93,6 +93,10 @@ class TestSCMExtension(
             TODO("Not yet implemented")
         }
 
+        override fun getPullRequestByName(prName: String): SCMPullRequest? {
+            TODO("Not yet implemented")
+        }
+
         override fun getBranchLastCommit(branch: String): String? {
             TODO("Not yet implemented")
         }

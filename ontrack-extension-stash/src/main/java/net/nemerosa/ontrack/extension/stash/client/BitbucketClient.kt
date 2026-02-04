@@ -85,7 +85,7 @@ interface BitbucketClient {
     /**
      * Gets a PR using its ID.
      */
-    fun getPR(repo: BitbucketRepository, prId: Int): BitbucketServerPR
+    fun getPR(repo: BitbucketRepository, prId: Int): BitbucketServerPR?
 
     /**
      * Checks if a PR can be merged.

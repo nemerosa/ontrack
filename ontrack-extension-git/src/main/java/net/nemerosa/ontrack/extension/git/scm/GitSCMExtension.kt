@@ -79,6 +79,10 @@ class GitSCMExtension(
             unsupported("createBranch")
         }
 
+        override fun getPullRequestByName(prName: String): SCMPullRequest? {
+            unsupported("getPullRequestByName")
+        }
+
         override fun download(scmBranch: String?, path: String, retryOnNotFound: Boolean): ByteArray? {
             unsupported("download")
         }

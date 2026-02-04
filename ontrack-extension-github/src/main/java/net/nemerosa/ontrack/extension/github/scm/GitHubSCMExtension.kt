@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
 import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension
 import net.nemerosa.ontrack.extension.github.catalog.GitHubSCMCatalogSettings
+import net.nemerosa.ontrack.extension.github.client.GitHubPR
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
@@ -188,13 +189,26 @@ class GitHubSCMExtension(
                 }
             }
             // PR
-            return SCMPullRequest(
-                id = pr.number.toString(),
-                name = "#${pr.number}",
-                link = pr.html_url ?: "",
-                status = status
-            )
+            return toSCMPullRequest(pr, status)
         }
+
+        private fun toSCMPullRequest(
+            pr: GitHubPR,
+            status: SCMPullRequestStatus = pr.status,
+        ): SCMPullRequest = SCMPullRequest(
+            id = pr.number.toString(),
+            name = "#${pr.number}",
+            link = pr.html_url ?: "",
+            status = status
+        )
+
+        override fun getPullRequestByName(prName: String): SCMPullRequest? =
+            if (prName.startsWith("#")) {
+                val id = prName.substringAfter("#").toInt()
+                client.getPR(repository, id)?.let { toSCMPullRequest(it) }
+            } else {
+                null
+            }
 
         private fun waitAndMerge(prId: Int, message: String): SCMPullRequestStatus {
             // Waits for the PR checks to be OK

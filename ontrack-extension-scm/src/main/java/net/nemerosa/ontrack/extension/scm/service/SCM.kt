@@ -114,6 +114,12 @@ interface SCM {
     ): SCMPullRequest
 
     /**
+     * Given the name of PR (#1234, PR-1234, etc. depending on the SCM), returns the corresponding
+     * PR information or null if not found.
+     */
+    fun getPullRequestByName(prName: String): SCMPullRequest?
+
+    /**
      * Gets a link to see the diff between two commits.
      */
     fun getDiffLink(commitFrom: String, commitTo: String): String?

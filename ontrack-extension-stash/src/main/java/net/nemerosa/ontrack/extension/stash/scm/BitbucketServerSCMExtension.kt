@@ -177,13 +177,26 @@ class BitbucketServerSCMExtension(
                 }
             }
             // PR
-            return SCMPullRequest(
-                id = pr.id.toString(),
-                name = "PR-${pr.id}",
-                link = "${configuration.url}/projects/${project}/repos/${repositoryName}/pull-requests/${pr.id}/overview",
-                status = status
-            )
+            return toSCMPullRequest(pr, status=status)
         }
+
+        private fun toSCMPullRequest(
+            pr: BitbucketServerPR,
+            status: SCMPullRequestStatus = pr.status,
+        ): SCMPullRequest = SCMPullRequest(
+            id = pr.id.toString(),
+            name = "PR-${pr.id}",
+            link = "${configuration.url}/projects/${project}/repos/${repositoryName}/pull-requests/${pr.id}/overview",
+            status = status,
+        )
+
+        override fun getPullRequestByName(prName: String): SCMPullRequest? =
+            if (prName.startsWith("PR-")) {
+                val id = prName.substringAfter("PR-").toInt()
+                client.getPR(repo, id)?.let { toSCMPullRequest(it) }
+            } else {
+                null
+            }
 
         override fun getDiffLink(commitFrom: String, commitTo: String): String {
             return "${configuration.url}/projects/${project}/repos/${repositoryName}/compare/commits?targetBranch=${commitTo}&sourceBranch=${commitFrom}"
@@ -277,7 +290,7 @@ class BitbucketServerSCMExtension(
                 }
             }
             if (merged == null || !merged) {
-                return client.getPR(repo, prId).status
+                return client.getPR(repo, prId)?.status ?: SCMPullRequestStatus.UNKNOWN
             }
             // Merges the PR
             client.mergePR(

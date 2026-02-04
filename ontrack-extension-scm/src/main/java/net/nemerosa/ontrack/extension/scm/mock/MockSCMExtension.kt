@@ -66,7 +66,14 @@ class MockSCMExtension(
         val approved: Boolean,
         val status: SCMPullRequestStatus,
         val reviewers: List<String>,
-    )
+    ) {
+        fun toSCMPullRequest(): SCMPullRequest = SCMPullRequest(
+            id = id.toString(),
+            name = "#$id",
+            link = "mock:pr:$id",
+            status = status,
+        )
+    }
 
     class MockRepository(
         val name: String,
@@ -170,12 +177,16 @@ class MockSCMExtension(
             }
 
             createdPullRequests += pr
-            return SCMPullRequest(
-                id = id.toString(),
-                name = "#$id",
-                link = "mock:pr:$id",
-                status = pr.status,
-            )
+            return pr.toSCMPullRequest()
+        }
+
+        fun getPullRequestByName(prName: String): SCMPullRequest? {
+            return if (prName.startsWith("#")) {
+                val id = prName.substringAfter("#").toInt()
+                createdPullRequests.find { it.id == id }?.toSCMPullRequest()
+            } else {
+                null
+            }
         }
 
         fun findPR(from: String?, to: String?): MockPullRequest? =
@@ -354,6 +365,9 @@ class MockSCMExtension(
             autoApproval = autoApproval,
             reviewers = reviewers,
         )
+
+        override fun getPullRequestByName(prName: String): SCMPullRequest? =
+            repository(mockScmProjectProperty.name).getPullRequestByName(prName)
 
         override fun getDiffLink(commitFrom: String, commitTo: String): String =
             "diff?from=$commitFrom&to=$commitTo"

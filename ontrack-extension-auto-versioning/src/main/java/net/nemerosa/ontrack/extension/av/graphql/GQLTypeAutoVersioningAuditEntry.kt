@@ -4,13 +4,12 @@ import graphql.Scalars
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditEntry
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditEntryService
+import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.GQLTypePromotionRun
-import net.nemerosa.ontrack.graphql.support.field
-import net.nemerosa.ontrack.graphql.support.listType
-import net.nemerosa.ontrack.graphql.support.stringField
-import net.nemerosa.ontrack.graphql.support.toNotNull
+import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
@@ -20,6 +19,7 @@ class GQLTypeAutoVersioningAuditEntry(
     private val gqlTypeAutoVersioningOrder: GQLTypeAutoVersioningOrder,
     private val gqlTypeAutoVersioningAuditEntryState: GQLTypeAutoVersioningAuditEntryState,
     private val structureService: StructureService,
+    private val autoVersioningAuditEntryService: AutoVersioningAuditEntryService,
 ) : GQLType {
 
     override fun getTypeName(): String = AutoVersioningAuditEntry::class.java.simpleName
@@ -52,6 +52,14 @@ class GQLTypeAutoVersioningAuditEntry(
                 it.name("duration")
                     .description("Elapsed time between the creation of this process and its last state (in ms)")
                     .type(Scalars.GraphQLInt)
+            }
+            // Link to any associated pull request
+            .fieldGetter<AutoVersioningAuditEntry, SCMPullRequest>(
+                name = "pullRequest",
+                description = "Associated pull request if any",
+                nullable = true,
+            ) { source, _ ->
+                autoVersioningAuditEntryService.getPullRequest(source)
             }
             // Upgrade branch
             .stringField(AutoVersioningAuditEntry::upgradeBranch)
