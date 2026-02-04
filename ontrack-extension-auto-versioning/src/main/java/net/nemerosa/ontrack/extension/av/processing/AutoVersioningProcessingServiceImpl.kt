@@ -18,6 +18,7 @@ import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingRegistry
 import net.nemerosa.ontrack.extension.av.properties.FilePropertyType
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
+import net.nemerosa.ontrack.extension.scm.service.SCMPullRequestStatus
 import net.nemerosa.ontrack.extension.scm.service.uploadLines
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
@@ -256,7 +257,7 @@ class AutoVersioningProcessingServiceImpl(
                                 AutoVersioningProcessingOutcome.CREATED
                             }
 
-                            AutoApprovalMode.CLIENT -> if (!pr.merged) {
+                            AutoApprovalMode.CLIENT -> if (pr.status != SCMPullRequestStatus.MERGED) {
                                 logger.debug("Processing auto versioning order PR timed out: {}", order)
                                 // Audit
                                 autoVersioningAuditService.onPRTimeout(

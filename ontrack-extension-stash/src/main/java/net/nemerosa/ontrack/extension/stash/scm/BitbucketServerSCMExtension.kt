@@ -12,10 +12,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
-import net.nemerosa.ontrack.extension.scm.service.SCM
-import net.nemerosa.ontrack.extension.scm.service.SCMExtension
-import net.nemerosa.ontrack.extension.scm.service.SCMPath
-import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
+import net.nemerosa.ontrack.extension.scm.service.*
 import net.nemerosa.ontrack.extension.stash.StashExtensionFeature
 import net.nemerosa.ontrack.extension.stash.client.BitbucketClient
 import net.nemerosa.ontrack.extension.stash.client.BitbucketClientFactory
@@ -156,7 +153,7 @@ class BitbucketServerSCMExtension(
             )
             val prId = pr.id
             // Auto approval process (approval + wait for checks + merge)
-            var merged = false
+            var status = SCMPullRequestStatus.UNKNOWN
             // Auto approval
             if (autoApproval) {
                 // Auto merge token must be set
@@ -176,7 +173,7 @@ class BitbucketServerSCMExtension(
                 if (remoteAutoMerge) {
                     error("Server-side auto merge is not supported for Bitbucket Server")
                 } else {
-                    merged = waitAndMerge(prId, from, message)
+                    status = waitAndMerge(prId, from, message)
                 }
             }
             // PR
@@ -184,7 +181,7 @@ class BitbucketServerSCMExtension(
                 id = pr.id.toString(),
                 name = "PR-${pr.id}",
                 link = "${configuration.url}/projects/${project}/repos/${repositoryName}/pull-requests/${pr.id}/overview",
-                merged = merged
+                status = status
             )
         }
 
@@ -267,7 +264,7 @@ class BitbucketServerSCMExtension(
             }
         }
 
-        private fun waitAndMerge(prId: Int, from: String, message: String): Boolean {
+        private fun waitAndMerge(prId: Int, from: String, message: String): SCMPullRequestStatus {
             // Waits for the PR checks to be OK
             val autoApprovalTimeoutMillis = settings.autoMergeTimeout
             val autoApprovalIntervalMillis = settings.autoMergeInterval
@@ -280,7 +277,7 @@ class BitbucketServerSCMExtension(
                 }
             }
             if (merged == null || !merged) {
-                return false
+                return client.getPR(repo, prId).status
             }
             // Merges the PR
             client.mergePR(
@@ -293,7 +290,7 @@ class BitbucketServerSCMExtension(
                 client.deleteBranch(repo, from)
             }
             // Merged
-            return true
+            return SCMPullRequestStatus.MERGED
         }
 
         private val client: BitbucketClient by lazy {

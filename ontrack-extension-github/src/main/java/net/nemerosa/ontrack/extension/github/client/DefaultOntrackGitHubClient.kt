@@ -383,6 +383,29 @@ class DefaultOntrackGitHubClient(
         }
         .build()
 
+    override fun getPR(
+        repository: String,
+        pr: Int
+    ): GitHubPR? {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Getting the PR
+        return try {
+            client("Get PR $repository#$pr") {
+                getForObject<GitHubPR?>("/repos/$owner/$name/pulls/$pr")
+            }
+        } catch (ex: GitHubErrorsException) {
+            if (ex.status == 404) {
+                null
+            } else {
+                throw ex
+            }
+        }
+    }
+
+    @Deprecated("Will be removed in V6. Use getPR instead.")
     override fun getPullRequest(repository: String, id: Int, ignoreError: Boolean): GitPullRequest? {
         // Getting a client
         val client = createGitHubRestTemplate()
@@ -586,7 +609,7 @@ class DefaultOntrackGitHubClient(
                     "/repos/${owner}/${name}/git/ref/heads/${branch}",
                     GitHubGetRefResponse::class.java
                 )?.`object`?.sha
-            } catch (ex: HttpClientErrorException.NotFound) {
+            } catch (_: HttpClientErrorException.NotFound) {
                 null
             }
         }
@@ -686,7 +709,9 @@ class DefaultOntrackGitHubClient(
                 number = number,
                 mergeable = mergeable,
                 mergeable_state = mergeable_state,
-                html_url = html_url
+                html_url = html_url,
+                state = state,
+                merged = merged,
             )
         } ?: throw IllegalStateException("PR creation response did not return a PR.")
     }
@@ -762,7 +787,7 @@ class DefaultOntrackGitHubClient(
             // We need both the mergeable flag and the mergeable state
             // Mergeable is not enough since it represents only the fact that the branch can be merged
             // from a Git-point of view and does not represent the checks
-            (response?.mergeable ?: false) && (response?.mergeable_state == "clean")
+            (response?.mergeable ?: false) && (response.mergeable_state == "clean")
         }
     }
 
@@ -1193,6 +1218,14 @@ class DefaultOntrackGitHubClient(
          * Link to the PR
          */
         val html_url: String?,
+        /**
+         * Merged status
+         */
+        val merged: Boolean,
+        /**
+         * State
+         */
+        val state: String,
     )
 
 }

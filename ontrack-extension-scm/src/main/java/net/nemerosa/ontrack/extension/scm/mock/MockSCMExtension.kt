@@ -10,10 +10,7 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
-import net.nemerosa.ontrack.extension.scm.service.SCM
-import net.nemerosa.ontrack.extension.scm.service.SCMExtension
-import net.nemerosa.ontrack.extension.scm.service.SCMPath
-import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
+import net.nemerosa.ontrack.extension.scm.service.*
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
 import net.nemerosa.ontrack.model.structure.*
@@ -67,7 +64,7 @@ class MockSCMExtension(
         val title: String,
         val body: String,
         val approved: Boolean,
-        val merged: Boolean,
+        val status: SCMPullRequestStatus,
         val reviewers: List<String>,
     )
 
@@ -160,7 +157,7 @@ class MockSCMExtension(
                 title = title,
                 body = body,
                 approved = autoApproval,
-                merged = autoApproval, // Merged immediately?
+                status = if (autoApproval) SCMPullRequestStatus.MERGED else SCMPullRequestStatus.OPEN, // Merged immediately?
                 reviewers = reviewers,
             )
 
@@ -177,7 +174,7 @@ class MockSCMExtension(
                 id = id.toString(),
                 name = "#$id",
                 link = "mock:pr:$id",
-                merged = pr.merged,
+                status = pr.status,
             )
         }
 

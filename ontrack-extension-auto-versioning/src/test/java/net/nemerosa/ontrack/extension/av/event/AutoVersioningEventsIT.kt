@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.av.event
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.createOrder
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
+import net.nemerosa.ontrack.extension.scm.service.SCMPullRequestStatus
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.events.EventTemplatingService
@@ -62,7 +63,7 @@ internal class AutoVersioningEventsIT : AbstractDSLTestSupport() {
                     id = "42",
                     name = "PR-42",
                     link = "https://scm/pr/42",
-                    merged = true,
+                    status = SCMPullRequestStatus.MERGED,
                 )
             )
             val text = eventTemplatingService.renderEvent(
@@ -118,7 +119,7 @@ internal class AutoVersioningEventsIT : AbstractDSLTestSupport() {
                     id = "42",
                     name = "PR-42",
                     link = "https://scm/pr/42",
-                    merged = true,
+                    status = SCMPullRequestStatus.OPEN,
                 )
             )
             val text = eventTemplatingService.renderEvent(

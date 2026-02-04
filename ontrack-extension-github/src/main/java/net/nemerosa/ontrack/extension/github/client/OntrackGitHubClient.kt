@@ -78,6 +78,7 @@ interface OntrackGitHubClient {
      * @param ignoreError If `true` in case of error, this method returns `null`
      * @return Details of the pull request or `null` if it does not exist
      */
+    @Deprecated("Will be removed in V6. Use getPR instead.")
     fun getPullRequest(repository: String, id: Int, ignoreError: Boolean = false): GitPullRequest?
 
     /**
@@ -226,6 +227,15 @@ interface OntrackGitHubClient {
      * @return PR mergeable state
      */
     fun isPRMergeable(repository: String, pr: Int): Boolean
+
+    /**
+     * Gets a PR using its ID.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param pr PR number
+     * @return PR details
+     */
+    fun getPR(repository: String, pr: Int): GitHubPR?
 
     /**
      * Merges a PR.

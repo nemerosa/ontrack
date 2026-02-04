@@ -43,6 +43,14 @@ class MockOntrackGitHubClient(
         TODO("Not yet implemented")
     }
 
+    override fun getPR(
+        repository: String,
+        pr: Int
+    ): GitHubPR {
+        TODO("Not yet implemented")
+    }
+
+    @Deprecated("Will be removed in V6. Use getPR instead.")
     override fun getPullRequest(
         repository: String,
         id: Int,

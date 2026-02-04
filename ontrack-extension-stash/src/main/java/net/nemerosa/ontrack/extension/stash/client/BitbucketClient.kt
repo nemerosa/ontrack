@@ -83,6 +83,11 @@ interface BitbucketClient {
     fun approvePR(repo: BitbucketRepository, prId: Int, user: String, token: String)
 
     /**
+     * Gets a PR using its ID.
+     */
+    fun getPR(repo: BitbucketRepository, prId: Int): BitbucketServerPR
+
+    /**
      * Checks if a PR can be merged.
      *
      * @param repo Repository where the PR is

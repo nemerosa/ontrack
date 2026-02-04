@@ -26,10 +26,7 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
-import net.nemerosa.ontrack.extension.scm.service.SCM
-import net.nemerosa.ontrack.extension.scm.service.SCMExtension
-import net.nemerosa.ontrack.extension.scm.service.SCMPath
-import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
+import net.nemerosa.ontrack.extension.scm.service.*
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.model.exceptions.InputException
@@ -171,7 +168,7 @@ class GitHubSCMExtension(
             )
             val prId = pr.number
             // Auto approval process (approval + wait for checks + merge)
-            var merged = false
+            var status = SCMPullRequestStatus.UNKNOWN
             // Auto approval
             if (autoApproval) {
                 // Approving using the auto merge account if provided
@@ -187,7 +184,7 @@ class GitHubSCMExtension(
                 if (remoteAutoMerge) {
                     client.enableAutoMerge(repository, pr.number, message)
                 } else {
-                    merged = waitAndMerge(prId, message)
+                    status = waitAndMerge(prId, message)
                 }
             }
             // PR
@@ -195,11 +192,11 @@ class GitHubSCMExtension(
                 id = pr.number.toString(),
                 name = "#${pr.number}",
                 link = pr.html_url ?: "",
-                merged = merged
+                status = status
             )
         }
 
-        private fun waitAndMerge(prId: Int, message: String): Boolean {
+        private fun waitAndMerge(prId: Int, message: String): SCMPullRequestStatus {
             // Waits for the PR checks to be OK
             // See https://docs.github.com/en/free-pro-team@latest/rest/guides/getting-started-with-the-git-database-api#checking-mergeability-of-pull-requests
             // for a reference
@@ -214,7 +211,7 @@ class GitHubSCMExtension(
                 }
             }
             if (merged == null || !merged) {
-                return false
+                return client.getPR(repository, prId)?.status ?: SCMPullRequestStatus.UNKNOWN
             }
             // Merges the PR
             client.mergePR(
@@ -223,7 +220,7 @@ class GitHubSCMExtension(
                 message
             )
             // Merged
-            return true
+            return SCMPullRequestStatus.MERGED
         }
 
         override fun getBuildCommit(build: Build): String? =

@@ -202,6 +202,14 @@ class BitbucketClientImpl(
         )
     }
 
+    override fun getPR(
+        repo: BitbucketRepository,
+        prId: Int
+    ): BitbucketServerPR =
+        template.getForObject<BitbucketServerPR>(
+            "/rest/api/latest/projects/${repo.project}/repos/${repo.repository}/pull-requests/${prId}",
+        )
+
     override fun isPRMergeable(repo: BitbucketRepository, prId: Int): Boolean {
         val response = template.getForObject<PRMergeableResponse>(
             "/rest/api/latest/projects/${repo.project}/repos/${repo.repository}/pull-requests/${prId}/merge",

@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
+import net.nemerosa.ontrack.extension.scm.service.SCMPullRequestStatus
 import net.nemerosa.ontrack.extension.stash.AbstractBitbucketTestSupport
 import net.nemerosa.ontrack.extension.stash.TestOnBitbucketServer
 import net.nemerosa.ontrack.extension.stash.bitbucketServerEnv
@@ -152,14 +153,14 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
     @Test
     fun `Creating a PR without auto approval`() {
         withPR(autoApproval = false) { _, pr, _, _ ->
-            assertFalse(pr.merged, "PR not merged")
+            assertEquals(SCMPullRequestStatus.OPEN, pr.status, "PR not merged")
         }
     }
 
     @Test
     fun `Creating a PR with auto approval`() {
         withPR(autoApproval = true) { _, pr, head, config ->
-            assertTrue(pr.merged, "PR is merged")
+            assertEquals(SCMPullRequestStatus.MERGED, pr.status, "PR is merged")
             // Checks that the source branch has been deleted
             val client = bitbucketClientFactory.getBitbucketClient(config)
             val repo = BitbucketRepository(
