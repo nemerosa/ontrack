@@ -16,8 +16,20 @@ import SelectBoolean from "@components/common/SelectBoolean";
 import SelectAutoVersioningAuditState from "@components/extension/auto-versioning/SelectAutoVersioningAuditState";
 import AutoVersioningSchedule from "@components/extension/auto-versioning/AutoVersioningSchedule";
 import {FaForwardStep} from "react-icons/fa6";
+import {useState} from "react";
+import AutoVersioningLoadPRStatusesButton
+    from "@components/extension/auto-versioning/AutoVersioningLoadPRStatusesButton";
 
 export default function AutoVersioningAuditView() {
+
+    const [loadPullRequests, setLoadPullRequests] = useState(false)
+    const [loadPullRequestsCount, setLoadPullRequestsCount] = useState(0)
+
+    const loadPRStatuses = () => {
+        setLoadPullRequests(true)
+        setLoadPullRequestsCount(value => value + 1)
+    }
+
     return (
         <>
             <Space className="ot-line" direction="vertical">
@@ -82,6 +94,9 @@ export default function AutoVersioningAuditView() {
                             <SelectAutoVersioningAuditState/>
                         </Form.Item>,
                     ]}
+                    filterExtraButtons={[
+                        <AutoVersioningLoadPRStatusesButton key="load-pr-statuses" onClick={loadPRStatuses}/>,
+                    ]}
                     query={
                         gql`
                             query AutoVersioningAudit(
@@ -95,6 +110,7 @@ export default function AutoVersioningAuditView() {
                                 $running: Boolean,
                                 $routing: String,
                                 $queue: String,
+                                $loadPullRequests: Boolean = false,
                             ) {
                                 autoVersioningAuditEntries(
                                     offset: $offset,
@@ -133,6 +149,12 @@ export default function AutoVersioningAuditView() {
                                             state
                                             data
                                         }
+                                        pullRequest @include(if: $loadPullRequests) {
+                                            id
+                                            name
+                                            link
+                                            status
+                                        }
                                         routing
                                         queue
                                         order {
@@ -170,7 +192,8 @@ export default function AutoVersioningAuditView() {
                     }
                     queryNode="autoVersioningAuditEntries"
                     autoRefresh={true}
-                    variables={{}}
+                    variables={{loadPullRequests}}
+                    reloadCount={loadPullRequestsCount}
                     filter={{}}
                     columns={[
                         {
@@ -283,7 +306,7 @@ export default function AutoVersioningAuditView() {
                         {
                             key: 'pr',
                             title: "PR",
-                            render: (_, entry) => <AutoVersioningAuditEntryPR entry={entry}/>,
+                            render: (_, entry) => <AutoVersioningAuditEntryPR entry={entry} displayStatus={true}/>,
                         },
                         {
                             key: 'timestamp',

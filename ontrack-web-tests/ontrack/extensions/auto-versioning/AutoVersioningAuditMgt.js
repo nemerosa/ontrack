@@ -28,9 +28,18 @@ export class AutoVersioningAuditMgt {
                         pageItems {
                             order {
                                 uuid
+                                branch {
+                                    id
+                                    name
+                                    project {
+                                        id
+                                        name
+                                    }
+                                }
                             }
                             mostRecentState {
                                 state
+                                data
                             }
                         }
                     }

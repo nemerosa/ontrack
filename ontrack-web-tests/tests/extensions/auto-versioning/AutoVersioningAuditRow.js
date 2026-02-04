@@ -27,4 +27,16 @@ export class AutoVersioningAuditRow {
         await detailsPage.expectOnPage()
         return detailsPage
     }
+
+    async expectPRStatusAbsent(prName) {
+        const cell = await this.row.getCell("PR")
+        const statusComponent = cell.locator(`[data-pr-name="${prName}"].ot-pr-status`)
+        await expect(statusComponent).not.toBeVisible()
+    }
+
+    async expectPRStatus(prName, status) {
+        const cell = await this.row.getCell("PR")
+        const statusComponent = cell.locator(`[data-pr-name="${prName}"].ot-pr-status`)
+        await expect(statusComponent).toHaveText(status)
+    }
 }

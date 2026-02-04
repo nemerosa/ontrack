@@ -3,6 +3,7 @@ const {ValidationRunHistoryDialog} = require("../validationRuns/ValidationRunHis
 const {SCMChangeLogPage} = require("../../extensions/scm/scm");
 const {PromotionsPage} = require("../promotionLevels/PromotionsPage");
 const {confirmBox} = require("../../support/confirm");
+const {BranchLinksPage} = require("./BranchLinksPage");
 
 class BranchPage {
     constructor(page, branch) {
@@ -86,6 +87,15 @@ class BranchPage {
         await expect(button).toBeVisible()
         await button.click()
         await confirmBox(this.page, "Delete branch", {okText: "Delete"})
+    }
+
+    async displayBranchLinks() {
+        const button = this.page.getByRole('button', {name: 'Links', exact: true})
+        await expect(button).toBeVisible()
+        await button.click()
+        const branchLinksPage = new BranchLinksPage(this.page, this.branch.ontrack, this.branch)
+        await branchLinksPage.expectOnPage()
+        return branchLinksPage
     }
 }
 

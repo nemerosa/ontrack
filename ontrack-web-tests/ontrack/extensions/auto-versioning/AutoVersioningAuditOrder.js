@@ -1,5 +1,6 @@
 export class AutoVersioningAuditOrder {
-    constructor({uuid}) {
+    constructor({uuid, branch}) {
         this.uuid = uuid
+        this.branch = branch
     }
 }

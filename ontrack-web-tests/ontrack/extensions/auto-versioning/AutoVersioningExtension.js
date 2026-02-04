@@ -9,6 +9,31 @@ export class AutoVersioningExtension {
         this.audit = new AutoVersioningAuditMgt(ontrack)
     }
 
+    async autoVersioningCheck(build) {
+        return await graphQLCallMutation(
+            this.ontrack.connection,
+            'checkAutoVersioning',
+            gql`
+                mutation AutoVersioningCheck($project: String!, $branch: String!, $build: String!) {
+                    checkAutoVersioning(input: {
+                        project: $project,
+                        branch: $branch,
+                        build: $build
+                    }) {
+                        errors {
+                            message
+                        }
+                    }
+                }
+            `,
+            {
+                project: build.branch.project.name,
+                branch: build.branch.name,
+                build: build.name,
+            }
+        )
+    }
+
     async setAutoVersioningConfig(branch, config) {
         await graphQLCallMutation(
             this.ontrack.connection,

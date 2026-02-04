@@ -14,6 +14,13 @@ export class Table {
         return new TableRow(this.page, this, row)
     }
 
+    async getRowByIndex(index) {
+        const row = this.table.getByRole('row').nth(index)
+        await expect(row).toBeVisible()
+
+        return new TableRow(this.page, this, row)
+    }
+
     async getColumnIndex(columnName) {
         const nameColumnIndex = await this.table.locator('thead tr th').allTextContents()
         const index = nameColumnIndex.indexOf(columnName)

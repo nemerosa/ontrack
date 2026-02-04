@@ -54,5 +54,7 @@ const buildInstance = (branch, data) => {
     build.validate = async (validationStamp, config) => createValidationRun(build, validationStamp, config)
     build.linkTo = async (other, qualifier = "") => createBuildLink(build, other, qualifier)
 
+    build.autoVersioningCheck = async () => build.ontrack.autoVersioning.autoVersioningCheck(build)
+
     return build
 }

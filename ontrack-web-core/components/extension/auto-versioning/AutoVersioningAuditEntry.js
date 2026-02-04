@@ -35,7 +35,7 @@ export default function AutoVersioningAuditEntry({entry}) {
         {
             key: 'pr',
             label: "Pull request",
-            children: <AutoVersioningAuditEntryPR entry={entry}/>,
+            children: <AutoVersioningAuditEntryPR entry={entry} displayStatus={true}/>,
         },
         {
             key: 'promotion',

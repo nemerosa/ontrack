@@ -64,6 +64,11 @@ export default function AutoVersioningAuditEntryView({uuid}) {
                                     state
                                     data
                                 }
+                                pullRequest {
+                                    name
+                                    link
+                                    status
+                                }
                                 routing
                                 queue
                                 upgradeBranch

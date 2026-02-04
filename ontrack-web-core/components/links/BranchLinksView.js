@@ -12,6 +12,9 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
 import {FaTable} from "react-icons/fa";
 import BranchLinksModeButton from "@components/links/BranchLinksModeButton";
+import AutoVersioningLoadPRStatusesButton
+    from "@components/extension/auto-versioning/AutoVersioningLoadPRStatusesButton";
+import {Space} from "antd";
 
 export default function BranchLinksView({id}) {
 
@@ -20,6 +23,14 @@ export default function BranchLinksView({id}) {
     const [loadingBranch, setLoadingBranch] = useState(true)
     const [branch, setBranch] = useState({project: {}})
     const [commands, setCommands] = useState([])
+
+    const [loadPullRequests, setLoadPullRequests] = useState(false)
+    const [loadPullRequestsCount, setLoadPullRequestsCount] = useState(0)
+
+    const loadPRStatuses = () => {
+        setLoadPullRequests(true)
+        setLoadPullRequestsCount(value => value + 1)
+    }
 
     useEffect(() => {
         if (id && client) {
@@ -70,13 +81,14 @@ export default function BranchLinksView({id}) {
                     <PageSection
                         title={undefined}
                         extra={
-                            <>
+                            <Space>
+                                <AutoVersioningLoadPRStatusesButton onClick={loadPRStatuses}/>
                                 <AutoRefreshButton/>
-                            </>
+                            </Space>
                         }
                         padding={false}
                     >
-                        <BranchLinksGraph branch={branch}/>
+                        <BranchLinksGraph branch={branch} loadPullRequests={loadPullRequests} loadPullRequestsCount={loadPullRequestsCount}/>
                     </PageSection>
                 </AutoRefreshContextProvider>
             </MainPage>

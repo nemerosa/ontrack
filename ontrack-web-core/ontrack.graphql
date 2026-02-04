@@ -138,6 +138,8 @@ type AutoVersioningAuditEntry {
   order: AutoVersioningOrder!
   "Promotion which triggered the auto-versioning"
   promotionRun: PromotionRun
+  "Associated pull request if any"
+  pullRequest: SCMPullRequest
   "Actual queue where the order was posted"
   queue: String
   "Queue routing key used for this order"
@@ -5236,6 +5238,11 @@ type Query {
     "Size of the page"
     size: Int = 20
   ): AutoVersioningAuditEntryPaginated
+  "Gets an audit entry using its UUID"
+  autoVersioningAuditEntry(
+    "UUID of the entry"
+    uuid: String!
+  ): AutoVersioningAuditEntry
   "List of possible states for auto version audit entries"
   autoVersioningAuditStates: [String!]!
   "Getting a branch using its ID"
@@ -6144,6 +6151,18 @@ type SCMIssueInfo {
   issueServiceConfigurationRepresentation: IssueServiceConfigurationRepresentation!
   "scmCommitInfo field"
   scmCommitInfo: SCMCommitInfo
+}
+
+"Information about a pull request"
+type SCMPullRequest {
+  "id field"
+  id: String!
+  "link field"
+  link: String!
+  "name field"
+  name: String!
+  "Status of the PR"
+  status: SCMPullRequestStatus!
 }
 
 "Output type for the saveBuildFilter mutation."
@@ -8276,6 +8295,14 @@ enum QueueRecordState {
   ROUTING_READY
   SENT
   STARTED
+}
+
+"Status of a pull request"
+enum SCMPullRequestStatus {
+  DECLINED
+  MERGED
+  OPEN
+  UNKNOWN
 }
 
 "Type of change in a deployment"

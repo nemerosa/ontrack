@@ -38,11 +38,16 @@ export class SimpleAutoVersioning {
             sourcePromotion: 'GOLD',
             targetPath: 'versions.properties',
             targetProperty: 'version',
+            validationStamp: 'auto',
         })
     }
 
     async createDepBuild(name) {
         return this.depBranch.createBuild(name)
+    }
+
+    async createTargetBuild(name) {
+        return this.targetBranch.createBuild(name)
     }
 
     async promoteDepBuild(depBuild) {

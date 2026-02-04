@@ -2,8 +2,9 @@ import {FaCodeBranch} from "react-icons/fa";
 import {Typography} from "antd";
 import Link from "next/link";
 import Columns from "@components/common/Columns";
+import {AutoVersioningAuditEntryPRStatus} from "@components/extension/auto-versioning/AutoVersioningAuditEntryPRStatus";
 
-export default function AutoVersioningPRLink({autoVersioningStatusMostRecentStateData, size}) {
+export default function AutoVersioningPRLink({autoVersioningStatusMostRecentStateData, pullRequestStatus, size}) {
     return (
         <>
             {
@@ -16,6 +17,10 @@ export default function AutoVersioningPRLink({autoVersioningStatusMostRecentStat
                         <Link
                             href={autoVersioningStatusMostRecentStateData.prLink}>{autoVersioningStatusMostRecentStateData.prName}</Link>
                     </Typography.Text>
+                    {
+                        pullRequestStatus && pullRequestStatus.status &&
+                        <AutoVersioningAuditEntryPRStatus prName={autoVersioningStatusMostRecentStateData.prName} status={pullRequestStatus.status}/>
+                    }
                 </Columns>
             }
         </>

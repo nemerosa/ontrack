@@ -58,7 +58,9 @@ export default function AutoVersioningInfo({autoVersioning, branchLink}) {
                                         </Typography.Text>
                                     </Columns>
                                     <AutoVersioningPRLink
-                                        autoVersioningStatusMostRecentStateData={autoVersioning.status.mostRecentState.data}/>
+                                        autoVersioningStatusMostRecentStateData={autoVersioning.status.mostRecentState.data}
+                                        pullRequestStatus={autoVersioning.status.pullRequest}
+                                    />
                                     <Columns>
                                         <FaInfoCircle color="blue"/>
                                         <Link
@@ -78,6 +80,7 @@ export default function AutoVersioningInfo({autoVersioning, branchLink}) {
                     autoVersioning.status &&
                     <AutoVersioningPRLink
                         autoVersioningStatusMostRecentStateData={autoVersioning.status.mostRecentState.data}
+                        pullRequestStatus={autoVersioning.status.pullRequest}
                         size={8}
                     />
                 }

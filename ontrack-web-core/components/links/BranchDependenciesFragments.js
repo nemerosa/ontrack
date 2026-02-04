@@ -76,6 +76,12 @@ const gqlDownstreamDependencies = (depth) => {
                             ...BuildInfo
                         }
                         status {
+                            pullRequest @include(if: $loadPullRequests) {
+                                id
+                                name
+                                link
+                                status
+                            }
                             order {
                                 uuid
                                 targetVersion
@@ -124,7 +130,7 @@ const gqlUpstreamDependencies = (depth) => {
 }
 
 export const branchQuery = ({downstream, upstream}) => `
-        query RootBranch($branchId: Int!) {
+        query RootBranch($branchId: Int!, $loadPullRequests: Boolean! = false) {
             branch(id: $branchId) {
                 ...BranchNodeInfo
                 ${downstream ? gqlDownstreamDependencies(maxDownstreamDepth) : ''}

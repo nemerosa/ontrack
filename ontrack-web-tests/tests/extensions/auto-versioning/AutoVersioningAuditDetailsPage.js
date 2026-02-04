@@ -9,6 +9,11 @@ export class AutoVersioningAuditDetailsPage {
         this.uuid = uuid
     }
 
+    async goTo() {
+        await this.page.goto(`${this.ontrack.connection.ui}/extension/auto-versioning/audit/detail/${this.uuid}`)
+        await this.expectOnPage()
+    }
+
     async expectOnPage() {
         await expect(this.page.getByText("Auto-versioning audit entry")).toBeVisible()
         await expect(this.page.getByText(this.uuid).nth(1)).toBeVisible()
@@ -40,6 +45,10 @@ export class AutoVersioningAuditDetailsPage {
                 }
             }
         })
+    }
+
+    async expectPRLink(prName) {
+        await expect(this.page.getByRole('link', {name: prName, exact: true})).toBeVisible()
     }
 
 }

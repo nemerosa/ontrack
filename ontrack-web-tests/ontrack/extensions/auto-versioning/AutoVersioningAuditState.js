@@ -1,5 +1,6 @@
 export class AutoVersioningAuditState {
-    constructor({state}) {
+    constructor({state, data}) {
         this.state = state
+        this.data = data
     }
 }

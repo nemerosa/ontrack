@@ -17,4 +17,9 @@ export class AutoVersioningAuditPage {
         await row.expectToBeVisible()
         return row
     }
+
+    async loadPRStatuses() {
+        const button = this.page.getByRole('button', {name: 'Load PR statuses'})
+        await button.click()
+    }
 }

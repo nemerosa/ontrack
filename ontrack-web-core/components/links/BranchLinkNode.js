@@ -35,6 +35,7 @@ export default function BranchLinkNode({data}) {
                     border: selected ? 'solid 3px black' : 'dashed 1px gray',
                     backgroundColor: latestOk ? undefined : '#ffcccc'
                 }}
+                data-testid={`ot-branch-link-node-${sourceBranch.project.name}-${targetBranch.project.name}`}
             >
                 <Space direction="vertical">
                     <Space>

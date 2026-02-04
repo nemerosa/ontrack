@@ -17,7 +17,7 @@ import {AutoRefreshContext} from "@components/common/AutoRefresh";
 import {edgeStyle} from "@components/links/LinksGraphConstants";
 import {branchQuery} from "@components/links/BranchDependenciesFragments";
 
-function BranchLinksFlow({branch}) {
+function BranchLinksFlow({branch, loadPullRequests, loadPullRequestsCount}) {
 
     const client = useGraphQLClient()
 
@@ -225,7 +225,10 @@ function BranchLinksFlow({branch}) {
             setLoading(true)
             client.request(
                 branchQuery({downstream: true, upstream: true}),
-                {branchId: Number(branch.id)}
+                {
+                    branchId: Number(branch.id),
+                    loadPullRequests,
+                }
             ).then(data => {
 
                 setLayoutDone(false)
@@ -256,7 +259,7 @@ function BranchLinksFlow({branch}) {
                 setLoading(false)
             })
         }
-    }, [client, branch, autoRefreshCount]);
+    }, [client, branch, autoRefreshCount, loadPullRequestsCount]);
 
     const onNodesChange = useCallback(
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -342,11 +345,11 @@ function BranchLinksFlow({branch}) {
     )
 }
 
-export default function BranchLinksGraph({branch}) {
+export default function BranchLinksGraph({branch, loadPullRequests, loadPullRequestsCount}) {
     return (
         <>
             <ReactFlowProvider>
-                <BranchLinksFlow branch={branch}/>
+                <BranchLinksFlow branch={branch} loadPullRequests={loadPullRequests} loadPullRequestsCount={loadPullRequestsCount}/>
             </ReactFlowProvider>
         </>
     )

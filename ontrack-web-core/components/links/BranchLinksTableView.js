@@ -18,6 +18,8 @@ import ProjectLink from "@components/projects/ProjectLink";
 import BuildPromotions from "@components/links/BuildPromotions";
 import CheckStatus from "@components/common/CheckStatus";
 import AutoVersioningInfo from "@components/extension/auto-versioning/AutoVersioningInfo";
+import AutoVersioningLoadPRStatusesButton
+    from "@components/extension/auto-versioning/AutoVersioningLoadPRStatusesButton";
 
 export default function BranchLinksTableView({id}) {
 
@@ -76,6 +78,14 @@ export default function BranchLinksTableView({id}) {
         }
     }
 
+    const [loadPullRequests, setLoadPullRequests] = useState(false)
+    const [loadPullRequestsCount, setLoadPullRequestsCount] = useState(0)
+
+    const loadPRStatuses = () => {
+        setLoadPullRequests(true)
+        setLoadPullRequestsCount(value => value + 1)
+    }
+
     return (
         <>
             <Head>
@@ -94,11 +104,16 @@ export default function BranchLinksTableView({id}) {
                 />
                 <LoadingContainer loading={loading}>
                     <StandardTable
-                        id="branch-dependencies"
+                        id="branch-links"
                         filter={{}}
-                        variables={{branchId: Number(id)}}
+                        variables={{branchId: Number(id), loadPullRequests}}
                         query={branchQuery({downstream: true})}
                         queryNode={(data, filterFormData) => flattenDependencies(data, filterFormData)}
+                        rowKey={link => `${link.targetBuild.branch.project.name}-${link.sourceBuild.branch.project.name}`}
+                        reloadCount={loadPullRequestsCount}
+                        filterExtraButtons={[
+                            <AutoVersioningLoadPRStatusesButton key="load-pr-statuses" onClick={loadPRStatuses}/>,
+                        ]}
                         columns={[
                             {
                                 key: 'consumer',
