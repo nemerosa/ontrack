@@ -229,7 +229,7 @@ $actualContent
         val title: String,
         val body: String,
         val approved: Boolean,
-        val merged: Boolean,
+        val status: String,
         val reviewers: List<String>,
     )
 

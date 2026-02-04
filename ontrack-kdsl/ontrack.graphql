@@ -138,6 +138,8 @@ type AutoVersioningAuditEntry {
   order: AutoVersioningOrder!
   "Promotion which triggered the auto-versioning"
   promotionRun: PromotionRun
+  "Associated pull request if any"
+  pullRequest: SCMPullRequest
   "Actual queue where the order was posted"
   queue: String
   "Queue routing key used for this order"
@@ -230,6 +232,8 @@ type AutoVersioningOrder {
   repositoryHtmlURL: String
   "List of reviewers to always add to the pull request"
   reviewers: [String!]!
+  "Schedule time"
+  schedule: LocalDateTime
   "Source project for the processing order"
   sourceProject: String!
   "Source promotion for the processing order"
@@ -270,8 +274,8 @@ type AutoVersioningSourceConfig {
   buildLinkCreation: Boolean
   "Cron schedule (when to start applying queued requests)"
   cronSchedule: String
-  "Maximum number of retries. If null or 0, no retry is performed."
-  maxRetries: Int
+  "Set if this configuration is disabled"
+  disabled: Boolean
   "List of notifications subscriptions to setup for this auto versioning"
   notifications: [AutoVersioningNotification!]
   "Type of post processing to launch after the version has been updated"
@@ -286,10 +290,6 @@ type AutoVersioningSourceConfig {
   prTitleTemplate: String
   "Qualifier for the build link to create (when links are created)"
   qualifier: String
-  "Exponential factor. 1.0 means that the interval is linear. If null, default value is taken from the setings. If < 1, 1.0 is assumer."
-  retryIntervalFactor: Float
-  "Exponential interval to wait between retries. If null, default value is taken from the settings."
-  retryIntervalSeconds: Int
   "List of reviewers to always set on the pull request created by the auto versioning"
   reviewers: [String!]
   "Branches to watch using a regular expression"
@@ -308,8 +308,6 @@ type AutoVersioningSourceConfig {
   targetPropertyType: String
   "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
   targetRegex: String
-  "Number of requests to keep at one given moment. If > 0, this is an actual throttling of the requests for this configuration."
-  throttling: Int
   "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`"
   upgradeBranchPattern: String
   "Validation stamp to create on auto versioning (optional)"
@@ -2783,6 +2781,62 @@ type JobExecutionStatus {
   paused: Boolean!
 }
 
+"Histogram of run durations and status for a job"
+type JobHistogram {
+  "from field"
+  from: LocalDateTime!
+  "interval field"
+  interval: String!
+  "items field"
+  items: [JobHistogramItem!]!
+  "to field"
+  to: LocalDateTime!
+}
+
+"Histogram item for a job"
+type JobHistogramItem {
+  "avgDurationMs field"
+  avgDurationMs: Int
+  "count field"
+  count: Int
+  "error field"
+  error: Boolean
+  "errorCount field"
+  errorCount: Int
+  "from field"
+  from: LocalDateTime!
+  "maxDurationMs field"
+  maxDurationMs: Int
+  "minDurationMs field"
+  minDurationMs: Int
+  "to field"
+  to: LocalDateTime!
+}
+
+"History item for a job"
+type JobHistoryItem {
+  "duration field"
+  duration: String!
+  "Duration in milliseconds"
+  durationMs: Int
+  "endedAt field"
+  endedAt: LocalDateTime!
+  "id field"
+  id: Int
+  "jobCategory field"
+  jobCategory: String!
+  "jobKey field"
+  jobKey: String!
+  "jobType field"
+  jobType: String!
+  "message field"
+  message: String
+  "startedAt field"
+  startedAt: LocalDateTime!
+  "status field"
+  status: JobHistoryItemStatus!
+}
+
 "JobIngestionConfigValidation"
 type JobIngestionConfigValidation {
   "Description for the validation stamp"
@@ -2851,6 +2905,28 @@ type JobStatus {
   isTimeout: Boolean
   "isValid field"
   isValid: Boolean
+  "Histogram of run durations and statuses for this job"
+  jobHistogram(
+    "Start of the history"
+    from: LocalDateTime,
+    "Interval for the histogram"
+    interval: String,
+    "Period for the histogram (used instead of from/to"
+    period: String,
+    "Skipping the runs in error"
+    skipErrors: Boolean,
+    "End of the history"
+    to: LocalDateTime
+  ): JobHistogram
+  "List of runs for this job"
+  jobHistory(
+    "Start of the history"
+    from: LocalDateTime,
+    "Skipping the runs in error"
+    skipErrors: Boolean,
+    "End of the history"
+    to: LocalDateTime
+  ): [JobHistoryItem!]!
   "key field"
   key: JobKey!
   "lastError field"
@@ -3809,6 +3885,11 @@ type Mutation {
     "Input for the mutation"
     input: ReorderPromotionLevelByIdInput
   ): ReorderPromotionLevelByIdPayload
+  "Rescheduling an auto-versioning order"
+  rescheduleAutoVersioning(
+    "Input for the mutation"
+    input: RescheduleAutoVersioningInput
+  ): RescheduleAutoVersioningPayload
   "Resuming the execution of all jobs"
   resumeAllJobs: JobActionResult!
   "Resumes a job"
@@ -4951,6 +5032,13 @@ type ProjectIndicators {
   project: Project
 }
 
+type ProjectPaginated {
+  "Information about the current page"
+  pageInfo: PageInfo
+  "Items in the current page"
+  pageItems: [Project!]!
+}
+
 type ProjectRole {
   "description field"
   description: String!
@@ -5150,6 +5238,11 @@ type Query {
     "Size of the page"
     size: Int = 20
   ): AutoVersioningAuditEntryPaginated
+  "Gets an audit entry using its UUID"
+  autoVersioningAuditEntry(
+    "UUID of the entry"
+    uuid: String!
+  ): AutoVersioningAuditEntry
   "List of possible states for auto version audit entries"
   autoVersioningAuditStates: [String!]!
   "Getting a branch using its ID"
@@ -5442,6 +5535,15 @@ type Query {
   ): NotificationRecordPaginated
   "Notification settings"
   notificationSettings: NotificationSettings
+  "Paginated list of projects"
+  paginatedProjects(
+    "Fragment of the project name to filter on"
+    name: String,
+    "Offset for the page"
+    offset: Int = 0,
+    "Size of the page"
+    size: Int = 20
+  ): ProjectPaginated
   "List of permission targets"
   permissionTargets(
     "Part of the name of the permission target to look for"
@@ -5825,6 +5927,14 @@ type ReorderPromotionLevelByIdPayload implements Payload {
   errors: [UserError]
 }
 
+"Output type for the rescheduleAutoVersioning mutation."
+type RescheduleAutoVersioningPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+  "Rescheduled order"
+  order: AutoVersioningOrder
+}
+
 "Output type for the revokeAccountTokens mutation."
 type RevokeAccountTokensPayload implements Payload {
   "List of errors"
@@ -5962,6 +6072,13 @@ type SCMChangeLog {
     "Renderer to use for the change log rendering"
     renderer: String
   ): String
+  "Semantic change log"
+  semantic(
+    "Configuration for the rendering"
+    config: SemanticChangeLogTemplatingServiceConfig,
+    "Renderer to use for the change log rendering"
+    renderer: String
+  ): String
   "Boundary for the change log"
   to: Build!
 }
@@ -6034,6 +6151,18 @@ type SCMIssueInfo {
   issueServiceConfigurationRepresentation: IssueServiceConfigurationRepresentation!
   "scmCommitInfo field"
   scmCommitInfo: SCMCommitInfo
+}
+
+"Information about a pull request"
+type SCMPullRequest {
+  "id field"
+  id: String!
+  "link field"
+  link: String!
+  "name field"
+  name: String!
+  "Status of the PR"
+  status: SCMPullRequestStatus!
 }
 
 "Output type for the saveBuildFilter mutation."
@@ -7020,6 +7149,8 @@ type SlotPipeline {
   changes: [SlotPipelineChange!]!
   "end field"
   end: LocalDateTime
+  "Error message if any"
+  errorMessage: String
   "Can this deployment be completed?"
   finishAction: SlotPipelineDeploymentStatusProgress
   "Is the pipeline finished?"
@@ -7984,7 +8115,6 @@ enum AutoVersioningAuditState {
   POST_PROCESSING_LAUNCHED
   POST_PROCESSING_START
   PROCESSING_ABORTED
-  PROCESSING_CANCELLED
   PROCESSING_CREATING_BRANCH
   PROCESSING_START
   PROCESSING_UPDATING_FILE
@@ -8089,6 +8219,12 @@ enum IngestionHookPayloadStatus {
   SCHEDULED
 }
 
+"Status of a job history item"
+enum JobHistoryItemStatus {
+  ERROR
+  SUCCESS
+}
+
 "Global state of a job"
 enum JobState {
   DISABLED
@@ -8159,6 +8295,14 @@ enum QueueRecordState {
   ROUTING_READY
   SENT
   STARTED
+}
+
+"Status of a pull request"
+enum SCMPullRequestStatus {
+  DECLINED
+  MERGED
+  OPEN
+  UNKNOWN
 }
 
 "Type of change in a deployment"
@@ -8279,8 +8423,8 @@ input AutoVersioningSourceConfigInput {
   buildLinkCreation: Boolean
   "Cron schedule (when to start applying queued requests)"
   cronSchedule: String
-  "Maximum number of retries. If null or 0, no retry is performed."
-  maxRetries: Int
+  "Set if this configuration is disabled"
+  disabled: Boolean
   "List of notifications subscriptions to setup for this auto versioning"
   notifications: [AutoVersioningNotificationInput!]
   "Type of post processing to launch after the version has been updated"
@@ -8295,10 +8439,6 @@ input AutoVersioningSourceConfigInput {
   prTitleTemplate: String
   "Qualifier for the build link to create (when links are created)"
   qualifier: String
-  "Exponential factor. 1.0 means that the interval is linear. If null, default value is taken from the setings. If < 1, 1.0 is assumer."
-  retryIntervalFactor: Float
-  "Exponential interval to wait between retries. If null, default value is taken from the settings."
-  retryIntervalSeconds: Int
   "List of reviewers to always set on the pull request created by the auto versioning"
   reviewers: [String!]
   "Branches to watch using a regular expression"
@@ -8317,8 +8457,6 @@ input AutoVersioningSourceConfigInput {
   targetPropertyType: String
   "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
   targetRegex: String
-  "Number of requests to keep at one given moment. If > 0, this is an actual throttling of the requests for this configuration."
-  throttling: Int
   "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`"
   upgradeBranchPattern: String
   "Validation stamp to create on auto versioning (optional)"
@@ -9909,6 +10047,12 @@ input ReorderPromotionLevelByIdInput {
   oldName: String!
 }
 
+"Input type for the rescheduleAutoVersioning mutation."
+input RescheduleAutoVersioningInput {
+  "UUID of the order to reschedule"
+  uuid: String!
+}
+
 "Input type for the revokeAccountTokens mutation."
 input RevokeAccountTokensInput {
   "accountId field"
@@ -10061,6 +10205,24 @@ input ScheduleAutoVersioningInput {
 input SelectDashboardInput {
   "UUID of the dashboard to select"
   uuid: String!
+}
+
+"SemanticChangeLogTemplatingServiceConfig"
+input SemanticChangeLogTemplatingServiceConfig {
+  "Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence."
+  allQualifiers: Boolean
+  "If a qualifier has no previous link, uses the default qualifier (empty) qualifier."
+  defaultQualifierFallback: Boolean
+  "Comma-separated list of project links to follow one by one for a get deep change log. Each item in the list is either a project name, or a project name and qualifier separated by a colon (:)."
+  dependencies: [String!]
+  "Use emojis in the section titles"
+  emojis: Boolean
+  "Types to exclude"
+  exclude: [String!]
+  "Must a section for changelog actual issues be present?"
+  issues: Boolean
+  "List of type=title sections"
+  sections: [String!]
 }
 
 "Input type for the setAutoVersioningConfigByName mutation."
