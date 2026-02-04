@@ -51,4 +51,9 @@ export class AutoVersioningAuditDetailsPage {
         await expect(this.page.getByRole('link', {name: prName, exact: true})).toBeVisible()
     }
 
+    async expectPRStatus(prName, status) {
+        const statusComponent = this.page.locator(`[data-pr-name="${prName}"].ot-pr-status`)
+        await expect(statusComponent).toHaveText(status)
+    }
+
 }
