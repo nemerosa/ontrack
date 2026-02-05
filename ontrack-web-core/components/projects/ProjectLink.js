@@ -2,10 +2,10 @@ import Link from "next/link";
 import {projectUri} from "@components/common/Links";
 import ShortenedName from "@components/common/ShortenedName";
 
-export default function ProjectLink({project, text, shorten}) {
+export default function ProjectLink({project, text, shorten, className}) {
     return (
         <>
-            <Link href={projectUri(project)}>
+            <Link href={projectUri(project)} className={className}>
                 {
                     text ?? (
                         shorten ? <ShortenedName text={project.name}/> : project.name
