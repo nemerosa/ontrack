@@ -126,38 +126,6 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Verify fix for cross-project ID comparison in downstream dependencies`() {
-        asAdmin {
-            // We need a target project to have a build with a LARGER ID than source project's build,
-            // but we want to simulate the case where an OLDER target build is already collected.
-
-            val targetBranch = project().branch()
-            val targetBuild1 = targetBranch.build("1") // Smaller ID
-            val targetBuild2 = targetBranch.build("2") // Larger ID
-
-            project {
-                branch {
-                    val sourceBuild1 = build("10")
-                    val sourceBuild2 = build("11")
-
-                    // sourceBuild2 -> targetBuild1
-                    sourceBuild2.linkTo(targetBuild1)
-                    
-                    // sourceBuild1 -> targetBuild2
-                    sourceBuild1.linkTo(targetBuild2)
-
-                    val links = branchLinksService.getDownstreamDependencies(this, 10)
-                    assertEquals(1, links.size)
-
-                    // The logic in BranchLinksServiceImpl takes the link with the most recent TARGET build
-                    val newestTargetBuild = if (targetBuild1.id.value >= targetBuild2.id.value) targetBuild1 else targetBuild2
-                    assertEquals(newestTargetBuild.id.value, links[0].targetBuild.id.value)
-                }
-            }
-        }
-    }
-
-    @Test
     fun `Verify fix for cross-project ID comparison - scenario where it could fail before`() {
         asAdmin {
             val targetBranch = project().branch()
@@ -178,9 +146,9 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
                     val links = branchLinksService.getDownstreamDependencies(this, 10)
                     assertEquals(1, links.size)
                     
-                    // It should keep the link that points to the most recent TARGET build
-                    val newestTargetBuild = if (targetBuild1.id.value >= targetBuild2.id.value) targetBuild1 else targetBuild2
-                    assertEquals(newestTargetBuild.id.value, links[0].targetBuild.id.value)
+                    // It should keep the link that points to the most recent SOURCE build
+                    assertEquals(sourceBuild2.id, links[0].sourceBuild.id)
+                    assertEquals(targetBuild1.id, links[0].targetBuild.id)
                 }
             }
         }

@@ -49,9 +49,7 @@ class BranchLinksServiceImpl(
         val existingBuild = nextBuilds[key]
         if (existingBuild != null) {
             // Takes the new build if more recent
-            if (linkInfo.sourceBuild.id() > existingBuild.sourceBuild.id() ||
-                linkInfo.targetBuild.id() > existingBuild.targetBuild.id()
-            ) {
+            if (linkInfo.sourceBuild.id() > existingBuild.sourceBuild.id()) {
                 nextBuilds[key] = linkInfo
             }
         } else {
