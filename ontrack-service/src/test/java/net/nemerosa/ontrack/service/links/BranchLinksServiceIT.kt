@@ -185,4 +185,55 @@ class BranchLinksServiceIT : AbstractDSLTestSupport() {
             }
         }
     }
+
+    @Test
+    fun `Multiple source builds pointing to the same target build`() {
+        asAdmin {
+            val targetProject = project()
+            val targetBranch = targetProject.branch("main")
+            val targetBuild = targetBranch.build("1.70")
+
+            project {
+                branch {
+                    val sourceBuild1 = build("1.40.7")
+                    val sourceBuild2 = build("1.40.8")
+
+                    // Both source builds point to the same target build
+                    sourceBuild1.linkTo(targetBuild)
+                    sourceBuild2.linkTo(targetBuild)
+
+                    val links = branchLinksService.getDownstreamDependencies(this, 10)
+                    assertEquals(1, links.size, "Only one link expected for the target branch")
+                    assertEquals(targetBranch.id, links[0].branch.id)
+                    assertEquals(sourceBuild2.id, links[0].sourceBuild.id, "Expected link from 1.40.8")
+                    assertEquals(targetBuild.id, links[0].targetBuild.id)
+                }
+            }
+        }
+    }
+    @Test
+    fun `Multiple target builds pointing to the same source build (upstream)`() {
+        asAdmin {
+            val sourceProject = project()
+            val sourceBranch = sourceProject.branch("main")
+            val sourceBuild = sourceBranch.build("1.70")
+
+            project {
+                branch {
+                    val targetBuild1 = build("1.40.7")
+                    val targetBuild2 = build("1.40.8")
+
+                    // Both target builds point to the same source build
+                    targetBuild1.linkTo(sourceBuild)
+                    targetBuild2.linkTo(sourceBuild)
+
+                    val links = branchLinksService.getUpstreamDependencies(sourceBranch, 10)
+                    assertEquals(1, links.size, "Only one link expected for the target branch")
+                    assertEquals(this.id, links[0].branch.id)
+                    assertEquals(targetBuild2.id, links[0].sourceBuild.id, "Expected link from 1.40.8")
+                    assertEquals(sourceBuild.id, links[0].targetBuild.id)
+                }
+            }
+        }
+    }
 }
