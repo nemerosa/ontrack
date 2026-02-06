@@ -48,8 +48,14 @@ class BranchLinksServiceImpl(
         // Existing build?
         val existingBuild = nextBuilds[key]
         if (existingBuild != null) {
+            // We need to compare the linked builds (the ones that define the key)
+            val existingLinkedBuild = if (existingBuild.targetBuild.project.id == buildLink.build.project.id) {
+                existingBuild.targetBuild
+            } else {
+                existingBuild.sourceBuild
+            }
             // Takes the new build if more recent
-            if (buildLink.build.id() > existingBuild.sourceBuild.id()) {
+            if (buildLink.build.id() > existingLinkedBuild.id()) {
                 nextBuilds[key] = linkInfo
             }
         } else {
