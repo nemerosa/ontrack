@@ -2,12 +2,19 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.provisioning
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
+import net.nemerosa.ontrack.kdsl.acceptance.tests.av.AutoVersioningUtils.waitForAutoVersioningCompletion
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.seconds
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.acceptance.tests.workflows.WorkflowTestSupport
+import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.Build
 import net.nemerosa.ontrack.kdsl.spec.admin.admin
+import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
+import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioning
+import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioningCheck
+import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.casc.casc
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.environments
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.startPipeline
@@ -156,6 +163,204 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
         // Building the hierarchy of projects, branches & builds first
         val root = createProjectNode(level = levels)
         root.populate()
+    }
+
+    // Accepted levels of promotions
+    enum class TestPromotionLevel { BRONZE, SILVER, GOLD }
+
+    @OptIn(ExperimentalAtomicApi::class)
+    @Test
+    @Disabled
+    fun `Dependencies with auto-versioning`() {
+        // Cleanup
+        ontrack.autoVersioning.audit.purge()
+        ontrack.projects().forEach {
+            it.delete()
+        }
+
+        // Predefined promotion levels
+        predefinedPromotionLevels()
+
+        // Structure definition node
+        data class StructureDefinitionNode(
+            val name: String,
+            val promotion: TestPromotionLevel,
+            val maxBuilds: Int,
+            val majorVersion: Int,
+            val children: List<StructureDefinitionNode>,
+        ) {
+
+            private var branch: Branch? = null
+            private var builds = mutableListOf<Build>()
+
+            fun createProjectsAndBranches(processed: MutableSet<String> = mutableSetOf()) {
+                if (name in processed) return
+                // Creating the dependencies first
+                children.forEach { child ->
+                    // Creating the child and its own children
+                    child.createProjectsAndBranches(processed)
+                }
+                // Creating the project & its branch
+                withMockScmRepository(ontrack) {
+                    repositoryFile(
+                        path = "versions.properties",
+                        branch = "main",
+                        content = {
+                            children.joinToString("\n") { child ->
+                                "${child.name}.version=1.0"
+                            }
+                        },
+                    )
+                    project(name = name) {
+                        branch("main") {
+                            configuredForMockRepository("main")
+                            this@StructureDefinitionNode.branch = this
+                            // Promotions up its maximum possible one
+                            TestPromotionLevel.entries.forEach { pl ->
+                                if (pl <= promotion) promotion(name = pl.name)
+                            }
+                            // Auto-versioning from this branch to all the children
+                            setAutoVersioningConfig(
+                                configurations = children.map { child ->
+                                    AutoVersioningSourceConfig(
+                                        sourceProject = child.name,
+                                        sourceBranch = "main",
+                                        sourcePromotion = child.promotion.name,
+                                        targetPath = "versions.properties",
+                                        targetProperty = "${child.name}.version",
+                                        validationStamp = "auto",
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+                // Done
+                processed.add(name)
+            }
+
+            fun populateBuilds(processed: MutableSet<String> = mutableSetOf()) {
+                if (name in processed) return
+
+                // Populating the builds for each child
+                children.forEach { child ->
+                    child.populateBuilds(processed)
+                }
+
+                // Creates N builds, depending on the settings
+                repeat(maxBuilds) { no ->
+                    val consumerBranch = branch
+                    consumerBranch?.build("$majorVersion.$no") {
+                        builds += this
+                        // Linking this build "no" to some of the dependencies
+                        children.forEach { child ->
+                            val childBranch = child.branch
+                            if (childBranch != null) {
+                                val childBuilds = child.builds
+                                val childBuild = childBuilds.getOrNull(no) ?: childBuilds.last()
+                                // Promoting the child build
+                                childBuild.promote(promotion = child.promotion.name)
+                                // Waiting for the AV process to be OK
+                                waitForAutoVersioningCompletion(
+                                    ontrack,
+                                    initial = 100L,
+                                    timeout = 2_000L,
+                                    interval = 500L
+                                )
+                                // Checking that the build is linked
+                                autoVersioningCheck()
+                            }
+                        }
+                    }
+                }
+
+                processed += name
+            }
+        }
+
+        // DSL
+        class StructureDefinitionNodeBuilder(
+            private val nodes: MutableMap<String, StructureDefinitionNode>,
+            private val name: String,
+            private val promotion: TestPromotionLevel,
+            private val maxBuilds: Int,
+            private val majorVersion: Int,
+        ) {
+            private val children = mutableListOf<StructureDefinitionNode>()
+            fun node(
+                name: String,
+                promotion: TestPromotionLevel,
+                maxBuilds: Int,
+                majorVersion: Int,
+                code: StructureDefinitionNodeBuilder.() -> Unit = {}
+            ) {
+                val existingNode = nodes[name]
+                val node = if (existingNode != null) {
+                    existingNode
+                } else {
+                    val builder = StructureDefinitionNodeBuilder(
+                        nodes = nodes,
+                        name = name,
+                        promotion = promotion,
+                        maxBuilds = maxBuilds,
+                        majorVersion = majorVersion,
+                    )
+                    builder.code()
+                    builder.build().apply {
+                        nodes[name] = this
+                    }
+                }
+                children += node
+            }
+
+            fun build() = StructureDefinitionNode(
+                name = name,
+                promotion = promotion,
+                maxBuilds = maxBuilds,
+                children = children,
+                majorVersion = majorVersion,
+            )
+        }
+
+        fun structure(
+            name: String,
+            code: StructureDefinitionNodeBuilder.() -> Unit = {},
+        ): StructureDefinitionNode {
+            val builder = StructureDefinitionNodeBuilder(
+                nodes = mutableMapOf<String, StructureDefinitionNode>(),
+                name = name,
+                promotion = TestPromotionLevel.GOLD,
+                maxBuilds = 4,
+                majorVersion = 1,
+            )
+            builder.code()
+            return builder.build()
+        }
+
+        // Defining the structure
+        val root = structure("aggregator") {
+            node("analysis", TestPromotionLevel.GOLD, 4, majorVersion = 4) {
+                node("computing", TestPromotionLevel.SILVER, 3, majorVersion = 2) {
+                    node("job-engine", TestPromotionLevel.BRONZE, 2, majorVersion = 1)
+                }
+            }
+            node("workflows", TestPromotionLevel.GOLD, 4, majorVersion = 5) {
+                node("scheduling", TestPromotionLevel.SILVER, 3, majorVersion = 2) {
+                    node("job-engine", TestPromotionLevel.BRONZE, 2, majorVersion = 1)
+                }
+            }
+            node("reporting", TestPromotionLevel.GOLD, 4, majorVersion = 2) {
+                node("dashboards", TestPromotionLevel.SILVER, 3, majorVersion = 3) {
+                    node("charts", TestPromotionLevel.BRONZE, 2, majorVersion = 1)
+                    node("rendering", TestPromotionLevel.BRONZE, 2, majorVersion = 2)
+                }
+            }
+            node("ui", TestPromotionLevel.GOLD, 4, majorVersion = 5)
+        }
+
+        // Creating the projects, layer per layer
+        root.createProjectsAndBranches()
+        root.populateBuilds()
     }
 
     @Test

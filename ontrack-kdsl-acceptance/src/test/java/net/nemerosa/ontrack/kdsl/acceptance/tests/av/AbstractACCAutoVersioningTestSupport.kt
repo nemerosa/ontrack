@@ -51,13 +51,7 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
     protected fun waitForAutoVersioningCompletion(
         timeout: Long = ACCProperties.AutoVersioning.autoVersioningCompletion,
     ) {
-        waitUntil(
-            task = "Auto-versioning completion",
-            initial = 1_000L,
-            timeout = timeout,
-        ) {
-            ontrack.autoVersioning.stats.pendingOrders == 0
-        }
+        AutoVersioningUtils.waitForAutoVersioningCompletion(ontrack, timeout)
     }
 
     protected fun checkMostRecentStateOfAutoVersioningAuditForSourceAndTargetBranch(
