@@ -279,17 +279,23 @@ function BranchLinksFlow({branch, loadPullRequests, loadPullRequestsCount}) {
             .filter(edge => edge.source === selectedNodeId || edge.target === selectedNodeId)
             .flatMap(edge => [edge.source, edge.target])
 
-        const focusedEdgeIds = edges
-            .filter(edge => edge.source === focusNodeId || edge.target === focusNodeId)
-            .map(edge => edge.id)
-
         const focusedNodeIds = edges
             .filter(edge => edge.source === focusNodeId || edge.target === focusNodeId)
             .flatMap(edge => [edge.source, edge.target])
 
+        const secondHopNodeIds = edges
+            .filter(edge => focusedNodeIds.includes(edge.source) || focusedNodeIds.includes(edge.target))
+            .flatMap(edge => [edge.source, edge.target])
+
+        const allFocusedNodeIds = [...new Set([...focusedNodeIds, ...secondHopNodeIds])]
+
+        const allFocusedEdgeIds = edges
+            .filter(edge => allFocusedNodeIds.includes(edge.source) && allFocusedNodeIds.includes(edge.target))
+            .map(edge => edge.id)
+
         setNodes((nds) => nds.map((node) => {
             const selected = node.id === selectedNodeId || connectedNodeIds.includes(node.id)
-            const visible = !focusNodeId || (node.id === focusNodeId || focusedNodeIds.includes(node.id))
+            const visible = !focusNodeId || (node.id === focusNodeId || allFocusedNodeIds.includes(node.id))
             return {
                 ...node,
                 data: {
@@ -302,7 +308,7 @@ function BranchLinksFlow({branch, loadPullRequests, loadPullRequestsCount}) {
         }))
         setEdges((eds) => eds.map((edge) => {
             const selected = selectedEdgeIds.includes(edge.id)
-            const focused = focusedEdgeIds.includes(edge.id)
+            const focused = allFocusedEdgeIds.includes(edge.id)
             const visible = !focusNodeId || focused
             return {
                 ...edge,
