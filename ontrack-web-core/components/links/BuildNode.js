@@ -3,8 +3,10 @@ import {Card, Popover, Space, Typography} from "antd";
 import BuildLink from "@components/builds/BuildLink";
 import BuildPromotions from "@components/links/BuildPromotions";
 import ProjectLink from "@components/projects/ProjectLink";
-import {FaInfoCircle} from "react-icons/fa";
+import {FaInfoCircle, FaProjectDiagram} from "react-icons/fa";
 import BuildNodePopoverContent from "@components/links/BuildNodePopoverContent";
+import {buildLinksUri} from "@components/common/Links";
+import Link from "next/link";
 
 export default function BuildNode({data}) {
 
@@ -34,7 +36,7 @@ export default function BuildNode({data}) {
                     </Typography.Text>
                     <Typography.Text strong>
                         {
-                            build && <Space>
+                            build && <Space size="small">
                                 <BuildLink build={build} displayTooltip={false}></BuildLink>
                                 <BuildPromotions build={build} lastOnly={true}/>
                                 <Popover
@@ -42,6 +44,9 @@ export default function BuildNode({data}) {
                                 >
                                     <FaInfoCircle color="blue"/>
                                 </Popover>
+                                <Link href={buildLinksUri(build)} title="Links from this build">
+                                    {<FaProjectDiagram/>}
+                                </Link>
                             </Space>
                         }
                     </Typography.Text>
