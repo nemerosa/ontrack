@@ -159,3 +159,38 @@ test('updating a build', async ({page, ontrack}) => {
     await buildPage.assertName('new-name')
     await buildPage.assertDescription('Some new description')
 })
+
+test('previous and next builds', async ({page, ontrack}) => {
+    const project = await ontrack.createProject()
+    const branch = await project.createBranch()
+    const build1 = await branch.createBuild('1.0.1')
+    const build2 = await branch.createBuild('1.0.2')
+    const build3 = await branch.createBuild('1.0.3')
+
+    // Going to build 1
+    await login(page, ontrack)
+    const buildPage1 = new BuildPage(page, build1)
+    await buildPage1.goTo()
+    await buildPage1.expectPreviousBuild({visible: false})
+    await buildPage1.expectNextBuild({visible: true})
+
+    // Navigating to build 2
+    await buildPage1.nextBuild()
+    const buildPage2 = new BuildPage(page, build2)
+    await buildPage2.checkOnBuildPage()
+    await buildPage2.expectPreviousBuild({visible: true})
+    await buildPage2.expectNextBuild({visible: true})
+
+    // Navigating to build 3
+    await buildPage2.nextBuild()
+    const buildPage3 = new BuildPage(page, build3)
+    await buildPage3.checkOnBuildPage()
+    await buildPage3.expectPreviousBuild({visible: true})
+    await buildPage3.expectNextBuild({visible: false})
+
+    // Navigating again to build 2
+    await buildPage3.previousBuild()
+    await buildPage2.checkOnBuildPage()
+    await buildPage2.expectPreviousBuild({visible: true})
+    await buildPage2.expectNextBuild({visible: true})
+})

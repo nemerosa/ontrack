@@ -107,11 +107,11 @@ export default function BuildView({id}) {
                 setLoadingBuild(false)
                 const commands = [
                     <PreviousBuildCommand
-                        key="previous"
+                        key={`previous-${data.build.id}`}
                         previousBuild={data.build.previousBuild}
                     />,
                     <NextBuildCommand
-                        key="previous"
+                        key={`next-${data.build.id}`}
                         nextBuild={data.build.nextBuild}
                     />,
                     <UserMenuActions

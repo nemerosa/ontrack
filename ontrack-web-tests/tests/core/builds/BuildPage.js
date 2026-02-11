@@ -13,8 +13,6 @@ export class BuildPage {
 
     async goTo() {
         await this.page.goto(`${this.build.ontrack.connection.ui}/build/${this.build.id}`)
-        await this.assertName(this.build.name)
-        // Widgets must be visible
         await this.checkOnBuildPage()
     }
 
@@ -23,6 +21,7 @@ export class BuildPage {
         await expect(this.page.getByText("Validations")).toBeVisible()
         await expect(this.page.getByText("Downstream links")).toBeVisible()
         await expect(this.page.getByText("Upstream links")).toBeVisible()
+        await this.assertName(this.build.name)
     }
 
     async goToLinks() {
@@ -62,4 +61,21 @@ export class BuildPage {
     async assertDescription(description) {
         await expect(this.page.getByText(description)).toBeVisible()
     }
+
+    async expectPreviousBuild({visible = true}) {
+        await expect(this.page.getByRole('button', {name: 'Previous build'})).toBeVisible({visible})
+    }
+
+    async expectNextBuild({visible = true}) {
+        await expect(this.page.getByRole('button', {name: 'Next build'})).toBeVisible({visible})
+    }
+
+    async nextBuild() {
+        await this.page.getByRole('button', {name: 'Next build'}).click()
+    }
+
+    async previousBuild() {
+        await this.page.getByRole('button', {name: 'Previous build'}).click()
+    }
+
 }
