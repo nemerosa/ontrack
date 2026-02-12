@@ -1760,4 +1760,137 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Filtering downstream links using project name fragment`() {
+        val source = build()
+        val prefix = uid("tgt-")
+        val targets = (1..3).map { no ->
+            val targetProject = project(uid("$prefix-$no-"))
+            val target = targetProject.branch().build()
+            source.linkTo(target)
+            target
+        }
+        run(
+            """
+                {
+                    build(id: ${source.id}) {
+                        usingQualified(project: "$prefix-2", projectFragment: true) {
+                            pageItems {
+                                build {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                }
+            """.trimIndent()
+        ) { data ->
+            val ids = data.path("build").path("usingQualified").path("pageItems").map {
+                it.path("build").path("id").asInt()
+            }
+            assertEquals(targets[1].id(), ids[0])
+        }
+    }
+
+    @Test
+    fun `Filtering downstream links using project name fragment without a project argument`() {
+        val source = build()
+        val prefix = uid("tgt-")
+        val targets = (1..3).map { no ->
+            val targetProject = project(uid("$prefix-$no-"))
+            val target = targetProject.branch().build()
+            source.linkTo(target)
+            target
+        }
+        run(
+            """
+                {
+                    build(id: ${source.id}) {
+                        usingQualified(project: "", projectFragment: true) {
+                            pageItems {
+                                build {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                }
+            """.trimIndent()
+        ) { data ->
+            val ids = data.path("build").path("usingQualified").path("pageItems").map {
+                it.path("build").path("id").asInt()
+            }
+            assertEquals(targets.reversed().map { it.id() }, ids)
+        }
+    }
+
+    @Test
+    fun `Filtering upstream links using project name fragment`() {
+        val target = build()
+        val prefix = uid("src-")
+        val sources = (1..3).map { no ->
+            val sourceProject = project(uid("$prefix-$no-"))
+            val source = sourceProject.branch().build()
+            source.linkTo(target)
+            source
+        }
+        run(
+            """
+                {
+                    build(id: ${target.id}) {
+                        usedByQualified(project: "$prefix-2", projectFragment: true) {
+                            pageItems {
+                                build {
+                                    id
+                                    branch {
+                                        project {
+                                            name
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            """.trimIndent()
+        ) { data ->
+            val ids = data.path("build").path("usedByQualified").path("pageItems").map {
+                it.path("build").path("id").asInt()
+            }
+            assertEquals(sources[1].id(), ids[0])
+        }
+    }
+
+    @Test
+    fun `Filtering upstream links using project name fragment without a project argument`() {
+        val target = build()
+        val prefix = uid("src-")
+        val sources = (1..3).map { no ->
+            val sourceProject = project(uid("$prefix-$no-"))
+            val source = sourceProject.branch().build()
+            source.linkTo(target)
+            source
+        }
+        run(
+            """
+                {
+                    build(id: ${target.id}) {
+                        usedByQualified(project: "", projectFragment: true) {
+                            pageItems {
+                                build {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                }
+            """.trimIndent()
+        ) { data ->
+            val ids = data.path("build").path("usedByQualified").path("pageItems").map {
+                it.path("build").path("id").asInt()
+            }
+            assertEquals(sources.reversed().map { it.id() }, ids)
+        }
+    }
+
 }

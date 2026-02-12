@@ -8,11 +8,8 @@ import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.and
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
-import net.nemerosa.ontrack.graphql.support.intArgument
-import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
-import net.nemerosa.ontrack.graphql.support.stringArgument
-import net.nemerosa.ontrack.graphql.support.stringListArgument
 import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.labels.LabelManagementService
 import net.nemerosa.ontrack.model.labels.LabelNotFoundException
@@ -259,7 +256,12 @@ class GQLTypeBuild(
                             description = "Label (category:name) to filter build projects with",
                             nullable = true,
                             defaultValue = "",
-                        )
+                        ),
+                        booleanArgument(
+                            name = ARG_PROJECT_FRAGMENT,
+                            description = "Using a fragment of the project name",
+                            nullable = true,
+                        ),
                     ),
                     itemPaginatedListProvider = { environment, build, offset, size ->
                         val depth = environment.getArgument<Int>("depth") ?: 0
@@ -300,7 +302,12 @@ class GQLTypeBuild(
                             .name("branch")
                             .description("Keeps only links targeted from this branch. `project` argument is also required.")
                             .type(GraphQLString)
-                            .build()
+                            .build(),
+                        booleanArgument(
+                            name = ARG_PROJECT_FRAGMENT,
+                            description = "Using a fragment of the project name",
+                            nullable = true,
+                        ),
                     ),
                     itemPaginatedListProvider = { environment, build, offset, size ->
                         val filter = getFilter(environment)
@@ -346,6 +353,7 @@ class GQLTypeBuild(
 
     private fun getFilter(environment: DataFetchingEnvironment): (BuildLink) -> Boolean {
         val projectName: String? = environment.getArgument("project")
+        val projectFragment: Boolean = environment.getArgument(ARG_PROJECT_FRAGMENT) ?: false
         val qualifier: String? = environment.getArgument("qualifier")
         val branchName: String? = environment.getArgument("branch")
         val filter: (BuildLink) -> Boolean = if (branchName != null) {
@@ -353,14 +361,14 @@ class GQLTypeBuild(
                 throw IllegalArgumentException("`project` is required")
             } else {
                 {
-                    it.build.branch.project.name == projectName &&
+                    matchProjectName(it, projectName, projectFragment) &&
                             it.build.branch.name == branchName &&
                             (qualifier == null || qualifier == it.qualifier)
                 }
             }
         } else if (!projectName.isNullOrBlank()) {
             {
-                it.build.branch.project.name == projectName &&
+                matchProjectName(it, projectName, projectFragment) &&
                         (qualifier == null || qualifier == it.qualifier)
             }
         } else {
@@ -368,6 +376,13 @@ class GQLTypeBuild(
         }
         return filter
     }
+
+    private fun matchProjectName(link: BuildLink, projectName: String, projectFragment: Boolean): Boolean =
+        if (projectFragment) {
+            link.build.branch.project.name.contains(projectName, ignoreCase = true)
+        } else {
+            link.build.branch.project.name == projectName
+        }
 
     private fun buildValidationsFetcher() =
         DataFetcher { environment ->
@@ -553,5 +568,10 @@ class GQLTypeBuild(
          * Filter on statuses
          */
         const val ARG_STATUSES = "statuses"
+
+        /**
+         * Using a fragment of the project name
+         */
+        const val ARG_PROJECT_FRAGMENT = "projectFragment"
     }
 }

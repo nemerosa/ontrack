@@ -2,21 +2,15 @@ import GridCell from "@components/grid/GridCell";
 import GridCellCommand from "@components/grid/GridCellCommand";
 import {FaProjectDiagram, FaSearch} from "react-icons/fa";
 import {buildLinksUri} from "@components/common/Links";
-import {Button, Popover, Space, Table, Typography} from "antd";
+import {Button, Input, Popover, Space, Table, Typography} from "antd";
 import {useEffect, useState} from "react";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import ProjectLink from "@components/projects/ProjectLink";
 import BuildLink from "@components/builds/BuildLink";
+import {useQuery} from "@components/services/GraphQL";
 
 const {Column} = Table
 
 export default function BuildContentLinks({build, id, title, fieldName}) {
-
-    const client = useGraphQLClient()
-
-    const [loading, setLoading] = useState(true)
-    const [links, setLinks] = useState([])
-
 
     const [pagination, setPagination] = useState({
         offset: 0,
@@ -27,68 +21,79 @@ export default function BuildContentLinks({build, id, title, fieldName}) {
         nextPage: null,
     })
 
-    useEffect(() => {
-        if (client && build) {
-            setLoading(true)
-            client.request(
-                `
-                    query GetBuildLinks(
-                        $id: Int!,
-                        $offset: Int!,
-                        $size: Int!,
-                    ) {
-                        build(id: $id) {
-                            ${fieldName}(offset: $offset, size: $size) {
-                                pageInfo {
-                                    nextPage {
-                                        offset
-                                        size
-                                    }
+    const [links, setLinks] = useState([])
+    const [projectFilter, setProjectFilter] = useState(null)
+
+    const {data, loading} = useQuery(
+        `
+                query GetBuildLinks(
+                    $id: Int!,
+                    $offset: Int!,
+                    $size: Int!,
+                    $projectName: String,
+                ) {
+                    build(id: $id) {
+                        ${fieldName}(offset: $offset, size: $size, project: $projectName, projectFragment: true) {
+                            pageInfo {
+                                nextPage {
+                                    offset
+                                    size
                                 }
-                                pageItems {
-                                    qualifier
-                                    build {
+                            }
+                            pageItems {
+                                qualifier
+                                build {
+                                    id
+                                    name
+                                    releaseProperty {
+                                        value
+                                    }
+                                    branch {
                                         id
                                         name
-                                        releaseProperty {
-                                            value
-                                        }
-                                        branch {
+                                        project {
                                             id
                                             name
-                                            project {
-                                                id
-                                                name
-                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                `,
-                {
-                    id: Number(build.id),
-                    offset: pagination.offset,
-                    size: pagination.size,
                 }
-            ).then(data => {
-                setPageInfo(data.build[fieldName].pageInfo)
-                if (pagination.offset > 0) {
-                    setLinks((links) => [...links, ...data.build[fieldName].pageItems])
-                } else {
-                    setLinks(data.build[fieldName].pageItems)
-                }
-            }).finally(() => {
-                setLoading(false)
-            })
+            `,
+        {
+            variables: {
+                id: Number(build.id),
+                offset: pagination.offset,
+                size: pagination.size,
+                projectName: projectFilter,
+            },
+            initialData: {},
+            deps: [pagination, id, projectFilter],
         }
-    }, [client, build, pagination, fieldName]);
+    )
+
+    useEffect(() => {
+        if (data && data.build) {
+            setPageInfo(data.build[fieldName].pageInfo)
+            if (pagination.offset > 0) {
+                setLinks((links) => [...links, ...data.build[fieldName].pageItems])
+            } else {
+                setLinks(data.build[fieldName].pageItems)
+            }
+        }
+    }, [data, fieldName])
 
     const onLoadMore = () => {
         if (pageInfo.nextPage) {
             setPagination(pageInfo.nextPage)
         }
+    }
+
+    const onProjectFilter = (value) => {
+        setPagination({offset: 0, size: 10})
+        setProjectFilter(value ? value : null)
     }
 
     return (
@@ -97,6 +102,11 @@ export default function BuildContentLinks({build, id, title, fieldName}) {
                       title={title}
                       extra={
                           <>
+                              <Input.Search
+                                  placeholder="Project filter"
+                                  allowClear
+                                  onSearch={onProjectFilter}
+                              />
                               <GridCellCommand
                                   icon={<FaProjectDiagram/>}
                                   title="Graph of build links"

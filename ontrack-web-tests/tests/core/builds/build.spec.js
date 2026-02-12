@@ -194,3 +194,85 @@ test('previous and next builds', async ({page, ontrack}) => {
     await buildPage2.expectPreviousBuild({visible: true})
     await buildPage2.expectNextBuild({visible: true})
 })
+
+test('filtering the downstream links', async ({page, ontrack}) => {
+    // Source build
+    const sourceProject = await ontrack.createProject()
+    const sourceBranch = await sourceProject.createBranch()
+    const sourceBuild = await sourceBranch.createBuild()
+    // Target builds (==> downstream)
+    const targetBuilds = []
+    for (const i of [1, 2, 3]) {
+        const targetProject = await ontrack.createProject()
+        const targetBranch = await targetProject.createBranch()
+        const targetBuild = await targetBranch.createBuild()
+        await sourceBuild.linkTo(targetBuild)
+        targetBuilds.push(targetBuild)
+    }
+
+    // Going to the source build page
+    await login(page, ontrack)
+    const buildPage = new BuildPage(page, sourceBuild)
+    await buildPage.goTo()
+
+    // Getting access to the downstream links
+    const links = await buildPage.getDownstreamLinks()
+
+    // Checks all builds are visible
+    await links.isProjectLinkVisible({project: targetBuilds[0].branch.project.name, visible: true})
+    await links.isProjectLinkVisible({project: targetBuilds[1].branch.project.name, visible: true})
+    await links.isProjectLinkVisible({project: targetBuilds[2].branch.project.name, visible: true})
+
+    // Filtering on the project name
+    await links.filterByProjectName({project: targetBuilds[1].branch.project.name})
+    await links.isProjectLinkVisible({project: targetBuilds[0].branch.project.name, visible: false})
+    await links.isProjectLinkVisible({project: targetBuilds[1].branch.project.name, visible: true})
+    await links.isProjectLinkVisible({project: targetBuilds[2].branch.project.name, visible: false})
+
+    // Clearing the filter
+    await links.clearFilterByProjectName()
+    await links.isProjectLinkVisible({project: targetBuilds[0].branch.project.name, visible: true})
+    await links.isProjectLinkVisible({project: targetBuilds[1].branch.project.name, visible: true})
+    await links.isProjectLinkVisible({project: targetBuilds[2].branch.project.name, visible: true})
+})
+
+test('filtering the upstream links', async ({page, ontrack}) => {
+    // Target build
+    const targetProject = await ontrack.createProject()
+    const targetBranch = await targetProject.createBranch()
+    const targetBuild = await targetBranch.createBuild()
+    // Source builds (==> upstream)
+    const sourceBuilds = []
+    for (const i of [1, 2, 3]) {
+        const sourceProject = await ontrack.createProject()
+        const sourceBranch = await sourceProject.createBranch()
+        const sourceBuild = await sourceBranch.createBuild()
+        await sourceBuild.linkTo(targetBuild)
+        sourceBuilds.push(sourceBuild)
+    }
+
+    // Going to the target build page
+    await login(page, ontrack)
+    const buildPage = new BuildPage(page, targetBuild)
+    await buildPage.goTo()
+
+    // Getting access to the upstream links
+    const links = await buildPage.getUpstreamLinks()
+
+    // Checks all builds are visible
+    await links.isProjectLinkVisible({project: sourceBuilds[0].branch.project.name, visible: true})
+    await links.isProjectLinkVisible({project: sourceBuilds[1].branch.project.name, visible: true})
+    await links.isProjectLinkVisible({project: sourceBuilds[2].branch.project.name, visible: true})
+
+    // Filtering on the project name
+    await links.filterByProjectName({project: sourceBuilds[1].branch.project.name})
+    await links.isProjectLinkVisible({project: sourceBuilds[0].branch.project.name, visible: false})
+    await links.isProjectLinkVisible({project: sourceBuilds[1].branch.project.name, visible: true})
+    await links.isProjectLinkVisible({project: sourceBuilds[2].branch.project.name, visible: false})
+
+    // Clearing the filter
+    await links.clearFilterByProjectName()
+    await links.isProjectLinkVisible({project: sourceBuilds[0].branch.project.name, visible: true})
+    await links.isProjectLinkVisible({project: sourceBuilds[1].branch.project.name, visible: true})
+    await links.isProjectLinkVisible({project: sourceBuilds[2].branch.project.name, visible: true})
+})

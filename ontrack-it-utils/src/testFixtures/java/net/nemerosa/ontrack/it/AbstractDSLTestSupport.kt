@@ -158,6 +158,13 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         }
     }
 
+    /**
+     * Shortcut for getting a build
+     */
+    fun build(): Build {
+        return project().branch().build()
+    }
+
     fun project(name: NameDescription = nameDescription(), init: Project.() -> Unit = {}): Project {
         val project = doCreateProject(name)
         securityService.asAdmin {

@@ -1,6 +1,7 @@
 import {BuildLinksPage} from "./buildLinks";
 import {PromotionInfoSection} from "./PromotionInfoSection";
 import {confirmBox} from "../../support/confirm";
+import {BuildLinksSection} from "./BuildLinksSection";
 
 const {expect} = require("@playwright/test");
 
@@ -76,6 +77,18 @@ export class BuildPage {
 
     async previousBuild() {
         await this.page.getByRole('button', {name: 'Previous build'}).click()
+    }
+
+    async getDownstreamLinks() {
+        const downstreamLinks =  this.page.getByTestId('links-using')
+        await expect(downstreamLinks).toBeVisible()
+        return new BuildLinksSection(this.page, this.build, downstreamLinks)
+    }
+
+    async getUpstreamLinks() {
+        const upstreamLinks =  this.page.getByTestId('links-usedby')
+        await expect(upstreamLinks).toBeVisible()
+        return new BuildLinksSection(this.page, this.build, upstreamLinks)
     }
 
 }
