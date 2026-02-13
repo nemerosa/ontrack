@@ -1,13 +1,15 @@
 package net.nemerosa.ontrack.extension.av.tracking
 
+import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.settings.AutoVersioningSettings
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.PromotionRun
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertNull
 
-class AutoVersioningTrackingServiceIT : AbstractDSLTestSupport() {
+@AsAdminTest
+class AutoVersioningTrackingServiceIT : AbstractAutoVersioningTestSupport() {
 
     @Autowired
     private lateinit var autoVersioningTrackingService: AutoVersioningTrackingService
@@ -28,14 +30,12 @@ class AutoVersioningTrackingServiceIT : AbstractDSLTestSupport() {
     }
 
     private fun withRun(code: (run: PromotionRun) -> Unit) {
-        asAdmin {
-            project {
-                branch {
-                    val pl = promotionLevel()
-                    build {
-                        val run = promote(pl)
-                        code(run)
-                    }
+        project {
+            branch {
+                val pl = promotionLevel()
+                build {
+                    val run = promote(pl)
+                    code(run)
                 }
             }
         }

@@ -1,5 +1,6 @@
 import {expect} from "@playwright/test";
 import {confirmBox} from "../../support/confirm";
+import {AutoVersioningTrail} from "../../extensions/auto-versioning/AutoVersioningTrail";
 
 export class PromotionRunPage {
 
@@ -25,6 +26,12 @@ export class PromotionRunPage {
         await expect(button).toBeVisible()
         await button.click()
         await confirmBox(this.page, "Removing this promotion run", {okText: "Confirm deletion"})
+    }
+
+    async getAVTrail() {
+        const section = this.page.getByTestId('auto-versioning-trail')
+        await expect(section).toBeVisible()
+        return new AutoVersioningTrail(this.page, section)
     }
 
 }

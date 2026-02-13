@@ -51,7 +51,7 @@ class MockSCMTester(
             mockSCMExtension.registerRepository(repositoryName)
         }
 
-        private fun Project.configureMockSCMProject(
+        fun Project.configureMockSCMProject(
             issueServiceIdentifier: String? = null
         ) {
             propertyService.editProperty(

@@ -13,15 +13,34 @@ class PromotionRunJdbcRepository(
     private val buildJdbcRepositoryAccessor: BuildJdbcRepositoryAccessor,
 ) : AbstractJdbcRepository(dataSource), PromotionRunRepository, PromotionRunJdbcRepositoryAccessor {
 
-    override fun toPromotionRun(rs: ResultSet): PromotionRun {
-        val build = buildJdbcRepositoryAccessor.getBuild(id(rs, "buildid"))
+    override fun getPromotionRun(
+        id: ID,
+        promotionLevel: PromotionLevel?,
+        build: Build?
+    ): PromotionRun {
+        return getFirstItem(
+            """
+               SELECT *
+                FROM promotion_runs
+                WHERE id = :id
+            """,
+            params("id", id.value)
+        ) { rs, _ ->
+            toPromotionRun(rs, promotionLevel, build)
+        } ?: error("Promotion run with ID ${id.value} not found")
+    }
+
+    override fun toPromotionRun(rs: ResultSet, promotionLevel: PromotionLevel?, build: Build?): PromotionRun {
+        val actualBuild = build ?: buildJdbcRepositoryAccessor.getBuild(id(rs, "buildid"))
+        val actualPL = promotionLevel
+            ?: promotionLevelJdbcRepositoryAccessor.getPromotionLevel(
+                id(rs, "promotionlevelid"),
+                actualBuild.branch
+            )
         return PromotionRun(
             id = id(rs),
-            build = build,
-            promotionLevel = promotionLevelJdbcRepositoryAccessor.getPromotionLevel(
-                id(rs, "promotionlevelid"),
-                build.branch,
-            ),
+            build = actualBuild,
+            promotionLevel = actualPL,
             signature = readSignature(rs),
             description = rs.getString("description"),
         )
@@ -81,4 +100,6 @@ class PromotionRunJdbcRepository(
             Int::class.java
         ).isNotEmpty()
     }
+
+
 }

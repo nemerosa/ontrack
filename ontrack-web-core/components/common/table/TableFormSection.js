@@ -5,7 +5,7 @@ export default function TableFormSection({children}) {
         <>
             <Card
                 size="small"
-                className="ot-well"
+                className="ot-standard-table-form"
             >
                 {children}
             </Card>

@@ -102,6 +102,17 @@
 }
 
 /**
+ * Standard table form
+ */
+
+.ot-standard-table-form {
+    width: 100%;
+    border-radius: 0;
+    background-color: rgb(240, 240, 240);
+    border-bottom: dotted 1px rgb(200, 200, 200);
+}
+
+/**
  * Small inline box
  */
 

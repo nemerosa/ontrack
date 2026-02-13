@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.extension.av.tracking
 
 import net.nemerosa.ontrack.common.RunProfile
-import net.nemerosa.ontrack.model.structure.EntityStore
+import net.nemerosa.ontrack.extension.av.listener.AutoVersioningPromotionListenerService
+import net.nemerosa.ontrack.model.pagination.PaginatedList
+import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.PromotionRun
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.context.annotation.Profile
@@ -13,9 +15,14 @@ import org.springframework.transaction.annotation.Transactional
 @Profile(RunProfile.PROD)
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 class AutoVersioningTrackingServiceImpl(
-    entityStore: EntityStore,
+    avTrailRepository: AvTrailRepository,
     structureService: StructureService,
-) : AbstractAutoVersioningTrackingService(entityStore, structureService) {
+    autoVersioningPromotionListenerService: AutoVersioningPromotionListenerService,
+) : AbstractAutoVersioningTrackingService(
+    avTrailRepository = avTrailRepository,
+    structureService = structureService,
+    autoVersioningPromotionListenerService = autoVersioningPromotionListenerService
+) {
 
     @Suppress("RedundantOverride")
     override fun start(run: PromotionRun): AutoVersioningTracking {
@@ -37,5 +44,26 @@ class AutoVersioningTrackingServiceImpl(
     @Suppress("RedundantOverride")
     override fun getTrail(run: PromotionRun): AutoVersioningTrail? {
         return super.getTrail(run)
+    }
+
+
+    @Suppress("RedundantOverride")
+    override fun getPaginatedTrail(
+        run: PromotionRun,
+        filter: AutoVersioningTrailFilter,
+        offset: Int,
+        size: Int
+    ): PaginatedList<AutoVersioningBranchTrail> {
+        return super.getPaginatedTrail(run, filter, offset, size)
+    }
+
+    @Suppress("RedundantOverride")
+    override fun getPromotionPaginatedTrail(
+        promotionLevel: PromotionLevel,
+        filter: AutoVersioningTrailFilter,
+        offset: Int,
+        size: Int
+    ): PaginatedList<AutoVersioningBranchTrail> {
+        return super.getPromotionPaginatedTrail(promotionLevel, filter, offset, size)
     }
 }

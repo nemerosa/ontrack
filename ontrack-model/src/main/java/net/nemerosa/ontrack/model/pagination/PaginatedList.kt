@@ -16,6 +16,11 @@ class PaginatedList<T>(
         pageItems = pageItems.map(fn)
     )
 
+    fun <S> mapNotNull(fn: (T) -> S?) = PaginatedList(
+        pageInfo = pageInfo,
+        pageItems = pageItems.mapNotNull(fn)
+    )
+
     companion object {
 
         fun <T> ofOne(item: T) = PaginatedList(

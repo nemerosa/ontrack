@@ -79,6 +79,24 @@ const branchInstance = (ontrack, data, project) => {
     branch.createPromotionLevel = async (name) => createPromotionLevel(branch, name)
     branch.createValidationStamp = async (name) => createValidationStamp(branch, name)
     branch.createBuild = async (name) => createBuild(branch, name)
+    branch.disableBranch = async () => disableBranch(branch)
 
     return branch
+}
+
+const disableBranch = async (branch) => {
+    await graphQLCallMutation(
+        branch.ontrack.connection,
+        'disableBranch',
+        gql`
+            mutation DisableBranch($branchId: Int!) {
+                disableBranch(input: {id: $branchId}) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `,
+        {branchId: Number(branch.id)}
+    )
 }

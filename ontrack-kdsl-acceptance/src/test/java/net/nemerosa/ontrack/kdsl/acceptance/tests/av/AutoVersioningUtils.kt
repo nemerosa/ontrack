@@ -9,8 +9,8 @@ object AutoVersioningUtils {
 
     fun waitForAutoVersioningCompletion(
         ontrack: Ontrack,
-        initial: Long = 1_000L,
-        interval: Long = 15_000L,
+        initial: Long = 500L,
+        interval: Long = 1_000L,
         timeout: Long = ACCProperties.AutoVersioning.autoVersioningCompletion,
     ) {
         waitUntil(

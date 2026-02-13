@@ -153,7 +153,7 @@ export default function PromotionLevelView({id}) {
             id: sectionAutoVersioning,
             content: <GridCell
                 id={sectionAutoVersioning}
-                title="Auto-versioning"
+                title="Auto-versioning trail"
             >
                 <Space className="ot-line" direction="vertical">
                     <Typography.Text type="secondary" style={{padding: 8, display: "block"}}>

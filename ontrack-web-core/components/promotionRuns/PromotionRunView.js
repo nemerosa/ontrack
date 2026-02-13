@@ -12,12 +12,11 @@ import BuildLink from "@components/builds/BuildLink";
 import TimestampText from "@components/common/TimestampText";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import PageSection from "@components/common/PageSection";
-import AutoVersioningTrail from "@components/extension/auto-versioning/AutoVersioningTrail";
-import {gqlAutoVersioningTrailContent} from "@components/extension/auto-versioning/AutoVersioningGraphQLFragments";
 import {isAuthorized} from "@components/common/authorizations";
 import NotificationRecordingsTable from "@components/extension/notifications/NotificationRecordingsTable";
 import {useQuery} from "@components/services/GraphQL";
 import PromotionRunDeleteCommand from "@components/promotionRuns/PromotionRunDeleteCommand";
+import AutoVersioningPromotionRunTrail from "@components/extension/auto-versioning/AutoVersioningPromotionRunTrail";
 
 export default function PromotionRunView({id}) {
 
@@ -65,13 +64,8 @@ export default function PromotionRunView({id}) {
                             }
                         }
                     }
-                    autoVersioningTrail {
-                        ...AutoVersioningTrailContent
-                    }
                 }
             }
-
-            ${gqlAutoVersioningTrailContent}
         `,
         {
             variables: {
@@ -149,12 +143,8 @@ export default function PromotionRunView({id}) {
                                 </Space>
                             </Card>
                             {
-                                run?.autoVersioningTrail &&
-                                <PageSection
-                                    title="Auto-versioning trail"
-                                >
-                                    <AutoVersioningTrail trail={run.autoVersioningTrail}/>
-                                </PageSection>
+                                run &&
+                                <AutoVersioningPromotionRunTrail promotionRunId={run.id}/>
                             }
                             <PageSection
                                 id="promotion-run-notifications"

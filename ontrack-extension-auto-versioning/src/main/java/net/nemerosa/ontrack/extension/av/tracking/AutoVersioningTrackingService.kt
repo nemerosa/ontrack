@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.tracking
 
-import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.pagination.PaginatedList
+import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.PromotionRun
 
 interface AutoVersioningTrackingService {
@@ -27,5 +28,25 @@ interface AutoVersioningTrackingService {
      * Gets the trail for a promotion run
      */
     fun getTrail(run: PromotionRun): AutoVersioningTrail?
+
+    /**
+     * Gets a paginated trail for a promotion run
+     */
+    fun getPaginatedTrail(
+        run: PromotionRun,
+        filter: AutoVersioningTrailFilter = AutoVersioningTrailFilter(),
+        offset: Int,
+        size: Int,
+    ): PaginatedList<AutoVersioningBranchTrail>
+
+    /**
+     * Gets a paginated trail for a promotion level
+     */
+    fun getPromotionPaginatedTrail(
+        promotionLevel: PromotionLevel,
+        filter: AutoVersioningTrailFilter,
+        offset: Int,
+        size: Int
+    ): PaginatedList<AutoVersioningBranchTrail>
 
 }

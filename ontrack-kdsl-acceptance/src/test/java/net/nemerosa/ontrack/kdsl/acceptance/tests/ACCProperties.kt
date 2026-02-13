@@ -34,7 +34,7 @@ object ACCProperties {
     }
 
     object AutoVersioning {
-        @DefaultValue("120000") // 2 minutes
+        @DefaultValue("30000") // 30 seconds
         val autoVersioningCompletion: Long by longFromEnv()
     }
 

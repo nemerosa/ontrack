@@ -186,6 +186,20 @@ type AutoVersioningBranchTrail {
   rejectionReason: String
 }
 
+type AutoVersioningBranchTrailPaginated {
+  "Information about the current page"
+  pageInfo: PageInfo
+  "Items in the current page"
+  pageItems: [AutoVersioningBranchTrail!]!
+}
+
+type AutoVersioningBranchTrailPromotionPaginated {
+  "Information about the current page"
+  pageInfo: PageInfo
+  "Items in the current page"
+  pageItems: [AutoVersioningBranchTrail!]!
+}
+
 "Configuration of the auto versioning on a branch."
 type AutoVersioningConfig {
   "List of configurations"
@@ -605,6 +619,8 @@ type Build implements Authorizable & ProjectEntity {
     offset: Int = 0,
     "Keeps only links targeted from this project"
     project: String,
+    "Using a fragment of the project name"
+    projectFragment: Boolean,
     "Size of the page"
     size: Int = 20
   ): BuildLinkPaginated
@@ -622,6 +638,8 @@ type Build implements Authorizable & ProjectEntity {
     offset: Int = 0,
     "Keeps only links targeted from this project"
     project: String,
+    "Using a fragment of the project name"
+    projectFragment: Boolean,
     "Keeps only links targeted for this qualifier"
     qualifier: String,
     "Size of the page"
@@ -5058,7 +5076,15 @@ type PromotionLevel implements Authorizable & ProjectEntity {
   "List of branches targeted for auto-versioning based on this promotion level"
   autoVersioningTargets: [AutoVersioningConfiguredBranch!]!
   "List of branches targeted for auto-versioning based on this promotion level or with their reason for rejection"
-  autoVersioningTrail: AutoVersioningTrail
+  autoVersioningTrail: AutoVersioningTrail @deprecated(reason : "Will be removed in V6. Use autoVersioningTrailPaginated instead.")
+  "List of branches targeted for auto-versioning based on this promotion or with their reason for rejection"
+  autoVersioningTrailPaginated(
+    filter: AutoVersioningTrailFilter,
+    "Offset for the page"
+    offset: Int = 0,
+    "Size of the page"
+    size: Int = 20
+  ): AutoVersioningBranchTrailPromotionPaginated
   "Reference to branch"
   branch: Branch
   creation: Signature
@@ -5125,7 +5151,15 @@ type PromotionRun implements Authorizable & ProjectEntity {
   "Authorizations for this context"
   authorizations: [Authorization!]!
   "List of branches targeted for auto-versioning based on this promotion run or with their reason for rejection"
-  autoVersioningTrail: AutoVersioningTrail
+  autoVersioningTrail: AutoVersioningTrail @deprecated(reason : "Will be removed in V6. Use autoVersioningTrailPaginated instead.")
+  "List of branches targeted for auto-versioning based on this promotion run or with their reason for rejection"
+  autoVersioningTrailPaginated(
+    filter: AutoVersioningTrailFilter,
+    "Offset for the page"
+    offset: Int = 0,
+    "Size of the page"
+    size: Int = 20
+  ): AutoVersioningBranchTrailPaginated
   "Associated build"
   build: Build!
   creation: Signature
@@ -8478,6 +8512,13 @@ input AutoVersioningSourceConfigPathInput {
   regex: String
   "Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior."
   versionSource: String
+}
+
+input AutoVersioningTrailFilter {
+  "onlyEligible field"
+  onlyEligible: Boolean!
+  "Part of the project name"
+  projectName: String
 }
 
 "BuildSearchForm"
