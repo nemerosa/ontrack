@@ -15,6 +15,9 @@ const gqlBuildInfo = gql`
                 id
                 name
             }
+            scmBranchInfo {
+                changeLogs
+            }
         }
         releaseProperty {
             value

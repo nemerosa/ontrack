@@ -51,6 +51,7 @@ export default function BranchLinkNode({data}) {
                         sourceBuild={sourceBuild}
                         latestOk={latestOk}
                         targetBuild={targetBuild}
+                        lastTargetBuild={autoVersioning?.lastEligibleBuild}
                     />
                     {/* AV information */}
                     {

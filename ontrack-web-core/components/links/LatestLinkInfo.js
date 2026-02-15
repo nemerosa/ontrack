@@ -4,8 +4,9 @@ import BuildPromotions from "@components/links/BuildPromotions";
 import {useEffect, useState} from "react";
 import CheckStatus from "@components/common/CheckStatus";
 import {FaCaretRight} from "react-icons/fa";
+import ChangelogButton from "@components/links/ChangelogButton";
 
-export default function LatestLinkInfo({sourceBuild, latestOk, targetBuild}) {
+export default function LatestLinkInfo({sourceBuild, latestOk, targetBuild, lastTargetBuild}) {
 
     const [items, setItems] = useState([])
     useEffect(() => {
@@ -68,10 +69,14 @@ export default function LatestLinkInfo({sourceBuild, latestOk, targetBuild}) {
                     </Space>
                 </Popover>
                 {
-                    !latestOk && <Space>
+                    !latestOk && <Space size="small">
                         (
                         <BuildRef build={targetBuild} displayTooltip={false} tooltipText="Current build"/>
                         <BuildPromotions build={targetBuild}/>
+                        <ChangelogButton
+                            targetBuild={targetBuild}
+                            lastTargetBuild={lastTargetBuild}
+                        />
                         )
                     </Space>
                 }
