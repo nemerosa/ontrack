@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.fail
 
 class AutoVersioningBranchCIConfigExtensionIT : AbstractQLKTITSupport() {
@@ -244,6 +245,52 @@ class AutoVersioningBranchCIConfigExtensionIT : AbstractQLKTITSupport() {
                 assertEquals(false, disabled)
             }
         }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Branch filter for the auto-versioning configuration`() {
+        val yaml = """
+            version: v1
+            configuration:
+              defaults:
+                branch:
+                  autoVersioning:
+                    branchFilter:
+                      includes:
+                        - main
+                        - 'release\/.*'
+                      excludes:
+                        - 'release\/1\..*'
+                    configurations:
+                      - sourceProject: my-project
+                        sourceBranch: main
+                        sourcePromotion: GOLD
+                        targetPath: versions.properties
+                        targetProperty: yontrackVersion
+        """
+
+        fun testBranch(
+            scmBranch: String,
+            present: Boolean,
+        ) {
+            val branch = configTestSupport.configureBranch(
+                yaml,
+                ci = "generic",
+                scm = "mock",
+                env = EnvFixtures.generic(scmBranch = scmBranch)
+            )
+            val config = autoVersioningConfigurationService.getAutoVersioning(branch)
+            if (present) {
+                assertNotNull(config, "Auto-versioning config has been set on branch $scmBranch")
+            } else {
+                assertNull(config, "Auto-versioning config has not been set on branch $scmBranch")
+            }
+        }
+
+        testBranch("main", true)
+        testBranch("release/1.0", false)
+        testBranch("release/2.1", true)
     }
 
 }
