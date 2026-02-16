@@ -521,6 +521,25 @@ branch:
         targetProperty: yontrack
 ```
 
+If the auto-versioning configuration must not be applied to all branches, you can use the `branchFilter` property to
+restrict it to a list of branch names using regular expressions. For example:
+
+```yaml
+version: v1
+configuration:
+  default:
+    branch:
+      autoVersioning:
+        branchFilter:
+          includes:
+            - main
+            - 'release\\.*'
+          excludes:
+            - 'release\\1\..*'
+```
+
+This restricts the auto-versioning configuration to the `main` and `release/*` branches, but not the `release/1.*` ones.
+
 #### Auto-versioning check
 
 This extension is set at the build level to check the compliance with the latest versions using
