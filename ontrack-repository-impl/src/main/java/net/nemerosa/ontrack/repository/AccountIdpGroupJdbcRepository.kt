@@ -17,6 +17,8 @@ class AccountIdpGroupJdbcRepository(dataSource: DataSource) : AbstractJdbcReposi
         ) {
             equality { a, b -> a == b }
             onCreation { name ->
+                val nameMaxLength = 255
+                val actualName = name.take(nameMaxLength)
                 namedParameterJdbcTemplate!!.update(
                     """
                         INSERT INTO ACCOUNT_IDP_GROUPS(ACCOUNT_ID, NAME) 
@@ -24,7 +26,7 @@ class AccountIdpGroupJdbcRepository(dataSource: DataSource) : AbstractJdbcReposi
                     """.trimIndent(),
                     mapOf(
                         "accountId" to accountId,
-                        "name" to name
+                        "name" to actualName,
                     )
                 )
             }

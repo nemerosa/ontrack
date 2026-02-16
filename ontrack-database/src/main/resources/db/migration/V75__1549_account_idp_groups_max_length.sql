@@ -1,0 +1,4 @@
+-- 75. Max length for account IDP groups
+
+ALTER TABLE ACCOUNT_IDP_GROUPS
+    ALTER COLUMN NAME TYPE VARCHAR(255);
