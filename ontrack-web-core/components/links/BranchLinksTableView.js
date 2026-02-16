@@ -20,6 +20,7 @@ import CheckStatus from "@components/common/CheckStatus";
 import AutoVersioningInfo from "@components/extension/auto-versioning/AutoVersioningInfo";
 import AutoVersioningLoadPRStatusesButton
     from "@components/extension/auto-versioning/AutoVersioningLoadPRStatusesButton";
+import ChangelogButton from "@components/links/ChangelogButton";
 
 export default function BranchLinksTableView({id}) {
 
@@ -168,7 +169,13 @@ export default function BranchLinksTableView({id}) {
                                                 <FaCaretRight/>
                                                 <BuildLink build={link.latestBuild}/>
                                             </Space>
-                                            <BuildPromotions build={link.latestBuild}/>
+                                            <Space size="small">
+                                                <BuildPromotions build={link.latestBuild}/>
+                                                <ChangelogButton
+                                                    targetBuild={link.targetBuild}
+                                                    lastTargetBuild={link.latestBuild}
+                                                />
+                                            </Space>
                                         </Space>
                                     }
                                 </>,
