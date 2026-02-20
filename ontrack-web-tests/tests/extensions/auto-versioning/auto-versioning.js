@@ -8,7 +8,7 @@ export class SimpleAutoVersioning {
         this.ontrack = ontrack
     }
 
-    async init() {
+    async init({cronSchedule = null}) {
         // Dependency setup
         const depName = generate("dep-")
         this.depProject = await this.ontrack.createProject(depName)
@@ -39,6 +39,7 @@ export class SimpleAutoVersioning {
             targetPath: 'versions.properties',
             targetProperty: 'version',
             validationStamp: 'auto',
+            cronSchedule: cronSchedule,
         })
     }
 
@@ -87,8 +88,8 @@ export class SimpleAutoVersioning {
     }
 }
 
-export const setupSimpleAutoVersioning = async ({page, ontrack}) => {
+export const setupSimpleAutoVersioning = async ({page, ontrack, cronSchedule = null}) => {
     const setup = new SimpleAutoVersioning(page, ontrack)
-    await setup.init()
+    await setup.init({cronSchedule})
     return setup
 }

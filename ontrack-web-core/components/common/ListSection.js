@@ -16,7 +16,7 @@ export default function ListSection({title, extraTitle, icon, loading, items}) {
                         itemLayout="horizontal"
                         dataSource={items}
                         renderItem={(item) =>
-                            <List.Item>
+                            <List.Item data-testid={item.id}>
                                 <List.Item.Meta
                                     avatar={item.icon}
                                     title={item.title}

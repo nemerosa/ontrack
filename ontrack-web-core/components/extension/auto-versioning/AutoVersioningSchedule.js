@@ -1,8 +1,8 @@
-import TimestampText from "@components/common/TimestampText";
+import {Typography} from "antd";
 
 export default function AutoVersioningSchedule({schedule}) {
     if (schedule) {
-        return <TimestampText value={schedule}/>
+        return <Typography.Text data-testid="auto-versioning-schedule" code>{schedule}</Typography.Text>
     } else {
         return "-"
     }

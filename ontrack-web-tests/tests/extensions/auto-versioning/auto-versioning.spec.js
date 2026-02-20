@@ -4,6 +4,7 @@ const {expect} = require("@playwright/test");
 const {login} = require("../../core/login");
 const {AutoVersioningAuditPage} = require("./AutoVersioningAuditPage");
 const {AutoVersioningAuditDetailsPage} = require("./AutoVersioningAuditDetailsPage");
+const {BranchPage} = require("../../core/branches/branch");
 
 test('rescheduling an auto-versioning order', async ({page, ontrack}) => {
     // Auto-versioning context
@@ -54,7 +55,7 @@ test('seeing the status of the PR linked to the auto-versioning order', async ({
     const depBuild = await autoVersioning.createDepBuild()
     await autoVersioning.promoteDepBuild(depBuild)
     const entry = await autoVersioning.waitForAutoVersioningCompletion({depBuild})
-    await expect(entry.mostRecentState.state).toBe('PR_MERGED')
+    expect(entry.mostRecentState.state).toBe('PR_MERGED')
 
     // Going to the details page
     await login(page, ontrack)
@@ -75,7 +76,7 @@ test('loading the statuses of the PRs in the audit page', async ({page, ontrack}
     const depBuild = await autoVersioning.createDepBuild()
     await autoVersioning.promoteDepBuild(depBuild)
     const entry = await autoVersioning.waitForAutoVersioningCompletion({depBuild})
-    await expect(entry.mostRecentState.state).toBe('PR_MERGED')
+    expect(entry.mostRecentState.state).toBe('PR_MERGED')
 
     // Going to the audit page
     await login(page, ontrack)
@@ -93,4 +94,23 @@ test('loading the statuses of the PRs in the audit page', async ({page, ontrack}
     // Checking the PR statuses are visible in the audit page
     entryRow = await avAuditPage.getEntryRow(entry.order.uuid)
     await entryRow.expectPRStatus(entry.mostRecentState.data.prName, 'Merged')
+})
+
+test('auto-versioning cron schedule being displayed', async ({page, ontrack}) => {
+    // Auto-versioning context
+    const {depProject, targetBranch} = await setupSimpleAutoVersioning({page, ontrack, cronSchedule: '0 0 23 * * *'})
+
+    // Going to the target branch page
+    await login(page, ontrack)
+    const branchPage = new BranchPage(page, targetBranch)
+    await branchPage.goTo()
+
+    // Going to the AV config page
+    const avConfigPage = await branchPage.navigateToAutoVersioningConfig()
+
+    // Once on the AV config page, display the config for the dependency
+    const avConfigDetails = await avConfigPage.displayConfig(depProject.name)
+
+    // Checks the schedule being displayed
+    await avConfigDetails.expectCronSchedule('0 0 23 * * *')
 })

@@ -16,6 +16,7 @@ export default function InformationSection({entity, loading}) {
                             .map(info => {
                                     const shortTypeName = info.type.slice("net.nemerosa.ontrack.extension.".length)
                                     return {
+                                        id: shortTypeName,
                                         title: info.title,
                                         icon: <Dynamic path={`framework/information/${shortTypeName}/Icon`}/>,
                                         content: <Dynamic path={`framework/information/${shortTypeName}/Display`} props={{info, entity}}/>,

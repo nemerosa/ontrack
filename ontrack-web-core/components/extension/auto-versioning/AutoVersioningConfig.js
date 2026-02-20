@@ -25,6 +25,7 @@ export default function AutoVersioningConfig({branch, config, onDeleteConfig}) {
             }
             {
                 config && <Table
+                    data-testid="auto-versioning-config-table"
                     dataSource={items}
                     pagination={false}
                     expandable={{

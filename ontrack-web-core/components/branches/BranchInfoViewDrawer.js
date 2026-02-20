@@ -6,6 +6,7 @@ export default function BranchInfoViewDrawer({branch, loadingBranch}) {
     return (
         <>
             <InfoViewDrawer
+                id="branch-info"
                 title="Branch information"
                 tooltip="Displays information about the branch"
                 width="40%"

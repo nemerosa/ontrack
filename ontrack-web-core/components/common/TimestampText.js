@@ -20,7 +20,6 @@ export default function TimestampText({
         const localDateTime = dayjs.utc(value).local()
         return (
             <>
-
                 {prefix && `${prefix} `}
                 {localDateTime.format(format)}
                 {suffix && ` ${suffix}`}

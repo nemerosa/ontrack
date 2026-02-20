@@ -4,6 +4,7 @@ const {SCMChangeLogPage} = require("../../extensions/scm/scm");
 const {PromotionsPage} = require("../promotionLevels/PromotionsPage");
 const {confirmBox} = require("../../support/confirm");
 const {BranchLinksPage} = require("./BranchLinksPage");
+const {AutoVersioningConfigPage} = require("../../extensions/auto-versioning/AutoVersioningConfigPage");
 
 class BranchPage {
     constructor(page, branch) {
@@ -96,6 +97,22 @@ class BranchPage {
         const branchLinksPage = new BranchLinksPage(this.page, this.branch.ontrack, this.branch)
         await branchLinksPage.expectOnPage()
         return branchLinksPage
+    }
+
+    async navigateToAutoVersioningConfig() {
+        const button = this.page.getByTestId('branch-info')
+        await expect(button).toBeVisible()
+        await button.click()
+
+        const avInfoSection = this.page.getByTestId('av.config.AutoVersioningConfigInformationExtension')
+        await expect(avInfoSection.getByText("Auto-versioning")).toBeVisible()
+        const avConfigLink = avInfoSection.getByRole('link', {name: 'Configuration'})
+        await expect(avConfigLink).toBeVisible()
+        await avConfigLink.click()
+
+        const avConfigPage = new AutoVersioningConfigPage(this.page, this.branch.ontrack)
+        await avConfigPage.expectOnPage()
+        return avConfigPage
     }
 }
 

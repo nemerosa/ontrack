@@ -7,6 +7,16 @@ export class Table {
         this.table = table
     }
 
+    async findRow(predicate) {
+        const rows = await this.table.locator('tr').all()
+        for (let row of rows) {
+            if (await predicate(row)) {
+                return new TableRow(this.page, this, row)
+            }
+        }
+        return null
+    }
+
     async getRow(cellId) {
         const row = this.table.getByRole('row', {name: cellId, exact: false})
         await expect(row).toBeVisible()
@@ -42,6 +52,13 @@ export class TableRow {
     async getCell(columnName) {
         const index = await this.table.getColumnIndex(columnName)
         return this.row.getByRole('cell').nth(index)
+    }
+
+    async expand() {
+        await this.row.getByRole('button', {name: 'Expand row'}).click()
+        const details = this.table.table.locator('tr.ant-table-expanded-row')
+        await expect(details).toBeVisible()
+        return details
     }
 }
 
