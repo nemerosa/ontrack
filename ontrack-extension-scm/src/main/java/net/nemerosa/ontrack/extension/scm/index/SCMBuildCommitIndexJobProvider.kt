@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.index
 
 import net.nemerosa.ontrack.extension.scm.SCMJobs
-import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.JobProvider
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component
 class SCMBuildCommitIndexJobProvider(
     private val structureService: StructureService,
     private val scmBuildCommitIndexService: SCMBuildCommitIndexService,
-    private val scmDetector: SCMDetector,
 ) : JobProvider {
 
     override fun getStartingJobs(): Collection<JobRegistration> =

@@ -7,6 +7,7 @@ import co.elastic.clients.util.ObjectBuilder
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
+import net.nemerosa.ontrack.extension.scm.SCMIndexationType
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -27,7 +28,7 @@ class ScmCommitSearchExtension(
     private val structureService: StructureService,
     private val securityService: SecurityService,
     private val ontrackConfigProperties: OntrackConfigProperties,
-    scmExtensionConfigProperties: SCMExtensionConfigProperties,
+    private val scmExtensionConfigProperties: SCMExtensionConfigProperties,
     private val scmDetector: SCMDetector,
     private val scmIssueSearchExtension: ScmIssueSearchExtension,
 ) : AbstractExtension(extensionFeature), SearchIndexer<ScmCommitSearchItem> {
@@ -77,16 +78,21 @@ class ScmCommitSearchExtension(
     }
 
     override fun indexAll(processor: (ScmCommitSearchItem) -> Unit) {
-        logger.debug("[search][indexation][scm-commits] Indexing all SCM commits")
-        val traceCommits = ontrackConfigProperties.search.index.logging &&
-                ontrackConfigProperties.search.index.tracing &&
-                logger.isDebugEnabled
-        securityService.asAdmin {
-            structureService.projectList.forEach { project ->
-                try {
-                    indexProjectCommits(project, traceCommits, processor)
-                } catch (any: Exception) {
-                    logger.error("[search][indexation][scm-commits] Cannot index commits for project ${project.name}", any)
+        if (scmExtensionConfigProperties.search.indexationType == SCMIndexationType.ELASTIC_SEARCH) {
+            logger.debug("[search][indexation][scm-commits] Indexing all SCM commits")
+            val traceCommits = ontrackConfigProperties.search.index.logging &&
+                    ontrackConfigProperties.search.index.tracing &&
+                    logger.isDebugEnabled
+            securityService.asAdmin {
+                structureService.projectList.forEach { project ->
+                    try {
+                        indexProjectCommits(project, traceCommits, processor)
+                    } catch (any: Exception) {
+                        logger.error(
+                            "[search][indexation][scm-commits] Cannot index commits for project ${project.name}",
+                            any
+                        )
+                    }
                 }
             }
         }

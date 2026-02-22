@@ -7,6 +7,7 @@ dependencies {
     api(project(":ontrack-extension-issues"))
     api(project(":ontrack-extension-indicators"))
 
+    implementation(project(":ontrack-extension-queue"))
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.apache.commons:commons-lang3")
