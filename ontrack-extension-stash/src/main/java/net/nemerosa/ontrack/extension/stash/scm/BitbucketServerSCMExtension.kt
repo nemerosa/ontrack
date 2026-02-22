@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommitFilter
 import net.nemerosa.ontrack.extension.scm.service.*
 import net.nemerosa.ontrack.extension.stash.StashExtensionFeature
 import net.nemerosa.ontrack.extension.stash.client.BitbucketClient
@@ -268,8 +269,23 @@ class BitbucketServerSCMExtension(
         override fun getBranchesForCommit(project: Project, commit: String): List<String> =
             client.getBranchesForCommit(repo, commit)
 
+        @Deprecated("Use forAllCommits with filter")
         override fun forAllCommits(code: (commit: SCMCommit) -> Unit) {
-            client.forEachCommit(repo) { commit ->
+            forAllCommits(
+                filter = SCMCommitFilter(
+                    sinceCommit = null,
+                    sinceCommitTimestamp = null,
+                    count = Int.MAX_VALUE,
+                ),
+                code = code
+            )
+        }
+
+        override fun forAllCommits(
+            filter: SCMCommitFilter,
+            code: (commit: SCMCommit) -> Unit
+        ) {
+            client.forEachCommit(filter, repo) { commit ->
                 code(
                     BitbucketServerSCMCommit(
                         root = configuration.url,

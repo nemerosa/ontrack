@@ -78,6 +78,12 @@ class MockSCMTester(
             )
         }
 
+        fun repositoryCommit(message: String) =
+            mockSCMExtension.repository(repositoryName).registerCommit(
+                scmBranch = "main",
+                message = message
+            )
+
         fun repositoryIssue(key: String, message: String, type: String? = null) {
             mockSCMExtension
                 .repository(repositoryName)

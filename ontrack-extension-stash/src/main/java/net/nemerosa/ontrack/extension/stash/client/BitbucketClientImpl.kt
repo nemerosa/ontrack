@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.stash.client
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommitFilter
 import net.nemerosa.ontrack.extension.stash.model.BitbucketProject
 import net.nemerosa.ontrack.extension.stash.model.BitbucketRepository
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
@@ -260,13 +261,19 @@ class BitbucketClientImpl(
             null
         }
 
-    override fun forEachCommit(repo: BitbucketRepository, code: (BitbucketServerCommit) -> Unit) {
+    override fun forEachCommit(filter: SCMCommitFilter, repo: BitbucketRepository, code: (BitbucketServerCommit) -> Unit) {
         var start = 0
         var isLastPage = false
+
+        val limit = minOf(maxCommits, filter.count)
+
+        var uri = "/rest/api/latest/projects/${repo.project}/repos/${repo.repository}/commits?limit=$limit"
+        if (filter.sinceCommit != null) {
+            uri += "&since=${filter.sinceCommit}"
+        }
+
         while (!isLastPage) {
-            val response = template.getForObject<JsonNode>(
-                "/rest/api/latest/projects/${repo.project}/repos/${repo.repository}/commits?start=$start&limit=$maxCommits"
-            )
+            val response = template.getForObject<JsonNode>("$uri&start=$start")
             response.path("values").forEach {
                 code(it.parse<BitbucketServerCommit>())
             }

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.stash.client
 
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommitFilter
 import net.nemerosa.ontrack.extension.stash.model.BitbucketProject
 import net.nemerosa.ontrack.extension.stash.model.BitbucketRepository
 import net.nemerosa.ontrack.extension.stash.scm.BitbucketServerPR
@@ -155,6 +156,6 @@ interface BitbucketClient {
     /**
      * Iterates over all commits.
      */
-    fun forEachCommit(repo: BitbucketRepository, code: (BitbucketServerCommit) -> Unit)
+    fun forEachCommit(filter: SCMCommitFilter, repo: BitbucketRepository, code: (BitbucketServerCommit) -> Unit)
 
 }

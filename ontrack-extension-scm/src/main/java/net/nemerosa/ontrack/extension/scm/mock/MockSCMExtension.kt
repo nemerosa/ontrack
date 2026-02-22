@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommitFilter
 import net.nemerosa.ontrack.extension.scm.service.*
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
@@ -425,8 +426,22 @@ class MockSCMExtension(
         override fun getBranchesForCommit(project: Project, commit: String): List<String> =
             repository(mockScmProjectProperty.name).getBranchesForCommit(commit)
 
+        @Deprecated("Use forAllCommits with filter")
         override fun forAllCommits(code: (commit: SCMCommit) -> Unit) {
             repository(mockScmProjectProperty.name).forAllCommits(code)
+        }
+
+        override fun forAllCommits(
+            filter: SCMCommitFilter,
+            code: (commit: SCMCommit) -> Unit
+        ) {
+            var count = 0
+            repository(mockScmProjectProperty.name).forAllCommits { scmCommit ->
+                if (count <= filter.count && (filter.sinceCommitTimestamp != null && filter.sinceCommitTimestamp <= scmCommit.timestamp)) {
+                    count++
+                    code(scmCommit)
+                }
+            }
         }
     }
 
