@@ -54,6 +54,9 @@ class SCMExtensionConfigProperties {
         @APIDescription("Timeout for an indexation job")
         var timeout: Duration = Duration.ofMinutes(10)
 
+        @APIDescription("Maximum number of items to index in a single job")
+        var batchSize: Int = 500
+
     }
 
 }
