@@ -16,6 +16,7 @@ class ScmSearchIndexServiceImpl(
     private val scmDetector: SCMDetector,
     private val scmExtensionConfigProperties: SCMExtensionConfigProperties,
     private val scmIndexIngestionRepository: ScmIndexIngestionRepository,
+    private val scmIndexCommitRepository: ScmIndexCommitRepository,
 ) : ScmSearchIndexService {
 
     // TODO Timeout
@@ -46,9 +47,30 @@ class ScmSearchIndexServiceImpl(
             sinceCommitTimestamp = lastIngestion?.lastCommitTimestamp,
             count = scmExtensionConfigProperties.search.database.batchSize,
         )
-        // TODO Launching the collection in a loop
-        // TODO Saving the data in the database
-        TODO()
+        // Launching the collection in a loop
+        var count = 0
+        scm.forAllCommits(
+            filter = scmCommitFilter,
+        ) { scmCommit ->
+            // Saving the data in the database
+            scmIndexCommitRepository.save(
+                project,
+                ScmIndexCommit(
+                    commitId = scmCommit.id,
+                    commitShort = scmCommit.shortId,
+                    commitTimestamp = scmCommit.timestamp,
+                    message = scmCommit.message,
+                )
+            )
+            // TODO Indexes the list of issues for this commit
+//            if (issueConfig != null) {
+//                val keys = issueConfig.extractIssueKeysFromMessage(commit.message)
+//                projectIssueKeys.addAll(keys)
+//            }
+            count++
+        }
+        // OK
+        return count
     }
 
 }

@@ -70,6 +70,15 @@ interface SCMChangeLogEnabled : SCM {
     /**
      * Looping over all the commits in the repository
      */
+    @Deprecated("Use forAllCommits with filter")
     fun forAllCommits(code: (commit: SCMCommit) -> Unit)
+
+    /**
+     * Looping over all the commits in the repository
+     */
+    fun forAllCommits(
+        filter: SCMCommitFilter,
+        code: (commit: SCMCommit) -> Unit
+    )
 
 }
