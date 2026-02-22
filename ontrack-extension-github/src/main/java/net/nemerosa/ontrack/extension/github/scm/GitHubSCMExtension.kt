@@ -63,6 +63,7 @@ class GitHubSCMExtension(
                 configuration = property.configuration,
                 repository = property.repository,
                 issueServiceConfigurationIdentifier = property.issueServiceConfigurationIdentifier,
+                indexationInterval = property.indexationInterval,
                 settings = settings,
             )
         }
@@ -81,6 +82,7 @@ class GitHubSCMExtension(
             configuration = config,
             repository = "$owner/$repo",
             issueServiceConfigurationIdentifier = null,
+            indexationInterval = 0,
             settings = cachedSettingsService.getCachedSettings(GitHubSCMCatalogSettings::class.java),
         )
         return SCMPath(
@@ -93,6 +95,7 @@ class GitHubSCMExtension(
         private val configuration: GitHubEngineConfiguration,
         override val repository: String,
         private val issueServiceConfigurationIdentifier: String?,
+        override val indexationInterval: Int,
         private val settings: GitHubSCMCatalogSettings,
     ) : SCMChangeLogEnabled {
 
