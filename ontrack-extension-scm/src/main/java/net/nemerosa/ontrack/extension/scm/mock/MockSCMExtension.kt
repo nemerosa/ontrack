@@ -319,6 +319,8 @@ class MockSCMExtension(
         private val mockScmProjectProperty: MockSCMProjectProperty,
     ) : SCM, SCMChangeLogEnabled {
 
+        override val indexationInterval: Int = 0
+
         override val type: String = "mock"
         override val engine: String = "mock"
 

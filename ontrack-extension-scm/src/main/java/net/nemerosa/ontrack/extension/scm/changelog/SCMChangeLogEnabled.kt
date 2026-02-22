@@ -12,6 +12,11 @@ import net.nemerosa.ontrack.model.structure.Project
 interface SCMChangeLogEnabled : SCM {
 
     /**
+     * Indexation interval for this project configuration, in minutes. If 0 or less, no indexation is performed.
+     */
+    val indexationInterval: Int
+
+    /**
      * Gets the change log between two builds.
      *
      * Implementation notes:

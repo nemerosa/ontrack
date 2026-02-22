@@ -55,6 +55,7 @@ class BitbucketServerSCMExtension(
             project = project,
             repositoryName = repository,
             issueServiceConfigurationIdentifier = null,
+            indexationInterval = 0,
             settings = cachedSettingsService.getCachedSettings(BitbucketServerSettings::class.java)
         )
         return SCMPath(
@@ -71,6 +72,7 @@ class BitbucketServerSCMExtension(
             project = property.project,
             repositoryName = property.repository,
             issueServiceConfigurationIdentifier = property.issueServiceConfigurationIdentifier,
+            indexationInterval = property.indexationInterval,
             settings = cachedSettingsService.getCachedSettings(BitbucketServerSettings::class.java),
         )
     }
@@ -80,6 +82,7 @@ class BitbucketServerSCMExtension(
         private val project: String,
         private val repositoryName: String,
         private val issueServiceConfigurationIdentifier: String?,
+        override val indexationInterval: Int,
         private val settings: BitbucketServerSettings,
     ) : SCMChangeLogEnabled {
 

@@ -31,6 +31,12 @@ class SCMExtensionConfigProperties {
         @APIDescription("Enabling auto indexation")
         var scheduled: Boolean = true
 
+        @APIDescription("Type of indexation")
+        var indexationType: SCMIndexationType = SCMIndexationType.ELASTIC_SEARCH
+
+        @APIDescription("Database indexation properties")
+        var database: SCMIndexationDatabaseConfigProperties = SCMIndexationDatabaseConfigProperties()
+
         /**
          * Converting the [schedule] property to a job [Schedule]
          */
@@ -40,6 +46,14 @@ class SCMExtensionConfigProperties {
             } else {
                 Schedule.NONE
             }
+    }
+
+    class SCMIndexationDatabaseConfigProperties {
+
+        @DurationUnit(ChronoUnit.MINUTES)
+        @APIDescription("Timeout for an indexation job")
+        var timeout: Duration = Duration.ofMinutes(10)
+
     }
 
 }
