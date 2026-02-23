@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import net.nemerosa.ontrack.repository.support.readLocalDateTimeNotNull
 import org.springframework.stereotype.Repository
+import java.sql.ResultSet
 import javax.sql.DataSource
 
 @Repository
@@ -56,12 +57,7 @@ class ScmIndexCommitRepository(dataSource: DataSource) : AbstractJdbcRepository(
                 "size" to size,
             )
         ) { rs, _ ->
-            ScmIndexCommit(
-                commitId = rs.getString("COMMIT_ID").trim(),
-                commitShort = rs.getString("COMMIT_SHORT").trim(),
-                commitTimestamp = rs.readLocalDateTimeNotNull("COMMIT_TIMESTAMP"),
-                message = rs.getString("MESSAGE"),
-            )
+            toCommit(rs)
         }
 
         return PaginatedList.create(
@@ -70,6 +66,32 @@ class ScmIndexCommitRepository(dataSource: DataSource) : AbstractJdbcRepository(
             pageSize = size,
             total = count,
         )
+    }
+
+    private fun toCommit(rs: ResultSet): ScmIndexCommit = ScmIndexCommit(
+        commitId = rs.getString("COMMIT_ID").trim(),
+        commitShort = rs.getString("COMMIT_SHORT").trim(),
+        commitTimestamp = rs.readLocalDateTimeNotNull("COMMIT_TIMESTAMP"),
+        message = rs.getString("MESSAGE"),
+    )
+
+    fun findLastCommit(id: Int, key: String): ScmIndexCommit? {
+        return namedParameterJdbcTemplate!!.query(
+            """
+                SELECT C.*
+                FROM SCM_INDEX_COMMIT_ISSUES L
+                INNER JOIN SCM_INDEX_COMMITS C ON L.COMMIT_ID = C.COMMIT_ID
+                WHERE L.PROJECT_ID = :projectId AND L.ISSUE_KEY = :issueKey
+                ORDER BY C.COMMIT_TIMESTAMP DESC
+                LIMIT 1
+            """.trimIndent(),
+            mapOf(
+                "projectId" to id,
+                "issueKey" to key
+            )
+        ) { rs, _ ->
+            toCommit(rs)
+        }.firstOrNull()
     }
 
 }

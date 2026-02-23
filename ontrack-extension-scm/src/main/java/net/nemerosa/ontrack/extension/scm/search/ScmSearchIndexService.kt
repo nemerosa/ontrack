@@ -18,4 +18,14 @@ interface ScmSearchIndexService {
      */
     fun getCommits(project: Project, offset: Int, size: Int): PaginatedList<ScmIndexCommit>
 
+    /**
+     * Looks for all issues matching the given [key].
+     */
+    fun findIssues(key: String): List<ScmIndexIssue>
+
+    /**
+     * Looks for the last commit for a given project and issue key.
+     */
+    fun getIssueLastCommit(project: Project, key: String): ScmIndexCommit?
+
 }
