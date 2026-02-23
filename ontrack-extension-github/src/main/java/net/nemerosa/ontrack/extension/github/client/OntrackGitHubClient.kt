@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.github.client
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.model.*
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommitFilter
 import org.springframework.web.client.RestTemplate
 
 
@@ -327,9 +328,10 @@ interface OntrackGitHubClient {
      * Iterates over all commits of a repository.
      *
      * @param repository Repository name, like `nemerosa/ontrack`
+     * @param filter Commit filter to apply
      * @param code Code to run for each commit
      */
-    fun forAllCommits(repository: String, code: (commit: GitHubCommit) -> Unit)
+    fun forAllCommits(repository: String, filter: SCMCommitFilter, code: (commit: GitHubCommit) -> Unit)
 
     companion object {
         const val PROPERTY_GITHUB_CLIENT_TYPE = "ontrack.extension.github.client.type"

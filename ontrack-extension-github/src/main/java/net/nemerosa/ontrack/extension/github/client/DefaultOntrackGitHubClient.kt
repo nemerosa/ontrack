@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.extension.github.app.GitHubAppRateLimitMetricsNames
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.model.*
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommitFilter
 import net.nemerosa.ontrack.git.support.GitConnectionConfig
 import net.nemerosa.ontrack.git.support.GitConnectionRetry
 import net.nemerosa.ontrack.json.*
@@ -21,7 +22,9 @@ import org.apache.commons.codec.binary.Base64
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClientResponseException
@@ -30,6 +33,8 @@ import org.springframework.web.client.getForObject
 import java.net.URLEncoder
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 /**
@@ -925,9 +930,22 @@ class DefaultOntrackGitHubClient(
                 "sort" to "committer-date",
                 "order" to "desc"
             )
-            val node = client.getForObject<JsonNode>(url, params)
-            val items = node.path("items")
-            if (items.isArray && items.size() > 0) {
+            // Using the cloak-preview header for the search API
+            val node = client("Searching for last commit of issue #$key") {
+                exchange(
+                    url,
+                    HttpMethod.GET,
+                    HttpEntity<Any>(
+                        org.springframework.http.HttpHeaders().apply {
+                            set("Accept", "application/vnd.github.cloak-preview")
+                        }
+                    ),
+                    JsonNode::class.java,
+                    params
+                ).body
+            }
+            val items = node?.path("items")
+            if (items != null && items.isArray && items.size() > 0) {
                 items[0].path("sha").asText(null)
             } else {
                 null
@@ -949,70 +967,106 @@ class DefaultOntrackGitHubClient(
         }
     }
 
-    override fun forAllCommits(repository: String, code: (commit: GitHubCommit) -> Unit) {
+    override fun forAllCommits(repository: String, filter: SCMCommitFilter, code: (commit: GitHubCommit) -> Unit) {
         val (owner, name) = getRepositoryParts(repository)
-        paginateGraphQL(
-            message = "Iterating over all commits for $repository",
-            query = $$"""
-                query AllCommits($owner: String!, $name: String!, $after: String) {
-                    repository(owner: $owner, name: $name) {
-                        defaultBranchRef {
-                            target {
-                                ... on Commit {
-                                    history(first: 100, after: $after) {
-                                        pageInfo {
-                                            hasNextPage
-                                            endCursor
-                                        }
-                                        edges {
-                                            node {
-                                                oid
-                                                url
-                                                message
-                                                author {
-                                                    name
-                                                    email
-                                                    date
-                                                }
-                                                committer {
-                                                    name
-                                                    email
-                                                    date
-                                                }
-                                            }
-                                        }
-                                    }
+        val client = createGitHubRestTemplate()
+
+        // Starting timestamp
+        var currentSinceTimestamp: LocalDateTime? = filter.sinceCommitTimestamp
+        val filterSinceCommit = filter.sinceCommit
+        if (currentSinceTimestamp == null && filterSinceCommit != null) {
+            val sinceCommit = getCommit(repository, filterSinceCommit)
+            currentSinceTimestamp = sinceCommit?.commit?.committer?.date
+        }
+
+        var totalCount = 0
+        var done = false
+        val seenShas = mutableSetOf<String>()
+        if (filterSinceCommit != null) {
+            seenShas.add(filterSinceCommit)
+        }
+
+        while (!done && totalCount < filter.count) {
+            val q = StringBuilder("repo:$owner/$name")
+            if (currentSinceTimestamp != null) {
+                // We use >= to make sure we don't miss anything if multiple commits have the same timestamp,
+                // and we'll filter out seen SHAs.
+                // We use the ISO 8601 format for the date.
+                val formattedTimestamp = currentSinceTimestamp.atOffset(ZoneOffset.UTC).format(searchTimestampFormatter)
+                q.append(" committer-date:>=$formattedTimestamp")
+            }
+
+            var page = 1
+            var batchHasResults = false
+            var lastTimestampInBatch: LocalDateTime? = null
+
+            // Search API only allows up to 1000 results (e.g., 10 pages of 100)
+            // Note: Search API is used because it's the only one allowing across-all-branches search
+            // AND chronological sorting. The repository/commits endpoint only supports one branch at a time
+            // and only returns results in reverse chronological order.
+            while (page <= 10 && totalCount < filter.count) {
+                val perPage = 100
+                val url = "/search/commits?q={q}&sort=committer-date&order=asc&per_page={per_page}&page={page}"
+
+                val response = try {
+                    client("Searching for commits batch (page $page)") {
+                        exchange(
+                            url,
+                            HttpMethod.GET,
+                            HttpEntity<Any>(
+                                HttpHeaders().apply {
+                                    set("Accept", "application/vnd.github.cloak-preview")
                                 }
-                            }
+                            ),
+                            JsonNode::class.java,
+                            mapOf(
+                                "q" to q.toString(),
+                                "per_page" to perPage,
+                                "page" to page
+                            )
+                        ).body
+                    }
+                } catch (ex: GitHubErrorsException) {
+                    if (ex.status == 422) break
+                    throw ex
+                }
+
+                val items = response?.path("items")
+                if (items == null || items.isMissingNode || items.isEmpty) {
+                    break
+                }
+
+                batchHasResults = true
+                for (item in items) {
+                    val commit: GitHubCommit = item.parse()
+                    if (seenShas.add(commit.sha)) {
+                        if (totalCount < filter.count) {
+                            code(commit)
+                            totalCount++
+                            lastTimestampInBatch = commit.commit.committer.date
+                        } else {
+                            done = true
+                            break
                         }
                     }
                 }
-            """,
-            variables = mapOf(
-                "owner" to owner,
-                "name" to name
-            ),
-            collectionAt = listOf("repository", "defaultBranchRef", "target", "history"),
-            nodes = false,
-        ) { n ->
-            val node = n.path("node")
-            val sha = node.path("oid").asText()
-            val url = node.path("url").asText()
-            val message = node.path("message").asText()
-            val author = node.path("author").toGitHubAuthor()
-            val committer = node.path("committer").toGitHubAuthor()
-            code(
-                GitHubCommit(
-                    sha = sha,
-                    url = url,
-                    commit = GitHubCommitInfo(
-                        author = author,
-                        committer = committer,
-                        message = message
-                    ),
-                    parents = null // Not needed for now
-                )
-            )
+
+                if (items.size() < perPage) {
+                    done = true
+                    break
+                }
+                page++
+            }
+
+            if (!batchHasResults) {
+                done = true
+            } else if (!done) {
+                if (lastTimestampInBatch != null && lastTimestampInBatch != currentSinceTimestamp) {
+                    currentSinceTimestamp = lastTimestampInBatch
+                } else {
+                    done = true
+                }
+            }
         }
     }
 
@@ -1112,6 +1166,11 @@ class DefaultOntrackGitHubClient(
         }
 
     companion object {
+        /**
+         * Timestamp formatter for GitHub Search API
+         */
+        private val searchTimestampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
+
         /**
          * Cloud root API
          */

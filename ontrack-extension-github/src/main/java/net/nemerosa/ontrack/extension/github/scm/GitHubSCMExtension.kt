@@ -28,6 +28,7 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommitFilter
 import net.nemerosa.ontrack.extension.scm.service.*
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
@@ -120,8 +121,23 @@ class GitHubSCMExtension(
             return client.getBranchLastCommit(repository, branch, retryOnNotFound = false)
         }
 
+        @Deprecated("Use forAllCommits with filter")
         override fun forAllCommits(code: (commit: SCMCommit) -> Unit) {
-            client.forAllCommits(repository) {
+            forAllCommits(
+                filter = SCMCommitFilter(
+                    sinceCommit = null,
+                    sinceCommitTimestamp = null,
+                    count = Int.MAX_VALUE,
+                ),
+                code = code,
+            )
+        }
+
+        override fun forAllCommits(
+            filter: SCMCommitFilter,
+            code: (commit: SCMCommit) -> Unit
+        ) {
+            client.forAllCommits(repository, filter) {
                 code(GitHubSCMCommit(it))
             }
         }
