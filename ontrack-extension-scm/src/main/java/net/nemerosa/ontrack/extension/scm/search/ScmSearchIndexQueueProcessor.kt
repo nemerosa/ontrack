@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.extension.scm.search
 
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.extension.queue.QueueMetadata
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
@@ -11,6 +14,7 @@ import kotlin.reflect.KClass
 @Component
 class ScmSearchIndexQueueProcessor(
     private val scmSearchIndexService: ScmSearchIndexService,
+    private val scmExtensionConfigProperties: SCMExtensionConfigProperties,
     private val securityService: SecurityService,
     private val structureService: StructureService,
 ) : QueueProcessor<ScmSearchIndexQueueItem> {
@@ -23,6 +27,14 @@ class ScmSearchIndexQueueProcessor(
 
     override fun isCancelled(payload: ScmSearchIndexQueueItem): String? = null
 
+    /**
+     * One queue only
+     */
+    override val defaultScale: Int = 1
+
+    /**
+     * No parallel processing of indexes
+     */
     override val maxConcurrency: Int = 1
 
     override fun process(
@@ -32,7 +44,15 @@ class ScmSearchIndexQueueProcessor(
         securityService.asAdmin {
             val project = structureService.findProjectByName(payload.projectName).getOrNull()
             if (project != null) {
-                scmSearchIndexService.index(project)
+                runBlocking {
+                    val timeoutMillis = scmExtensionConfigProperties.search.database.timeout.toMillis()
+                    val commitCount = withTimeoutOrNull(timeoutMillis) {
+                        scmSearchIndexService.index(project)
+                    }
+                    if (commitCount == null) {
+                        throw ScmSearchIndexProjectTimeoutException(project.name)
+                    }
+                }
             } else {
                 throw ScmSearchIndexProjectNotFoundException(payload.projectName)
             }
