@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.extension.scm.search
 
+import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommitFilter
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
+import net.nemerosa.ontrack.model.metrics.timeNotNull
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.stereotype.Service
@@ -17,17 +19,21 @@ class ScmSearchIndexServiceImpl(
     private val scmExtensionConfigProperties: SCMExtensionConfigProperties,
     private val scmIndexIngestionRepository: ScmIndexIngestionRepository,
     private val scmIndexCommitRepository: ScmIndexCommitRepository,
+    private val meterRegistry: MeterRegistry,
 ) : ScmSearchIndexService {
-
-    // TODO Metrics
 
     override fun index(project: Project): Int {
         val scm = scmDetector.getSCM(project)
         return if (scm != null && scm is SCMChangeLogEnabled) {
-            indexInternal(
-                project = project,
-                scm = scm,
-            )
+            meterRegistry.timeNotNull(
+                ScmSearchIndexMetrics.scmSearchIndexIndexationTime,
+                ScmSearchIndexMetrics.TAG_PROJECT to project.name,
+            ) {
+                indexInternal(
+                    project = project,
+                    scm = scm,
+                )
+            }
         } else {
             throw ScmSearchIndexProjectSCMNotSupportedException(project.name)
         }
