@@ -311,7 +311,7 @@ class MockSCMExtension(
             }.map { it.name }
 
         fun forAllCommits(code: (SCMCommit) -> Unit) {
-            branches.flatMap { it.commits }.forEach(code)
+            branches.flatMap { it.commits }.sortedBy { it.revision }.forEach(code)
         }
 
     }
@@ -436,10 +436,15 @@ class MockSCMExtension(
             code: (commit: SCMCommit) -> Unit
         ) {
             var count = 0
+            var found = filter.sinceCommit == null
             repository(mockScmProjectProperty.name).forAllCommits { scmCommit ->
-                if (count <= filter.count && (filter.sinceCommitTimestamp != null && filter.sinceCommitTimestamp <= scmCommit.timestamp)) {
-                    count++
-                    code(scmCommit)
+                if (found) {
+                    if (count < filter.count) {
+                        count++
+                        code(scmCommit)
+                    }
+                } else {
+                    found = scmCommit.id == filter.sinceCommit
                 }
             }
         }
