@@ -8,6 +8,8 @@ import net.nemerosa.ontrack.extension.scm.changelog.SCMCommitFilter
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.metrics.timeNotNull
 import net.nemerosa.ontrack.model.pagination.PaginatedList
+import net.nemerosa.ontrack.model.security.ProjectView
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,10 +17,12 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class ScmSearchIndexServiceImpl(
+    private val securityService: SecurityService,
     private val scmDetector: SCMDetector,
     private val scmExtensionConfigProperties: SCMExtensionConfigProperties,
     private val scmIndexIngestionRepository: ScmIndexIngestionRepository,
     private val scmIndexCommitRepository: ScmIndexCommitRepository,
+    private val scmIndexIssueRepository: ScmIndexIssueRepository,
     private val meterRegistry: MeterRegistry,
 ) : ScmSearchIndexService {
 
@@ -39,6 +43,18 @@ class ScmSearchIndexServiceImpl(
         }
     }
 
+    override fun findIssues(key: String): List<ScmIndexIssue> =
+        scmIndexIssueRepository.findIssues(key)
+            .filter { securityService.isProjectFunctionGranted(it.projectId, ProjectView::class.java) }
+
+    override fun getIssueLastCommit(
+        project: Project,
+        key: String
+    ): ScmIndexCommit? {
+        securityService.checkProjectFunction(project, ProjectView::class.java)
+        return scmIndexCommitRepository.findLastCommit(project.id(), key)
+    }
+
     private fun indexInternal(project: Project, scm: SCMChangeLogEnabled): Int {
         // Gets the last ingestion data for this project
         val lastIngestion = scmIndexIngestionRepository.getLastIngestion(project.id())
@@ -48,6 +64,8 @@ class ScmSearchIndexServiceImpl(
             sinceCommitTimestamp = lastIngestion?.lastCommitTimestamp,
             count = scmExtensionConfigProperties.search.database.batchSize,
         )
+        // Issue service
+        val issueConfig = scm.getConfiguredIssueService()
         // Launching the collection in a loop
         var count = 0
         var lastScmCommit: SCMCommit? = null
@@ -64,11 +82,13 @@ class ScmSearchIndexServiceImpl(
                     message = scmCommit.message,
                 )
             )
-            // TODO Indexes the list of issues for this commit
-//            if (issueConfig != null) {
-//                val keys = issueConfig.extractIssueKeysFromMessage(commit.message)
-//                projectIssueKeys.addAll(keys)
-//            }
+            // Indexes the list of issues for this commit
+            if (issueConfig != null) {
+                val keys = issueConfig.extractIssueKeysFromMessage(scmCommit.message)
+                if (keys.isNotEmpty()) {
+                    scmIndexIssueRepository.index(project, keys, scmCommit.id)
+                }
+            }
             lastScmCommit = scmCommit
             count++
         }
