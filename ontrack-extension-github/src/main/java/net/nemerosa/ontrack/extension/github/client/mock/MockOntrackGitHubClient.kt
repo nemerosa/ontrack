@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.github.client.*
 import net.nemerosa.ontrack.extension.github.model.*
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommitFilter
 import org.springframework.web.client.RestTemplate
 
 class MockOntrackGitHubClient(
@@ -213,6 +214,11 @@ class MockOntrackGitHubClient(
         TODO("Not yet implemented")
     }
 
-    override fun forAllCommits(repository: String, code: (commit: GitHubCommit) -> Unit) {
+    override fun forAllCommits(
+        repository: String,
+        filter: SCMCommitFilter,
+        code: (commit: GitHubCommit) -> Unit
+    ) {
     }
+
 }

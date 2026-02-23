@@ -2,8 +2,10 @@ package net.nemerosa.ontrack.extension.scm.search
 
 import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommitFilter
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -42,6 +44,7 @@ class ScmSearchIndexServiceImpl(
         )
         // Launching the collection in a loop
         var count = 0
+        var lastScmCommit: SCMCommit? = null
         scm.forAllCommits(
             filter = scmCommitFilter,
         ) { scmCommit ->
@@ -60,10 +63,23 @@ class ScmSearchIndexServiceImpl(
 //                val keys = issueConfig.extractIssueKeysFromMessage(commit.message)
 //                projectIssueKeys.addAll(keys)
 //            }
+            lastScmCommit = scmCommit
             count++
         }
+        // Last ingestion data
+        scmIndexIngestionRepository.saveLastIngestion(
+            projectId = project.id(),
+            lastIngestion = lastIngestion,
+            lastScmCommit = lastScmCommit,
+        )
         // OK
         return count
     }
 
+    override fun getCommits(
+        project: Project,
+        offset: Int,
+        size: Int
+    ): PaginatedList<ScmIndexCommit> =
+        scmIndexCommitRepository.getCommits(project, offset, size)
 }
