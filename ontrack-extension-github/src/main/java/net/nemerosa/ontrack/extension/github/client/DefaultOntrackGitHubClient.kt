@@ -26,10 +26,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.RestClientResponseException
-import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.getForObject
+import org.springframework.web.client.*
 import java.net.URLEncoder
 import java.time.Duration
 import java.time.LocalDateTime
@@ -1009,23 +1006,20 @@ class DefaultOntrackGitHubClient(
                 val url = "/search/commits?q={q}&sort=committer-date&order=asc&per_page={per_page}&page={page}"
 
                 val response = try {
-                    client("Searching for commits batch (page $page)") {
-                        exchange(
-                            url,
-                            HttpMethod.GET,
-                            HttpEntity<Any>(
-                                HttpHeaders().apply {
-                                    set("Accept", "application/vnd.github.cloak-preview")
-                                }
-                            ),
-                            JsonNode::class.java,
-                            mapOf(
-                                "q" to q.toString(),
-                                "per_page" to perPage,
-                                "page" to page
-                            )
-                        ).body
-                    }
+                    client.exchange<JsonNode>(
+                        url,
+                        HttpMethod.GET,
+                        HttpEntity<Any>(
+                            HttpHeaders().apply {
+                                set("Accept", "application/vnd.github.cloak-preview")
+                            }
+                        ),
+                        mapOf(
+                            "q" to q.toString(),
+                            "per_page" to perPage,
+                            "page" to page
+                        )
+                    ).body
                 } catch (ex: GitHubErrorsException) {
                     if (ex.status == 422) break
                     throw ex
