@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.scm.search
 
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
 import net.nemerosa.ontrack.extension.queue.source.createQueueSource
+import net.nemerosa.ontrack.extension.scm.SCMExtensionConfigProperties
+import net.nemerosa.ontrack.extension.scm.SCMIndexationType
 import net.nemerosa.ontrack.extension.scm.SCMJobs
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
@@ -20,13 +22,18 @@ class ScmSearchIndexJobs(
     private val queueDispatcher: QueueDispatcher,
     private val scmSearchIndexQueueProcessor: ScmSearchIndexQueueProcessor,
     private val scmSearchIndexQueueSourceExtension: ScmSearchIndexQueueSourceExtension,
+    private val scmExtensionConfigProperties: SCMExtensionConfigProperties,
 ) : JobOrchestratorSupplier {
 
     override val jobRegistrations: Collection<JobRegistration>
-        get() = securityService.asAdmin {
-            structureService.projectList.mapNotNull {
-                createProjectScmSearchIndexJobRegistration(it)
+        get() = if (scmExtensionConfigProperties.search.indexationType == SCMIndexationType.DATABASE) {
+            securityService.asAdmin {
+                structureService.projectList.mapNotNull {
+                    createProjectScmSearchIndexJobRegistration(it)
+                }
             }
+        } else {
+            emptyList()
         }
 
     private fun createProjectScmSearchIndexJobRegistration(project: Project): JobRegistration? {
