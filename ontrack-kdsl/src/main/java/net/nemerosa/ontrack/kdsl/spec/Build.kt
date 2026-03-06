@@ -73,6 +73,18 @@ class Build(
         } ?: emptyList()
 
     /**
+     * Gets the list of promotions run for this build and a given promotion level name
+     */
+    fun getPromotionRunsForPromotionLevel(
+        promotionLevel: String,
+    ): List<PromotionRun> =
+        graphqlConnector.query(
+            BuildPromotionRunsQuery(id.toInt(), promotionLevel)
+        )?.builds?.firstOrNull()?.promotionRuns?.map {
+            it.promotionRunFragment.toPromotionRun(this@Build)
+        } ?: emptyList()
+
+    /**
      * Gets the list of builds used by _this_ build.
      */
     fun getLinksUsing(

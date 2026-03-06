@@ -27,6 +27,42 @@ private val durationShorthandRegex = "(\\d+)([smhdwMy])".toRegex()
 val durationRegex = "^${durationNumericRegex}|${durationIsoRegex}|${durationShorthandRegex}$"
 
 /**
+ * Week in seconds
+ */
+private val weekSeconds = 86400 * 7
+
+/**
+ * Day in seconds
+ */
+private val daySeconds = 24 * 3600
+
+/**
+ * Hour in seconds
+ */
+private val hourSeconds = 3600
+
+/**
+ * Minute in seconds
+ */
+private val minuteSeconds = 60
+
+/**
+ * Formatting of durations using shorthand representations when possible.
+ */
+fun Duration.format(): String {
+    val seconds = this.toSeconds()
+    return when {
+        seconds == 0L -> "0s"
+        seconds % weekSeconds == 0L -> "${seconds / weekSeconds}w"
+        seconds % 86400 == 0L -> "${seconds / 86400}d"
+        seconds % 3600 == 0L -> "${seconds / 3600}h"
+        seconds % 60 == 0L -> "${seconds / 60}m"
+        seconds < 60 -> "${seconds}s"
+        else -> this.toString()
+    }
+}
+
+/**
  * Parsing of durations using different possible formats:
  *
  * * 1800 - numeric, number of seconds

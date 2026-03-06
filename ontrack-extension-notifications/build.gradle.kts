@@ -39,6 +39,7 @@ dependencies {
     testFixturesImplementation(testFixtures(project(":ontrack-it-utils")))
     testFixturesImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testFixturesImplementation(testFixtures(project(":ontrack-extension-queue")))
+    testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

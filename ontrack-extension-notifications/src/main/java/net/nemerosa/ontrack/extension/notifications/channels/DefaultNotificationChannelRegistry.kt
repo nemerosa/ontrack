@@ -1,13 +1,16 @@
 package net.nemerosa.ontrack.extension.notifications.channels
 
+import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
 
 @Component
 class DefaultNotificationChannelRegistry(
-    channels: List<NotificationChannel<*,*>>,
+    private val applicationContext: ApplicationContext,
 ) : NotificationChannelRegistry {
 
-    private val index = channels.associateBy { it.type }
+    private val index: Map<String, NotificationChannel<*, *>> by lazy {
+        applicationContext.getBeansOfType(NotificationChannel::class.java).values.associateBy { it.type }
+    }
 
     override val channels: List<NotificationChannel<*, *>>
         get() = index.values.sortedBy { it.type }

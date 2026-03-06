@@ -52,6 +52,46 @@ class DurationUtilsTest {
     }
 
     @Test
+    fun `Formatting of durations`() {
+        assertEquals(
+            "30m",
+            Duration.ofMinutes(30).format(),
+        )
+        assertEquals(
+            "1h",
+            Duration.ofHours(1).format(),
+        )
+        assertEquals(
+            "15s",
+            Duration.ofSeconds(15).format(),
+        )
+        assertEquals(
+            "15m",
+            Duration.ofMinutes(15).format(),
+        )
+        assertEquals(
+            "15h",
+            Duration.ofHours(15).format(),
+        )
+        assertEquals(
+            "15d",
+            Duration.ofDays(15).format(),
+        )
+        assertEquals(
+            "15w",
+            Duration.ofDays(15 * 7).format(),
+        )
+        assertEquals(
+            "0s",
+            Duration.ZERO.format(),
+        )
+        assertEquals(
+            "366h",
+            Duration.ofDays(15).plusHours(6).format(),
+        )
+    }
+
+    @Test
     fun `Format is truncated to the highest unit`() {
         val duration = Duration.parse("P2DT13H56M")
         val format = formatDurationForHumans(duration)

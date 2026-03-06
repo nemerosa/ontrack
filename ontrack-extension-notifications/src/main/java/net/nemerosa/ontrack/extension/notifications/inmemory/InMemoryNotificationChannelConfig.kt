@@ -9,4 +9,6 @@ data class InMemoryNotificationChannelConfig(
     val group: String,
     @APIDescription("Optional data to pass along to the output")
     val data: String? = null,
+    @APIDescription("Optional waiting time in ms")
+    val waitMs: Long? = null,
 )

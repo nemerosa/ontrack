@@ -1,0 +1,10 @@
+query BuildPromotionRuns(
+    $buildId: Int!,
+    $promotionLevel: String!,
+) {
+    builds(id: $buildId) {
+        promotionRuns(promotion: $promotionLevel) {
+            ...PromotionRunFragment
+        }
+    }
+}

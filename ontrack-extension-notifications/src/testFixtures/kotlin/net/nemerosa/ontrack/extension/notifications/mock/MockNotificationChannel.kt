@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.notifications.mock
 
 import com.fasterxml.jackson.databind.JsonNode
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
@@ -119,6 +121,13 @@ class MockNotificationChannel(
             template = template,
             renderer = renderer,
         )
+
+        if (config.waitMs != null) {
+            runBlocking {
+                delay(config.waitMs)
+            }
+        }
+
         messages.getOrPut(config.target) { mutableListOf() }.add(text)
         return NotificationResult.ok(
             output = MockNotificationChannelOutput(text = text, data = config.data)

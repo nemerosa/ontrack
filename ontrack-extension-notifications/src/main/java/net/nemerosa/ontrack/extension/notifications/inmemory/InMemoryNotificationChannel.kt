@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.notifications.inmemory
 
 import com.fasterxml.jackson.databind.JsonNode
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
@@ -63,6 +65,13 @@ class InMemoryNotificationChannel(
             template,
             PlainEventRenderer()
         )
+
+        if (config.waitMs != null) {
+            runBlocking {
+                delay(config.waitMs)
+            }
+        }
+
         messages.getOrPut(config.group) { mutableListOf() }.add(text)
         return NotificationResult.ok(InMemoryNotificationChannelOutput(sent = true, data = config.data))
     }
