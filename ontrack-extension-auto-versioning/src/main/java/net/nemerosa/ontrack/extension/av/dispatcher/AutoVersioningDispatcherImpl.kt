@@ -50,7 +50,7 @@ class AutoVersioningDispatcherImpl(
                     }
                 }
             } else {
-                logger.error("Dispatching not possible because no trail was created (auto-versioning may not be enabled after all)")
+                // Dispatching not possible because no trail was created
             }
         }
     }
