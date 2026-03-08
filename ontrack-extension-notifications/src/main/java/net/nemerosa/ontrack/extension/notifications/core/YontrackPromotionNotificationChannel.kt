@@ -1,34 +1,29 @@
 package net.nemerosa.ontrack.extension.notifications.core
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.api.APIDescription
 import net.nemerosa.ontrack.common.parseDuration
-import net.nemerosa.ontrack.common.waitFor
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
+import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordFilter
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordingService
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionFilter
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
-import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.patchBoolean
-import net.nemerosa.ontrack.json.patchNullableString
-import net.nemerosa.ontrack.json.patchString
+import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.PromotionRun
-import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.model.structure.toProjectEntityID
+import net.nemerosa.ontrack.model.structure.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.time.Duration
 import kotlin.jvm.optionals.getOrNull
-import kotlin.time.toKotlinDuration
 
 @Component
 @APIDescription("Promotes a build in Yontrack")
@@ -105,45 +100,82 @@ class YontrackPromotionNotificationChannel(
 
         logger.info("Promoted build ${build.name} to ${promotionLevel.name}: ${run.id}")
 
-        // Waiting for the promotion notifications to be completed & successful
-        if (config.waitForPromotion) {
+        val output = YontrackPromotionNotificationChannelOutput(
+            runId = run.id(),
+            promotionLevelId = promotionLevel.id(),
+        )
+
+        return if (config.waitForPromotion) {
+            // Promotion created, waiting for the promotion notifications to be completed
+            // will be done asynchronously
+            NotificationResult.async(
+                output
+            )
+        } else {
+            // Done & done
+            NotificationResult.ok(
+                output
+            )
+        }
+
+
+    }
+
+    override fun getNotificationResult(notificationRecord: NotificationRecord): NotificationResult<YontrackPromotionNotificationChannelOutput>? {
+        val config = notificationRecord.channelConfig.parse<YontrackPromotionNotificationChannelConfig>()
+        val output = notificationRecord.result.output
+            ?.parse<YontrackPromotionNotificationChannelOutput>()
+        val runId = output
+            ?.runId
+            ?: return null
+        val promotionLevelId = output.promotionLevelId
+
+        return if (config.waitForPromotion) {
+
+            val run = structureService.getPromotionRun(ID.of(runId))
+            val runStart = run.signature.time
+            val elapsedTime = Duration.between(runStart, Time.now)
+
+            if (elapsedTime > config.waitForPromotionTimeout) {
+                return NotificationResult.error(
+                    "Timeout after ${config.waitForPromotionTimeout}",
+                    output
+                )
+            }
+
             val subscriptionsCount = eventSubscriptionService.filterSubscriptions(
                 EventSubscriptionFilter(
-                    entity = promotionLevel.toProjectEntityID(),
+                    entity = ProjectEntityID(
+                        type = ProjectEntityType.PROMOTION_LEVEL,
+                        id = promotionLevelId
+                    )
                 )
             ).pageInfo.totalSize
             logger.info("Waiting for $subscriptionsCount subscriptions to complete...")
             if (subscriptionsCount > 0) {
-                waitForPromotion(recordId, subscriptionsCount, run, config)
+                val records = notificationRecordingService.filter(
+                    filter = NotificationRecordFilter(
+                        eventEntityId = ProjectEntityID(
+                            type = ProjectEntityType.PROMOTION_RUN,
+                            id = runId
+                        )
+                    )
+                ).pageItems.filter { it.id != notificationRecord.id }
+                if (records.size == subscriptionsCount && records.all { it.result.type == NotificationResultType.OK }) {
+                    NotificationResult.ok(output)
+                } else if (records.all { it.result.type.running }) {
+                    NotificationResult.ongoing(output)
+                } else {
+                    NotificationResult.error(
+                        "At least one notification linked to the promotion failed, was not valid or was interrupted",
+                        output
+                    )
+                }
+            } else {
+                null
             }
-        }
-
-        return NotificationResult.ok(
-            YontrackPromotionNotificationChannelOutput(
-                runId = run.id(),
-            )
-        )
-    }
-
-    private fun waitForPromotion(
-        recordId: String,
-        subscriptionsCount: Int,
-        run: PromotionRun,
-        config: YontrackPromotionNotificationChannelConfig
-    ) {
-        waitFor(
-            message = "Waiting for promotion notifications to complete: $run",
-            timeout = config.waitForPromotionTimeout.toKotlinDuration(),
-        ) {
-            logger.info("Checking for promotion notifications...")
-            notificationRecordingService.filter(
-                filter = NotificationRecordFilter(
-                    eventEntityId = run.toProjectEntityID()
-                )
-            ).pageItems.filter { it.id != recordId }
-        } until { records ->
-            logger.info("Checking for promotion notifications: ${records.map { it.result.type }}")
-            records.size == subscriptionsCount && records.all { it.result.type == NotificationResultType.OK }
+        } else {
+            null
         }
     }
 

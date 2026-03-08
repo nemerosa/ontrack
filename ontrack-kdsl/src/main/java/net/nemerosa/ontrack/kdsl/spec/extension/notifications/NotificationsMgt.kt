@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.NotificationRecordsQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SubscribeToEntityEventsMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SubscriptionsByEntityQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.spec.ProjectEntity
 
@@ -86,9 +87,17 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
     /**
      * Gets the last notification record for a given channel
      */
-    fun notificationRecords(channel: String?): List<NotificationRecord> {
+    fun notificationRecords(
+        channel: String?,
+        projectEntityType: ProjectEntityType? = null,
+        projectEntityId: Int? = null,
+    ): List<NotificationRecord> {
         return graphqlConnector.query(
-            NotificationRecordsQuery(Optional.presentIfNotNull(channel))
+            NotificationRecordsQuery(
+                Optional.presentIfNotNull(channel),
+                Optional.presentIfNotNull(projectEntityType),
+                Optional.presentIfNotNull(projectEntityId),
+            )
         )?.notificationRecords?.pageItems
             ?.map {
                 NotificationRecord(

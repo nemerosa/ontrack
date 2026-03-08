@@ -1,7 +1,13 @@
 query NotificationRecords(
     $channel: String,
+    $eventEntityType: ProjectEntityType = null,
+    $eventEntityId: Int = null,
 ) {
-    notificationRecords(channel: $channel) {
+    notificationRecords(
+        channel: $channel,
+        eventEntityType: $eventEntityType,
+        eventEntityId: $eventEntityId,
+    ) {
         pageItems {
             id
             source {

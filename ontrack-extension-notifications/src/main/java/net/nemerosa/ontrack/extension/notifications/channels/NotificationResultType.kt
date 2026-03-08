@@ -1,22 +1,24 @@
 package net.nemerosa.ontrack.extension.notifications.channels
 
-enum class NotificationResultType {
+enum class NotificationResultType(
+    val running: Boolean,
+) {
 
-    OK,
+    OK(running = false),
 
-    ONGOING,
+    ONGOING(running = true),
 
-    NOT_CONFIGURED,
+    NOT_CONFIGURED(running = false),
 
-    INVALID_CONFIGURATION,
+    INVALID_CONFIGURATION(running = false),
 
-    DISABLED,
+    DISABLED(running = false),
 
-    ERROR,
+    ERROR(running = false),
 
     @Deprecated("Timeout was introduced in 4.10.3 but is no longer used. No replacement not deletion is planned at the moment.")
-    TIMEOUT,
+    TIMEOUT(running = false),
 
-    ASYNC,
+    ASYNC(running = true),
 
 }

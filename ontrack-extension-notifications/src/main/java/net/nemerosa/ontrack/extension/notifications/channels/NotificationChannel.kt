@@ -17,6 +17,10 @@ interface NotificationChannel<C, R> {
     /**
      * Sends an event onto this channel.
      *
+     * If the notification launches asynchronous processes that will participate
+     * into its outcome and result, it should return an [asynchronous][NotificationResult.async]
+     * result and computes its current state using the [getNotificationResult] function.
+     *
      * @param recordId Unique ID for the recording of this notification
      * @param config Configuration for the channel
      * @param event Event to send notification about
@@ -37,8 +41,11 @@ interface NotificationChannel<C, R> {
     /**
      * Getting the result of a notification dynamically.
      *
-     * By default, returns null, meaning that the notification result is
-     * immediately returned by the channel.
+     * By default, returns null, meaning that the channel
+     * immediately returns the notification result.
+     *
+     * If the notification's result is computed asynchronously, this function
+     * is called to retrieve the current state of the notification.
      *
      * @param notificationRecord Notification to get the result for
      * @return Actual notification result or null if must be ignored
