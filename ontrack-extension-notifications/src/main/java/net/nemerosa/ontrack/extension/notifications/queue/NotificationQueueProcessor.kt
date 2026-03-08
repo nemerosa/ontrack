@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.notifications.NotificationsConfigPropertie
 import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
 import net.nemerosa.ontrack.extension.notifications.model.Notification
 import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingService
+import net.nemerosa.ontrack.extension.queue.QueueAckMode
 import net.nemerosa.ontrack.extension.queue.QueueMetadata
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
 import net.nemerosa.ontrack.model.events.SerializableEventService
@@ -44,4 +45,9 @@ class NotificationQueueProcessor(
     }
 
     override fun getRoutingIdentifier(payload: NotificationQueuePayload): String = payload.id
+
+    /**
+     * Immediately ack the messages
+     */
+    override val ackMode: QueueAckMode = QueueAckMode.IMMEDIATE
 }

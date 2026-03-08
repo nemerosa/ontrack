@@ -62,7 +62,7 @@ class ACCYontrackPromotionNotificationChannel : AbstractACCDSLNotificationsTestS
                             ) {
                                 targetBuild.getPromotionRunsForPromotionLevel(targetPl.name).firstOrNull()
                             } until {
-                                it.description == "Promotion of $name"
+                                it.description == "Promotion of source"
                             }
 
                             // Waits until the Promotion notification is OK

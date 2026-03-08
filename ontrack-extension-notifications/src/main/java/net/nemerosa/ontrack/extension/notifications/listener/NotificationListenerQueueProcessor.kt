@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
 import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
 import net.nemerosa.ontrack.extension.notifications.metrics.incrementForEvent
+import net.nemerosa.ontrack.extension.queue.QueueAckMode
 import net.nemerosa.ontrack.extension.queue.QueueMetadata
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
 import net.nemerosa.ontrack.model.events.SerializableEventService
@@ -51,4 +52,9 @@ class NotificationListenerQueueProcessor(
 
     override fun getRoutingIdentifier(payload: NotificationListenerQueuePayload): String =
         payload.serializedEvent.id.toString()
+
+    /**
+     * Immediately ack the messages
+     */
+    override val ackMode: QueueAckMode = QueueAckMode.IMMEDIATE
 }
