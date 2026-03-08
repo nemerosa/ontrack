@@ -86,6 +86,7 @@ class NotificationsCIConfigExtensionTest {
                         channelConfig = mapOf(
                             "target" to "#release",
                             "data" to null,
+                            "waitMs" to null,
                             "rendererType" to null,
                         ).asJson(),
                     ),

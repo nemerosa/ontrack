@@ -219,6 +219,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                                     "channelConfig" to mapOf(
                                         "target" to "#one",
                                         "data" to null,
+                                        "waitMs" to null,
                                         "rendererType" to null,
                                     ),
                                     "events" to listOf(
@@ -418,6 +419,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                                     "channelConfig" to mapOf(
                                         "target" to "#one",
                                         "data" to null,
+                                        "waitMs" to null,
                                         "rendererType" to null,
                                     ),
                                     "events" to listOf(

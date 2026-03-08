@@ -125,6 +125,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                         mapOf(
                             "target" to targetBranch,
                             "data" to null,
+                            "waitMs" to null,
                             "rendererType" to null,
                         ).asJson(),
                         subscription.channelConfig
@@ -142,6 +143,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                         mapOf(
                             "target" to targetProject,
                             "data" to null,
+                            "waitMs" to null,
                             "rendererType" to null,
                         ).asJson(),
                         subscription.channelConfig
