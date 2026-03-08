@@ -15,6 +15,8 @@ import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
@@ -32,6 +34,8 @@ class InMemoryNotificationChannel(
     AbstractNotificationChannel<InMemoryNotificationChannelConfig, InMemoryNotificationChannelOutput>(
         InMemoryNotificationChannelConfig::class
     ) {
+
+    private val logger: Logger = LoggerFactory.getLogger(InMemoryNotificationChannel::class.java)
 
     override fun validateParsedConfig(config: InMemoryNotificationChannelConfig) {
         if (config.group.isBlank()) {
@@ -67,11 +71,13 @@ class InMemoryNotificationChannel(
         )
 
         if (config.waitMs != null) {
+            logger.info("Waiting ${config.waitMs}ms before sending the message")
             runBlocking {
                 delay(config.waitMs)
             }
         }
 
+        logger.info("Sending message to group ${config.group}: $text")
         messages.getOrPut(config.group) { mutableListOf() }.add(text)
         return NotificationResult.ok(InMemoryNotificationChannelOutput(sent = true, data = config.data))
     }

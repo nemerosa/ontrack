@@ -24,6 +24,8 @@ import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.PromotionRun
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import kotlin.jvm.optionals.getOrNull
 import kotlin.time.toKotlinDuration
@@ -42,6 +44,8 @@ class YontrackPromotionNotificationChannel(
 ) : AbstractNotificationChannel<YontrackPromotionNotificationChannelConfig, YontrackPromotionNotificationChannelOutput>(
     YontrackPromotionNotificationChannelConfig::class
 ) {
+
+    private val logger: Logger = LoggerFactory.getLogger(YontrackPromotionNotificationChannel::class.java)
 
     override fun validateParsedConfig(config: YontrackPromotionNotificationChannelConfig) {
         if (config.promotion.isBlank()) {
@@ -86,6 +90,8 @@ class YontrackPromotionNotificationChannel(
             promotionLevel = config.promotion,
         ).getOrNull() ?: return NotificationResult.error("Promotion level not found: ${config.promotion}")
 
+        logger.info("Promoting build ${build.name} to ${promotionLevel.name}...")
+
         val run = securityService.asAdmin {
             structureService.newPromotionRun(
                 PromotionRun.of(
@@ -97,6 +103,8 @@ class YontrackPromotionNotificationChannel(
             )
         }
 
+        logger.info("Promoted build ${build.name} to ${promotionLevel.name}: ${run.id}")
+
         // Waiting for the promotion notifications to be completed & successful
         if (config.waitForPromotion) {
             val subscriptionsCount = eventSubscriptionService.filterSubscriptions(
@@ -104,6 +112,7 @@ class YontrackPromotionNotificationChannel(
                     entity = promotionLevel.toProjectEntityID(),
                 )
             ).pageInfo.totalSize
+            logger.info("Waiting for $subscriptionsCount subscriptions to complete...")
             if (subscriptionsCount > 0) {
                 waitForPromotion(recordId, subscriptionsCount, run, config)
             }
@@ -126,12 +135,14 @@ class YontrackPromotionNotificationChannel(
             message = "Waiting for promotion notifications to complete: $run",
             timeout = config.waitForPromotionTimeout.toKotlinDuration(),
         ) {
+            logger.info("Checking for promotion notifications...")
             notificationRecordingService.filter(
                 filter = NotificationRecordFilter(
                     eventEntityId = run.toProjectEntityID()
                 )
             ).pageItems.filter { it.id != recordId }
         } until { records ->
+            logger.info("Checking for promotion notifications: ${records.map { it.result.type }}")
             records.size == subscriptionsCount && records.all { it.result.type == NotificationResultType.OK }
         }
     }
