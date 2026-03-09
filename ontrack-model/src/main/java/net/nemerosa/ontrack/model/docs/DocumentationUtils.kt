@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyName
+import java.time.Duration
 import java.time.LocalDateTime
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -105,6 +106,7 @@ fun getFieldType(documentationClass: KClass<*>, property: KProperty1<out Any, *>
         List::class -> "List"
         JsonNode::class -> "JSON"
         LocalDateTime::class -> "LocalDateTime"
+        Duration::class -> "String"
         else -> if (classifier is KClass<*>) {
             when {
                 classifier.isSubclassOf(Enum::class) ->
