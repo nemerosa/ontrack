@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.BuildDisplayNameService
+import net.nemerosa.ontrack.model.structure.ID
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -64,6 +65,24 @@ class CIConfigurationMutationsIT : AbstractQLKTITSupport() {
                 buildDisplayNameService.getFirstBuildDisplayName(build),
                 "Build has the expected version as display name"
             )
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Configuration of the branch only`() {
+        configTestSupport.withBranchConfig(
+            """
+                version: v1
+                configuration: {}
+            """.trimIndent(),
+        ) { payload ->
+            val branchId = payload.path("branch").path("id").asInt()
+            // Getting the branch
+            val branch = structureService.getBranch(ID.of(branchId))
+            assertEquals("release-5.1", branch.name)
+            // Checking there is no build
+            assertEquals(0, structureService.getBuildCount(branch), "No build was created")
         }
     }
 

@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.config.ci.CIConfigurationService
 import net.nemerosa.ontrack.extension.config.model.ConfigureBuildInput
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Component
 
@@ -27,6 +28,21 @@ class CIConfigurationMutations(
                 scm = input.scm,
                 env = input.env,
             )
-        }
+        },
+        simpleMutation(
+            name = "configureBranch",
+            description = "Configuration of a Yontrack branch based on some input",
+            input = ConfigureBuildInput::class,
+            outputName = "branch",
+            outputDescription = "Configured branch",
+            outputType = Branch::class,
+        ) { input ->
+            ciConfigurationService.configureBranch(
+                config = input.config,
+                ci = input.ci,
+                scm = input.scm,
+                env = input.env,
+            )
+        },
     )
 }

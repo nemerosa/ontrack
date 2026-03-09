@@ -100,6 +100,52 @@ class ConfigTestSupport(
         }
     }
 
+    fun withBranchConfig(
+        yaml: String,
+        ci: String? = DEFAULT_CI,
+        scm: String? = DEFAULT_SCM,
+        scmBranch: String = "release/5.1",
+        extraEnv: Map<String, String> = emptyMap(),
+        env: Map<String, String> = EnvFixtures.generic(scmBranch, extraEnv),
+        code: (payload: JsonNode) -> Unit,
+    ) {
+        graphQLTestSupport.run(
+            $$"""
+                mutation ConfigureBranch(
+                    $config: String!,
+                    $ci: String,
+                    $scm: String,
+                    $env: [CIEnv!]!,
+                ) {
+                    configureBranch(input: {
+                        config: $config,
+                        ci: $ci,
+                        scm: $scm,
+                        env: $env,
+                    }) {
+                        errors {
+                            message
+                            exception
+                        }
+                        branch {
+                            id
+                        }
+                    }
+                }
+            """,
+            mapOf(
+                "config" to yaml,
+                "ci" to ci,
+                "scm" to scm,
+                "env" to env.map { mapOf("name" to it.key, "value" to it.value) },
+            )
+        ) { data ->
+            graphQLTestSupport.checkGraphQLUserErrors(data, "configureBranch") { payload ->
+                code(payload)
+            }
+        }
+    }
+
     fun withConfigAndProject(
         yaml: String = """
             version: v1
