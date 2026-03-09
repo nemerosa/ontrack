@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.config
 
 import net.nemerosa.ontrack.extension.config.ConfigTestSupport
 import net.nemerosa.ontrack.extension.config.EnvFixtures
+import net.nemerosa.ontrack.extension.config.model.EnvConstants
 import net.nemerosa.ontrack.extension.config.scm.SCMEngineNotDetectedException
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
@@ -188,6 +189,132 @@ class GitHubSCMEngineIT : AbstractGitHubTestSupport() {
                 assertEquals(
                     EnvFixtures.TEST_COMMIT,
                     it.commit,
+                )
+            }
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Configuration of the project with an explicit issue service identifier`() {
+        gitHubConfiguration()
+        withDisabledConfigurationTest {
+            val project = configTestSupport.configureProject(
+                yaml = """
+                    version: v1
+                    configuration:
+                        defaults:
+                            project:
+                                issueServiceIdentifier:
+                                    serviceId: jira
+                                    serviceName: JIRA
+                """.trimIndent(),
+                ci = null,
+                scm = null,
+                env = EnvFixtures.gitHub(),
+            )
+            assertNotNull(
+                propertyService.getPropertyValue(project, GitHubProjectConfigurationPropertyType::class.java),
+                "GitHub project config has been set"
+            ) {
+                assertEquals(
+                    "jira//JIRA",
+                    it.issueServiceConfigurationIdentifier
+                )
+            }
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Configuration of the project with a default issue service identifier from the legacy environment`() {
+        gitHubConfiguration()
+        withDisabledConfigurationTest {
+            val project = configTestSupport.configureProject(
+                yaml = """
+                    version: v1
+                    configuration: {}
+                """.trimIndent(),
+                ci = null,
+                scm = null,
+                env = EnvFixtures.gitHub(
+                    extraEnv = mapOf(
+                        EnvConstants.YONTRACK_LEGACY_SCM_ISSUES to "jira//JIRA",
+                    )
+                ),
+            )
+            assertNotNull(
+                propertyService.getPropertyValue(project, GitHubProjectConfigurationPropertyType::class.java),
+                "GitHub project config has been set"
+            ) {
+                assertEquals(
+                    "jira//JIRA",
+                    it.issueServiceConfigurationIdentifier
+                )
+            }
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Configuration of the project with a default issue service identifier from the environment`() {
+        gitHubConfiguration()
+        withDisabledConfigurationTest {
+            val project = configTestSupport.configureProject(
+                yaml = """
+                    version: v1
+                    configuration: {}
+                """.trimIndent(),
+                ci = null,
+                scm = null,
+                env = EnvFixtures.gitHub(
+                    extraEnv = mapOf(
+                        EnvConstants.YONTRACK_CI_SCM_ISSUES to "jira//JIRA",
+                    )
+                ),
+            )
+            assertNotNull(
+                propertyService.getPropertyValue(project, GitHubProjectConfigurationPropertyType::class.java),
+                "GitHub project config has been set"
+            ) {
+                assertEquals(
+                    "jira//JIRA",
+                    it.issueServiceConfigurationIdentifier
+                )
+            }
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Configuration of the project with an explicit issue service identifier overriding the environment`() {
+        gitHubConfiguration()
+        withDisabledConfigurationTest {
+            val project = configTestSupport.configureProject(
+                yaml = """
+                    version: v1
+                    configuration:
+                        defaults:
+                            project:
+                                issueServiceIdentifier:
+                                    serviceId: jira
+                                    serviceName: JIRA
+                """.trimIndent(),
+                ci = null,
+                scm = null,
+                env = EnvFixtures.gitHub(
+                    extraEnv = mapOf(
+                        EnvConstants.YONTRACK_CI_SCM_ISSUES to "jira//OTHER",
+                    )
+                ),
+            )
+            assertNotNull(
+                propertyService.getPropertyValue(project, GitHubProjectConfigurationPropertyType::class.java),
+                "GitHub project config has been set"
+            ) {
+                assertEquals(
+                    "jira//JIRA",
+                    it.issueServiceConfigurationIdentifier
                 )
             }
         }

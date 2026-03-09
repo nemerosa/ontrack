@@ -6,6 +6,16 @@ package net.nemerosa.ontrack.extension.config.model
 object EnvConstants {
 
     /**
+     * Issue service identifier legacy environment variable (`serviceId//serviceName`)
+     */
+    const val YONTRACK_LEGACY_SCM_ISSUES = "ONTRACK_SCM_ISSUES"
+
+    /**
+     * Issue service identifier environment variable (`serviceId//serviceName`)
+     */
+    const val YONTRACK_CI_SCM_ISSUES = "YONTRACK_CI_SCM_ISSUES"
+
+    /**
      * Project name
      */
     const val GENERIC_PROJECT_NAME = "PROJECT_NAME"

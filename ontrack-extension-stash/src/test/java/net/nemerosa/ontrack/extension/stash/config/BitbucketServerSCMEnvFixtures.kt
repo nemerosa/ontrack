@@ -5,8 +5,8 @@ import net.nemerosa.ontrack.extension.config.model.EnvConstants
 import net.nemerosa.ontrack.extension.stash.BitbucketServerFixtures
 
 object BitbucketServerSCMEnvFixtures {
-    fun bitbucketServerEnv() =
+    fun bitbucketServerEnv(extraEnv: Map<String, String> = emptyMap()) =
         EnvFixtures.generic() + mapOf(
             EnvConstants.GENERIC_SCM_URL to "${BitbucketServerFixtures.BITBUCKET_SERVER_URL}/scm/nemerosa/yontrack.git",
-        )
+        ) + extraEnv
 }

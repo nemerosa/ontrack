@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.config.ci.engine.CIEngine
 import net.nemerosa.ontrack.extension.config.model.BranchConfiguration
 import net.nemerosa.ontrack.extension.config.model.BuildConfiguration
 import net.nemerosa.ontrack.extension.config.model.ProjectConfiguration
+import net.nemerosa.ontrack.extension.config.model.getActualIssueServiceIdentifier
 import net.nemerosa.ontrack.extension.config.scm.AbstractSCMEngine
 import net.nemerosa.ontrack.extension.config.scm.SCMEngineNoURLException
 import net.nemerosa.ontrack.extension.git.config.GitSCMEngineHelper
@@ -50,7 +51,7 @@ class BitbucketServerSCMEngine(
             project = bbServerRepository.project,
             repository = bbServerRepository.repository,
             indexationInterval = configuration.scmIndexationInterval ?: 0,
-            issueServiceConfigurationIdentifier = configuration.issueServiceIdentifier?.toRepresentation(),
+            issueServiceConfigurationIdentifier = configuration.getActualIssueServiceIdentifier(env)?.toRepresentation(),
         )
         val existingConfig =
             propertyService.getPropertyValue(project, StashProjectConfigurationPropertyType::class.java)

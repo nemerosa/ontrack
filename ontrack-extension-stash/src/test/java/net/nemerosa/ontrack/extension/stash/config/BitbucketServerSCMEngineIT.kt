@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.stash.config
 
 import net.nemerosa.ontrack.extension.config.ConfigTestSupport
 import net.nemerosa.ontrack.extension.config.EnvFixtures
+import net.nemerosa.ontrack.extension.config.model.EnvConstants
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.git.support.GitCommitPropertyCommitLink
@@ -201,6 +202,132 @@ class BitbucketServerSCMEngineIT : AbstractDSLTestSupport() {
                 assertEquals(
                     EnvFixtures.TEST_COMMIT,
                     it.commit,
+                )
+            }
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Configuration of the project with an explicit issue service identifier`() {
+        bitbucketServerConfig()
+        withDisabledConfigurationTest {
+            val project = configTestSupport.configureProject(
+                yaml = """
+                    version: v1
+                    configuration:
+                        defaults:
+                            project:
+                                issueServiceIdentifier:
+                                    serviceId: jira
+                                    serviceName: JIRA
+                """.trimIndent(),
+                ci = "generic",
+                scm = null,
+                env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(),
+            )
+            assertNotNull(
+                propertyService.getPropertyValue(project, StashProjectConfigurationPropertyType::class.java),
+                "GitHub project config has been set"
+            ) {
+                assertEquals(
+                    "jira//JIRA",
+                    it.issueServiceConfigurationIdentifier
+                )
+            }
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Configuration of the project with a default issue service identifier from the legacy environment`() {
+        bitbucketServerConfig()
+        withDisabledConfigurationTest {
+            val project = configTestSupport.configureProject(
+                yaml = """
+                    version: v1
+                    configuration: {}
+                """.trimIndent(),
+                ci = "generic",
+                scm = null,
+                env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(
+                    extraEnv = mapOf(
+                        EnvConstants.YONTRACK_LEGACY_SCM_ISSUES to "jira//JIRA",
+                    )
+                ),
+            )
+            assertNotNull(
+                propertyService.getPropertyValue(project, StashProjectConfigurationPropertyType::class.java),
+                "GitHub project config has been set"
+            ) {
+                assertEquals(
+                    "jira//JIRA",
+                    it.issueServiceConfigurationIdentifier
+                )
+            }
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Configuration of the project with a default issue service identifier from the environment`() {
+        bitbucketServerConfig()
+        withDisabledConfigurationTest {
+            val project = configTestSupport.configureProject(
+                yaml = """
+                    version: v1
+                    configuration: {}
+                """.trimIndent(),
+                ci = "generic",
+                scm = null,
+                env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(
+                    extraEnv = mapOf(
+                        EnvConstants.YONTRACK_CI_SCM_ISSUES to "jira//JIRA",
+                    )
+                ),
+            )
+            assertNotNull(
+                propertyService.getPropertyValue(project, StashProjectConfigurationPropertyType::class.java),
+                "GitHub project config has been set"
+            ) {
+                assertEquals(
+                    "jira//JIRA",
+                    it.issueServiceConfigurationIdentifier
+                )
+            }
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Configuration of the project with an explicit issue service identifier overriding the environment`() {
+        bitbucketServerConfig()
+        withDisabledConfigurationTest {
+            val project = configTestSupport.configureProject(
+                yaml = """
+                    version: v1
+                    configuration:
+                        defaults:
+                            project:
+                                issueServiceIdentifier:
+                                    serviceId: jira
+                                    serviceName: JIRA
+                """.trimIndent(),
+                ci = "generic",
+                scm = null,
+                env = BitbucketServerSCMEnvFixtures.bitbucketServerEnv(
+                    extraEnv = mapOf(
+                        EnvConstants.YONTRACK_CI_SCM_ISSUES to "jira//OTHER",
+                    )
+                ),
+            )
+            assertNotNull(
+                propertyService.getPropertyValue(project, StashProjectConfigurationPropertyType::class.java),
+                "GitHub project config has been set"
+            ) {
+                assertEquals(
+                    "jira//JIRA",
+                    it.issueServiceConfigurationIdentifier
                 )
             }
         }
