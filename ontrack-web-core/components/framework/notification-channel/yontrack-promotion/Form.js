@@ -2,13 +2,9 @@ import {Form, Input, Switch} from "antd";
 import {prefixedFormName} from "@components/form/formUtils";
 import DurationPicker from "@components/common/DurationPicker";
 
-export default function OntrackValidationNotificationChannelForm({prefix}) {
+export default function YontrackPromotionNotificationChannelForm({prefix}) {
     return (
         <>
-            {/*@APIDescription("Waiting for the promotion level associated notifications to be completed")*/}
-            {/*val waitForPromotion: Boolean = false,*/}
-            {/*@APIDescription("Timeout when waiting for the promotion level associated notifications to be completed")*/}
-            {/*val waitForPromotionTimeout: Duration = Duration.ofMinutes(5),*/}
             <Form.Item
                 name={prefixedFormName(prefix, 'project')}
                 label="Project"
