@@ -9,6 +9,19 @@ import kotlin.test.assertEquals
 class YontrackPromotionNotificationChannelConfigTest {
 
     @Test
+    fun `Parsing of the duration using number of seconds`() {
+        val config = mapOf(
+            "promotion" to "GOLD",
+            "waitForPromotionTimeout" to "25",
+        ).asJson().parse<YontrackPromotionNotificationChannelConfig>()
+
+        assertEquals(
+            Duration.ofSeconds(25),
+            config.waitForPromotionTimeout
+        )
+    }
+
+    @Test
     fun `Parsing of the duration using shorthand`() {
         val config = mapOf(
             "promotion" to "GOLD",
