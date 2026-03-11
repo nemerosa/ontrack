@@ -139,7 +139,7 @@ class OntrackConfigProperties {
         /**
          * Custom claim for the list of groups
          */
-        val groups: String = ""
+        var groups: String = ""
     }
 
     class AdminConfigProperties {
@@ -255,7 +255,7 @@ class OntrackConfigProperties {
         /**
          * Security token settings
          */
-        val tokens = TokensProperties()
+        var tokens = TokensProperties()
     }
 
     /**
