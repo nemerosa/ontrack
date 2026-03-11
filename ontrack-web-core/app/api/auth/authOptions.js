@@ -14,7 +14,7 @@ if (providerId === "oidc") {
             clientSecret: process.env.NEXTAUTH_CLIENT_SECRET,
             authorization: {
                 params: {
-                    scope: "openid profile email",
+                    scope: process.env.NEXTAUTH_SCOPE ?? "openid profile email",
                     audience: encodeURI(process.env.NEXTAUTH_AUDIENCE),
                 }
             },
