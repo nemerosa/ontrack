@@ -45,7 +45,7 @@ export default function ProjectSlotGraph() {
         `,
         {
             variables: {
-                id: project?.id,
+                id: Number(project?.id),
                 qualifier,
             },
             condition: project,
