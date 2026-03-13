@@ -49,13 +49,65 @@ const baseAuthOptions = {
     // },
     callbacks: {
         async jwt({token, account}) {
+            // Initial login — save all tokens
             if (account) {
-                token.accessToken = account.access_token
+                return {
+                    ...token,
+                    accessToken: account.access_token,
+                    refreshToken: account.refresh_token,
+                    expiresAt: account.expires_at,
+                }
             }
-            return token
+
+            // Token still valid — return as-is
+            if (Date.now() < token.expiresAt * 1000) {
+                return token
+            }
+
+            // Token expired — refresh
+            if (!token.refreshToken) {
+                console.error("Token expired but no refresh token available")
+                return {...token, error: "RefreshTokenError"}
+            }
+            console.log("Access token expired, refreshing...")
+            try {
+                const discoveryRes = await fetch(`${process.env.NEXTAUTH_ISSUER}/.well-known/openid-configuration`)
+                const {token_endpoint: tokenEndpoint} = await discoveryRes.json()
+
+                const body = new URLSearchParams({
+                    client_id: process.env.NEXTAUTH_CLIENT_ID,
+                    client_secret: process.env.NEXTAUTH_CLIENT_SECRET,
+                    grant_type: "refresh_token",
+                    refresh_token: token.refreshToken,
+                    scope: process.env.NEXTAUTH_SCOPE,
+                })
+
+                const response = await fetch(tokenEndpoint, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                    body: body.toString(),
+                })
+
+                const newTokens = await response.json()
+                if (!response.ok) throw newTokens
+
+                const newExpiresAt = Math.floor(Date.now() / 1000) + newTokens.expires_in
+                console.log("Token refreshed successfully, new expiry:", new Date(newExpiresAt * 1000).toISOString())
+                return {
+                    ...token,
+                    accessToken: newTokens.access_token,
+                    expiresAt: newExpiresAt,
+                    refreshToken: newTokens.refresh_token ?? token.refreshToken,
+                }
+            } catch (error) {
+                console.error("Token refresh failed:", error)
+                return {...token, error: "RefreshTokenError"}
+            }
         },
         async session({session, token}) {
             session.accessToken = token.accessToken
+            session.refreshToken = token.refreshToken
+            session.error = token.error
             return session
         }
     },
