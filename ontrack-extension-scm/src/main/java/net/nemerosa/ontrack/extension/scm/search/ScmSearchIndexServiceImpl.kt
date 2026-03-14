@@ -70,6 +70,7 @@ class ScmSearchIndexServiceImpl(
         var count = 0
         var lastScmCommit: SCMCommit? = null
         scm.forAllCommits(
+            project = project,
             filter = scmCommitFilter,
         ) { scmCommit ->
             // Saving the data in the database

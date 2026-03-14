@@ -427,11 +427,12 @@ class MockSCMExtension(
             repository(mockScmProjectProperty.name).getBranchesForCommit(commit)
 
         @Deprecated("Use forAllCommits with filter")
-        override fun forAllCommits(code: (commit: SCMCommit) -> Unit) {
+        override fun forAllCommits(project: Project, code: (commit: SCMCommit) -> Unit) {
             repository(mockScmProjectProperty.name).forAllCommits(code)
         }
 
         override fun forAllCommits(
+            project: Project,
             filter: SCMCommitFilter,
             code: (commit: SCMCommit) -> Unit
         ) {

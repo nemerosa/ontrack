@@ -4,6 +4,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.common.BaseException
+import net.nemerosa.ontrack.extension.git.model.getCommitLink
 import net.nemerosa.ontrack.extension.git.casc.GitConfigService
 import net.nemerosa.ontrack.extension.git.model.gitRepository
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
@@ -29,12 +30,15 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepr
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
 import net.nemerosa.ontrack.extension.scm.changelog.SCMCommitFilter
+import net.nemerosa.ontrack.extension.scm.changelog.SimpleSCMCommit
 import net.nemerosa.ontrack.extension.scm.service.*
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 /**
@@ -54,6 +58,8 @@ class GitHubSCMExtension(
     private val gitHubConfigurator: GitHubConfigurator,
     private val gitConfigService: GitConfigService,
 ) : AbstractExtension(gitHubExtensionFeature), SCMExtension {
+
+    private val logger: Logger = LoggerFactory.getLogger(GitHubSCMExtension::class.java)
 
     override fun getSCM(project: Project): SCM? {
         val property: GitHubProjectConfigurationProperty? =
@@ -122,8 +128,9 @@ class GitHubSCMExtension(
         }
 
         @Deprecated("Use forAllCommits with filter")
-        override fun forAllCommits(code: (commit: SCMCommit) -> Unit) {
+        override fun forAllCommits(project: Project, code: (commit: SCMCommit) -> Unit) {
             forAllCommits(
+                project = project,
                 filter = SCMCommitFilter(
                     sinceCommit = null,
                     sinceCommitTimestamp = null,
@@ -134,11 +141,30 @@ class GitHubSCMExtension(
         }
 
         override fun forAllCommits(
+            project: Project,
             filter: SCMCommitFilter,
             code: (commit: SCMCommit) -> Unit
         ) {
-            client.forAllCommits(repository, filter) {
-                code(GitHubSCMCommit(it))
+            val configuration = gitHubConfigurator.getConfiguration(project)
+            val gitRepo = configuration?.gitRepository
+                ?: error("Cannot get the Git repository for project $project")
+            val gitRepoClient = gitRepositoryClientFactory.getClient(gitRepo)
+            gitRepoClient.sync { logger.info(it) }
+            gitRepoClient.forCommits(
+                sinceCommit = filter.sinceCommit,
+                sinceCommitTimestamp = filter.sinceCommitTimestamp,
+                count = filter.count,
+            ) { gitCommit ->
+                val scmCommit = SimpleSCMCommit(
+                    id = gitCommit.id,
+                    shortId = gitCommit.shortId,
+                    author = gitCommit.author.name,
+                    authorEmail = gitCommit.author.email,
+                    timestamp = gitCommit.commitTime,
+                    message = gitCommit.fullMessage,
+                    link = configuration.getCommitLink(gitCommit.id),
+                )
+                code(scmCommit)
             }
         }
 

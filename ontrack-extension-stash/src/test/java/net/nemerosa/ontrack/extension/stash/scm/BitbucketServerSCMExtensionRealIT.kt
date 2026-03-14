@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.stash.scm
 
-import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
-import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
+import net.nemerosa.ontrack.extension.scm.search.ScmSearchIndexService
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
@@ -35,6 +34,9 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
 
     @Autowired
     private lateinit var bitbucketClientFactory: BitbucketClientFactory
+
+    @Autowired
+    private lateinit var scmSearchIndexService: ScmSearchIndexService
 
     @Test
     fun `Using a complete SCM reference to download a file`() {
@@ -208,17 +210,16 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
     }
 
     @Test
-    fun `Listing all commits`() {
-        withScm { scm, _ ->
-            if (scm is SCMChangeLogEnabled) {
-                val commits = mutableListOf<SCMCommit>()
-                scm.forAllCommits {
-                    commits += it
-                }
-                assertTrue(commits.isNotEmpty(), "At least one commit must be present")
-            } else {
-                fail("SCM should be SCMChangeLogEnabled")
+    fun `SCM for all commits`() {
+        project {
+            bitbucketServerConfig()
+            // Launching the indexation for this repository (twice)
+            repeat(2) {
+                scmSearchIndexService.index(this)
             }
+            // Gets the list of commits
+            val commits = scmSearchIndexService.getCommits(this, 0, 10).pageItems
+            assertTrue(commits.isNotEmpty(), "At least one commit must be found")
         }
     }
 
