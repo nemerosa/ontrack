@@ -37,6 +37,8 @@ class BitbucketServerSCMExtensionTest {
             structureService = mockk(),
             issueServiceRegistry = mockk(),
             ontrackConfigProperties = mockk(),
+            stashConfigurator = mockk(),
+            gitRepositoryClientFactory = mockk(),
         )
         val (scm, path) = extension.getSCMPath("config", "PROJECT/repository/some/path")
             ?: fail("SCM path should have been found")

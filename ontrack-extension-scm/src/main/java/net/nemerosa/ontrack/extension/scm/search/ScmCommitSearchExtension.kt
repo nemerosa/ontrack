@@ -109,7 +109,7 @@ class ScmCommitSearchExtension(
             var commitCount = 0
             val projectIssueKeys = mutableSetOf<String>()
             val issueConfig = scm.getConfiguredIssueService()
-            scm.forAllCommits { commit ->
+            scm.forAllCommits(project) { commit ->
                 commitCount++
                 // Logging
                 if (traceCommits) {
