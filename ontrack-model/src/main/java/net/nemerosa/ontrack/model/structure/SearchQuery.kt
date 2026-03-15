@@ -14,4 +14,9 @@ interface SearchQuery {
         size: Int,
     ): SearchResults
 
+    /**
+     * Is the query mode enabled?
+     */
+    val isQueryModeEnabled: Boolean get() = true
+
 }

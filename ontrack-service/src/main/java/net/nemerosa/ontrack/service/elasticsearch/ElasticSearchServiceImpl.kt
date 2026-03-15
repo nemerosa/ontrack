@@ -33,7 +33,7 @@ class ElasticSearchServiceImpl(
     override fun paginatedSearch(request: SearchRequest): SearchResults {
         val searchIndexer = indexerByResultType[request.type]
             ?: return SearchResults.empty
-        return if (searchIndexer is SearchQuery) {
+        return if (searchIndexer is SearchQuery && searchIndexer.isQueryModeEnabled) {
             searchIndexer.query(
                 token = request.token,
                 offset = request.offset,

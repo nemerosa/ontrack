@@ -31,7 +31,8 @@ class ScmCommitSearchExtension(
     private val scmExtensionConfigProperties: SCMExtensionConfigProperties,
     private val scmDetector: SCMDetector,
     private val scmIssueSearchExtension: ScmIssueSearchExtension,
-) : AbstractExtension(extensionFeature), SearchIndexer<ScmCommitSearchItem> {
+    private val scmSearchIndexService: ScmSearchIndexService,
+) : AbstractExtension(extensionFeature), SearchIndexer<ScmCommitSearchItem>, SearchQuery {
 
     private val logger: Logger = LoggerFactory.getLogger(ScmCommitSearchExtension::class.java)
 
@@ -109,7 +110,9 @@ class ScmCommitSearchExtension(
             var commitCount = 0
             val projectIssueKeys = mutableSetOf<String>()
             val issueConfig = scm.getConfiguredIssueService()
-            scm.forAllCommits(project) { commit ->
+            scm.forAllCommits(
+                project = project,
+            ) { commit ->
                 commitCount++
                 // Logging
                 if (traceCommits) {
@@ -145,6 +148,22 @@ class ScmCommitSearchExtension(
         description = "Commit hash (abbreviated or not)",
         order = SearchResultType.ORDER_PROPERTIES + 60,
     )
+
+    override fun query(
+        token: String,
+        offset: Int,
+        size: Int
+    ): SearchResults {
+        return SearchResults(
+            items = TODO(),
+            offset = offset,
+            total = TODO(),
+            message = null,
+        )
+    }
+
+    override val isQueryModeEnabled: Boolean =
+        scmExtensionConfigProperties.search.indexationType == SCMIndexationType.DATABASE
 
     override fun toSearchResult(
         id: String,
