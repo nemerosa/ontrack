@@ -1,0 +1,7 @@
+mutation DeleteBranchById(
+    $id: Int!,
+) {
+    deleteBranchById(input: {id: $id}) {
+        ...PayloadUserErrors
+    }
+}

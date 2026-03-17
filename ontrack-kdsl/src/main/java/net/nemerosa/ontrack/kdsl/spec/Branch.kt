@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateBuildMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreatePromotionLevelMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateValidationStampMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.DeleteBranchByIdMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.RunInfoInput
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
@@ -31,6 +32,17 @@ class Branch(
     val description: String?,
     val disabled: Boolean,
 ) : ProjectEntity(connector, ProjectEntityType.BRANCH, id) {
+
+    /**
+     * Deletes this branch
+     */
+    fun delete() {
+        graphqlConnector.mutate(
+            DeleteBranchByIdMutation(id.toInt())
+        ) {
+            it?.deleteBranchById?.payloadUserErrors?.convert()
+        }
+    }
 
     /**
      * Create a promotion level inside this branch.
