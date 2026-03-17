@@ -191,12 +191,6 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
 
     @Test
     fun `Running states for a complete process`() {
-
-        fun Branch.checkRunning(order: AutoVersioningOrder, expected: Boolean, after: (AutoVersioningOrder) -> Unit) {
-            after(order)
-            assertEquals(expected, autoVersioningAuditQueryService.getByUUID(this, order.uuid).running)
-        }
-
         val source = project()
         project {
             branch {
@@ -240,12 +234,6 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
 
     @Test
     fun `Running states for an aborted process`() {
-
-        fun Branch.checkRunning(order: AutoVersioningOrder, expected: Boolean, after: (AutoVersioningOrder) -> Unit) {
-            after(order)
-            assertEquals(expected, autoVersioningAuditQueryService.getByUUID(this, order.uuid).running)
-        }
-
         val source = project()
         project {
             branch {
@@ -282,12 +270,6 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
 
     @Test
     fun `Running states for an errored process`() {
-
-        fun Branch.checkRunning(order: AutoVersioningOrder, expected: Boolean, after: (AutoVersioningOrder) -> Unit) {
-            after(order)
-            assertEquals(expected, autoVersioningAuditQueryService.getByUUID(this, order.uuid).running)
-        }
-
         val source = project()
         project {
             branch {
@@ -320,6 +302,15 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                 checkRunning(order, false) { autoVersioningAuditService.onError(order, IllegalStateException("error")) }
             }
         }
+    }
+
+    private fun Branch.checkRunning(
+        order: AutoVersioningOrder,
+        expected: Boolean,
+        after: (AutoVersioningOrder) -> Unit
+    ) {
+        after(order)
+        assertEquals(expected, autoVersioningAuditQueryService.getByUUID(this, order.uuid).running)
     }
 
 }
