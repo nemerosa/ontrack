@@ -21,6 +21,7 @@ private val SCALAR_CLASSES: Set<KClass<*>> = setOf(
     Double::class,
     Char::class,
     String::class,
+    UInt::class,
 )
 
 /**

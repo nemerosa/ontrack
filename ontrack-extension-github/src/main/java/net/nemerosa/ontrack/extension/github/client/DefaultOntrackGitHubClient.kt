@@ -40,6 +40,8 @@ class DefaultOntrackGitHubClient(
     private val timeout: Duration = Duration.ofSeconds(60),
     private val retries: UInt = 3u,
     private val interval: Duration = Duration.ofSeconds(30),
+    private val retryOn5xx: Boolean = true,
+    private val retryOn400: Boolean = false,
     private val notFoundRetries: UInt = 6u,
     private val notFoundInterval: Duration = Duration.ofSeconds(5),
     private val meterRegistry: MeterRegistry,
@@ -320,7 +322,13 @@ class DefaultOntrackGitHubClient(
     ): T {
         logger.debug("[github] {}", message)
         return try {
-            GitConnectionRetry.retry(message, retries, interval) {
+            GitConnectionRetry.retry(
+                message = message,
+                retries = retries,
+                interval = interval,
+                retryOn5xx = retryOn5xx,
+                retryOn400 = retryOn400,
+            ) {
                 code()
             }
         } catch (ex: RestClientResponseException) {

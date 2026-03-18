@@ -4,6 +4,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.BaseException
 import org.apache.commons.lang3.exception.ExceptionUtils
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpServerErrorException
 import java.io.InterruptedIOException
 import java.net.SocketException
 import java.time.Duration
@@ -17,6 +19,8 @@ object GitConnectionRetry {
         message: String,
         retries: UInt,
         interval: Duration,
+        retryOn5xx: Boolean = true,
+        retryOn400: Boolean = false,
         code: () -> T
     ): T {
         var tries = 0u
@@ -27,7 +31,11 @@ object GitConnectionRetry {
                     result = code()
                 } catch (any: Exception) {
                     val root = ExceptionUtils.getRootCause(any)
-                    if (root is SocketException || root is InterruptedIOException) {
+                    val mustRetry = root is SocketException ||
+                            root is InterruptedIOException ||
+                            (root is HttpServerErrorException && retryOn5xx) ||
+                            (root is HttpClientErrorException.BadRequest && retryOn400)
+                    if (mustRetry) {
                         tries++
                         GitConnectionMetrics.connectRetry()
                         delay(interval.toMillis())

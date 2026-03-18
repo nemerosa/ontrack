@@ -25,6 +25,8 @@ class DefaultGitHubClientFactoryImpl(
             timeout = gitConfigProperties.remote.timeout,
             retries = gitConfigProperties.remote.retries,
             interval = gitConfigProperties.remote.interval,
+            retryOn5xx = gitConfigProperties.remote.retryOn5xx,
+            retryOn400 = gitConfigProperties.remote.retryOn400,
             meterRegistry = meterRegistry,
         )
     }

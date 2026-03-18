@@ -63,7 +63,6 @@ class GitConfigProperties {
     /**
      * General sync properties
      */
-    @Deprecated("Will be removed in V5. No fetch nor clone of Git repository will be done by Ontrack any longer.")
     class GitRemoteConfigProperties {
 
         @DurationUnit(ChronoUnit.SECONDS)
@@ -112,6 +111,20 @@ class GitConfigProperties {
             """
         )
         var maxNoRemote: Int = 3
+
+        @APIDescription(
+            """
+                Retrying on 5xx errors.
+            """
+        )
+        var retryOn5xx: Boolean = true
+
+        @APIDescription(
+            """
+                Retrying on 400 errors.
+            """
+        )
+        var retryOn400: Boolean = false
 
     }
 
