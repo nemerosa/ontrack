@@ -3,7 +3,7 @@ import {graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
 import {createValidationRun} from "@ontrack/validationRun";
 import {createBuildLink} from "@ontrack/links";
-import {createPromotionRun} from "@ontrack/promotionRun";
+import {createPromotionRun, getBuildPromotionRuns} from "@ontrack/promotionRun";
 import {setReleaseProperty} from "@ontrack/extensions/general/release";
 
 export const createBuild = async (branch, name) => {
@@ -55,6 +55,8 @@ const buildInstance = (branch, data) => {
     build.linkTo = async (other, qualifier = "") => createBuildLink(build, other, qualifier)
 
     build.autoVersioningCheck = async () => build.ontrack.autoVersioning.autoVersioningCheck(build)
+
+    build.promotionRuns = async (promotionLevel) => getBuildPromotionRuns(build, promotionLevel)
 
     return build
 }

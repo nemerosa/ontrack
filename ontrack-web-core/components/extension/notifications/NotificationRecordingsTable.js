@@ -16,6 +16,7 @@ export default function NotificationRecordingsTable({entity, sourceId}) {
     return (
         <>
             <StandardTable
+                id="notification-recordings-table"
                 filterForm={[
                     <Form.Item
                         key="channel"

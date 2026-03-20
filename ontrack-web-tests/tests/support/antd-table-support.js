@@ -8,7 +8,8 @@ export class Table {
     }
 
     async findRow(predicate) {
-        const rows = await this.table.locator('tr').all()
+        const rowsLocator = await this.table.locator('tr').all()
+        const rows = rowsLocator.slice(1)
         for (let row of rows) {
             if (await predicate(row)) {
                 return new TableRow(this.page, this, row)

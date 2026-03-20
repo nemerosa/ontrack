@@ -10,7 +10,7 @@ export default function PromotionRunPage() {
         <>
             <main>
                 <MainLayout>
-                    <PromotionRunView id={Number(id)}/>
+                    <PromotionRunView id={Number(id)} key={router.asPath}/>
                 </MainLayout>
             </main>
         </>

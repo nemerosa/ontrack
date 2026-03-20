@@ -1,6 +1,7 @@
 import {expect} from "@playwright/test";
 import {confirmBox} from "../../support/confirm";
 import {AutoVersioningTrail} from "../../extensions/auto-versioning/AutoVersioningTrail";
+import {NotificationsTable} from "../../extensions/notifications/NotificationsTable";
 
 export class PromotionRunPage {
 
@@ -11,7 +12,11 @@ export class PromotionRunPage {
 
     async goTo() {
         await this.page.goto(`${this.promotionRun.ontrack.connection.ui}/promotionRun/${this.promotionRun.id}`)
-        await expect(this.page.getByText("has been promoted")).toBeVisible()
+        await this.expectOnPage()
+    }
+
+    async expectOnPage() {
+        await expect(this.page.getByText("has been promoted").nth(0)).toBeVisible()
     }
 
     async assertNotificationPresent(text) {
@@ -32,6 +37,12 @@ export class PromotionRunPage {
         const section = this.page.getByTestId('auto-versioning-trail')
         await expect(section).toBeVisible()
         return new AutoVersioningTrail(this.page, section)
+    }
+
+    async getNotificationsTable() {
+        const table = this.page.getByTestId('promotion-run-notifications').getByTestId('notification-recordings-table')
+        await expect(table).toBeVisible()
+        return new NotificationsTable(this.page, table)
     }
 
 }

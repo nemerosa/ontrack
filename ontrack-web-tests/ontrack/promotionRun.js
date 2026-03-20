@@ -1,4 +1,4 @@
-import {graphQLCallMutation} from "@ontrack/graphql";
+import {graphQLCall, graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
 
 const promotionRunFragment = gql`
@@ -55,6 +55,32 @@ export const createPromotionRun = async (build, promotionLevel, params) => {
 
     return promotionRunInstance(build.ontrack, build, promotionLevel, data.createPromotionRunById.promotionRun)
 
+}
+
+export const getBuildPromotionRuns = async (build, promotionLevel) => {
+    const data = await graphQLCall(
+        build.ontrack.connection,
+        gql`
+            query GetBuildPromotionRuns(
+                $buildId: Int!,
+                $promotionLevelName: String!,
+            ) {
+                build(id: $buildId) {
+                    promotionRuns(promotion: $promotionLevelName) {
+                        ...PromotionRunData
+                    }
+                }
+            }
+
+            ${promotionRunFragment}
+        `,
+        {
+            buildId: Number(build.id),
+            promotionLevelName: promotionLevel.name,
+        }
+    )
+
+    return data.build.promotionRuns.map(it => promotionRunInstance(build.ontrack, build, promotionLevel, it))
 }
 
 const promotionRunInstance = (ontrack, build, promotionLevel, data) => {

@@ -6,6 +6,7 @@ import {promotionRunUri} from "@components/common/Links";
 import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
 import EntityNotificationsBadge from "@components/extension/notifications/EntityNotificationsBadge";
 import React from "react";
+import PromotionRunLink from "@components/promotionRuns/PromotionRunLink";
 
 export default function OntrackValidationNotificationChannelOutput({runId}) {
 
@@ -40,7 +41,15 @@ export default function OntrackValidationNotificationChannelOutput({runId}) {
                             entityId={run.id}
                             href={promotionRunUri(run)}
                         >
-                            <PromotionLevelImage promotionLevel={run.promotionLevel}/>
+                            <PromotionRunLink
+                                promotionRun={run}
+                                text={
+                                    <Space>
+                                        <PromotionLevelImage promotionLevel={run.promotionLevel}/>
+                                        {run.promotionLevel.name}
+                                    </Space>
+                                }
+                            />
                         </EntityNotificationsBadge>
                     }
                 </LoadingInline>
