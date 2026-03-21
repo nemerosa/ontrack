@@ -11,7 +11,7 @@ export default function BuildPromotions({build, lastOnly}) {
                 build && build.promotionRuns &&
                 <>
                     {
-                        lastOnly && <EntityNotificationsBadge
+                        lastOnly && lastPromotionRun && <EntityNotificationsBadge
                             key={lastPromotionRun.id}
                             entityType="PROMOTION_RUN"
                             entityId={lastPromotionRun.id}
