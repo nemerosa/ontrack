@@ -43,6 +43,7 @@ export default function BranchNode({data}) {
                 style={{
                     border: selected ? 'solid 3px black' : 'solid 1px gray',
                 }}
+                data-testid={`ot-branch-node-${branch.project.name}`}
             >
                 <Space direction="vertical" className="ot-line">
                     <Typography.Text>

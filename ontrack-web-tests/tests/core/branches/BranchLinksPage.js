@@ -1,6 +1,7 @@
 import {expect} from "@playwright/test";
 import {BranchLinkNode} from "./BranchLinkNode";
 import {BranchLinksTablePage} from "./BranchLinksTablePage";
+import {BranchNode} from "./BranchNode";
 
 export class BranchLinksPage {
 
@@ -8,6 +9,11 @@ export class BranchLinksPage {
         this.page = page
         this.ontrack = ontrack
         this.branch = branch
+    }
+
+    async goTo() {
+        await this.page.goto(`${this.ontrack.connection.ui}/branch/${this.branch.id}/links`)
+        await this.expectOnPage()
     }
 
     async expectOnPage() {
@@ -23,6 +29,12 @@ export class BranchLinksPage {
         const node = this.page.getByTestId(`ot-branch-link-node-${targetBranchProjectName}-${sourceBranchProjectName}`)
         await expect(node).toBeVisible()
         return new BranchLinkNode(this.page, this.ontrack, node)
+    }
+
+    async getBranchNode(branchProjectName) {
+        const node = this.page.getByTestId(`ot-branch-node-${branchProjectName}`)
+        await expect(node).toBeVisible()
+        return new BranchNode(this.page, this.ontrack, node)
     }
 
     async displayAsTable() {

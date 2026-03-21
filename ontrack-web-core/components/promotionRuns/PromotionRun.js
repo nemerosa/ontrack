@@ -13,7 +13,7 @@ export default function PromotionRun({
         <>
             {
                 promotionRun &&
-                <Link href={promotionRunUri(promotionRun)}>
+                <Link data-testid={`promotion-run-link-${promotionRun.id}`} href={promotionRunUri(promotionRun)}>
                     <PromotionLevel
                         promotionLevel={promotionRun.promotionLevel}
                         size={size}
