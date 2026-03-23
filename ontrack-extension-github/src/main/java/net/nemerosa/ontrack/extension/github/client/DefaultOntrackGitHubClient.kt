@@ -345,7 +345,7 @@ class DefaultOntrackGitHubClient(
         val contentType: Any? = this.responseHeaders?.contentType
         return if (contentType != null && contentType is MediaType && contentType.includes(MediaType.APPLICATION_JSON)) {
             val json = this.responseBodyAsString
-            return try {
+            try {
                 json.parseAsJson().parseOrNull<GitHubErrorMessage>()
             } catch (_: JsonParseException) {
                 null
@@ -1162,7 +1162,7 @@ class DefaultOntrackGitHubClient(
         message: String,
         error: GitHubErrorMessage,
         val status: Int,
-    ) : BaseException(error.format(message))
+    ) : BaseException("HTTP $status: ${error.format(message)}")
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private data class GitHubErrorMessage(
