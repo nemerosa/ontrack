@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.workflows
 
+import net.nemerosa.ontrack.common.waitFor
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 import net.nemerosa.ontrack.kdsl.spec.configurations.configurations
 import net.nemerosa.ontrack.kdsl.spec.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.kdsl.spec.extension.jenkins.jenkins
@@ -14,6 +16,8 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.test.fail
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
 
@@ -519,6 +523,118 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
                                     .firstOrNull()?.trim()
                                 println("In-memory message: $message")
                                 message == "User ${user.email} - build linked to ${dep.name}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Waiting for the promotion notifications to be completed and successful`() {
+        val targetGroup = uid("tg-")
+        project {
+            branch {
+                val targetPl = promotion("pl-target")
+                val targetBuild = build("target") { this }
+
+                targetPl.subscribe(
+                    name = uid("t"),
+                    channel = "workflow",
+                    channelConfig = mapOf(
+                        "workflow" to WorkflowTestSupport.yamlWorkflowToJson(
+                            """
+                                name: On target promotion
+                                nodes:
+                                    - id: promotion
+                                      executorId: notification
+                                      data:
+                                        channel: in-memory
+                                        channelConfig:
+                                          group: $targetGroup
+                                          waitMs: 2000
+                            """.trimIndent()
+                        )
+                    ),
+                    keywords = null,
+                    events = listOf(
+                        "new_promotion_run",
+                    ),
+                )
+
+                project {
+                    branch {
+                        val pl = promotion("pl-source")
+
+                        pl.subscribe(
+                            name = uid("s"),
+                            channel = "workflow",
+                            channelConfig = mapOf(
+                                "workflow" to WorkflowTestSupport.yamlWorkflowToJson(
+                                    """
+                                        name: On source promotion
+                                        nodes:
+                                          - id: promotion
+                                            executorId: notification
+                                            timeout: 20
+                                            interval: 1
+                                            data:
+                                              channel: yontrack-promotion
+                                              channelConfig:
+                                                project: ${targetBuild.branch.project.name}
+                                                branch: ${targetBuild.branch.name}
+                                                build: ${targetBuild.name}
+                                                promotion: ${targetPl.name}
+                                                waitForPromotion: true
+                                                waitForPromotionTimeout: 10s
+                                              template: Promotion from source ${pl.branch.project.name}
+                                    """.trimIndent()
+                                )
+                            ),
+                            keywords = null,
+                            contentTemplate = $$"Promotion of ${build}",
+                            events = listOf("new_promotion_run"),
+                        )
+
+                        build("source") {
+                            val sourceRun = promote(pl.name)
+
+                            // Checks that the target promotion has been set
+                            waitFor(
+                                message = "Waiting for the target promotion to be set",
+                                interval = 500.milliseconds,
+                                timeout = 10.seconds,
+                            ) {
+                                targetBuild.getPromotionRunsForPromotionLevel(targetPl.name).firstOrNull()
+                            } until {
+                                it.description == "Promotion from source ${pl.branch.project.name}"
+                            }
+
+                            // Waits until the Promotion notification is OK
+                            waitFor(
+                                message = "Waiting for the promotion notification to be completed",
+                                interval = 500.milliseconds,
+                                timeout = 10.seconds,
+                            ) {
+                                ontrack.notifications.notificationRecords(
+                                    channel = "workflow",
+                                    projectEntityType = ProjectEntityType.PROMOTION_RUN,
+                                    projectEntityId = sourceRun.id.toInt(),
+                                ).firstOrNull()
+                            } until { record ->
+                                record.result.type == "OK"
+                            }
+
+                            // Checks that the target notification has been received
+                            waitFor(
+                                message = "Waiting for the target notification to be received",
+                                interval = 500.milliseconds,
+                                timeout = 10.seconds,
+                            ) {
+                                ontrack.notifications.inMemory.group(targetGroup).firstOrNull()
+                            } until { record ->
+                                record == "Build ${targetBuild.name} has been promoted to ${targetPl.name} for branch ${targetPl.branch.name} in ${targetPl.branch.project.name}."
                             }
                         }
                     }

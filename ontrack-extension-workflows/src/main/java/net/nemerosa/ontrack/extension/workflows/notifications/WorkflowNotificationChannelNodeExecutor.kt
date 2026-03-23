@@ -2,14 +2,15 @@ package net.nemerosa.ontrack.extension.workflows.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.api.APIDescription
-import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
-import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
-import net.nemerosa.ontrack.extension.notifications.channels.getChannel
-import net.nemerosa.ontrack.extension.notifications.channels.throwException
+import net.nemerosa.ontrack.common.waitFor
+import net.nemerosa.ontrack.extension.notifications.channels.*
 import net.nemerosa.ontrack.extension.notifications.model.Notification
 import net.nemerosa.ontrack.extension.notifications.model.createData
+import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingResult
+import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingResultService
 import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.extension.workflows.WorkflowConfigurationProperties
 import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
@@ -20,7 +21,13 @@ import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.SerializableEventService
+import net.nemerosa.ontrack.model.tx.TransactionHelper
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toKotlinDuration
 
 @Component
 @APIDescription(
@@ -49,7 +56,12 @@ class WorkflowNotificationChannelNodeExecutor(
     private val notificationChannelRegistry: NotificationChannelRegistry,
     private val workflowNotificationSource: WorkflowNotificationSource,
     private val serializableEventService: SerializableEventService,
+    private val notificationProcessingResultService: NotificationProcessingResultService,
+    private val workflowConfigurationProperties: WorkflowConfigurationProperties,
+    private val transactionHelper: TransactionHelper,
 ) : AbstractExtension(workflowsExtensionFeature), WorkflowNodeExecutor {
+
+    private val logger: Logger = LoggerFactory.getLogger(WorkflowNotificationChannelNodeExecutor::class.java)
 
     companion object {
         const val ID: String = "notification"
@@ -73,7 +85,8 @@ class WorkflowNotificationChannelNodeExecutor(
         workflowNodeExecutorResultFeedback: (output: JsonNode?) -> Unit,
     ): WorkflowNodeExecutorResult {
         // Gets the node's data
-        val (channel, channelConfig, template) = workflowInstance.workflow.getNode(workflowNodeId).data.parse<WorkflowNotificationChannelNodeData>()
+        val node = workflowInstance.workflow.getNode(workflowNodeId)
+        val (channel, channelConfig, template) = node.data.parse<WorkflowNotificationChannelNodeData>()
         // Creating the notification item
         val notification = Notification(
             source = workflowNotificationSource.createData(
@@ -97,46 +110,80 @@ class WorkflowNotificationChannelNodeExecutor(
                 ).asJson()
             )
         }
+
         // Processing
         val processingResult = notificationProcessingService.process(notification, context, outputFeedback)
         val result = processingResult?.result
-        // Result of the execution
-        return if (processingResult != null && result != null) {
-            when (result.type) {
-                NotificationResultType.OK -> WorkflowNotificationChannelNodeExecutorOutput.success(processingResult)
-                NotificationResultType.ASYNC -> WorkflowNotificationChannelNodeExecutorOutput.success(processingResult)
-                NotificationResultType.ONGOING -> WorkflowNotificationChannelNodeExecutorOutput.error(
-                    "Notification is still ongoing",
-                    processingResult,
-                )
 
-                NotificationResultType.NOT_CONFIGURED -> WorkflowNotificationChannelNodeExecutorOutput.error(
-                    "Notification is not configured",
-                    processingResult
-                )
+        // If running asynchronously, the result is not available yet,
+        // and we need to wait for it
 
-                NotificationResultType.INVALID_CONFIGURATION -> WorkflowNotificationChannelNodeExecutorOutput.error(
-                    "Notification configuration is invalid",
-                    processingResult
-                )
-
-                NotificationResultType.DISABLED -> WorkflowNotificationChannelNodeExecutorOutput.error(
-                    "Notification is disabled",
-                    processingResult
-                )
-
-                NotificationResultType.ERROR -> WorkflowNotificationChannelNodeExecutorOutput.error(
-                    result.message ?: "Unknown error",
-                    processingResult
-                )
-
-                NotificationResultType.TIMEOUT -> WorkflowNotificationChannelNodeExecutorOutput.error(
-                    "Timeout when running a workflow",
-                    processingResult
-                )
+        return if (processingResult != null && result?.type == NotificationResultType.ASYNC) {
+            val timeoutSeconds = node.timeout
+            val interval = node.interval
+                ?.let { Duration.ofSeconds(it) }
+                ?: workflowConfigurationProperties.asyncCheckInterval
+            val finalResult = waitFor(
+                message = "Waiting for notification ${processingResult.recordId} to be processed",
+                interval = interval.toKotlinDuration(),
+                timeout = timeoutSeconds.seconds,
+            ) {
+                transactionHelper.inNewTransactionNullable {
+                    notificationProcessingResultService.getActualizedResult(processingResult)
+                }
+            } until { actualResult ->
+                logger.info("Checking notification result for ${processingResult.recordId}: ${actualResult.result?.type}")
+                val actualResultType = actualResult.result?.type
+                actualResultType != null && !actualResultType.running
             }
+            val finalResultResult = finalResult.result
+            finalResultResult.toWorkflowNodeExecutorResult(finalResult)
+        } else if (processingResult != null && result != null) {
+            result.toWorkflowNodeExecutorResult(processingResult)
         } else {
             WorkflowNodeExecutorResult.error("Notification did not return any result", null)
         }
     }
+
+    private fun NotificationResult<out Any?>?.toWorkflowNodeExecutorResult(
+        processingResult: NotificationProcessingResult<*>
+    ): WorkflowNodeExecutorResult =
+        if (this == null) {
+            WorkflowNodeExecutorResult.error("Notification did not return any result", null)
+        } else when (type) {
+
+            NotificationResultType.OK -> WorkflowNotificationChannelNodeExecutorOutput.success(processingResult)
+
+            NotificationResultType.ONGOING -> WorkflowNotificationChannelNodeExecutorOutput.error(
+                "Notification is still ongoing",
+                processingResult,
+            )
+
+            NotificationResultType.NOT_CONFIGURED -> WorkflowNotificationChannelNodeExecutorOutput.error(
+                "Notification is not configured",
+                processingResult
+            )
+
+            NotificationResultType.INVALID_CONFIGURATION -> WorkflowNotificationChannelNodeExecutorOutput.error(
+                "Notification configuration is invalid",
+                processingResult
+            )
+
+            NotificationResultType.DISABLED -> WorkflowNotificationChannelNodeExecutorOutput.error(
+                "Notification is disabled",
+                processingResult
+            )
+
+            NotificationResultType.ERROR -> WorkflowNotificationChannelNodeExecutorOutput.error(
+                message ?: "Unknown error",
+                processingResult
+            )
+
+            NotificationResultType.TIMEOUT -> WorkflowNotificationChannelNodeExecutorOutput.error(
+                "Timeout when running a workflow",
+                processingResult
+            )
+
+            else -> WorkflowNodeExecutorResult.error("Invalid notification result type: $type", null)
+        }
 }

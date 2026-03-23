@@ -7,9 +7,12 @@ import net.nemerosa.ontrack.common.parseDuration
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
+import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingResultService
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordFilter
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordingService
+import net.nemerosa.ontrack.extension.notifications.sources.EntitySubscriptionNotificationSource
+import net.nemerosa.ontrack.extension.notifications.sources.EntitySubscriptionNotificationSourceDataType
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionFilter
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
@@ -36,6 +39,8 @@ class YontrackPromotionNotificationChannel(
     private val yontrackBuildNotificationHelper: YontrackBuildNotificationHelper,
     private val notificationRecordingService: NotificationRecordingService,
     private val eventSubscriptionService: EventSubscriptionService,
+    private val entitySubscriptionNotificationSource: EntitySubscriptionNotificationSource,
+    private val notificationProcessingResultService: NotificationProcessingResultService,
 ) : AbstractNotificationChannel<YontrackPromotionNotificationChannelConfig, YontrackPromotionNotificationChannelOutput>(
     YontrackPromotionNotificationChannelConfig::class
 ) {
@@ -128,54 +133,115 @@ class YontrackPromotionNotificationChannel(
         val runId = output
             ?.runId
             ?: return null
-        val promotionLevelId = output.promotionLevelId
 
         return if (config.waitForPromotion) {
 
             val run = structureService.getPromotionRun(ID.of(runId))
-            val runStart = run.signature.time
-            val elapsedTime = Duration.between(runStart, Time.now)
 
-            if (elapsedTime > config.waitForPromotionTimeout) {
-                return NotificationResult.error(
-                    "Timeout after ${config.waitForPromotionTimeout}",
-                    output
-                )
-            }
+            val records = findTargetPromotionNotificationRecords(run)
 
-            val subscriptionsCount = eventSubscriptionService.filterSubscriptions(
-                EventSubscriptionFilter(
-                    entity = ProjectEntityID(
-                        type = ProjectEntityType.PROMOTION_LEVEL,
-                        id = promotionLevelId
+            if (records.isEmpty()) {
+                // No subscription record expected
+                NotificationResult.ok(output)
+            } else {
+                val savedRecords = records.filterNotNull()
+                if (savedRecords.size != records.size) {
+                    // Not all subscriptions have led to notification records yet
+                    checkTimeout(
+                        config,
+                        run,
+                        output,
+                        NotificationResult.ongoing(output)
                     )
-                )
-            ).pageInfo.totalSize
-            logger.info("Waiting for $subscriptionsCount subscriptions to complete...")
-            if (subscriptionsCount > 0) {
-                val records = notificationRecordingService.filter(
+                } else {
+                    val actualRecordResults = savedRecords.map { record ->
+                        notificationProcessingResultService.getActualizedResult(
+                            recordId = record.id,
+                        )
+                    }
+                    if (actualRecordResults.size != savedRecords.size) {
+                        checkTimeout(
+                            config,
+                            run,
+                            output,
+                            NotificationResult.ongoing(output)
+                        )
+                    } else {
+                        val savedResults = actualRecordResults.filterNotNull()
+                        if (savedResults.all { it.type == NotificationResultType.OK }) {
+                            NotificationResult.ok(output)
+                        } else if (savedResults.any { it.type.running }) {
+                            checkTimeout(
+                                config,
+                                run,
+                                output,
+                                NotificationResult.ongoing(output)
+                            )
+                        } else {
+                            checkTimeout(
+                                config,
+                                run,
+                                output,
+                                NotificationResult.error(
+                                    "At least one notification linked to the promotion failed, was not valid or was interrupted",
+                                    output
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        } else {
+            NotificationResult.ok(output)
+        }
+    }
+
+    private fun checkTimeout(
+        config: YontrackPromotionNotificationChannelConfig,
+        run: PromotionRun,
+        output: YontrackPromotionNotificationChannelOutput,
+        result: NotificationResult<YontrackPromotionNotificationChannelOutput>
+    ): NotificationResult<YontrackPromotionNotificationChannelOutput> {
+        val runStart = run.signature.time
+        val elapsedTime = Duration.between(runStart, Time.now)
+        return if (elapsedTime > config.waitForPromotionTimeout) {
+            NotificationResult.error(
+                "Timeout after ${config.waitForPromotionTimeout}",
+                output,
+            )
+        } else {
+            result
+        }
+    }
+
+    private fun findTargetPromotionNotificationRecords(
+        targetRun: PromotionRun,
+    ): List<NotificationRecord?> {
+
+        val subscriptions = eventSubscriptionService.filterSubscriptions(
+            EventSubscriptionFilter(
+                entity = targetRun.promotionLevel.toProjectEntityID(),
+            )
+        ).pageItems // We assume no more than 20 subscriptions for a promotion level
+
+        // If there is at least one subscription
+        return if (subscriptions.isNotEmpty()) {
+            subscriptions.map { subscription ->
+                notificationRecordingService.filter(
                     filter = NotificationRecordFilter(
                         eventEntityId = ProjectEntityID(
                             type = ProjectEntityType.PROMOTION_RUN,
-                            id = runId
-                        )
+                            id = targetRun.id()
+                        ),
+                        sourceId = entitySubscriptionNotificationSource.id,
+                        sourceData = mapOf(
+                            EntitySubscriptionNotificationSourceDataType::subscriptionName.name to subscription.name,
+                        ).asJson(),
                     )
-                ).pageItems.filter { it.id != notificationRecord.id }
-                if (records.size == subscriptionsCount && records.all { it.result.type == NotificationResultType.OK }) {
-                    NotificationResult.ok(output)
-                } else if (records.all { it.result.type.running }) {
-                    NotificationResult.ongoing(output)
-                } else {
-                    NotificationResult.error(
-                        "At least one notification linked to the promotion failed, was not valid or was interrupted",
-                        output
-                    )
-                }
-            } else {
-                null
+                ).pageItems.firstOrNull()
             }
         } else {
-            null
+            emptyList()
         }
     }
 

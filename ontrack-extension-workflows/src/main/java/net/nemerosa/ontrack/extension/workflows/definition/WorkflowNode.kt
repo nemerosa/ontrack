@@ -15,6 +15,8 @@ import net.nemerosa.ontrack.model.json.schema.DynamicJsonSchema
  * @property executorId ID of the executor to use
  * @property data Raw data associated with the node, to be used by the node executor.
  * @property parents List of the IDs of the parents for this node
+ * @property timeout Timeout in seconds (5 minutes by default)
+ * @property interval Interval in seconds to wait between checks of an async process inside the execution of a node. Not defined by default, using default settings.
  */
 @SelfDocumented
 @DynamicJsonSchema(
@@ -36,6 +38,8 @@ data class WorkflowNode(
     val parents: List<WorkflowParentNode> = emptyList(),
     @APIDescription("Timeout in seconds (5 minutes by default)")
     val timeout: Long = 5 * 60,
+    @APIDescription("Interval in seconds to wait between checks of an async process inside the execution of a node. Not defined by default, using default settings.")
+    val interval: Long? = null,
 ) {
     fun addParent(node: WorkflowNode) = WorkflowNode(
         id = id,
@@ -43,6 +47,7 @@ data class WorkflowNode(
         executorId = executorId,
         data = data,
         parents = parents + WorkflowParentNode(node.id),
-        timeout = timeout
+        timeout = timeout,
+        interval = interval,
     )
 }

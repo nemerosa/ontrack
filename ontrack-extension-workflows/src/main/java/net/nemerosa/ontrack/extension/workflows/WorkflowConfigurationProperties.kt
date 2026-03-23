@@ -15,4 +15,8 @@ class WorkflowConfigurationProperties {
     @DurationUnit(ChronoUnit.SECONDS)
     var parentWaitingInterval: Duration = Duration.ofSeconds(1)
 
+    @APIDescription("Default time to wait between checks of an async process inside the execution of a node")
+    @DurationUnit(ChronoUnit.SECONDS)
+    var asyncCheckInterval: Duration = Duration.ofSeconds(1)
+
 }

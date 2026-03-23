@@ -23,6 +23,7 @@ class GQLTypeWorkflowNode : GQLType {
             .stringField(WorkflowNode::description)
             .stringField(WorkflowNode::executorId)
             .longField(WorkflowNode::timeout)
+            .longField(WorkflowNode::interval)
             .jsonField(WorkflowNode::data)
             .listField(WorkflowNode::parents)
             .build()

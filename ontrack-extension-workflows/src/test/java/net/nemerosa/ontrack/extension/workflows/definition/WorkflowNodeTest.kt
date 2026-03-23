@@ -17,6 +17,7 @@ class WorkflowNodeTest {
                 data = mapOf("text" to "Test").asJson(),
                 parents = emptyList(),
                 timeout = 300L,
+                interval = null,
             ),
             mapOf(
                 "id" to "test",
