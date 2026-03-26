@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.github.app.MockGitHubAppClient
 import net.nemerosa.ontrack.extension.github.githubTestConfigReal
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.model.GitHubRepositoryPermission
+import net.nemerosa.ontrack.git.support.GitConnectionConfig
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.BeforeEach
@@ -35,6 +36,7 @@ class DefaultOntrackGitHubClientIT {
             ),
             timeout = Duration.ofSeconds(60),
             meterRegistry = meterRegistry,
+            gitConnectionConfig = GitConnectionConfig.default,
         )
     }
 

@@ -14,6 +14,7 @@ dependencies {
 
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-repository-support"))
+    implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-config"))
     implementation("org.springframework:spring-tx")
     implementation("commons-io:commons-io")
@@ -23,6 +24,7 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-it-utils")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))
     testImplementation(testFixtures(project(":ontrack-extension-issues")))
+    testImplementation(testFixtures(project(":ontrack-extension-casc")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
 
     testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github
 
+import net.nemerosa.ontrack.extension.git.casc.GitConfigService
 import net.nemerosa.ontrack.extension.git.model.gitRepository
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
@@ -28,6 +29,9 @@ class GitHubConnectionsIT : AbstractGitHubTestSupport() {
 
     @Autowired
     private lateinit var gitService: GitService
+
+    @Autowired
+    private lateinit var gitConfigService: GitConfigService
 
     @Test
     fun `Username and token access`() {
@@ -87,7 +91,7 @@ class GitHubConnectionsIT : AbstractGitHubTestSupport() {
                 )
             )
             val gitConfiguration = gitService.getProjectConfiguration(this) ?: fail("No Git project configuration")
-            val gitRepositoryClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
+            val gitRepositoryClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository, gitConfigService.gitConnectionConfig)
             gitRepositoryClient.sync { println(it) }
             gitRepositoryClient.test()
             assertTrue(gitRepositoryClient.isReady, "Repository is ready to be used")

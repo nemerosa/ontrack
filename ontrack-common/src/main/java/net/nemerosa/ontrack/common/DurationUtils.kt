@@ -19,7 +19,7 @@ private val durationIsoRegex = "P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:
 /**
  * Regex for 15d - shorthand representation, number of seconds (s), minutes (m), hours (h), days (d) or weeks (w)
  */
-private val durationShorthandRegex = "(\\d+)([smhdwMy])".toRegex()
+private val durationShorthandRegex = "(\\d+)([smhdwMy]|ms)".toRegex()
 
 /**
  * Combination of all regexes for durations
@@ -50,15 +50,15 @@ private val minuteSeconds = 60
  * Formatting of durations using shorthand representations when possible.
  */
 fun Duration.format(): String {
-    val seconds = this.toSeconds()
+    val millis = this.toMillis()
     return when {
-        seconds == 0L -> "0s"
-        seconds % weekSeconds == 0L -> "${seconds / weekSeconds}w"
-        seconds % 86400 == 0L -> "${seconds / 86400}d"
-        seconds % 3600 == 0L -> "${seconds / 3600}h"
-        seconds % 60 == 0L -> "${seconds / 60}m"
-        seconds < 60 -> "${seconds}s"
-        else -> this.toString()
+        millis == 0L -> "0s"
+        millis % (weekSeconds * 1000L) == 0L -> "${millis / (weekSeconds * 1000L)}w"
+        millis % (daySeconds * 1000L) == 0L -> "${millis / (daySeconds * 1000L)}d"
+        millis % (hourSeconds * 1000L) == 0L -> "${millis / (hourSeconds * 1000L)}h"
+        millis % (minuteSeconds * 1000L) == 0L -> "${millis / (minuteSeconds * 1000L)}m"
+        millis % 1000L == 0L -> "${millis / 1000L}s"
+        else -> "${millis}ms"
     }
 }
 
@@ -67,7 +67,7 @@ fun Duration.format(): String {
  *
  * * 1800 - numeric, number of seconds
  * * PT1H - ISO representation
- * * 15d - shorthand representation, number of seconds (s), minutes (m), hours (h), days (d) or weeks (w)
+ * * 15d - shorthand representation, number of seconds (s), minutes (m), hours (h), days (d), weeks (w) or milliseconds (ms)
  *
  * Returns null if not parsable.
  */
@@ -85,6 +85,7 @@ fun parseDuration(value: String): Duration? {
         val count = shorthand.groupValues[1].toLong()
         val unit = shorthand.groupValues[2]
         return when (unit) {
+            "ms" -> Duration.ofMillis(count)
             "s" -> Duration.ofSeconds(count)
             "m" -> Duration.ofMinutes(count)
             "h" -> Duration.ofHours(count)

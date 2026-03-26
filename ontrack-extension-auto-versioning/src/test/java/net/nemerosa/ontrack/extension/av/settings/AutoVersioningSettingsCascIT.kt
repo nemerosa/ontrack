@@ -28,12 +28,12 @@ class AutoVersioningSettingsCascIT : AbstractCascTestSupport() {
                     "auditCleanupDuration": {
                       "description": "Maximum time to keep audit entries for all kinds of auto versioning requests (counted _after_ the audit retention)",
                       "type": "string",
-                      "pattern": "^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy])${'$'}"
+                      "pattern": "^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy]|ms)${'$'}"
                     },
                     "auditRetentionDuration": {
                       "description": "Maximum time to keep audit entries for non-running auto versioning requests",
                       "type": "string",
-                      "pattern": "^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy])${'$'}"
+                      "pattern": "^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy]|ms)${'$'}"
                     },
                     "buildLinks": {
                       "description": "Creation of the build link on auto version check",
@@ -129,7 +129,7 @@ class AutoVersioningSettingsCascIT : AbstractCascTestSupport() {
                         auditCleanupDuration: xxxx
                         auditRetentionDuration: 30d
             """.trimIndent(),
-            message = "\$.ontrack.config.settings.auto-versioning.auditCleanupDuration: does not match the regex pattern ^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy])\$"
+            message = "\$.ontrack.config.settings.auto-versioning.auditCleanupDuration: does not match the regex pattern ^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy]|ms)\$"
         )
     }
 

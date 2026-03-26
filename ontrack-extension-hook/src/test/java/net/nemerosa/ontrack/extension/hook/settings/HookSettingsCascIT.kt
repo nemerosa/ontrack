@@ -28,12 +28,12 @@ class HookSettingsCascIT : AbstractCascTestSupport() {
                     "recordCleanupDuration": {
                       "description": "Maximum time to keep queue records for all kinds of hook requests (counted _after_ the retention)",
                       "type": "string",
-                      "pattern": "^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy])${'$'}"
+                      "pattern": "^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy]|ms)${'$'}"
                     },
                     "recordRetentionDuration": {
                       "description": "Maximum time to keep hook records for non-running requests",
                       "type": "string",
-                      "pattern": "^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy])${'$'}"
+                      "pattern": "^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy]|ms)${'$'}"
                     }
                   },
                   "required": [],

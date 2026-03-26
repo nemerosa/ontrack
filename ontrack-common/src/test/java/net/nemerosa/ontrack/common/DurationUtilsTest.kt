@@ -49,6 +49,10 @@ class DurationUtilsTest {
             null,
             parseDuration("15m ")
         )
+        assertEquals(
+            Duration.ofMillis(500),
+            parseDuration("500ms")
+        )
     }
 
     @Test
@@ -88,6 +92,10 @@ class DurationUtilsTest {
         assertEquals(
             "366h",
             Duration.ofDays(15).plusHours(6).format(),
+        )
+        assertEquals(
+            "500ms",
+            Duration.ofMillis(500).format(),
         )
     }
 

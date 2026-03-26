@@ -5,6 +5,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.common.FutureUtils
 import net.nemerosa.ontrack.common.asOptional
 import net.nemerosa.ontrack.extension.git.GitConfigProperties
+import net.nemerosa.ontrack.extension.git.casc.GitConfigService
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
@@ -52,6 +53,7 @@ class GitServiceImpl(
     private val gitConfigProperties: GitConfigProperties,
     private val gitPullRequestCache: DefaultGitPullRequestCache,
     private val gitNoRemoteCounter: GitNoRemoteCounter,
+    private val gitConfigService: GitConfigService,
     transactionManager: PlatformTransactionManager
 ) : GitService, JobOrchestratorSupplier {
 
@@ -151,43 +153,45 @@ class GitServiceImpl(
 
     override fun isPatternFound(gitConfiguration: GitConfiguration, token: String): Boolean {
         // Gets the client
-        val client = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
+        val client = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository, gitConfigService.gitConnectionConfig)
         // Scanning
         return client.isPatternFound(token)
     }
 
     override fun lookupCommit(configuration: GitConfiguration, id: String): GitCommit? {
         // Gets the client client for this configuration
-        val gitClient = gitRepositoryClientFactory.getClient(configuration.gitRepository)
+        val gitClient = gitRepositoryClientFactory.getClient(configuration.gitRepository, gitConfigService.gitConnectionConfig)
         // Gets the commit
         return gitClient.getCommitFor(id)
     }
 
     override fun forEachCommit(gitConfiguration: GitConfiguration, code: (GitCommit) -> Unit) {
         // Gets the client for this configuration
-        val gitClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
+        val gitClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository, gitConfigService.gitConnectionConfig)
         // Looping
         gitClient.forEachCommit(code)
     }
 
     override fun isRepositorySynched(gitConfiguration: GitConfiguration): Boolean {
         // Gets the client client for this configuration
-        val gitClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
+        val gitClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository, gitConfigService.gitConnectionConfig)
         // Test
         return gitClient.isReady
     }
 
     override fun getRemoteBranches(gitConfiguration: GitConfiguration): List<String> {
-        val gitClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
+        val gitClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository, gitConfigService.gitConnectionConfig)
         return gitClient.remoteBranches
     }
 
+    @Deprecated("Use the version with the branch name")
     override fun download(branch: Branch, path: String): Optional<String> {
         securityService.checkProjectFunction(branch, ProjectConfig::class.java)
         return transactionService.doInTransaction {
             val branchConfiguration = getRequiredBranchConfiguration(branch)
             val client = gitRepositoryClientFactory.getClient(
-                branchConfiguration.configuration.gitRepository
+                branchConfiguration.configuration.gitRepository,
+                gitConfigService.gitConnectionConfig
             )
             client.download(branchConfiguration.branch, path).asOptional()
         }
@@ -198,7 +202,8 @@ class GitServiceImpl(
         return transactionService.doInTransaction {
             val projectConfiguration = getRequiredProjectConfiguration(project)
             val client = gitRepositoryClientFactory.getClient(
-                projectConfiguration.gitRepository
+                projectConfiguration.gitRepository,
+                gitConfigService.gitConnectionConfig
             )
             client.download(scmBranch, path).asOptional()
         }.getOrNull()
@@ -218,7 +223,7 @@ class GitServiceImpl(
     override fun sync(gitConfiguration: GitConfiguration, request: GitSynchronisationRequest): Future<*>? {
         // Reset the repository?
         if (request.isReset) {
-            gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository).reset()
+            gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository, gitConfigService.gitConnectionConfig).reset()
         }
         // Schedules the job
         return jobScheduler.fireImmediately(getGitIndexationJobKey(gitConfiguration)).orElse(null)
@@ -233,7 +238,7 @@ class GitServiceImpl(
 
     private fun getGitSynchronisationInfo(gitConfiguration: GitConfiguration): GitSynchronisationInfo {
         // Gets the client for this configuration
-        val client = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
+        val client = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository, gitConfigService.gitConnectionConfig)
         // Gets the status
         val status = client.synchronisationStatus
         // Collects the branch info
@@ -443,7 +448,7 @@ class GitServiceImpl(
         listener.message("Git build/tag sync for %s/%s", branch.project.name, branch.name)
         val configuration = branchConfiguration.configuration
         // Gets the branch Git client
-        val gitClient = gitRepositoryClientFactory.getClient(configuration.gitRepository)
+        val gitClient = gitRepositoryClientFactory.getClient(configuration.gitRepository, gitConfigService.gitConnectionConfig)
         // Link
         @Suppress("UNCHECKED_CAST")
         val link = branchConfiguration.buildCommitLink?.link as IndexableBuildGitCommitLink<T>?
@@ -519,7 +524,7 @@ class GitServiceImpl(
     ) {
         listener("Git sync for ${config.name}")
         // Gets the client for this configuration
-        val client = gitRepositoryClientFactory.getClient(config.gitRepository)
+        val client = gitRepositoryClientFactory.getClient(config.gitRepository, gitConfigService.gitConnectionConfig)
         // Launches the synchronisation
         try {
             client.sync {
@@ -601,7 +606,7 @@ class GitServiceImpl(
         val project = branch.project
         val projectConfiguration = getProjectConfiguration(project)
         if (projectConfiguration != null) {
-            val client = gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository)
+            val client = gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository, gitConfigService.gitConnectionConfig)
             val branchConfiguration = getBranchConfiguration(branch)
             if (branchConfiguration != null) {
                 collectIndexableGitCommitForBranch(
@@ -635,7 +640,7 @@ class GitServiceImpl(
         val project = build.project
         val projectConfiguration = getProjectConfiguration(project)
         if (projectConfiguration != null) {
-            val client = gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository)
+            val client = gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository, gitConfigService.gitConnectionConfig)
             val branchConfiguration = getBranchConfiguration(build.branch)
             val buildCommitLink = branchConfiguration?.buildCommitLink
             if (buildCommitLink != null) {
@@ -652,7 +657,7 @@ class GitServiceImpl(
 
     override fun getSCMDefaultBranch(project: Project): String? =
         getProjectConfiguration(project)?.let { conf ->
-            val client = gitRepositoryClientFactory.getClient(conf.gitRepository)
+            val client = gitRepositoryClientFactory.getClient(conf.gitRepository, gitConfigService.gitConnectionConfig)
             client.defaultBranch
         }
 

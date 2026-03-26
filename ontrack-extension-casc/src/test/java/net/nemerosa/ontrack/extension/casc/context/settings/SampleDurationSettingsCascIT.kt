@@ -28,7 +28,7 @@ class SampleDurationSettingsCascIT : AbstractCascTestSupport() {
                     "duration": {
                       "description": "duration field",
                       "type": "string",
-                      "pattern": "^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy])${'$'}"
+                      "pattern": "^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy]|ms)${'$'}"
                     }
                   },
                   "required": [

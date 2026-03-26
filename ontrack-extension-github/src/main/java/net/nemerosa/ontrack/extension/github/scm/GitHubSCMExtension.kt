@@ -4,6 +4,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.common.BaseException
+import net.nemerosa.ontrack.extension.git.casc.GitConfigService
 import net.nemerosa.ontrack.extension.git.model.gitRepository
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
@@ -50,6 +51,7 @@ class GitHubSCMExtension(
     private val structureService: StructureService,
     private val gitRepositoryClientFactory: GitRepositoryClientFactory,
     private val gitHubConfigurator: GitHubConfigurator,
+    private val gitConfigService: GitConfigService,
 ) : AbstractExtension(gitHubExtensionFeature), SCMExtension {
 
     override fun getSCM(project: Project): SCM? {
@@ -314,7 +316,7 @@ class GitHubSCMExtension(
          */
         override fun getBranchesForCommit(project: Project, commit: String): List<String> {
             val configuration = gitHubConfigurator.getConfiguration(project) ?: return emptyList()
-            val gitRepoClient = gitRepositoryClientFactory.getClient(configuration.gitRepository)
+            val gitRepoClient = gitRepositoryClientFactory.getClient(configuration.gitRepository, gitConfigService.gitConnectionConfig)
             return gitRepoClient.getBranchesForCommit(commit)
         }
 

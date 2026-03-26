@@ -112,20 +112,6 @@ class GitConfigProperties {
         )
         var maxNoRemote: Int = 3
 
-        @APIDescription(
-            """
-                Retrying on 5xx errors.
-            """
-        )
-        var retryOn5xx: Boolean = true
-
-        @APIDescription(
-            """
-                Retrying on 400 errors.
-            """
-        )
-        var retryOn400: Boolean = false
-
     }
 
     /**

@@ -106,6 +106,7 @@ nav:
   - Operations:
       - Metrics: content/operations/metrics.md
       - Troubleshooting:
+          - Git connectivity: content/operations/git-connectivity.md
           - RabbitMQ: content/operations/rabbitmq.md
   - Appendix:
       - Templating: content/appendix/templating.md

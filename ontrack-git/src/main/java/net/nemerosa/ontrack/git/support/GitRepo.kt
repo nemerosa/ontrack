@@ -45,8 +45,9 @@ class GitRepo(val dir: File) : AutoCloseable {
             )
             // Creates the client
             return GitRepositoryClientImpl(
-                    wd,
-                    originRepository,
+                repositoryDir = wd,
+                repository = originRepository,
+                config = GitConnectionConfig(), // Default retry
             )
         }
 
@@ -57,8 +58,9 @@ class GitRepo(val dir: File) : AutoCloseable {
      */
     val client: GitRepositoryClient
         get() = GitRepositoryClientImpl(
-                dir,
-                GitRepository("test", "test", "", authenticator = null),
+            repositoryDir = dir,
+            repository = GitRepository("test", "test", "", authenticator = null),
+            config = GitConnectionConfig(),
         )
 
     /**

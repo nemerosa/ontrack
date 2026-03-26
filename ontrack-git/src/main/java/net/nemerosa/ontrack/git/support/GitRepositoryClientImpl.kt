@@ -47,6 +47,7 @@ class GitRepositoryClientImpl(
     private val repository: GitRepository,
     private val timeout: Duration = Duration.ofSeconds(60),
     private val operationTimeout: Duration = Duration.ofMinutes(10),
+    private val config: GitConnectionConfig,
     private val retries: UInt = 3u,
     private val interval: Duration = Duration.ofSeconds(30),
 ) : GitRepositoryClient {
@@ -69,7 +70,12 @@ class GitRepositoryClientImpl(
         setCredentialsProvider(credentialsProvider)
         setTimeout(timeout.toSeconds().toInt())
         // Runs with retries
-        return GitConnectionRetry.retry(message, retries, interval) {
+        return GitConnectionRetry.retry(
+            message = message,
+            config = config,
+            defaultRetries = retries,
+            defaultInterval = interval,
+        ) {
             runBlocking {
                 withTimeout(operationTimeout.toMillis()) {
                     call()

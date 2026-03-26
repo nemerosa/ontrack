@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git
 
+import net.nemerosa.ontrack.extension.git.casc.GitConfigService
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurationProperty
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
@@ -54,6 +55,9 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     protected lateinit var gitService: GitService
+
+    @Autowired
+    protected lateinit var gitConfigService: GitConfigService
 
     @Autowired
     private lateinit var jobOrchestrator: JobOrchestrator
@@ -129,7 +133,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
             )
         }
         if (sync) {
-            gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository).sync { println(it) }
+            gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository, gitConfigService.gitConnectionConfig).sync { println(it) }
         }
         return gitConfiguration
     }

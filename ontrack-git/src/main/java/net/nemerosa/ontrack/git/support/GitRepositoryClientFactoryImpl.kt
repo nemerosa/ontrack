@@ -44,17 +44,17 @@ class GitRepositoryClientFactoryImpl(
         }
     }
 
-    override fun getClient(repository: GitRepository): GitRepositoryClient {
+    override fun getClient(repository: GitRepository, gitConnectionConfig: GitConnectionConfig): GitRepositoryClient {
         lock.lock()
         try {
             // Gets any existing repository in the cache
-            return createRepositoryClient(repository)
+            return createRepositoryClient(repository, gitConnectionConfig)
         } finally {
             lock.unlock()
         }
     }
 
-    private fun createRepositoryClient(repository: GitRepository): GitRepositoryClient {
+    private fun createRepositoryClient(repository: GitRepository, gitConnectionConfig: GitConnectionConfig): GitRepositoryClient {
         // ID for this repository
         val repositoryId = repository.id
         // Directory for this repository
@@ -73,7 +73,8 @@ class GitRepositoryClientFactoryImpl(
             timeout = timeout,
             operationTimeout = operationTimeout,
             retries = retries,
-            interval = interval
+            interval = interval,
+            config = gitConnectionConfig,
         )
     }
 

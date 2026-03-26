@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.github.client
 
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.git.GitConfigProperties
+import net.nemerosa.ontrack.extension.git.casc.GitConfigService
 import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component
 class DefaultGitHubClientFactoryImpl(
     private val gitHubAppTokenService: GitHubAppTokenService,
     private val gitConfigProperties: GitConfigProperties,
+    private val gitConfigService: GitConfigService,
     private val meterRegistry: MeterRegistry,
 ) : OntrackGitHubClientFactory {
     override fun create(configuration: GitHubEngineConfiguration): OntrackGitHubClient {
@@ -25,8 +27,7 @@ class DefaultGitHubClientFactoryImpl(
             timeout = gitConfigProperties.remote.timeout,
             retries = gitConfigProperties.remote.retries,
             interval = gitConfigProperties.remote.interval,
-            retryOn5xx = gitConfigProperties.remote.retryOn5xx,
-            retryOn400 = gitConfigProperties.remote.retryOn400,
+            gitConnectionConfig = gitConfigService.gitConnectionConfig,
             meterRegistry = meterRegistry,
         )
     }

@@ -42,7 +42,7 @@ class GitController(
      * Test for a configuration
      */
     @PostMapping("configurations/test")
-    fun testConfiguration(@RequestBody configuration: BasicGitConfiguration?): ConnectionResult {
+    fun testConfiguration(@RequestBody configuration: BasicGitConfiguration): ConnectionResult {
         return configurationService.test(configuration)
     }
 
