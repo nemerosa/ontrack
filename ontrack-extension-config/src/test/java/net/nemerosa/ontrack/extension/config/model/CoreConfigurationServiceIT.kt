@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.config.ConfigTestSupport
 import net.nemerosa.ontrack.extension.config.EnvFixtures
 import net.nemerosa.ontrack.extension.config.EnvFixtures.TEST_BUILD_NUMBER
 import net.nemerosa.ontrack.extension.config.EnvFixtures.TEST_VERSION
+import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.general.MetaInfoPropertyType
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
@@ -11,9 +12,11 @@ import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class CoreConfigurationServiceIT : AbstractDSLTestSupport() {
 
@@ -118,6 +121,83 @@ class CoreConfigurationServiceIT : AbstractDSLTestSupport() {
                 "1.0.2",
                 it.getValue("appVersion")
             )
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Validations and promotions additions in a condition`() {
+        val branch = configTestSupport.configureBranch(
+            yaml = """
+                version: v1
+                configuration:
+                  defaults:
+                    branch:
+                      validations:
+                        unit-test: {}
+                        long-it: {}
+                      promotions:
+                        BRONZE:
+                          validations:
+                            - unit-test
+                        SILVER:
+                          promotions:
+                            - BRONZE
+                          validations:
+                            - long-it
+                  custom:
+                    configs:
+                      - conditions:
+                          - name: branch
+                            config: main
+                        branch:
+                          validations:
+                            it-pilot: {}
+                            it-live: {}
+                          promotions:
+                            SILVER:
+                              validations:
+                                - it-pilot
+                                - it-live
+            """.trimIndent(),
+            ci = "generic",
+            scm = "mock",
+            env = EnvFixtures.generic(scmBranch = "main"),
+        )
+
+        // Checking the validations
+
+        val vsList = structureService.getValidationStampListForBranch(branch.id)
+        assertEquals(
+            listOf("unit-test", "long-it", "it-pilot", "it-live").sorted(),
+            vsList.map { it.name }.sorted()
+        )
+
+        // Checking the BRONZE promotion
+
+        val bronze = structureService.findPromotionLevelByName(branch.project.name, branch.name, "BRONZE")
+            .getOrNull()
+            ?: fail("Missing BRONZE promotion")
+
+        val bronzeValidations = propertyService.getPropertyValue(bronze, AutoPromotionPropertyType::class.java)
+        assertNotNull(bronzeValidations) {
+            assertEquals(listOf("unit-test"), it.validationStamps.map { it.name })
+            assertEquals(emptyList(), it.promotionLevels)
+        }
+
+        // Checking the SILVER promotion
+
+        val silver = structureService.findPromotionLevelByName(branch.project.name, branch.name, "SILVER")
+            .getOrNull()
+            ?: fail("Missing SILVER promotion")
+
+        val silverValidations = propertyService.getPropertyValue(silver, AutoPromotionPropertyType::class.java)
+        assertNotNull(silverValidations) { p ->
+            assertEquals(
+                listOf("long-it", "it-pilot", "it-live").sorted(),
+                p.validationStamps.map { it.name }.sorted()
+            )
+            assertEquals(listOf("BRONZE"), p.promotionLevels.map { it.name })
         }
     }
 

@@ -12,4 +12,11 @@ data class PromotionLevelConfiguration(
     val validations: List<String> = emptyList(),
     @APIDescription("List of promotions")
     val promotions: List<String> = emptyList(),
-)
+) {
+    fun merge(other: PromotionLevelConfiguration) = PromotionLevelConfiguration(
+        name = name,
+        description = other.description.takeIf { it.isNotBlank() } ?: description,
+        validations = (validations + other.validations).distinct(),
+        promotions = (promotions + other.promotions).distinct(),
+    )
+}

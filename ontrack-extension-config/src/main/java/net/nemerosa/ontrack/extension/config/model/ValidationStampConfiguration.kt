@@ -10,4 +10,10 @@ data class ValidationStampConfiguration(
     val description: String = "",
     @APIDescription("Data configuration")
     val validationStampDataConfiguration: ValidationStampDataConfiguration? = null,
-)
+) {
+    fun merge(other: ValidationStampConfiguration) = ValidationStampConfiguration(
+        name = name,
+        description = other.description.takeIf { it.isNotBlank() } ?: description,
+        validationStampDataConfiguration = other.validationStampDataConfiguration ?: validationStampDataConfiguration,
+    )
+}

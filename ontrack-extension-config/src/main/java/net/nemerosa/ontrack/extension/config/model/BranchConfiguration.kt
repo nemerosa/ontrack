@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.config.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.common.api.APIDescription
+import net.nemerosa.ontrack.common.mergeList
 import net.nemerosa.ontrack.extension.config.extensions.CIConfigExtensionService
 import net.nemerosa.ontrack.model.structure.PromotionLevelConfiguration
 
@@ -21,8 +22,8 @@ data class BranchConfiguration(
         ciConfigExtensionService: CIConfigExtensionService,
     ) = BranchConfiguration(
         properties = this.properties + branch.properties,
-        validations = this.validations + branch.validations,
-        promotions = this.promotions + branch.promotions,
+        validations = mergeList(this.validations, branch.validations, { it.name }, { a, b -> a.merge(b) }),
+        promotions = mergeList(this.promotions, branch.promotions, { it.name }, { a, b -> a.merge(b) }),
         extensions = ciConfigExtensionService.merge(this.extensions, branch.extensions),
     )
 
