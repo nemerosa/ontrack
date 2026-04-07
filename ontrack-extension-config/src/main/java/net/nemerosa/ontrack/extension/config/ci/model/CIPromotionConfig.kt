@@ -8,4 +8,6 @@ data class CIPromotionConfig(
     val validations: List<String> = emptyList(),
     @APIDescription("List of promotion levels to get for this promotion")
     val promotions: List<String> = emptyList(),
+    @APIDescription("List of promotion levels this promotion depends on")
+    val dependsOn: List<String> = emptyList(),
 )

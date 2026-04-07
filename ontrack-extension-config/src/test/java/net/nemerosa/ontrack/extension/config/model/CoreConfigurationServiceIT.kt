@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.config.EnvFixtures.TEST_BUILD_NUMBER
 import net.nemerosa.ontrack.extension.config.EnvFixtures.TEST_VERSION
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.general.MetaInfoPropertyType
+import net.nemerosa.ontrack.extension.general.PromotionDependenciesPropertyType
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
@@ -198,6 +199,43 @@ class CoreConfigurationServiceIT : AbstractDSLTestSupport() {
                 p.validationStamps.map { it.name }.sorted()
             )
             assertEquals(listOf("BRONZE"), p.promotionLevels.map { it.name })
+        }
+    }
+
+    @Test
+    @AsAdminTest
+    fun `Promotion dependsOn sets the promotion dependencies property`() {
+        val branch = configTestSupport.configureBranch(
+            yaml = """
+                version: v1
+                configuration:
+                  defaults:
+                    branch:
+                      promotions:
+                        GOLD: {}
+                        target-environment:
+                          dependsOn:
+                            - GOLD
+            """.trimIndent(),
+            ci = "generic",
+            scm = "mock",
+            env = EnvFixtures.generic(),
+        )
+
+        val gold = structureService.findPromotionLevelByName(branch.project.name, branch.name, "GOLD")
+            .getOrNull()
+            ?: fail("Missing GOLD promotion")
+
+        val goldDeps = propertyService.getPropertyValue(gold, PromotionDependenciesPropertyType::class.java)
+        assertEquals(null, goldDeps, "GOLD has no promotion dependencies")
+
+        val target = structureService.findPromotionLevelByName(branch.project.name, branch.name, "target-environment")
+            .getOrNull()
+            ?: fail("Missing target-environment promotion")
+
+        val targetDeps = propertyService.getPropertyValue(target, PromotionDependenciesPropertyType::class.java)
+        assertNotNull(targetDeps) {
+            assertEquals(listOf("GOLD"), it.dependencies)
         }
     }
 

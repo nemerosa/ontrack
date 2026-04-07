@@ -115,6 +115,7 @@ class CIConfigurationParserImpl(
                 description = "",
                 validations = config.validations,
                 promotions = config.promotions,
+                dependencies = config.dependsOn,
             )
         }
     }

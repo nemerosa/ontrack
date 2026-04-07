@@ -147,6 +147,41 @@ class CIConfigurationParserIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Parsing of promotion with dependsOn`() {
+        val config = parser.parseConfig(
+            """
+                version: v1
+                configuration:
+                  defaults:
+                    branch:
+                      promotions:
+                        GOLD: {}
+                        target-environment:
+                          dependsOn:
+                            - GOLD
+            """.trimIndent()
+        )
+        assertEquals(
+            ConfigurationInput(
+                configuration = RootConfiguration(
+                    defaults = Configuration(
+                        branch = BranchConfiguration(
+                            promotions = listOf(
+                                PromotionLevelConfiguration(name = "GOLD"),
+                                PromotionLevelConfiguration(
+                                    name = "target-environment",
+                                    dependencies = listOf("GOLD"),
+                                ),
+                            )
+                        )
+                    )
+                )
+            ),
+            config
+        )
+    }
+
+    @Test
     fun `Parsing of configuration with custom conditions`() {
         val config = parser.parseConfig(
             """
