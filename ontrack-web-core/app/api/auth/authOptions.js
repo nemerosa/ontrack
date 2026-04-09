@@ -31,15 +31,22 @@ if (providerId === "oidc") {
     )
 } else {
     const name = process.env.NEXTAUTH_PROVIDER_NAME ?? "Yontrack"
-    providers.push(
-        KeycloakProvider({
-            id: "keycloak",
-            name: name,
-            clientId: process.env.NEXTAUTH_CLIENT_ID,
-            clientSecret: process.env.NEXTAUTH_CLIENT_SECRET,
-            issuer: process.env.NEXTAUTH_ISSUER,
-        })
-    )
+    const provider = KeycloakProvider({
+        id: "keycloak",
+        name: name,
+        clientId: process.env.NEXTAUTH_CLIENT_ID,
+        clientSecret: process.env.NEXTAUTH_CLIENT_SECRET,
+        issuer: process.env.NEXTAUTH_ISSUER,
+    })
+    // When running inside Kubernetes, HTTPS is terminated at the load balancer and
+    // back-channel calls from the pod to the public HTTPS URL fail with an SSL error.
+    // NEXTAUTH_ISSUER_INTERNAL points to the in-cluster HTTP Keycloak service so that
+    // server-side discovery (token exchange, JWKS) uses HTTP, while NEXTAUTH_ISSUER is
+    // still used for id_token `iss` claim validation and browser-visible redirects.
+    if (process.env.NEXTAUTH_ISSUER_INTERNAL) {
+        provider.wellKnown = `${process.env.NEXTAUTH_ISSUER_INTERNAL}/.well-known/openid-configuration`
+    }
+    providers.push(provider)
 }
 
 const baseAuthOptions = {
@@ -71,7 +78,8 @@ const baseAuthOptions = {
             }
             console.log("Access token expired, refreshing...")
             try {
-                const discoveryRes = await fetch(`${process.env.NEXTAUTH_ISSUER}/.well-known/openid-configuration`)
+                const issuerForDiscovery = process.env.NEXTAUTH_ISSUER_INTERNAL || process.env.NEXTAUTH_ISSUER
+                const discoveryRes = await fetch(`${issuerForDiscovery}/.well-known/openid-configuration`)
                 const {token_endpoint: tokenEndpoint} = await discoveryRes.json()
 
                 const body = new URLSearchParams({

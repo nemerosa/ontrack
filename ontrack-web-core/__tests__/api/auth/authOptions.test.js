@@ -205,6 +205,29 @@ describe("authOptions callbacks", () => {
             expect(result.error).toBe("RefreshTokenError")
             expect(console.error).toHaveBeenCalled()
         })
+
+        it("uses NEXTAUTH_ISSUER_INTERNAL for discovery when set", async () => {
+            process.env.NEXTAUTH_ISSUER_INTERNAL = "http://keycloak-internal:8080/keycloak/realms/ontrack"
+            Date.now = jest.fn(() => 2_000_000_000_000)
+
+            global.fetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({token_endpoint: TOKEN_ENDPOINT}),
+                })
+                .mockResolvedValueOnce(mockTokenResponse())
+
+            await authOptions.callbacks.jwt({
+                token: {accessToken: "old", refreshToken: "rt", expiresAt: 1},
+                account: null,
+            })
+
+            expect(global.fetch).toHaveBeenCalledWith(
+                "http://keycloak-internal:8080/keycloak/realms/ontrack/.well-known/openid-configuration"
+            )
+
+            delete process.env.NEXTAUTH_ISSUER_INTERNAL
+        })
     })
 
     // ------------------------------------------------------------------ //
