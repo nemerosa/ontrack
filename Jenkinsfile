@@ -2,10 +2,6 @@
 
 pipeline {
 
-    environment {
-        ONTRACK = credentials("ontrack-service-account")
-    }
-
     parameters {
         booleanParam(
                 name: 'JUST_BUILD_AND_PUSH',
