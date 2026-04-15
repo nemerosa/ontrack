@@ -226,19 +226,21 @@ class YontrackPromotionNotificationChannel(
 
         // If there is at least one subscription
         return if (subscriptions.isNotEmpty()) {
-            subscriptions.map { subscription ->
-                notificationRecordingService.filter(
-                    filter = NotificationRecordFilter(
-                        eventEntityId = ProjectEntityID(
-                            type = ProjectEntityType.PROMOTION_RUN,
-                            id = targetRun.id()
-                        ),
-                        sourceId = entitySubscriptionNotificationSource.id,
-                        sourceData = mapOf(
-                            EntitySubscriptionNotificationSourceDataType::subscriptionName.name to subscription.name,
-                        ).asJson(),
-                    )
-                ).pageItems.firstOrNull()
+            securityService.asAdmin {
+                subscriptions.map { subscription ->
+                    notificationRecordingService.filter(
+                        filter = NotificationRecordFilter(
+                            eventEntityId = ProjectEntityID(
+                                type = ProjectEntityType.PROMOTION_RUN,
+                                id = targetRun.id()
+                            ),
+                            sourceId = entitySubscriptionNotificationSource.id,
+                            sourceData = mapOf(
+                                EntitySubscriptionNotificationSourceDataType::subscriptionName.name to subscription.name,
+                            ).asJson(),
+                        )
+                    ).pageItems.firstOrNull()
+                }
             }
         } else {
             emptyList()
