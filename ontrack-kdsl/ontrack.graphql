@@ -186,6 +186,20 @@ type AutoVersioningBranchTrail {
   rejectionReason: String
 }
 
+type AutoVersioningBranchTrailPaginated {
+  "Information about the current page"
+  pageInfo: PageInfo
+  "Items in the current page"
+  pageItems: [AutoVersioningBranchTrail!]!
+}
+
+type AutoVersioningBranchTrailPromotionPaginated {
+  "Information about the current page"
+  pageInfo: PageInfo
+  "Items in the current page"
+  pageItems: [AutoVersioningBranchTrail!]!
+}
+
 "Configuration of the auto versioning on a branch."
 type AutoVersioningConfig {
   "List of configurations"
@@ -605,6 +619,8 @@ type Build implements Authorizable & ProjectEntity {
     offset: Int = 0,
     "Keeps only links targeted from this project"
     project: String,
+    "Using a fragment of the project name"
+    projectFragment: Boolean,
     "Size of the page"
     size: Int = 20
   ): BuildLinkPaginated
@@ -622,6 +638,8 @@ type Build implements Authorizable & ProjectEntity {
     offset: Int = 0,
     "Keeps only links targeted from this project"
     project: String,
+    "Using a fragment of the project name"
+    projectFragment: Boolean,
     "Keeps only links targeted for this qualifier"
     qualifier: String,
     "Size of the page"
@@ -876,6 +894,14 @@ type Configuration {
   extra: JSON
   "Unique name for the configuration"
   name: String!
+}
+
+"Output type for the configureBranch mutation."
+type ConfigureBranchPayload implements Payload {
+  "Configured branch"
+  branch: Branch
+  "List of errors"
+  errors: [UserError]
 }
 
 "Output type for the configureBuild mutation."
@@ -3150,6 +3176,11 @@ type Mutation {
   ): CheckAutoVersioningPayload
   "Cleans auto-versioning audit entries based on the retention policy"
   cleanupAutoVersioningAuditEntries: CleanupAutoVersioningAuditEntriesPayload
+  "Configuration of a Yontrack branch based on some input"
+  configureBranch(
+    "Input for the mutation"
+    input: ConfigureBranchInput
+  ): ConfigureBranchPayload
   "Configuration of a Yontrack build based on some input"
   configureBuild(
     "Input for the mutation"
@@ -5058,7 +5089,15 @@ type PromotionLevel implements Authorizable & ProjectEntity {
   "List of branches targeted for auto-versioning based on this promotion level"
   autoVersioningTargets: [AutoVersioningConfiguredBranch!]!
   "List of branches targeted for auto-versioning based on this promotion level or with their reason for rejection"
-  autoVersioningTrail: AutoVersioningTrail
+  autoVersioningTrail: AutoVersioningTrail @deprecated(reason : "Will be removed in V6. Use autoVersioningTrailPaginated instead.")
+  "List of branches targeted for auto-versioning based on this promotion or with their reason for rejection"
+  autoVersioningTrailPaginated(
+    filter: AutoVersioningTrailFilter,
+    "Offset for the page"
+    offset: Int = 0,
+    "Size of the page"
+    size: Int = 20
+  ): AutoVersioningBranchTrailPromotionPaginated
   "Reference to branch"
   branch: Branch
   creation: Signature
@@ -5125,7 +5164,15 @@ type PromotionRun implements Authorizable & ProjectEntity {
   "Authorizations for this context"
   authorizations: [Authorization!]!
   "List of branches targeted for auto-versioning based on this promotion run or with their reason for rejection"
-  autoVersioningTrail: AutoVersioningTrail
+  autoVersioningTrail: AutoVersioningTrail @deprecated(reason : "Will be removed in V6. Use autoVersioningTrailPaginated instead.")
+  "List of branches targeted for auto-versioning based on this promotion run or with their reason for rejection"
+  autoVersioningTrailPaginated(
+    filter: AutoVersioningTrailFilter,
+    "Offset for the page"
+    offset: Int = 0,
+    "Size of the page"
+    size: Int = 20
+  ): AutoVersioningBranchTrailPaginated
   "Associated build"
   build: Build!
   creation: Signature
@@ -8071,6 +8118,8 @@ type WorkflowNode {
   executorId: String!
   "Unique ID of the node in its workflow."
   id: String!
+  "Interval in seconds to wait between checks of an async process inside the execution of a node. Not defined by default, using default settings."
+  interval: Int
   "List of the IDs of the parents for this node"
   parents: [WorkflowParentNode!]!
   "Timeout in seconds (5 minutes by default)"
@@ -8111,6 +8160,7 @@ enum AutoApprovalMode {
 enum AutoVersioningAuditState {
   CREATED
   ERROR
+  PENDING_SCHEDULE
   POST_PROCESSING_END
   POST_PROCESSING_LAUNCHED
   POST_PROCESSING_START
@@ -8480,6 +8530,13 @@ input AutoVersioningSourceConfigPathInput {
   versionSource: String
 }
 
+input AutoVersioningTrailFilter {
+  "onlyEligible field"
+  onlyEligible: Boolean!
+  "Part of the project name"
+  projectName: String
+}
+
 "BuildSearchForm"
 input BuildSearchForm {
   "Regular expression to match against the branch name."
@@ -8591,6 +8648,18 @@ input CheckAutoVersioningInput {
   build: String!
   "Project name"
   project: String!
+}
+
+"Input type for the configureBranch mutation."
+input ConfigureBranchInput {
+  "Type of CI engine. Will be guessed from the environment if not specified."
+  ci: String
+  "YAML configuration"
+  config: String!
+  "List of environment variables"
+  env: [CIEnv!]!
+  "Type of SCM. Will be guessed from the environment if not specified."
+  scm: String
 }
 
 "Input type for the configureBuild mutation."
