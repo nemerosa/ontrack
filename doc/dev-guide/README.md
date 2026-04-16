@@ -8,3 +8,5 @@
 * Components
   * [Model](components/core/README.md) - core model of Ontrack
   * [Properties](components/properties/README.md)
+* Workflows
+  * [Claude Pick Workflow](claude-pick-workflow.md) - Let Claude autonomously pick and implement issues
