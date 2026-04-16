@@ -88,7 +88,13 @@ class AutoVersioningSchedulerIT : AbstractDSLTestSupport() {
                     sourceProject = "sourceProject",
                     schedule = Time.now.minusHours(1),
                 ).run {
-                    store.create(this)
+                    store.create(this).also { entry ->
+                        store.addState(
+                            targetBranch = entry.order.branch,
+                            uuid = entry.order.uuid,
+                            state = AutoVersioningAuditState.PENDING_SCHEDULE,
+                        )
+                    }
                 }
                 scheduler.schedule()
                 // Checks the order is taken

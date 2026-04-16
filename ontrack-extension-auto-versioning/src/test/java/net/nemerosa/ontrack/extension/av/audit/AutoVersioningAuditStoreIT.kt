@@ -308,6 +308,7 @@ class AutoVersioningAuditStoreIT : AbstractAutoVersioningTestSupport() {
                     schedule = Time.now.minusHours(1),
                 ).apply {
                     autoVersioningAuditService.onCreated(this)
+                    autoVersioningAuditService.onPendingSchedule(this)
                 }
                 val entries = autoVersioningAuditStore.findByReady(Time.now)
                 assertEquals(
