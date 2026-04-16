@@ -19,6 +19,17 @@ abstract class AbstractAutoVersioningAuditService(
     override fun onCreated(order: AutoVersioningOrder) =
         store.create(order)
 
+    override fun onPendingSchedule(order: AutoVersioningOrder) {
+        store.addState(
+            targetBranch = order.branch,
+            uuid = order.uuid,
+            routing = null,
+            queue = null,
+            upgradeBranch = null,
+            state = AutoVersioningAuditState.PENDING_SCHEDULE
+        )
+    }
+
     override fun onScheduled(
         order: AutoVersioningOrder,
         routing: String

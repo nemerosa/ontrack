@@ -7,6 +7,7 @@ enum class AutoVersioningAuditState(
 
     CREATED,
     SCHEDULED,
+    PENDING_SCHEDULE,
 
     THROTTLED(isRunning = false),
 

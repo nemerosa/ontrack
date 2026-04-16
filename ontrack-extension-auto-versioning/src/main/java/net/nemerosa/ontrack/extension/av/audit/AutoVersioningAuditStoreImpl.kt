@@ -372,12 +372,13 @@ class AutoVersioningAuditStoreImpl(
             """
                 SELECT *
                 FROM AV_AUDIT
-                WHERE MOST_RECENT_STATE = :state
-                AND (SCHEDULE IS NULL OR SCHEDULE <= :time)
+                WHERE (MOST_RECENT_STATE = :createdState AND SCHEDULE IS NULL)
+                OR (MOST_RECENT_STATE = :pendingState AND SCHEDULE <= :time)
             """.trimIndent(),
             mapOf(
                 "time" to dateTimeForDB(time),
-                "state" to AutoVersioningAuditState.CREATED.name,
+                "createdState" to AutoVersioningAuditState.CREATED.name,
+                "pendingState" to AutoVersioningAuditState.PENDING_SCHEDULE.name,
             )
         ) { rs, _ ->
             rs.toEntry()

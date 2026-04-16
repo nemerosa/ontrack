@@ -46,6 +46,13 @@ interface AutoVersioningAuditService {
     fun onCreated(order: AutoVersioningOrder): AutoVersioningAuditEntry
 
     /**
+     * The [order] was created with a future schedule and is now waiting for its time.
+     *
+     * @param order Auto versioning order
+     */
+    fun onPendingSchedule(order: AutoVersioningOrder)
+
+    /**
      * The [order] was just scheduled.
      *
      * @param order Auto versioning order

@@ -26,7 +26,7 @@ class AutoVersioningController(
             AutoVersioningStats(
                 pendingOrders = autoVersioningAuditQueryService.countByFilter(
                     filter = AutoVersioningAuditQueryFilter(
-                        states = setOf(AutoVersioningAuditState.CREATED),
+                        states = setOf(AutoVersioningAuditState.CREATED, AutoVersioningAuditState.PENDING_SCHEDULE),
                     )
                 )
             ),

@@ -51,7 +51,7 @@ class ACCAutoVersioningScheduled : AbstractACCAutoVersioningTestSupport() {
                             }
                         }
 
-                        // Checks that the order has been created but not scheduled yet
+                        // Checks that the order has been created and is pending its schedule
                         assertNotNull(
                             ontrack.autoVersioning.audit.entries(
                                 source = dependency.project.name,
@@ -62,7 +62,7 @@ class ACCAutoVersioningScheduled : AbstractACCAutoVersioningTestSupport() {
                             "AV audit entry created"
                         ) {
                             assertEquals(
-                                "CREATED",
+                                "PENDING_SCHEDULE",
                                 it.mostRecentState.state,
                             )
                         }
@@ -148,7 +148,7 @@ class ACCAutoVersioningScheduled : AbstractACCAutoVersioningTestSupport() {
                                 ).firstOrNull(),
                                 "AV audit entry created"
                             ) {
-                                val expectedState = if (no == 5) "CREATED" else "THROTTLED"
+                                val expectedState = if (no == 5) "PENDING_SCHEDULE" else "THROTTLED"
                                 assertEquals(
                                     expectedState,
                                     it.mostRecentState.state,
