@@ -121,6 +121,12 @@ const statuses = {
         icon: <FaCalendar/>,
         text: "Scheduled",
     },
+    PENDING_SCHEDULE: {
+        type: 'secondary',
+        tooltip: "Auto-versioning request is waiting for its scheduled time",
+        icon: <FaCalendar/>,
+        text: "Pending schedule",
+    },
 }
 
 export default function AutoVersioningAuditEntryState({status, id, displayTooltip = true}) {
