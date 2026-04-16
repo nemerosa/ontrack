@@ -70,7 +70,8 @@ class YontrackBuildNotificationHelper(
             event.getEntity(ProjectEntityType.BRANCH)
         } else {
             val project = getProject(event, projectName)
-            structureService.findBranchByName(project.name, branchName).getOrNull()
+            val normalizedBranchName = NameDescription.escapeName(branchName)
+            structureService.findBranchByName(project.name, normalizedBranchName).getOrNull()
                 ?: throw BranchNotFoundException(project.name, branchName)
         }
 
