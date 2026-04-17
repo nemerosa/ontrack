@@ -628,3 +628,11 @@ For complex integration test scenarios, use `MockRestTemplateProvider` (see `Jir
 8. Write `*Test.kt` unit tests with MockK
 9. Write `*IT.kt` integration tests
 10. For each new property type, add UI components in `ontrack-web-core/components/framework/properties/`
+
+---
+
+## Workflow Conventions
+
+When picking and fixing a GitHub issue:
+- Always create a branch named `claude/<short-description>-pipeline` before making any changes
+- Never create a pull request unless explicitly asked to do so
