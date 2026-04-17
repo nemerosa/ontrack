@@ -33,7 +33,7 @@ pipeline {
     agent {
         docker {
             label "do && c-16"
-            image "nemerosa/ontrack-build:5.1.0"
+            image "nemerosa/ontrack-build:5.2.0"
             args "--volume /var/run/docker.sock:/var/run/docker.sock --network host"
         }
     }

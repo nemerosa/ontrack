@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "playwright-install": "npx playwright install",
-    "playwright-setup": "npx playwright install-deps",
+    "playwright-install": "npx playwright install chromium",
+    "playwright-setup": "npx playwright install-deps chromium",
     "test": "npx playwright test --retries 3",
     "test-ldap": "npx playwright test --retries 3 --grep '@auth'",
     "test-oidc": "npx playwright test --retries 3 --grep '@auth'"

@@ -96,6 +96,26 @@ test('loading the statuses of the PRs in the audit page', async ({page, ontrack}
     await entryRow.expectPRStatus(entry.mostRecentState.data.prName, 'Merged')
 })
 
+test('scheduled auto-versioning order shows pending schedule state', async ({page, ontrack}) => {
+    // Create an AV config with a cron schedule set far in the future
+    const autoVersioning = await setupSimpleAutoVersioning({page, ontrack, cronSchedule: '0 0 23 * * *'})
+
+    // Trigger a promotion to create an AV order
+    const depBuild = await autoVersioning.createDepBuild()
+    await autoVersioning.promoteDepBuild(depBuild)
+
+    // Wait for the order to settle into PENDING_SCHEDULE state (not immediately processed)
+    const entry = await autoVersioning.waitForAutoVersioningCompletion({depBuild, state: 'PENDING_SCHEDULE'})
+
+    // Navigate to the global audit page and check the state is shown correctly
+    await login(page, ontrack)
+    const avAuditPage = new AutoVersioningAuditPage(page, ontrack)
+    await avAuditPage.goTo()
+
+    const entryRow = await avAuditPage.getEntryRow(entry.order.uuid)
+    await entryRow.checkState('Pending schedule')
+})
+
 test('auto-versioning cron schedule being displayed', async ({page, ontrack}) => {
     // Auto-versioning context
     const {depProject, targetBranch} = await setupSimpleAutoVersioning({page, ontrack, cronSchedule: '0 0 23 * * *'})

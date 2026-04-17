@@ -26,6 +26,10 @@ class AutoVersioningAuditServiceImpl(
     override fun onCreated(order: AutoVersioningOrder) =
         super.onCreated(order)
 
+    override fun onPendingSchedule(order: AutoVersioningOrder) {
+        super.onPendingSchedule(order)
+    }
+
     override fun onScheduled(
         order: AutoVersioningOrder,
         routing: String

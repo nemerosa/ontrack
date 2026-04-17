@@ -77,6 +77,8 @@ class AutoVersioningDispatcherImpl(
         // Triggering the scheduler immediately when no schedule is planned
         if (entry.order.schedule == null) {
             autoVersioningScheduler.scheduleEntry(entry)
+        } else {
+            autoVersioningAuditService.onPendingSchedule(entry.order)
         }
     }
 

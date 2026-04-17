@@ -34,6 +34,11 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                 create(source) {
                     autoVersioningAuditService.onCreated(it)
                 }
+                // Pending schedule
+                create(source) {
+                    autoVersioningAuditService.onCreated(it)
+                    autoVersioningAuditService.onPendingSchedule(it)
+                }
                 // In queue
                 create(source) {
                     autoVersioningAuditService.onCreated(it)
@@ -202,6 +207,7 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                     mapOf(
                         AutoVersioningAuditState.CREATED to 1.0,
                         AutoVersioningAuditState.SCHEDULED to 1.0,
+                        AutoVersioningAuditState.PENDING_SCHEDULE to 1.0,
                         AutoVersioningAuditState.THROTTLED to 0.0,
                         AutoVersioningAuditState.RECEIVED to 2.0,
                         AutoVersioningAuditState.ERROR to 3.0,

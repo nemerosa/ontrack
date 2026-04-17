@@ -36,6 +36,13 @@ RUN DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker} \
     && curl -SL https://github.com/docker/compose/releases/download/v2.34.0/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose \
     && chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
 
+# Pre-install Playwright Chromium system dependencies to avoid slow apt-get downloads during builds
+# Node.js is installed temporarily; the build uses Gradle's own Node download at runtime
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npx -y playwright@1.52.0 install-deps chromium \
+    && rm -rf /var/lib/apt/lists/*
+
 # Git configuration
 RUN git config --global user.email "jenkins@nemerosa.net" \
     && git config --global user.name "Jenkins" \

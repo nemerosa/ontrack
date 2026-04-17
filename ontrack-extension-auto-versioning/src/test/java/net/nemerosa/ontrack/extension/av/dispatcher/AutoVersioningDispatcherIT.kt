@@ -135,9 +135,9 @@ class AutoVersioningDispatcherIT : AbstractAutoVersioningTestSupport() {
                 "Entry 2.0.0 found"
             ) {
                 assertEquals(
-                    AutoVersioningAuditState.CREATED,
+                    AutoVersioningAuditState.PENDING_SCHEDULE,
                     it.mostRecentState.state,
-                    "Entry 2.0.0 is created, will be scheduled later"
+                    "Entry 2.0.0 is pending schedule, will be scheduled later"
                 )
             }
         }

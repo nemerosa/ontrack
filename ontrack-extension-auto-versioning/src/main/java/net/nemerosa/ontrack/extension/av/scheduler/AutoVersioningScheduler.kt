@@ -60,7 +60,8 @@ class AutoVersioningScheduler(
         logger.info("Scheduling [${entry.order.uuid}] entry scheduled...")
 
         // Last check on state
-        if (entry.mostRecentState.state != AutoVersioningAuditState.CREATED) {
+        if (entry.mostRecentState.state != AutoVersioningAuditState.CREATED &&
+            entry.mostRecentState.state != AutoVersioningAuditState.PENDING_SCHEDULE) {
             logger.warn("Entry [${entry.order.uuid}] already scheduled, processing or processed. Skipping.")
             metrics.onScheduledCancelled(entry.order)
             return
