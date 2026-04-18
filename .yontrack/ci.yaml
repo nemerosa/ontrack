@@ -75,6 +75,61 @@ configuration:
               type: 'SUCCESS'
             contentTemplate: |
               Build ${build} has been promoted to ${promotionLevel}.
+    project:
+      environments:
+        keepEnvironments: true
+        environments:
+          - name: self.dev.yontrack.com
+            order: 100
+            tags:
+              - release
+        slots:
+          - project: ontrack
+            environments:
+              - name: self.dev.yontrack.com
+                admissionRules:
+                  - name: "branchPattern"
+                    ruleId: "branchPattern"
+                    ruleConfig:
+                      includes:
+                        - "main"
+                      lastBranchOnly: true
+                  - name: "promotion"
+                    ruleId: "promotion"
+                    ruleConfig:
+                      promotion: "RELEASE"
+                workflows:
+                  - trigger: "RUNNING"
+                    name: "Deploying"
+                    nodes:
+                      - id: "auto-versioning"
+                        description: "Updating version"
+                        executorId: "auto-versioning"
+                        data:
+                          targetProject: "yontrack-infra-gitops"
+                          targetBranch: "main"
+                          targetPath: "yontrack-helmfile.d/values/yontrack-self/defaults.yaml"
+                          targetPropertyType: "yaml-path"
+                          targetProperty: "image.tag"
+                          targetVersion: "${build}"
+                          autoApproval: true
+                      - id: "deploy"
+                        description: "Marking the deployment as finished"
+                        executorId: "slot-pipeline-deployed"
+                        data: {}
+                        parents:
+                          - id: "auto-versioning"
+                      - id: "end"
+                        parents:
+                          - id: "deploy"
+                        description: "Notification"
+                        executorId: "notification"
+                        data:
+                          channel: "slack"
+                          template: "Deployment of ${build} in Production is finished"
+                          channelConfig:
+                            type: "INFO"
+                            channel: "#notifications"
   custom:
     configs:
       - conditions:
