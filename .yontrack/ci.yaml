@@ -77,7 +77,6 @@ configuration:
               Build ${build} has been promoted to ${promotionLevel}.
     project:
       environments:
-        keepEnvironments: true
         environments:
           - name: self.dev.yontrack.com
             order: 100
