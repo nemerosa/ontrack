@@ -104,6 +104,7 @@ class AutoDisablingBranchPatternsStaleBranchCheckIT : AbstractDSLTestSupport() {
                     autoDisablingBranchPattern(
                         includes = listOf("release-.*"),
                         mode = AutoDisablingBranchPatternsMode.DISABLE,
+                        keepLast = 0,
                     )
                 )
             )
@@ -142,6 +143,36 @@ class AutoDisablingBranchPatternsStaleBranchCheckIT : AbstractDSLTestSupport() {
                 assertNotNull(structureService.findBranchByID(id), "Branch has not been deleted") {
                     assertFalse(it.isDisabled, "Branch has not been disabled")
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Disable mode with keep last 1 keeps the most recent branch among single-number branches like v1 to v21`() {
+        project {
+            autoDisablingBranchPatterns(
+                items = listOf(
+                    autoDisablingBranchPattern(
+                        includes = listOf("v.*"),
+                        mode = AutoDisablingBranchPatternsMode.DISABLE,
+                        keepLast = 1,
+                    ),
+                )
+            )
+            val branches = (1..21).map { no ->
+                branch("v$no")
+            }
+            staleJobService.detectAndManageStaleBranches(JobRunListener.out(), project)
+            // v1 to v20 should be disabled
+            (1..20).forEach { no ->
+                val branch = branches[no - 1]
+                assertNotNull(structureService.findBranchByID(branch.id), "Branch v$no has not been deleted") {
+                    assertTrue(it.isDisabled, "Branch v$no has been disabled")
+                }
+            }
+            // v21 (the last one) should remain enabled
+            assertNotNull(structureService.findBranchByID(branches[20].id), "Branch v21 has not been deleted") {
+                assertFalse(it.isDisabled, "Branch v21 has not been disabled")
             }
         }
     }

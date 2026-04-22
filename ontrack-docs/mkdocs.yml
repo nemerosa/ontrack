@@ -104,6 +104,7 @@ nav:
           - Sources: content/generated/templating/sources/index.md
       - Workflow node executors: content/generated/workflow-node-executors/index.md
   - Operations:
+      - Stale branches: content/operations/stale-branches.md
       - Metrics: content/operations/metrics.md
       - Troubleshooting:
           - Git connectivity: content/operations/git-connectivity.md

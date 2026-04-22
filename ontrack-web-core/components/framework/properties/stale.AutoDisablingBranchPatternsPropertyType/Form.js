@@ -1,7 +1,6 @@
-import {Button, Form, Input, InputNumber, Select, Space, Switch, Typography} from "antd";
+import {Button, Form, InputNumber, Select, Space, Typography} from "antd";
 import {prefixedFormName} from "@components/form/formUtils";
 import {FaPlus, FaTrash} from "react-icons/fa";
-import AutoDisablingBranchPatternsMode from "@components/extension/stale/AutoDisablingBranchPatternsMode";
 import SelectAutoDisablingBranchPatternsMode from "@components/extension/stale/SelectAutoDisablingBranchPatternsMode";
 
 export default function PropertyForm({prefix}) {
@@ -58,9 +57,9 @@ export default function PropertyForm({prefix}) {
                                             {...restField}
                                             name={[name, 'keepLast']}
                                             label="Keep last"
-                                            extra="When mode is set to Keep last, number of branches to keep. Branches are sorted using semantic versioning."
+                                            extra="Number of branches to keep (0 = disable all). Applies to both Disable and Keep last modes. Branches are sorted using semantic versioning."
                                         >
-                                            <InputNumber min={1}/>
+                                            <InputNumber min={0}/>
                                         </Form.Item>
                                     </Space>
                                 </>

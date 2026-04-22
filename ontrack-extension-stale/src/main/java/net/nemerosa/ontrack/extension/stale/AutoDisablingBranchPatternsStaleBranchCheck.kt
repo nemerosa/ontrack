@@ -36,7 +36,11 @@ class AutoDisablingBranchPatternsStaleBranchCheck(
         // Behaviour
         return when (item.mode) {
             AutoDisablingBranchPatternsMode.KEEP -> StaleBranchStatus.KEEP
-            AutoDisablingBranchPatternsMode.DISABLE -> StaleBranchStatus.DISABLE
+            AutoDisablingBranchPatternsMode.DISABLE -> if (item.keepLast > 0) {
+                isLastBranch(context, branch, item)
+            } else {
+                StaleBranchStatus.DISABLE
+            }
             AutoDisablingBranchPatternsMode.KEEP_LAST -> isLastBranch(context, branch, item)
         }
     }
