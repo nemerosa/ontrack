@@ -64,6 +64,48 @@ Given branches `v1`, `v2`, …, `v20`, `v21` and the following policy:
 
 See the [full property reference](../generated/properties/property-net.nemerosa.ontrack.extension.stale.AutoDisablingBranchPatternsPropertyType.md).
 
+### Configuring via CI config
+
+The auto-disabling property can also be set from your `.yontrack/ci.yaml` file using the `auto-disabling` project extension. This is useful when you want the policy to be defined centrally in your repository alongside your pipeline configuration.
+
+**Apply to all branches (under `defaults`):**
+
+```yaml
+version: v1
+configuration:
+  defaults:
+    project:
+      auto-disabling:
+        patterns:
+          - includes:
+              - 'v.*'
+            mode: DISABLE
+            keepLast: 1
+```
+
+**Apply only when triggered from a specific branch (under `custom`):**
+
+```yaml
+version: v1
+configuration:
+  custom:
+    configs:
+      - conditions:
+          - name: branch
+            config: main
+        project:
+          auto-disabling:
+            patterns:
+              - includes:
+                  - 'v.*'
+                mode: DISABLE
+                keepLast: 1
+```
+
+In the second example, the property is set on the project only when the CI run is on the `main` branch. This is the recommended approach so that the policy is updated from a single authoritative branch.
+
+See the [CI config reference](../configuration/ci-config.md) for more details on `defaults` vs `custom` configurations and available conditions.
+
 ## Combining both mechanisms
 
 The two checks are evaluated independently for each branch. A `Keep` verdict from either
