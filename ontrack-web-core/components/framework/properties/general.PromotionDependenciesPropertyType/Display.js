@@ -11,7 +11,7 @@ export default function Display({property, entityId}) {
         <>
             <LoadingContainer loading={loading}>
                 {
-                    branch && <Space>
+                    branch?.project?.name && <Space>
                         {
                             property.value.dependencies.map(plName => <>
                                 <PromotionLevelByName
