@@ -107,7 +107,7 @@ configuration:
                         data:
                           targetProject: "yontrack-infra-gitops"
                           targetBranch: "main"
-                          targetPath: "yontrack-helmfile.d/values/yontrack-self/defaults.yaml"
+                          targetPath: "yontrack-helmfile.d/values/yontrack-self/yontrack.yaml"
                           targetPropertyType: "yaml-path"
                           targetProperty: "image.tag"
                           targetVersion: "${build}"
