@@ -80,6 +80,29 @@ _Avoid_: placeholder, default icon, fallback image
 Picking two builds on a branch in order to see what changed between them.
 _Avoid_: build comparison, diff selection
 
+**Change log**:
+What happened between two builds: the commits, the issues they reference, and the
+dependency links that moved. It is computed from the project's SCM, not stored.
+_Avoid_: diff, delta, release notes
+
+**Change log view**:
+One interchangeable rendering of a change log, filling the change log page.
+Change log views are peers on a single axis of choice, exactly as *branch content
+views* are — a change log view never offers a sub-selector for other views.
+_Avoid_: view mode, display mode, tab
+
+**Semantic change log**:
+The change log view that groups commits into sections by their conventional-commit
+type. It shows only commits carrying a type; commits without one are absent rather
+than collected into an "other" section.
+_Avoid_: conventional change log, grouped change log, formatted change log
+
+**Issue export**:
+Rendering a change log's *issues*, grouped by issue type, into a format meant to be
+pasted elsewhere. It is a distinct thing from the semantic change log, which groups
+*commits* by commit type, and it belongs to the classic change log view.
+_Avoid_: change log export, issue report
+
 ### Deployment
 
 **Environment**:
