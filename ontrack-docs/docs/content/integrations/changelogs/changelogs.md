@@ -63,6 +63,52 @@ When you finally click _Export_, the changelog is shown in a modal box and can b
 
     See also the [templating](#using-templating) for more advanced usages
 
+#### Reading the changelog as a semantic changelog
+
+The same changelog can be read in two ways, chosen from the _View_ menu in the page's command
+bar:
+
+* _Classic_ — the sections described above: boundaries, dependencies, commits and issues. This
+  is what the page shows unless you ask for something else.
+* _Semantic_ — the commits grouped into sections by their
+  [conventional-commit](#semantic-changelogs) type, exactly as the templating renderer produces
+  them for a notification. This is the form you paste into release notes, a pull request
+  description or Jira.
+
+The semantic view replaces the _issues_ section with the rendered changelog, shown as raw text
+with a _Copy_ button — including for HTML, where the source is what you get, because the point
+of choosing a format is to paste the result somewhere else. The boundaries and the dependency
+changes stay: they answer which two builds this is about, whatever way you read it.
+
+Four options sit in the panel's own header:
+
+| Option    | Default    | Meaning                                                                          |
+|-----------|------------|----------------------------------------------------------------------------------|
+| _Format_  | `markdown` | The renderer: `text`, `markdown`, `html`, `jira` or `slack`                       |
+| _Emojis_  | on         | Emojis in the section titles                                                      |
+| _Issues_  | on         | An issues section **inside** the rendered text — the semantic view has no issues panel |
+| _Commits_ | off        | Shows the classic commits section beside the rendered text                         |
+
+The view and its options are remembered in your user preferences, so the changelog page opens
+the way you last read it, on any machine.
+
+They are also carried in the URL, so a link you share reproduces exactly what you were reading:
+
+```
+/extension/scm/changelog?from=1146&to=1149&view=semantic&format=jira&emojis=true&issues=true&commits=false
+```
+
+The parameters are written only when you change something. A changelog link with no `view=`
+parameter keeps meaning "however *you* like to read it" for whoever opens it.
+
+!!! note
+
+    The semantic changelog only shows commits whose subject carries a conventional-commit type,
+    such as `feat(api): search owners by phone number`. On a project whose commit messages do
+    not follow that convention, the view says so instead of showing an empty panel — turn
+    _Commits_ on to read the commits as they are. See [Semantic changelogs](#semantic-changelogs)
+    for the same rendering used from a template.
+
 ### Using the UI across branches
 
 You can generate a changelog between two builds on different branches.
@@ -256,7 +302,10 @@ the `commitsOption` parameter.
 ### Semantic changelogs
 
 The semantic changelog is based on the [conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
-specification.
+specification. The changelog page can be read this way too — see
+[Reading the changelog as a semantic changelog](#reading-the-changelog-as-a-semantic-changelog);
+the options below are the ones available from a template, of which the page exposes `issues` and
+`emojis`.
 
 | Option   | Type     | Default value | Description                                            |
 |----------|----------|---------------|--------------------------------------------------------|

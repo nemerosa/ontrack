@@ -4845,10 +4845,20 @@ type Preferences {
   branchViewVsGroups: Boolean!
   "Branch view VS names"
   branchViewVsNames: Boolean!
+  "Commits shown beside the semantic change log"
+  changeLogSemanticCommits: Boolean!
+  "Emojis in the section titles of the semantic change log"
+  changeLogSemanticEmojis: Boolean!
+  "Renderer used by the semantic change log view"
+  changeLogSemanticFormat: String!
+  "Issues section inside the rendered semantic change log"
+  changeLogSemanticIssues: Boolean!
   "Dashboard selected by default"
   dashboardUuid: String
   "Selected branch view"
   selectedBranchViewKey: String
+  "Selected change log view"
+  selectedChangeLogViewKey: String
   "Theme selected for the web UI"
   themeMode: ThemeMode!
 }
@@ -10841,10 +10851,20 @@ input SetPreferencesInput {
   branchViewVsGroups: Boolean
   "branchViewVsNames field"
   branchViewVsNames: Boolean
+  "Commits shown beside the semantic change log"
+  changeLogSemanticCommits: Boolean
+  "Emojis in the section titles of the semantic change log"
+  changeLogSemanticEmojis: Boolean
+  "Renderer used by the semantic change log view"
+  changeLogSemanticFormat: String
+  "Issues section inside the rendered semantic change log"
+  changeLogSemanticIssues: Boolean
   "Dashboard selected by default"
   dashboardUuid: String
   "Selected branch view"
   selectedBranchViewKey: String
+  "Selected change log view"
+  selectedChangeLogViewKey: String
   "Theme selected for the web UI"
   themeMode: ThemeMode
 }

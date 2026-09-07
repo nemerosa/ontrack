@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom"
-import {render} from "@testing-library/react"
+import {render, screen} from "@testing-library/react"
+import {PreferencesContext} from "@components/providers/PreferencesProvider"
 import ScmChangeLogContent from "@components/extension/scm/ScmChangeLogContent"
 
 // Captures every set of props GridTable is rendered with, so we can tell
@@ -11,7 +12,11 @@ import ScmChangeLogContent from "@components/extension/scm/ScmChangeLogContent"
 const gridTableCalls = []
 jest.mock("../../../../components/grid/GridTable", () => (props) => {
     gridTableCalls.push(props)
-    return <div data-testid="grid-table" data-items={props.items.length}/>
+    return (
+        <div data-testid="grid-table" data-items={props.items.length}>
+            {props.items.map(item => <div key={item.id} data-testid={`cell-${item.id}`}/>)}
+        </div>
+    )
 })
 
 jest.mock("../../../../components/extension/scm/ChangeLogBuild", () => () => <div/>)
@@ -19,7 +24,22 @@ jest.mock("../../../../components/grid/GridCell", () => () => <div/>)
 jest.mock("../../../../components/extension/scm/ChangeLogLinks", () => () => <div/>)
 jest.mock("../../../../components/extension/git/GitChangeLogCommits", () => () => <div/>)
 jest.mock("../../../../components/extension/issues/ChangeLogIssues", () => () => <div/>)
+jest.mock("../../../../components/extension/scm/views/ChangeLogSemantic", () => () => <div/>)
 jest.mock("../../../../components/layouts/MainPage", () => ({children}) => <div>{children}</div>)
+
+const mockRouter = {
+    pathname: "/scm/changelog",
+    query: {},
+    replace: jest.fn(),
+}
+
+jest.mock("next/router", () => ({
+    useRouter: () => ({
+        pathname: mockRouter.pathname,
+        query: {...mockRouter.query},
+        replace: mockRouter.replace,
+    }),
+}))
 
 const changeLog = {
     buildFrom: {id: 101, name: "5.1.12", creation: {time: "2026-08-01T10:00:00Z"}},
@@ -29,6 +49,17 @@ const changeLog = {
     commits: [],
 }
 
+const renderContent = ({query = {}, preferences = {}} = {}) => {
+    mockRouter.query = {from: "101", to: "102", ...query}
+    render(
+        <PreferencesContext.Provider value={{...preferences, setPreferences: jest.fn(), loaded: true}}>
+            <ScmChangeLogContent changeLog={changeLog} loading={false} error={null}/>
+        </PreferencesContext.Provider>
+    )
+}
+
+const cells = () => gridTableCalls[gridTableCalls.length - 1].items.map(it => it.id)
+
 beforeEach(() => {
     gridTableCalls.length = 0
 })
@@ -36,7 +67,7 @@ beforeEach(() => {
 describe('ScmChangeLogContent', () => {
 
     it('renders the grid with all its widgets on the very first render, never with an empty item list', () => {
-        render(<ScmChangeLogContent changeLog={changeLog} loading={false} error={null}/>)
+        renderContent()
 
         // Regression: `items` used to start as `useState([])` and only be
         // filled by a `useEffect`, so GridTable was first mounted with 0
@@ -46,7 +77,62 @@ describe('ScmChangeLogContent', () => {
         expect(gridTableCalls.length).toBeGreaterThan(0)
         gridTableCalls.forEach(call => {
             expect(call.items.length).toEqual(call.layout.length)
+            expect(call.items.map(it => it.id)).toEqual(call.layout.map(it => it.i))
         })
         expect(gridTableCalls[0].items.length).toEqual(5)
     })
+
+    describe('the classic view', () => {
+
+        it('is what the page shows when nothing else is asked for', () => {
+            renderContent()
+            expect(cells()).toEqual(['from', 'to', 'links', 'commits', 'issues'])
+        })
+
+        it('keeps its commits and issues whatever the semantic options say', () => {
+            renderContent({preferences: {changeLogSemanticCommits: false}})
+            expect(cells()).toContain('commits')
+            expect(cells()).toContain('issues')
+            expect(cells()).not.toContain('semantic')
+        })
+
+    })
+
+    describe('the semantic view', () => {
+
+        it('replaces the issues cell with the semantic one', () => {
+            renderContent({query: {view: 'semantic'}})
+            // The boundary builds and the dependency links stay: they answer *which* two builds
+            // and *what dependencies moved*, which are change log concerns rather than
+            // classic-view ones.
+            expect(cells()).toEqual(['from', 'to', 'links', 'semantic'])
+            expect(screen.getByTestId('cell-semantic')).toBeInTheDocument()
+            expect(screen.queryByTestId('cell-issues')).not.toBeInTheDocument()
+        })
+
+        it('shows the commits cell when the commits option is on', () => {
+            renderContent({query: {view: 'semantic', commits: 'true'}})
+            expect(cells()).toEqual(['from', 'to', 'links', 'commits', 'semantic'])
+        })
+
+        it('is selected by the stored preference as well as by the parameter', () => {
+            renderContent({preferences: {selectedChangeLogViewKey: 'semantic'}})
+            expect(cells()).toContain('semantic')
+        })
+
+        it('lays every cell out without leaving a hole in the grid', () => {
+            renderContent({query: {view: 'semantic'}})
+            const {layout} = gridTableCalls[gridTableCalls.length - 1]
+            expect(layout.map(it => it.i)).toEqual(['from', 'to', 'links', 'semantic'])
+            // The two boundary cells share the first row; the rest are full width, stacked
+            expect(layout.map(it => [it.x, it.y, it.w])).toEqual([
+                [0, 0, 6],
+                [6, 0, 6],
+                [0, 5, 12],
+                [0, 12, 12],
+            ])
+        })
+
+    })
+
 })

@@ -41,6 +41,11 @@ class PreferencesMutations(
                 dashboardUuid = input.dashboardUuid ?: current.dashboardUuid,
                 selectedBranchViewKey = input.selectedBranchViewKey ?: current.selectedBranchViewKey,
                 themeMode = input.themeMode ?: current.themeMode,
+                selectedChangeLogViewKey = input.selectedChangeLogViewKey ?: current.selectedChangeLogViewKey,
+                changeLogSemanticFormat = input.changeLogSemanticFormat ?: current.changeLogSemanticFormat,
+                changeLogSemanticEmojis = input.changeLogSemanticEmojis ?: current.changeLogSemanticEmojis,
+                changeLogSemanticIssues = input.changeLogSemanticIssues ?: current.changeLogSemanticIssues,
+                changeLogSemanticCommits = input.changeLogSemanticCommits ?: current.changeLogSemanticCommits,
             )
             // Saves the preferences...
             preferencesService.setPreferences(account, new)
@@ -61,4 +66,14 @@ data class SetPreferencesInput(
     var selectedBranchViewKey: String? = null,
     @APIDescription("Theme selected for the web UI")
     var themeMode: ThemeMode? = null,
+    @APIDescription("Selected change log view")
+    var selectedChangeLogViewKey: String? = null,
+    @APIDescription("Renderer used by the semantic change log view")
+    var changeLogSemanticFormat: String? = null,
+    @APIDescription("Emojis in the section titles of the semantic change log")
+    var changeLogSemanticEmojis: Boolean? = null,
+    @APIDescription("Issues section inside the rendered semantic change log")
+    var changeLogSemanticIssues: Boolean? = null,
+    @APIDescription("Commits shown beside the semantic change log")
+    var changeLogSemanticCommits: Boolean? = null,
 )

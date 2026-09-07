@@ -8,6 +8,11 @@ export const PreferencesContext = createContext({
     dashboardUuid: null,
     selectedBranchViewKey: null,
     themeMode: null,
+    selectedChangeLogViewKey: null,
+    changeLogSemanticFormat: null,
+    changeLogSemanticEmojis: null,
+    changeLogSemanticIssues: null,
+    changeLogSemanticCommits: null,
     setPreferences: () => {
     },
     loaded: false,
@@ -23,6 +28,11 @@ export default function PreferencesContextProvider({children}) {
         dashboardUuid: null,
         selectedBranchViewKey: null,
         themeMode: null,
+        selectedChangeLogViewKey: null,
+        changeLogSemanticFormat: null,
+        changeLogSemanticEmojis: null,
+        changeLogSemanticIssues: null,
+        changeLogSemanticCommits: null,
     })
 
     const {data, loading, error, finished} = useQuery(
@@ -34,6 +44,11 @@ export default function PreferencesContextProvider({children}) {
                     dashboardUuid
                     selectedBranchViewKey
                     themeMode
+                    selectedChangeLogViewKey
+                    changeLogSemanticFormat
+                    changeLogSemanticEmojis
+                    changeLogSemanticIssues
+                    changeLogSemanticCommits
                 }
             }
         `,
@@ -66,10 +81,14 @@ export default function PreferencesContextProvider({children}) {
 
     const setPreferences = async (values) => {
         await mutate({input: values})
-        setPreferencesRecord({
-            ...preferencesRecord,
+        // Functional update, not a merge into the record captured by this render: two
+        // preferences written in quick succession - the four switches in the change log's
+        // semantic panel invite exactly that - would otherwise have the second overwrite the
+        // first with the state it saw when it was created.
+        setPreferencesRecord(previous => ({
+            ...previous,
             ...values,
-        })
+        }))
     }
 
     const contextValue = {

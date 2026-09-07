@@ -11,6 +11,9 @@ import GridCell from "@components/grid/GridCell";
 import GitChangeLogCommits from "@components/extension/git/GitChangeLogCommits";
 import ChangeLogIssues from "@components/extension/issues/ChangeLogIssues";
 import ChangeLogLinks from "@components/extension/scm/ChangeLogLinks";
+import ChangeLogSemantic from "@components/extension/scm/views/ChangeLogSemantic";
+import ChangeLogViewSelector from "@components/extension/scm/views/ChangeLogViewSelector";
+import useChangeLogViewSelection from "@components/extension/scm/views/useChangeLogViewSelection";
 import {Alert, Empty, Typography} from "antd";
 
 /**
@@ -23,13 +26,32 @@ import {Alert, Empty, Typography} from "antd";
  */
 export default function ScmChangeLogContent({changeLog, loading, error}) {
 
-    const defaultLayout = [
-        {i: "from", x: 0, y: 0, w: 6, h: 5},
-        {i: "to", x: 6, y: 0, w: 6, h: 5},
-        {i: "links", x: 0, y: 5, w: 12, h: 7},
-        {i: "commits", x: 0, y: 12, w: 12, h: 10},
-        {i: "issues", x: 0, y: 22, w: 12, h: 10},
+    const {views, selectedViewKey, selectChangeLogView, options, setSemanticOption} =
+        useChangeLogViewSelection()
+
+    const semantic = selectedViewKey === 'semantic'
+
+    // The commits cell is always in the classic view, and an option in the semantic one.
+    const showCommits = !semantic || options.commits
+
+    // Layout and items are built from the same list, in the same render: react-grid-layout
+    // only re-derives its internal layout from a changed `layout` prop, so a layout naming a
+    // cell the item list does not carry - or the other way round - collapses widgets into the
+    // top-left corner (#1634).
+    const cells = [
+        {id: "from", w: 6, h: 5},
+        {id: "to", w: 6, h: 5},
+        {id: "links", w: 12, h: 7},
+        ...(showCommits ? [{id: "commits", w: 12, h: 10}] : []),
+        ...(semantic ? [{id: "semantic", w: 12, h: 14}] : [{id: "issues", w: 12, h: 10}]),
     ]
+
+    const defaultLayout = cells.reduce(({layout, x, y}, cell) => ({
+        layout: [...layout, {i: cell.id, x, y, w: cell.w, h: cell.h}],
+        // Two half-width cells sit side by side; anything else starts its own row
+        x: x + cell.w >= 12 ? 0 : x + cell.w,
+        y: x + cell.w >= 12 ? y + cell.h : y,
+    }), {layout: [], x: 0, y: 0}).layout
 
     // A boundary build cell, showing a skeleton for as long as the build is not known
     const boundaryCell = (id, label, build) => ({
@@ -44,29 +66,39 @@ export default function ScmChangeLogContent({changeLog, loading, error}) {
     // otherwise react-grid-layout mounts with 0 children, and when the items are
     // filled in a tick later it falls back to its stale (empty) internal layout,
     // collapsing every widget into a default 1x1 slot at the top-left corner (#1634).
-    const items = changeLog ? [
-        boundaryCell("from", "From", changeLog.buildFrom),
-        boundaryCell("to", "To", changeLog.buildTo),
-        {
+    const cellContent = {
+        from: () => boundaryCell("from", "From", changeLog.buildFrom),
+        to: () => boundaryCell("to", "To", changeLog.buildTo),
+        links: () => ({
             id: "links",
             content: <ChangeLogLinks id="links" loading={loading}
                                      linkChanges={changeLog.linkChanges}/>,
-        },
-        {
+        }),
+        commits: () => ({
             id: "commits",
             content: <GitChangeLogCommits id="commits" loading={loading}
                                           commits={changeLog.commits}
                                           diffLink={changeLog.diffLink}/>,
-        },
-        {
-            // The issues are loaded by the component itself, in parallel
-            // of the rest of the change log.
+        }),
+        // The issues and the semantic rendering are loaded by their own component, in
+        // parallel of the rest of the change log.
+        issues: () => ({
             id: "issues",
             content: <ChangeLogIssues id="issues"
                                       from={Number(changeLog.buildFrom?.id)}
                                       to={Number(changeLog.buildTo?.id)}/>,
-        },
-    ] : []
+        }),
+        semantic: () => ({
+            id: "semantic",
+            content: <ChangeLogSemantic id="semantic"
+                                        from={Number(changeLog.buildFrom?.id)}
+                                        to={Number(changeLog.buildTo?.id)}
+                                        options={options}
+                                        onOptionChange={setSemanticOption}/>,
+        }),
+    }
+
+    const items = changeLog ? cells.map(cell => cellContent[cell.id]()) : []
 
     return (
         <>
@@ -87,6 +119,12 @@ export default function ScmChangeLogContent({changeLog, loading, error}) {
                     changeLog && changeLog.buildFrom?.branch ? downToBranchBreadcrumbs(changeLog.buildFrom) : homeBreadcrumbs()
                 }
                 commands={[
+                    <ChangeLogViewSelector
+                        key="view"
+                        views={views}
+                        selectedViewKey={selectedViewKey}
+                        onSelect={selectChangeLogView}
+                    />,
                     <CloseCommand
                         key="close"
                         href={

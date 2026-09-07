@@ -3179,6 +3179,26 @@ type Message {
   type: MessageType!
 }
 
+"Output type for the mockScmDeleteRepository mutation."
+type MockScmDeleteRepositoryPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
+"Output type for the mockScmRegisterCommit mutation."
+type MockScmRegisterCommitPayload implements Payload {
+  "The registered commit"
+  commit: SCMCommit
+  "List of errors"
+  errors: [UserError]
+}
+
+"Output type for the mockScmRegisterIssue mutation."
+type MockScmRegisterIssuePayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 type Mutation {
   "Add a workflow into an existing slot"
   addSlotWorkflow(
@@ -3920,6 +3940,21 @@ type Mutation {
     "Input for the mutation"
     input: MapGroupInput
   ): MapGroupPayload
+  "Deletes a mock SCM repository and everything it holds. The mock SCM keeps its repositories on the bean, where they outlive the entities pointing at them, and derives a commit id from the position of the commit on its branch ? so anything registering the same commits twice starts here."
+  mockScmDeleteRepository(
+    "Input for the mutation"
+    input: MockScmDeleteRepositoryInput
+  ): MockScmDeleteRepositoryPayload
+  "Registers a commit in a mock SCM repository, creating the repository and the branch if they are not there yet."
+  mockScmRegisterCommit(
+    "Input for the mutation"
+    input: MockScmRegisterCommitInput
+  ): MockScmRegisterCommitPayload
+  "Registers an issue in a mock SCM repository's issue service. Issues must be registered before the commits mentioning them: the mock SCM links a commit to an issue as the commit comes in."
+  mockScmRegisterIssue(
+    "Input for the mutation"
+    input: MockScmRegisterIssueInput
+  ): MockScmRegisterIssuePayload
   "Overriding a rule into a pipeline"
   overridePipelineRule(
     "Input for the mutation"
@@ -4810,10 +4845,20 @@ type Preferences {
   branchViewVsGroups: Boolean!
   "Branch view VS names"
   branchViewVsNames: Boolean!
+  "Commits shown beside the semantic change log"
+  changeLogSemanticCommits: Boolean!
+  "Emojis in the section titles of the semantic change log"
+  changeLogSemanticEmojis: Boolean!
+  "Renderer used by the semantic change log view"
+  changeLogSemanticFormat: String!
+  "Issues section inside the rendered semantic change log"
+  changeLogSemanticIssues: Boolean!
   "Dashboard selected by default"
   dashboardUuid: String
   "Selected branch view"
   selectedBranchViewKey: String
+  "Selected change log view"
+  selectedChangeLogViewKey: String
   "Theme selected for the web UI"
   themeMode: ThemeMode!
 }
@@ -8784,6 +8829,8 @@ input CancelSlotPipelineInput {
 input ChangeLogTemplatingServiceConfig {
   "Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence."
   allQualifiers: Boolean
+  "Maximum length of a commit message in a change log, ellipsis included. Only the first line of a commit message is ever rendered; set this to 0 to render that line in full."
+  commitsMaxLength: Int
   "Defines how to render commits for a change log"
   commitsOption: ChangeLogTemplatingCommitsOption
   "If a qualifier has no previous link, uses the default qualifier (empty) qualifier."
@@ -10218,6 +10265,34 @@ input MetricsEntryInput {
   value: Float!
 }
 
+"Input type for the mockScmDeleteRepository mutation."
+input MockScmDeleteRepositoryInput {
+  "Name of the mock SCM repository"
+  repository: String!
+}
+
+"Input type for the mockScmRegisterCommit mutation."
+input MockScmRegisterCommitInput {
+  "Commit message"
+  message: String!
+  "Name of the mock SCM repository"
+  repository: String!
+  "Branch of the repository the commit goes on"
+  scmBranch: String!
+}
+
+"Input type for the mockScmRegisterIssue mutation."
+input MockScmRegisterIssueInput {
+  "Issue key, of the `ABC-123` shape the mock issue service reads out of a commit message"
+  key: String!
+  "Issue summary"
+  message: String!
+  "Name of the mock SCM repository"
+  repository: String!
+  "Issue type, which is what a change log groups its issues by"
+  type: String
+}
+
 "Input type for the overridePipelineRule mutation."
 input OverridePipelineRuleInput {
   "admissionRuleConfigId field"
@@ -10502,6 +10577,8 @@ input SelectDashboardInput {
 input SemanticChangeLogTemplatingServiceConfig {
   "Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence."
   allQualifiers: Boolean
+  "Maximum length of a commit message in a change log, ellipsis included. Only the first line of a commit message is ever rendered; set this to 0 to render that line in full."
+  commitsMaxLength: Int
   "If a qualifier has no previous link, uses the default qualifier (empty) qualifier."
   defaultQualifierFallback: Boolean
   "Comma-separated list of project links to follow one by one for a get deep change log. Each item in the list is either a project name, or a project name and qualifier separated by a colon (:)."
@@ -10774,10 +10851,20 @@ input SetPreferencesInput {
   branchViewVsGroups: Boolean
   "branchViewVsNames field"
   branchViewVsNames: Boolean
+  "Commits shown beside the semantic change log"
+  changeLogSemanticCommits: Boolean
+  "Emojis in the section titles of the semantic change log"
+  changeLogSemanticEmojis: Boolean
+  "Renderer used by the semantic change log view"
+  changeLogSemanticFormat: String
+  "Issues section inside the rendered semantic change log"
+  changeLogSemanticIssues: Boolean
   "Dashboard selected by default"
   dashboardUuid: String
   "Selected branch view"
   selectedBranchViewKey: String
+  "Selected change log view"
+  selectedChangeLogViewKey: String
   "Theme selected for the web UI"
   themeMode: ThemeMode
 }

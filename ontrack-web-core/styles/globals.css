@@ -580,6 +580,21 @@ button.ot-validation-stamp-filter-edition {
 }
 
 /**
+ * The rendered semantic change log, shown raw in the change log page's semantic view.
+ *
+ * The renderer's own syntax is the product - it is meant to be pasted somewhere else - so the
+ * text keeps its line breaks and is never reflowed into prose. Same lesson as
+ * `.ot-workflow-node-error` above: `Typography.Text` renders an inline span, on which the
+ * scrolling of an over-long change log would have no effect.
+ */
+.ot-semantic-change-log {
+    display: block;
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/**
  * Pulse marking an in-flight state - a notification still being delivered, a
  * run still going. Opacity only: the animation carries no colour of its own, so
  * the element keeps whatever Ant Design token its caller painted it with.
