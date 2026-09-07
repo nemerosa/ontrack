@@ -22,12 +22,35 @@ the seed — keep it in sync by hand whenever that file changes.
 | Environments and deployments                | `staging` and `production` environments                              | `petclinic` `105` deployed on staging, `104` deployed on production                        |
 | Shared dashboard                            | Dashboard picker → "Yontrack demo"                                    | `BranchStatuses`, `EnvironmentList`, `LastActiveProjects` and `PromotionFrequencyChart` widgets |
 | Self-hosted changelog                       | `yontrack` / `main`                                                   | One build per commit since the last release, always current, `BRONZE` only                 |
+| Change log between two builds               | `petclinic` / `main`, change log from build `104` to `107`            | Conventional-commit subjects, grouped issues, and the semantic view of the same change log |
 
 ## Projects
 
 | Project           | Branches                    | Role                                                                |
 |--------------------|------------------------------|----------------------------------------------------------------------|
 | `common-library`   | `main`                       | Bottom of the dependency graph; `petclinic` links to its builds       |
-| `petclinic`        | `main`, `release-1.3`        | The main demo project — full pipeline, both promotion ladders         |
+| `petclinic`        | `main`, `release-1.3`        | The main demo project — full pipeline, both promotion ladders, the only one with an SCM |
 | `petclinic-ui`     | `main`                       | Consumes `petclinic`, so the demo has a dependency graph to walk       |
 | `yontrack`         | `main`                       | Yontrack's own changelog, reseeded from git on every run              |
+
+## The change log
+
+`petclinic` is the only project with an SCM, and it is a **mock** one: the seed registers
+the commits itself, over REST, instead of pointing the project at a real repository. That
+keeps the reset self-contained — no credentials, no network egress — at two costs worth
+knowing about:
+
+- **The commits do not survive a backend restart.** `MockSCMExtension` holds its repositories
+  in memory, on the bean. The demo resets on every deployment, but a pod restart in between
+  leaves `petclinic` pointing at a repository the mock SCM no longer has — and since the build
+  commit properties are in the database, the change log fails with `Repository petclinic not
+  found` rather than reading empty, until the next reset. A persistent mock SCM is filed as
+  [#1701](https://github.com/yontrack/yontrack/issues/1701).
+- **The instance must enable the mock SCM**, with
+  `ONTRACK_CONFIG_EXTENSION_SCM_MOCK_ENABLED=true`. Without it the reset fails partway, after
+  the deletions — see [`doc/dev-guide/demo-seed.md`](../doc/dev-guide/demo-seed.md).
+
+The commit subjects are conventional-commit ones (`feat(api): …`, `fix: …`, `docs: …`)
+because the semantic change log groups commits by their type and drops every commit carrying
+none. That is also why the change log is on `petclinic` and not on `yontrack`, whose subjects
+come from this repository's own history and are overwhelmingly `#1234 Some message`.

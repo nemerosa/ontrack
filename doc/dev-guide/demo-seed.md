@@ -54,17 +54,24 @@ that is not a `demo.` host or a local instance. Naming another instance is possi
 ### What the target instance must have
 
 The dataset is not self-contained: it can only reference features the target instance
-actually runs. The CANARY promotion workflow is built on the **Simulated gate** node
-executor (`executorId: mock`), which is off by default and enabled by
-`ontrack.config.extension.workflows.mock.enabled`. It is on automatically in the `dev`
-profile, so the local dev stack needs nothing; a `prod`-profile instance — the demo
-included — must set the property, which for the demo means
-`ONTRACK_CONFIG_EXTENSION_WORKFLOWS_MOCK_ENABLED` in its Helm values.
+actually runs. Two of them are off by default, are on automatically in the `dev` profile —
+so the local dev stack needs nothing — and must be switched on explicitly anywhere else,
+which for the demo means an environment variable in its Helm values:
 
-Without it the reset fails partway through, after the deletions, with
-`Workflow node executor ID "mock" not found` — the dataset validation cannot catch this,
-because it checks the dataset against Yontrack's rules, not against the target's
-configuration.
+| Feature | Property | Helm value |
+|---------|----------|------------|
+| **Simulated gate** node executor (`executorId: mock`), which the CANARY promotion workflow is built on | `ontrack.config.extension.workflows.mock.enabled` | `ONTRACK_CONFIG_EXTENSION_WORKFLOWS_MOCK_ENABLED` |
+| **Mock SCM**, which the change log on `petclinic` is read from | `ontrack.config.extension.scm.mock.enabled` | `ONTRACK_CONFIG_EXTENSION_SCM_MOCK_ENABLED` |
+
+Without the first, the reset fails partway through, after the deletions, with
+`Workflow node executor ID "mock" not found`. Without the second it fails the same way,
+when the seed posts the demo's commits to an endpoint that is not there. The dataset
+validation cannot catch either, because it checks the dataset against Yontrack's rules, not
+against the target's configuration.
+
+Neither belongs on an instance tracking real deliveries: one lets a workflow report a gate
+as passed without anything having been verified, the other lets a project claim an SCM that
+answers with whatever anyone posted to it.
 
 ### The changelog project
 
@@ -78,6 +85,34 @@ warning and carries on with an empty changelog project. That is deliberate: a de
 project poorer beats a reset that refuses to run. The cost is that it degrades quietly, so
 a smoke test asserting the demo is fresh will not catch a checkout misconfigured this way;
 the warning in the log is the only signal.
+
+### The change log
+
+`petclinic` is the only project with an SCM, and it is the **mock** one: the seed registers
+the commits behind the demo's change logs itself, over REST, rather than pointing the project
+at a real repository. A real Git configuration would trade a self-contained reset for one
+depending on credentials and network egress.
+
+The commit subjects are conventional-commit ones on purpose. The semantic change log groups
+commits by their type and `SemanticChangelogRenderingServiceImpl` drops every commit carrying
+none, so a project writing subjects any other way demonstrates an empty semantic view — which
+is why the change log is not on the `yontrack` project, whose subjects come from this
+repository's own history and are overwhelmingly `#1234 Some message`.
+
+**The demo's change log is in memory and does not survive a backend restart.**
+`MockSCMExtension` keeps its repositories in a `mutableMapOf` on the bean. The demo resets on
+every deployment, but a pod restart in between leaves the project pointing at a repository the
+mock SCM no longer has. The build commit properties are in the database and survive, so the
+change log is not empty — it **fails**, with `Repository petclinic not found`, and so do the
+commit and issue info panels, until the next reset. The same applies locally:
+`scripts/dev-stack.sh restart backend` loses whatever the seed registered. This is accepted
+deliberately, for the reason above; a persistent mock SCM is filed separately as
+[#1701](https://github.com/yontrack/yontrack/issues/1701).
+
+Because those repositories outlive the projects the reset deletes, the seed **empties the
+repository** before registering anything in it. Commit ids are derived from the branch and the
+position of the commit on it, so a second run registering on top of the first would give every
+commit a different id.
 
 ## Adding to the demo
 
@@ -131,6 +166,12 @@ server involved.
 - **Another account's private dashboards survive.** The reset deletes every dashboard the
   seeding account can see: the shared ones and its own. Yontrack does not expose anyone
   else's private dashboards, so those are out of reach.
+- **The change log does not survive a backend restart.** See above: the mock SCM holds its
+  commits in memory, and the change log fails rather than reads empty once they are gone.
+- **Commits are not backdated.** The mock SCM stamps a commit with the time it is registered
+  and its REST endpoint takes no time, so a change log between two builds dated a week apart
+  shows commits dated within the same second of the reset. The same limitation as validation
+  runs, for the same reason, and it would need a server-side change to fix.
 - **`KdslDemoTarget` has no automated test.** The seed is destructive by definition, so it
   cannot share an instance with the acceptance suite. Changes to it are verified by running
   the program against a throwaway instance — the local dev stack does fine — twice, and
