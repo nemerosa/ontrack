@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.mock
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
@@ -11,11 +10,16 @@ import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import org.springframework.context.annotation.Profile
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
 @Component
-@Profile(RunProfile.DEV)
+@ConditionalOnProperty(
+    prefix = "ontrack.config.extension.scm.mock",
+    name = ["enabled"],
+    havingValue = "true",
+    matchIfMissing = false,
+)
 class MockSCMBranchPropertyType(
     extensionFeature: SCMExtensionFeature,
 ) : AbstractPropertyType<MockSCMBranchProperty>(extensionFeature) {

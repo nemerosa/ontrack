@@ -1,16 +1,23 @@
 package net.nemerosa.ontrack.extension.scm.mock
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import net.nemerosa.ontrack.common.RunProfile
-import org.springframework.context.annotation.Profile
+import net.nemerosa.ontrack.model.security.GlobalSettings
+import net.nemerosa.ontrack.model.security.SecurityService
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
-@Profile(RunProfile.DEV)
+@ConditionalOnProperty(
+    prefix = "ontrack.config.extension.scm.mock",
+    name = ["enabled"],
+    havingValue = "true",
+    matchIfMissing = false,
+)
 @RestController
 @RequestMapping("/extension/scm/mock")
 class MockSCMController(
     private val mockSCMExtension: MockSCMExtension,
+    private val securityService: SecurityService,
 ) {
 
     /**
@@ -45,6 +52,23 @@ class MockSCMController(
         commitId = mockSCMExtension.repositoryOrCreate(registration.name)
             .registerCommit(registration.scmBranch, registration.message)
     )
+
+    /**
+     * Deletes a repository and everything it holds.
+     *
+     * The mock SCM keeps its repositories on the bean, where they outlive the entities
+     * pointing at them: a seed re-registering the same commits would otherwise number them
+     * on top of the ones already there, and give every one of them a different id.
+     */
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @DeleteMapping("/repository")
+    fun deleteRepository(@RequestParam repository: String) {
+        // The endpoints beside this one only add mock data; this one destroys it, and the
+        // mock SCM now runs on long-lived instances - the demo included - where
+        // `/extension/**` asks for no more than an authenticated user.
+        securityService.checkGlobalFunction(GlobalSettings::class.java)
+        mockSCMExtension.deleteRepository(repository)
+    }
 
     /**
      * Gets a file content for a branch

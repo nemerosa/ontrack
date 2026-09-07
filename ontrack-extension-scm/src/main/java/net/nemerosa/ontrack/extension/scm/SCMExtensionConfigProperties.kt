@@ -18,6 +18,27 @@ class SCMExtensionConfigProperties {
     @APIDescription("SCM search properties")
     var search = SCMSearchConfigProperties()
 
+    @APIDescription("Mock SCM properties")
+    var mock = MockSCMConfigProperties()
+
+    /**
+     * Nested rather than a flat `mockEnabled`, so that the generated documentation publishes a
+     * usable environment variable: the doc generator uppercases a camel-case field without
+     * splitting it, and only the dots of a nested property become underscores.
+     */
+    class MockSCMConfigProperties {
+        @APIDescription(
+            "Enables the mock SCM, which keeps repositories, branches, commits and issues in memory " +
+                    "instead of talking to a real SCM. Disabled by default; always enabled in the `dev` " +
+                    "profile (the value shown opposite is the one the documentation build runs with). " +
+                    "Enable it only on demonstration or test instances - never on an instance tracking " +
+                    "real deliveries, where it would let a project claim an SCM that answers with " +
+                    "whatever anyone posted to it. Its data lives on the bean and does not survive a " +
+                    "restart."
+        )
+        var enabled: Boolean = false
+    }
+
     class SCMCatalogConfigProperties {
         @APIDescription("Enabling the SCM catalog")
         var enabled = false

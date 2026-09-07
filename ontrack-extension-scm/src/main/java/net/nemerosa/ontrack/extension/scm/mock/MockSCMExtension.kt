@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.scm.mock
 
-import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.issues.IssueRepositoryContext
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
@@ -19,12 +18,17 @@ import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
 import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
 import org.apache.commons.codec.digest.DigestUtils
-import org.springframework.context.annotation.Profile
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import java.util.concurrent.atomic.AtomicLong
 
 @Component
-@Profile(RunProfile.DEV)
+@ConditionalOnProperty(
+    prefix = "ontrack.config.extension.scm.mock",
+    name = ["enabled"],
+    havingValue = "true",
+    matchIfMissing = false,
+)
 class MockSCMExtension(
     extensionFeature: SCMExtensionFeature,
     private val propertyService: PropertyService,
