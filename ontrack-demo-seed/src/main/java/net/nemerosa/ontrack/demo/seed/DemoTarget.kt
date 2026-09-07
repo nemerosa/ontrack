@@ -46,6 +46,18 @@ interface DemoTarget {
     fun dashboards(): List<DemoDashboardHandle>
 
     /**
+     * Checks the instance can take the mock SCM data a dataset declares, and fails if it
+     * cannot.
+     *
+     * Called before the reset, for the same reason [DemoDataset.validate] is: the mock SCM
+     * is off unless `ontrack.config.extension.scm.mock.enabled` is set, and finding that out
+     * on the first commit — after every project has been deleted — leaves the demo blank.
+     * Dataset validation cannot catch it, because it checks the dataset against Yontrack's
+     * rules and not against the target's configuration.
+     */
+    fun checkScmAvailable()
+
+    /**
      * Creates or replaces a dashboard. Yontrack rejects a second dashboard with the same
      * name unless the UUID matches, so the seed always names a fixed one.
      */
@@ -61,10 +73,32 @@ interface DemoProject {
     val name: String
     fun delete()
     fun createBranch(name: String, description: String): DemoBranch
+
+    /**
+     * Points the project at a mock SCM repository, emptying whatever that repository held —
+     * the mock SCM keeps its repositories on the server, where they outlive the projects the
+     * reset deletes — and declaring its issues.
+     */
+    fun configureScm(scm: ScmSpec)
 }
 
 interface DemoBranch {
     val name: String
+
+    /**
+     * Maps this branch onto a branch of the project's SCM repository. Called after
+     * [DemoProject.configureScm].
+     */
+    fun configureScmBranch(scmBranch: String)
+
+    /**
+     * Registers a commit on this branch's SCM branch.
+     *
+     * @return The id of the commit, which the mock SCM derives from the branch and the
+     * position of the commit on it.
+     */
+    fun registerCommit(message: String): String
+
     fun createPromotionLevel(name: String, description: String, workflow: WorkflowSpec? = null)
     fun createValidationStamp(name: String, description: String)
     fun createBuild(name: String, description: String, creation: LocalDateTime): DemoBuild
@@ -86,6 +120,12 @@ interface DemoBuild {
      * Records that this build uses [build].
      */
     fun linkTo(build: DemoBuild)
+
+    /**
+     * Records the commit this build was built from, which is where a change log involving
+     * it starts or stops.
+     */
+    fun setCommit(commitId: String)
 }
 
 interface DemoEnvironment {

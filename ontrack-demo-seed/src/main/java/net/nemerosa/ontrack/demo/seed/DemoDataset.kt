@@ -14,15 +14,50 @@ data class DemoDataset(
     val dashboard: DemoDashboard? = null,
 )
 
+/**
+ * @property scm The SCM the project's change logs are read from. Only the mock SCM, whose
+ * commits the seed writes itself: a real repository would trade a self-contained reset for
+ * one depending on credentials and network egress.
+ */
 data class ProjectSpec(
     val name: String,
     val description: String,
     val branches: List<BranchSpec>,
+    val scm: ScmSpec? = null,
 )
 
+/**
+ * A mock SCM repository behind a project.
+ *
+ * @property repository Name of the repository, unique on the instance. The seed empties it
+ * before it registers anything: the mock SCM holds its repositories on the server, where
+ * they outlive the projects the reset deletes.
+ * @property issues Issues of the repository's issue service. Registered before any commit,
+ * because the mock SCM links a commit to an issue as the commit comes in.
+ */
+data class ScmSpec(
+    val repository: String,
+    val issues: List<IssueSpec> = emptyList(),
+)
+
+/**
+ * @property key Issue key, of the `ABC-123` shape the mock issue service recognises in a
+ * commit message.
+ * @property type What a change log groups its issues by.
+ */
+data class IssueSpec(
+    val key: String,
+    val summary: String,
+    val type: String? = null,
+)
+
+/**
+ * @property scmBranch The branch of the project's SCM repository this branch follows.
+ */
 data class BranchSpec(
     val name: String,
     val description: String,
+    val scmBranch: String? = null,
     val promotionLevels: List<PromotionLevelSpec> = emptyList(),
     val validationStamps: List<ValidationStampSpec> = emptyList(),
     val builds: List<BuildSpec> = emptyList(),
@@ -51,6 +86,10 @@ data class ValidationStampSpec(
  * @property release Version carried by the build, set as its release property, which is
  * what Yontrack shows as the build display name.
  * @property links Builds this build uses, resolved after every project exists.
+ * @property commits Commit messages, oldest first, registered on the branch's SCM branch
+ * when the build is created. The last one is the commit the build was built from; the ones
+ * before it are the work that went into it, and are what the change log with the previous
+ * build shows.
  */
 data class BuildSpec(
     val name: String,
@@ -60,6 +99,7 @@ data class BuildSpec(
     val promotionLevels: List<String> = emptyList(),
     val validations: List<ValidationSpec> = emptyList(),
     val links: List<BuildRef> = emptyList(),
+    val commits: List<String> = emptyList(),
 )
 
 /**

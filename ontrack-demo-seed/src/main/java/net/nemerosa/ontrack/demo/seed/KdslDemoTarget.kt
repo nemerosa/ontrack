@@ -14,8 +14,13 @@ import net.nemerosa.ontrack.kdsl.spec.extension.environments.Environment
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.Slot
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.environments
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.NotificationsMgt
+import net.nemerosa.ontrack.kdsl.spec.extension.scm.MockScmRepositoryContext
+import net.nemerosa.ontrack.kdsl.spec.extension.scm.mockScmBranchProperty
+import net.nemerosa.ontrack.kdsl.spec.extension.scm.mockScmBuildCommitProperty
+import net.nemerosa.ontrack.kdsl.spec.extension.scm.mockScmProjectProperty
 import net.nemerosa.ontrack.kdsl.spec.setProperty
 import net.nemerosa.ontrack.yaml.Yaml
+import org.springframework.web.client.HttpClientErrorException.NotFound
 import java.time.LocalDateTime
 
 /**
@@ -26,10 +31,10 @@ import java.time.LocalDateTime
  */
 class KdslDemoTarget(private val ontrack: Ontrack) : DemoTarget {
 
-    override fun projects(): List<DemoProject> = ontrack.projects().map(::KdslDemoProject)
+    override fun projects(): List<DemoProject> = ontrack.projects().map { KdslDemoProject(ontrack, it) }
 
     override fun createProject(name: String, description: String): DemoProject =
-        KdslDemoProject(ontrack.createProject(name, description))
+        KdslDemoProject(ontrack, ontrack.createProject(name, description))
 
     override fun environments(): List<DemoEnvironment> =
         ontrack.environments.list().map(::KdslDemoEnvironment)
@@ -55,6 +60,25 @@ class KdslDemoTarget(private val ontrack: Ontrack) : DemoTarget {
             .filter { it.userScope != DashboardContextUserScope.BUILT_IN }
             .map { KdslDemoDashboardHandle(ontrack, it.uuid, it.name) }
 
+    /**
+     * Registers an issue in a throwaway repository and deletes it again. The endpoints only
+     * exist when the mock SCM is enabled, so a 404 here is the answer being looked for.
+     */
+    override fun checkScmAvailable() {
+        val probe = MockScmRepositoryContext(ontrack, PREFLIGHT_REPOSITORY)
+        try {
+            probe.repositoryIssue(key = "PREFLIGHT-1", message = "Checking the mock SCM is enabled")
+            probe.deleteRepository()
+        } catch (_: NotFound) {
+            error(
+                "The mock SCM is not enabled on this instance, and the dataset needs it for its " +
+                        "change log. Set `ontrack.config.extension.scm.mock.enabled` " +
+                        "(`ONTRACK_CONFIG_EXTENSION_SCM_MOCK_ENABLED`) and run the seed again. " +
+                        "Nothing was deleted."
+            )
+        }
+    }
+
     override fun saveDashboard(dashboard: DemoDashboard) {
         ontrack.saveDashboard(
             uuid = dashboard.uuid,
@@ -77,6 +101,12 @@ class KdslDemoTarget(private val ontrack: Ontrack) : DemoTarget {
 
     companion object {
         /**
+         * Repository the pre-flight check writes to and deletes again, named so that one
+         * left behind by an interrupted run is recognisable.
+         */
+        const val PREFLIGHT_REPOSITORY = "demo-seed-preflight"
+
+        /**
          * The release property carries the version a build shows as its display name.
          */
         const val RELEASE_PROPERTY = "net.nemerosa.ontrack.extension.general.ReleasePropertyType"
@@ -98,19 +128,65 @@ private class KdslDemoDashboardHandle(
     override fun delete() = ontrack.deleteDashboard(uuid)
 }
 
-private class KdslDemoProject(val project: Project) : DemoProject {
+private class KdslDemoProject(
+    private val ontrack: Ontrack,
+    val project: Project,
+) : DemoProject {
 
     override val name: String get() = project.name
+
+    /**
+     * The mock SCM repository this project reads its change logs from, once
+     * [configureScm] has pointed it at one.
+     */
+    var scm: MockScmRepositoryContext? = null
+        private set
 
     override fun delete() = project.delete()
 
     override fun createBranch(name: String, description: String): DemoBranch =
-        KdslDemoBranch(project.createBranch(name, description))
+        KdslDemoBranch(this, project.createBranch(name, description))
+
+    /**
+     * Empties the repository before declaring anything in it: the mock SCM holds its
+     * repositories on the server, where they outlive the projects the reset deletes, so a
+     * second run would otherwise register its commits on top of the first run's and give
+     * every one of them a different id.
+     */
+    override fun configureScm(scm: ScmSpec) {
+        val repository = MockScmRepositoryContext(ontrack, scm.repository)
+        repository.deleteRepository()
+        scm.issues.forEach { issue ->
+            repository.repositoryIssue(key = issue.key, message = issue.summary, type = issue.type)
+        }
+        project.mockScmProjectProperty = scm.repository
+        this.scm = repository
+    }
 }
 
-private class KdslDemoBranch(val branch: Branch) : DemoBranch {
+private class KdslDemoBranch(
+    private val project: KdslDemoProject,
+    val branch: Branch,
+) : DemoBranch {
 
     override val name: String get() = branch.name
+
+    private var scmBranch: String? = null
+
+    override fun configureScmBranch(scmBranch: String) {
+        branch.mockScmBranchProperty = scmBranch
+        this.scmBranch = scmBranch
+    }
+
+    override fun registerCommit(message: String): String {
+        val repository = requireNotNull(project.scm) {
+            "No SCM configured on ${project.name}"
+        }
+        val scmBranch = requireNotNull(scmBranch) {
+            "No SCM branch configured on ${project.name}/$name"
+        }
+        return repository.repositoryCommit(message = message, branch = scmBranch)
+    }
 
     override fun createPromotionLevel(name: String, description: String, workflow: WorkflowSpec?) {
         val promotionLevel = branch.createPromotionLevel(name, description)
@@ -154,6 +230,10 @@ private class KdslDemoBuild(val build: Build) : DemoBuild {
 
     override fun linkTo(build: DemoBuild) {
         this.build.linkTo((build as KdslDemoBuild).build)
+    }
+
+    override fun setCommit(commitId: String) {
+        build.mockScmBuildCommitProperty = commitId
     }
 }
 

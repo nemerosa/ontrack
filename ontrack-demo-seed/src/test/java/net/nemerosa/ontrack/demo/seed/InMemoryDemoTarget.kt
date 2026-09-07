@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.demo.seed
 
+import java.security.MessageDigest
 import java.time.LocalDateTime
 
 /**
@@ -12,9 +13,21 @@ import java.time.LocalDateTime
  * [snapshot] renders the whole state as text, which is what the idempotency test compares
  * between two runs.
  */
-class InMemoryDemoTarget : DemoTarget {
+class InMemoryDemoTarget(
+    /**
+     * Whether the instance runs the mock SCM. `false` models the one thing the seed cannot
+     * check from the dataset alone: an instance that never enabled it.
+     */
+    private val scmEnabled: Boolean = true,
+) : DemoTarget {
 
     private val projects = mutableListOf<InMemoryProject>()
+
+    /**
+     * Mock SCM repositories, held by the instance rather than by the projects — as they are
+     * on a real server, where they outlive the projects the reset deletes.
+     */
+    private val scmRepositories = mutableMapOf<String, InMemoryScmRepository>()
     private val environments = mutableListOf<InMemoryEnvironment>()
     private val dashboards = mutableListOf<InMemoryDashboard>()
 
@@ -39,6 +52,10 @@ class InMemoryDemoTarget : DemoTarget {
         return InMemoryEnvironment(name, order, description, tags).also { environments += it }
     }
 
+    override fun checkScmAvailable() {
+        check(scmEnabled) { "The mock SCM is not enabled on this instance. Nothing was deleted." }
+    }
+
     override fun dashboards(): List<DemoDashboardHandle> = dashboards.toList()
 
     override fun saveDashboard(dashboard: DemoDashboard) {
@@ -57,13 +74,21 @@ class InMemoryDemoTarget : DemoTarget {
     fun snapshot(): String = buildList {
         projects.forEach { project ->
             add("project ${project.name} \"${project.description}\"")
+            project.scmRepositoryName?.let { repositoryName ->
+                val repository = scmRepositories.getValue(repositoryName)
+                add("  scm ${repository.name}")
+                repository.issues.forEach { add("    issue ${it.key} \"${it.summary}\" ${it.type}") }
+                repository.commits.forEach { add("    commit ${it.id} \"${it.message}\"") }
+            }
             project.branches.forEach { branch ->
                 add("  branch ${branch.name} \"${branch.description}\"")
+                branch.scmBranch?.let { add("    scm branch $it") }
                 branch.promotionLevels.forEach { add("    promotion level $it") }
                 branch.validationStamps.forEach { add("    validation stamp $it") }
                 branch.builds.forEach { build ->
                     add("    build ${build.name} \"${build.description}\" at ${build.creation}")
                     build.releaseVersion?.let { add("      release $it") }
+                    build.commitId?.let { add("      built from $it") }
                     build.promotions.forEach { add("      promotion ${it.first} at ${it.second}") }
                     build.validations.forEach { add("      validation ${it.first} ${it.second}") }
                     build.links.forEach { add("      uses ${it.branch.project.name}/${it.name}") }
@@ -77,6 +102,11 @@ class InMemoryDemoTarget : DemoTarget {
                 slot.deployments.forEach { add("    deployed ${it.name}") }
             }
         }
+        // Repositories no project points at: the mock SCM holds them on the server, where
+        // they outlive the projects the reset deletes.
+        scmRepositories.keys
+            .filter { name -> projects.none { it.scmRepositoryName == name } }
+            .forEach { add("orphan scm $it") }
         dashboards.forEach { held ->
             val dashboard = held.dashboard
             add("dashboard ${dashboard.name} (${dashboard.uuid})")
@@ -100,6 +130,12 @@ class InMemoryDemoTarget : DemoTarget {
 
         val branches = mutableListOf<InMemoryBranch>()
 
+        /**
+         * The project only points at a repository — the repository itself belongs to the
+         * instance, as it does on a real server.
+         */
+        var scmRepositoryName: String? = null
+
         override fun delete() {
             projects -= this
         }
@@ -108,6 +144,18 @@ class InMemoryDemoTarget : DemoTarget {
             checkName(name, "Branch")
             require(branches.none { it.name == name }) { "Branch $name already exists in ${this.name}" }
             return InMemoryBranch(this, name, description).also { branches += it }
+        }
+
+        /**
+         * Starts the repository over, the way the seed does on a real instance: the mock
+         * SCM keeps a repository until someone deletes it, so a second run registering the
+         * same commits again would number them on top of the first run's.
+         */
+        override fun configureScm(scm: ScmSpec) {
+            val repository = InMemoryScmRepository(scm.repository)
+            scmRepositories[scm.repository] = repository
+            scm.issues.forEach { repository.registerIssue(it) }
+            scmRepositoryName = scm.repository
         }
     }
 
@@ -120,6 +168,24 @@ class InMemoryDemoTarget : DemoTarget {
         val promotionLevels = mutableListOf<String>()
         val validationStamps = mutableListOf<String>()
         val builds = mutableListOf<InMemoryBuild>()
+        var scmBranch: String? = null
+
+        override fun configureScmBranch(scmBranch: String) {
+            requireNotNull(project.scmRepositoryName) {
+                "No SCM configured on ${project.name}"
+            }
+            this.scmBranch = scmBranch
+        }
+
+        override fun registerCommit(message: String): String {
+            val repository = requireNotNull(project.scmRepositoryName?.let(scmRepositories::get)) {
+                "No SCM configured on ${project.name}"
+            }
+            val scmBranch = requireNotNull(scmBranch) {
+                "No SCM branch configured on ${project.name}/$name"
+            }
+            return repository.registerCommit(scmBranch, message)
+        }
 
         override fun createPromotionLevel(name: String, description: String, workflow: WorkflowSpec?) {
             checkName(name, "Promotion level")
@@ -148,6 +214,9 @@ class InMemoryDemoTarget : DemoTarget {
     ) : DemoBuild {
 
         var releaseVersion: String? = null
+        // Named for its getter, not for the interface: `commit` would clash with setCommit
+        // on the JVM, the same way `releaseVersion` does with setRelease.
+        var commitId: String? = null
         val promotions = mutableListOf<Pair<String, LocalDateTime>>()
         val validations = mutableListOf<Pair<String, ValidationStatus>>()
         val links = mutableListOf<InMemoryBuild>()
@@ -172,6 +241,10 @@ class InMemoryDemoTarget : DemoTarget {
 
         override fun linkTo(build: DemoBuild) {
             links += build as InMemoryBuild
+        }
+
+        override fun setCommit(commitId: String) {
+            this.commitId = commitId
         }
     }
 
@@ -210,6 +283,34 @@ class InMemoryDemoTarget : DemoTarget {
             }
             deployments += build
         }
+    }
+
+    /**
+     * A mock SCM repository, reproducing the only part of `MockSCMExtension` the seed can
+     * observe: the ids it derives from the branch and the position of the commit on it.
+     */
+    class InMemoryScmRepository(val name: String) {
+
+        val issues = mutableListOf<IssueSpec>()
+        val commits = mutableListOf<Commit>()
+
+        fun registerIssue(issue: IssueSpec) {
+            issues += issue
+        }
+
+        fun registerCommit(scmBranch: String, message: String): String {
+            val index = commits.count { it.scmBranch == scmBranch } + 1
+            val prefix = "${scmBranch.replace("[^a-zA-Z0-9.]".toRegex(), "-")}-$index"
+            val digest = MessageDigest.getInstance("SHA-1")
+                .digest(prefix.toByteArray())
+                .joinToString("") { "%02x".format(it) }
+                .take(7)
+            val id = "$prefix-$digest"
+            commits += Commit(scmBranch, id, message)
+            return id
+        }
+
+        data class Commit(val scmBranch: String, val id: String, val message: String)
     }
 
     companion object {

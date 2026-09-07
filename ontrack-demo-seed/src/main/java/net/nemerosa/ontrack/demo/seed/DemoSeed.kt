@@ -26,6 +26,11 @@ class DemoSeed(
         // Before anything is deleted: a dataset the server would reject must not cost the
         // demo its current content.
         dataset.validate()
+        // Same reason, one step further: a dataset can be valid and still ask the instance
+        // for something it does not run.
+        if (dataset.projects.any { it.scm != null }) {
+            target.checkScmAvailable()
+        }
         val now = LocalDateTime.now(clock)
         reset()
         create(dataset, now)
@@ -62,6 +67,10 @@ class DemoSeed(
             log("Creating project ${spec.name}")
             val project = target.createProject(spec.name, spec.description)
             projects[spec.name] = project
+            // Before the branches: a branch maps onto a branch of the repository the
+            // project is pointed at here, and a commit is linked to its issues as it is
+            // registered, so the issues have to be in place first.
+            spec.scm?.let { project.configureScm(it) }
             spec.branches.forEach { branchSpec ->
                 createBranch(spec, branchSpec, project, now, builds)
             }
@@ -110,6 +119,7 @@ class DemoSeed(
         builds: MutableMap<BuildRef, DemoBuild>,
     ) {
         val branch = project.createBranch(spec.name, spec.description)
+        spec.scmBranch?.let { branch.configureScmBranch(it) }
         spec.promotionLevels.forEach { branch.createPromotionLevel(it.name, it.description, it.workflow) }
         spec.validationStamps.forEach { branch.createValidationStamp(it.name, it.description) }
         spec.builds.forEach { buildSpec ->
@@ -117,6 +127,13 @@ class DemoSeed(
             val build = branch.createBuild(buildSpec.name, buildSpec.description, creation)
             builds[BuildRef(projectSpec.name, spec.name, buildSpec.name)] = build
             buildSpec.release?.let { build.setRelease(it) }
+            // The build is built from the last commit declared for it; the ones before are
+            // the work that went into it, and are what the change log with the previous
+            // build shows.
+            buildSpec.commits
+                .map { message -> branch.registerCommit(message) }
+                .lastOrNull()
+                ?.let { build.setCommit(it) }
             // One hour per rung, so the promotions of a build are ordered and the lead
             // time charts have something other than a flat zero to draw.
             buildSpec.promotionLevels.forEachIndexed { index, promotionLevel ->

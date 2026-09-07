@@ -43,6 +43,13 @@ object DemoContent {
     const val PRODUCTION = "production"
 
     /**
+     * The SCM branch [MAIN] of [SERVICE] follows. The mock SCM's branches are named as a
+     * real repository's, so a slash is fine here where it is not in a Yontrack entity name.
+     */
+    const val SCM_MAIN = "main"
+    const val SCM_MAINTENANCE = "release/1.3"
+
+    /**
      * Fixed so that re-seeding updates the demo dashboard rather than colliding with the
      * one the previous run saved under the same name.
      */
@@ -171,16 +178,50 @@ object DemoContent {
     )
 
     /**
+     * The change log of [SERVICE], which is the only project the demo gives an SCM.
+     *
+     * The commit subjects are conventional-commit ones on purpose: the semantic change log
+     * groups commits by their type and drops every commit that carries none, so a project
+     * writing subjects any other way would demonstrate an empty semantic view. That is also
+     * why the change log is here rather than on [CHANGELOG], whose subjects come from
+     * Yontrack's own history and are overwhelmingly `#1234 Some message`.
+     *
+     * The mock SCM keeps all of this in memory, on the bean: the demo's change log does not
+     * survive a backend restart. The builds keep their commit properties, which are in the
+     * database, so the change log then fails on a repository the mock SCM no longer knows
+     * about, until the next reset. See `doc/dev-guide/demo-seed.md`.
+     */
+    private fun serviceScm() = ScmSpec(
+        repository = SERVICE,
+        issues = listOf(
+            IssueSpec("PETCLINIC-142", "Search owners by phone number", type = "feature"),
+            // Its own key rather than a second commit on PETCLINIC-142: the mock issue
+            // service points an issue at the LAST commit registered for it, and the
+            // maintenance branch is seeded after `main`, so sharing the key would show
+            // PETCLINIC-142 on release/1.3 alone.
+            IssueSpec("PETCLINIC-149", "Backport the owner search to 1.3", type = "bug"),
+            IssueSpec("PETCLINIC-157", "Paginate the visit history", type = "feature"),
+            IssueSpec("PETCLINIC-163", "Visit scheduling test is flaky", type = "bug"),
+            IssueSpec("PETCLINIC-165", "Administer vet specialities", type = "feature"),
+            IssueSpec("PETCLINIC-171", "Pet type look-up is slow", type = "performance"),
+            IssueSpec("PETCLINIC-178", "Export owners as CSV", type = "feature"),
+            IssueSpec("PETCLINIC-181", "CSV export mangles accented names", type = "bug"),
+        ),
+    )
+
+    /**
      * The main demo project: a branch that reads like a real one, with a maintenance
      * branch beside it and a history of promotions to chart.
      */
     private fun service() = ProjectSpec(
         name = SERVICE,
         description = "Sample application - the demo's main project.",
+        scm = serviceScm(),
         branches = listOf(
             BranchSpec(
                 name = MAIN,
                 description = "Main development branch.",
+                scmBranch = SCM_MAIN,
                 promotionLevels = fullPromotions + canaryPass,
                 validationStamps = fullValidationStamps,
                 builds = listOf(
@@ -197,6 +238,10 @@ object DemoContent {
                             ValidationSpec(SECURITY_SCAN, PASSED),
                         ),
                         links = listOf(BuildRef(LIBRARY, MAIN, "41")),
+                        commits = listOf(
+                            "feat(api): search owners by their phone number, closes PETCLINIC-142",
+                            "test: cover the owner search endpoint",
+                        ),
                     ),
                     BuildSpec(
                         name = "102",
@@ -211,6 +256,10 @@ object DemoContent {
                             ValidationSpec(SECURITY_SCAN, WARNING, "Two medium advisories in transitive dependencies."),
                         ),
                         links = listOf(BuildRef(LIBRARY, MAIN, "41")),
+                        commits = listOf(
+                            "feat(ui): paginate the visit history, closes PETCLINIC-157",
+                            "docs: describe the visit history endpoint",
+                        ),
                     ),
                     BuildSpec(
                         name = "103",
@@ -223,6 +272,10 @@ object DemoContent {
                             ValidationSpec(INTEGRATION_TESTS, FAILED, "Flaky visit scheduling test."),
                         ),
                         links = listOf(BuildRef(LIBRARY, MAIN, "41")),
+                        commits = listOf(
+                            "feat(admin): administer the vet specialities, closes PETCLINIC-165",
+                            "refactor: extract the speciality repository",
+                        ),
                     ),
                     BuildSpec(
                         name = "104",
@@ -237,6 +290,10 @@ object DemoContent {
                             ValidationSpec(SECURITY_SCAN, PASSED),
                         ),
                         links = listOf(BuildRef(LIBRARY, MAIN, "42")),
+                        commits = listOf(
+                            "fix(tests): stabilise the visit scheduling test, closes PETCLINIC-163",
+                            "chore(deps): bump common-library to 3.2.1",
+                        ),
                     ),
                     BuildSpec(
                         name = "105",
@@ -256,6 +313,10 @@ object DemoContent {
                             ValidationSpec(SECURITY_SCAN, PASSED),
                         ),
                         links = listOf(BuildRef(LIBRARY, MAIN, "42")),
+                        commits = listOf(
+                            "perf(api): cache the pet type reference data, closes PETCLINIC-171",
+                            "docs: note when the pet type cache is evicted",
+                        ),
                     ),
                     BuildSpec(
                         name = "106",
@@ -267,6 +328,10 @@ object DemoContent {
                             ValidationSpec(UNIT_TESTS, FAILED, "Export encoding test."),
                         ),
                         links = listOf(BuildRef(LIBRARY, MAIN, "42")),
+                        commits = listOf(
+                            "feat(export): export the owners as CSV, closes PETCLINIC-178",
+                            "style: reformat the export writer",
+                        ),
                     ),
                     BuildSpec(
                         name = "107",
@@ -281,12 +346,17 @@ object DemoContent {
                             ValidationSpec(SECURITY_SCAN, PASSED),
                         ),
                         links = listOf(BuildRef(LIBRARY, MAIN, "42")),
+                        commits = listOf(
+                            "fix(export): write the CSV in UTF-8, closes PETCLINIC-181",
+                            "ci: run the export tests on the canary pipeline",
+                        ),
                     ),
                 ),
             ),
             BranchSpec(
                 name = MAINTENANCE,
                 description = "Maintenance of the previous minor version.",
+                scmBranch = SCM_MAINTENANCE,
                 promotionLevels = fullPromotions + canaryFail,
                 validationStamps = fullValidationStamps,
                 builds = listOf(
@@ -301,6 +371,9 @@ object DemoContent {
                             ValidationSpec(UNIT_TESTS, PASSED),
                             ValidationSpec(INTEGRATION_TESTS, PASSED),
                         ),
+                        commits = listOf(
+                            "feat(api): backport the owner search by phone number, closes PETCLINIC-149",
+                        ),
                     ),
                     BuildSpec(
                         name = "88",
@@ -314,6 +387,10 @@ object DemoContent {
                             ValidationSpec(INTEGRATION_TESTS, PASSED),
                             ValidationSpec(SECURITY_SCAN, PASSED),
                         ),
+                        commits = listOf(
+                            "fix(security): mark the session cookie as SameSite",
+                            "test: cover the session cookie attributes",
+                        ),
                     ),
                     BuildSpec(
                         name = "89",
@@ -326,6 +403,10 @@ object DemoContent {
                             ValidationSpec(UNIT_TESTS, PASSED),
                             ValidationSpec(INTEGRATION_TESTS, PASSED),
                             ValidationSpec(SECURITY_SCAN, PASSED),
+                        ),
+                        commits = listOf(
+                            "fix(security): shorten the session cookie lifetime",
+                            "docs: record the session cookie settings",
                         ),
                     ),
                 ),

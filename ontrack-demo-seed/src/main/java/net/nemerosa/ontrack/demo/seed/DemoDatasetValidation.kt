@@ -33,8 +33,19 @@ fun DemoDataset.validate() {
 
     projects.forEach { project ->
         checkName(project.name, "Project")
+        project.scm?.issues?.forEach { issue ->
+            if (!ISSUE_KEY.matches(issue.key)) {
+                problems += "The ${project.name} project declares the issue \"${issue.key}\", " +
+                        "which the mock issue service would not recognise in a commit message: " +
+                        "it reads keys of the ABC-123 shape only."
+            }
+        }
         project.branches.forEach { branch ->
             checkName(branch.name, "Branch")
+            if (branch.scmBranch != null && project.scm == null) {
+                problems += "Branch ${branch.name} of ${project.name} follows the SCM branch " +
+                        "\"${branch.scmBranch}\", but the project declares no SCM."
+            }
             val promotionLevels = branch.promotionLevels.map { it.name }.toSet()
             val validationStamps = branch.validationStamps.map { it.name }.toSet()
             branch.promotionLevels.forEach { checkName(it.name, "Promotion level") }
@@ -42,6 +53,10 @@ fun DemoDataset.validate() {
             branch.builds.forEach { build ->
                 checkName(build.name, "Build")
                 buildRefs += BuildRef(project.name, branch.name, build.name)
+                if (build.commits.isNotEmpty() && branch.scmBranch == null) {
+                    problems += "Build ${build.name} of ${project.name}/${branch.name} declares " +
+                            "commits, but the branch follows no SCM branch."
+                }
                 build.promotionLevels.forEach { promotionLevel ->
                     if (promotionLevel !in promotionLevels) {
                         problems += "Build ${build.name} of ${project.name}/${branch.name} " +
@@ -120,3 +135,10 @@ fun DemoDataset.validate() {
  * over its model classes.
  */
 private val ENTITY_NAME = Regex("[A-Za-z0-9._-]+")
+
+/**
+ * What the mock issue service reads out of a commit message — `MockSCMExtension.issueRegex`
+ * on the server side. An issue keyed anything else is one no commit is ever linked to, and
+ * an issues section that silently stays empty.
+ */
+private val ISSUE_KEY = Regex("[A-Z]+-\\d+")
