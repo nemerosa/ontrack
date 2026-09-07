@@ -13,7 +13,7 @@ under its base version — see
 | Level     | Requires                                                     | Meaning                            |
 |-----------|--------------------------------------------------------------|------------------------------------|
 | `BRONZE`  | `BUILD`, `UI_UNIT`, `INTEGRATION`, `KDSL.ACCEPTANCE`, `PLAYWRIGHT`, `DOCS` | The build is green    |
-| `SILVER`  | `BRONZE` + `DEMO.SMOKE`                                      | Deployed to the demo and verified  |
+| `SILVER`  | `BRONZE` + `DEMO.SMOKE` (on `main`; `BRONZE` alone on a release branch) | Deployed to the demo and verified  |
 | `GOLD`    | `SILVER`, granted **by hand**                                | A human tested the demo and approved the release |
 | `RELEASE` | `GOLD` + `DOCKER.HUB`, `GITHUB.RELEASE`, `DOCUMENTATION`, `WIKI` | Publication completed          |
 
@@ -22,6 +22,11 @@ were its own triggers would be circular, which is why both levels exist. `RELEAS
 
 Because `RELEASE` requires `GOLD` requires `SILVER` requires `DEMO.SMOKE`, **nothing can be released
 until the demo pipeline works**. That is the intended constraint, not a side effect.
+
+`SILVER` is the one level that means something different on a release branch, where it is `BRONZE`
+alone: a patch is never deployed to the demo. See [Patch releases](patch-release.md), including why
+`.yontrack/ci.yaml` has to declare `SILVER` weakly and add `DEMO.SMOKE` back on `main` rather than
+the other way round.
 
 ## Releasing a build
 
@@ -98,17 +103,28 @@ to mean one.
 
 The rc version is still needed throughout: it is the GHCR tag the images are re-tagged *from*.
 
+Whether the published version takes GitHub's "Latest release" badge is decided rather than defaulted:
+`resolve` compares it against every released tag and passes `--latest=<true|false>`. Left at `gh`'s
+default of true, a 5.3.2 patch published after 5.4.0 would take the badge and flip the README's
+shields.io version to the previous minor.
+
 ## What is no longer possible
 
 `ci.yml` publishes nothing. The `RELEASE` and `JUST_BUILD_AND_PUSH` dispatch inputs, the
 `docker-hub` and `release` jobs, the S3 upload and the `feature/*-publication` escape hatch are all
-gone, and the release train is main-only.
+gone.
+
+The release train runs on `main` and on the one live `release/*` branch, and on nothing else. Patches
+to the previous minor go through the same four validations and the same human `GOLD` gate — see
+[Patch releases](patch-release.md).
 
 Every full run pushes a durable `:<version>` tag to GHCR, so "I just want an image somewhere" is
 satisfied by default. Those inputs were the remaining ways to put an unreviewed image on Docker Hub.
 
 ## See also
 
+* [Patch releases](patch-release.md) — releasing 5.3.2 from `release/5.3` once `main` is 5.4
+* [Minor cutover](minor-cutover.md) — moving `main` to the next minor and retiring the old release branch
 * [Demo smoke test](demo-smoke.md) — how a build reaches `SILVER`
 * [Documentation artefact](docs-artifact.md) — how the docs reach the release
 * [ADR 0006](../../docs/adr/0006-build-identity-through-the-release.md) — why the released build is an rc build

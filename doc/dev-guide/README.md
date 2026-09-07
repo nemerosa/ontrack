@@ -14,5 +14,7 @@
   * [Demo screenshots](demo-screenshots.md) - capturing the release-notes images from the demo
   * [Documentation artefact](docs-artifact.md) - building the docs on every run and carrying them to the release
   * [Releasing](release.md) - GOLD publishes, RELEASE records that it did
+  * [Patch releases](patch-release.md) - fixing the previous minor from a release/X.Y branch
+  * [Minor cutover](minor-cutover.md) - moving main to the next minor and retiring the old release branch
 * Workflows
   * [Claude Pick Workflow](claude-pick-workflow.md) - Let Claude autonomously pick and implement issues

@@ -21,6 +21,10 @@ These rules apply unconditionally. Follow them in every change, without exceptio
 
 ### Database
 - **Never** modify existing Flyway migration files — always add a new one
+- **Never** put a Flyway migration in a patch release. A patch is cherry-picked onto a
+  `release/X.Y` branch while `main` keeps moving, so a `V82` on the patch branch and an unrelated
+  `V82` on `main` give any user upgrading from the patch to the next minor a checksum conflict. If
+  a fix needs a schema change it is not a patch — see `doc/dev-guide/patch-release.md`.
 - **Always** add `ON DELETE CASCADE` on FK references to entity tables
 - Use `SERIAL PRIMARY KEY NOT NULL` for auto-increment primary keys
 
