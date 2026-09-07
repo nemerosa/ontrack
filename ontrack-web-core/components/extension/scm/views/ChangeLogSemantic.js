@@ -100,6 +100,10 @@ export default function ChangeLogSemantic({id, from, to, options, onOptionChange
             id={id}
             title="Semantic change log"
             loading={loading}
+            // Text, not a table: the commits and issues cells beside this one let their rows
+            // bleed to the edges, but a block of rendered prose against the border reads as
+            // cramped. Same choice as the boundary cells.
+            padding={true}
             extra={
                 <Space size={16}>
                     <Tooltip title="Syntax the change log is rendered in">
