@@ -115,6 +115,11 @@ rel_version_tags() {
     rel_git_tags | while read -r tag; do
         rel_valid_version "$tag" && printf '%s\n' "$tag"
     done
+    # The loop's status is the last `rel_valid_version`, which is 1 whenever the last tag is not a
+    # release - and under `pipefail` that becomes the function's status even though it emitted
+    # every version it found. Both callers read this in a `$( )` and ignore the status; a future
+    # one writing `rel_version_tags || return 1` would not.
+    return 0
 }
 
 # Whether publishing $1 should move GitHub's "Latest release" badge, i.e. whether it is the
@@ -305,9 +310,9 @@ rel_resolve() {
 
     rel_check_unpublished "$version" || return 1
 
-    # Decided here because this is where the tag list already is - `rel_check_unpublished` has
-    # just read it - and because it has to reach `gh release create` as an explicit
-    # `--latest=<true|false>`. See `rel_is_latest`.
+    # Decided here, next to the other tag-driven guard, because it has to reach
+    # `gh release create` as an explicit `--latest=<true|false>` and `resolve` is what feeds that
+    # step. See `rel_is_latest`.
     local latest=false
     rel_is_latest "$version" && latest=true
 

@@ -277,8 +277,11 @@ class CoreConfigurationServiceIT : AbstractDSLTestSupport() {
      * defaults declare the weakest SILVER - BRONZE alone, i.e. "the build is green" - and a
      * `^main$` block adds the demo verification back on top.
      *
-     * Someone will eventually try to tidy the `^main$` block back into the defaults. This is what
-     * fails when they do.
+     * What this pins is the engine, in the shape `.yontrack/ci.yaml` uses it: a `^main$` block adds
+     * to the defaults, and a branch no block matches keeps the defaults as they stand. It does not
+     * read `.yontrack/ci.yaml` itself - nothing does, from a test - so it cannot catch someone
+     * tidying the `^main$` block back into that file. The comment there is what has to carry that,
+     * and this is what tells them the tidied version could never have worked.
      */
     @Test
     @AsAdminTest
@@ -289,12 +292,12 @@ class CoreConfigurationServiceIT : AbstractDSLTestSupport() {
               defaults:
                 branch:
                   validations:
-                    unit-test: {}
-                    demo-smoke: {}
+                    BUILD: {}
+                    DEMO.SMOKE: {}
                   promotions:
                     BRONZE:
                       validations:
-                        - unit-test
+                        - BUILD
                     SILVER:
                       promotions:
                         - BRONZE
@@ -307,7 +310,7 @@ class CoreConfigurationServiceIT : AbstractDSLTestSupport() {
                       promotions:
                         SILVER:
                           validations:
-                            - demo-smoke
+                            - DEMO.SMOKE
         """.trimIndent()
 
         val main = configTestSupport.configureBranch(
@@ -316,7 +319,7 @@ class CoreConfigurationServiceIT : AbstractDSLTestSupport() {
             scm = "mock",
             env = EnvFixtures.generic(configuredProjectName, scmBranch = "main"),
         )
-        assertSilver(main, validations = listOf("demo-smoke"))
+        assertSilver(main, validations = listOf("DEMO.SMOKE"))
 
         val patch = configTestSupport.configureBranch(
             yaml = yaml,
@@ -334,7 +337,7 @@ class CoreConfigurationServiceIT : AbstractDSLTestSupport() {
         // The stamp itself stays declared on the release branch, so a patch that IS demoed can be
         // stamped by hand. What changes is that SILVER no longer waits for it.
         assertTrue(
-            structureService.getValidationStampListForBranch(patch.id).any { it.name == "demo-smoke" },
+            structureService.getValidationStampListForBranch(patch.id).any { it.name == "DEMO.SMOKE" },
             "The demo verification stamp still exists on the release branch"
         )
     }

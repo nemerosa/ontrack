@@ -209,9 +209,10 @@ jobs:
           # produces a release version at all. `release.yml` publishes an rc build under its base
           # version, which is where `5.0.42` comes from now (#1672).
           #
-          # `release/*` stays here even though the release train is main-only: such a branch is
-          # still built, and its GHCR tags have to keep the `-rc-<run>` suffix that keeps them
-          # from colliding with a published version.
+          # `release/*` is a patch branch for the previous minor (#1702): its builds go through
+          # the same pipeline and are published by release.yml just as main's are, so their GHCR
+          # tags need the same `-rc-<run>` suffix to keep from colliding with a published version.
+          # See doc/dev-guide/patch-release.md.
           case "$BRANCH_NAME" in
             main|release/*) VERSION="${BASE_VERSION}-rc-${RUN_NUMBER}" ;;
           esac

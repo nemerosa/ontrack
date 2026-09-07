@@ -672,7 +672,9 @@ echo "5.3.1" > "$REL_STUB_DIR/tags"
 body="$(REL_VERSION=5.3.2 REL_BUILD_ID=120 REL_SHA=abc1234def5678 rel_body 2>/dev/null)"; rc=$?
 assert_contains "$body" "#1672" "body: keeps the Yontrack changelog when there is one"
 assert_not_contains "$body" "#1701 Fix the thing" "body: does not append the git log on top of it"
-assert_not_contains "$(calls)" "git log" "body: does not even ask git when it does not have to"
+# Matched on the flag rather than on "git log": the stub logs `$*`, so argv[0] is never in
+# calls.log and "git log" could not appear there whether or not git was called.
+assert_not_contains "$(calls)" "--no-merges" "body: does not even ask git when it does not have to"
 
 # The fallback needs a boundary and a commit. With neither - the first release ever, or a caller
 # that did not pass the sha - the release still publishes, with the notice it had before.

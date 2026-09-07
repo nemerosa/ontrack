@@ -123,7 +123,10 @@ stamping `DEMO.SMOKE` by hand would assert a verification that never happened. S
 "green" on a release branch, and `GOLD` stays the human gate either way.
 
 `CoreConfigurationServiceIT.The demo verification is added to SILVER on main and not on a release
-branch` is what fails when someone tidies the `^main$` block back into the defaults.
+branch` pins that behaviour of the merge engine, in the shape this config uses it. Note what it
+cannot do: no test reads `.yontrack/ci.yaml`, so nothing mechanically catches someone moving the
+`^main$` block back into the defaults. The comment in the file is what has to hold that line — and
+the IT is what shows the tidied version could never have worked.
 
 Notifications behave differently, and that is what makes the message swap possible:
 `NotificationsCIConfigExtension` merges them **by name with override**, so a same-named `On SILVER`
