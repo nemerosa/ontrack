@@ -1,11 +1,12 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.assertThatMockScmRepository
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningProjectProperty
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioningProperty
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
+import net.nemerosa.ontrack.kdsl.spec.extension.scm.withMockScmRepository
 import org.junit.jupiter.api.Test
 
 class ACCAutoVersioningProjectProperty : AbstractACCAutoVersioningTestSupport() {

@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.core
 
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
-import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.spec.admin.admin
+import net.nemerosa.ontrack.kdsl.spec.extension.scm.withMockScmRepository
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 

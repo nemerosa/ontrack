@@ -1,11 +1,12 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.assertThatMockScmRepository
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioning
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
+import net.nemerosa.ontrack.kdsl.spec.extension.scm.withMockScmRepository
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import kotlin.test.assertEquals

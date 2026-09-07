@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.provisioning
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.av.AutoVersioningUtils.waitForAutoVersioningCompletion
-import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.seconds
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
@@ -20,6 +19,7 @@ import net.nemerosa.ontrack.kdsl.spec.extension.environments.environments
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.startPipeline
 import net.nemerosa.ontrack.kdsl.spec.extension.general.release
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
+import net.nemerosa.ontrack.kdsl.spec.extension.scm.withMockScmRepository
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.concurrent.atomics.AtomicInt

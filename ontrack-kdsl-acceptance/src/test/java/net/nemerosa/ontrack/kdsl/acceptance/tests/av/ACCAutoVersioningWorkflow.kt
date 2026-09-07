@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
+import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.assertThatMockScmRepository
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLClientException
@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.SlotPipelineStatu
 import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioning
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.environments
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.workflows.addWorkflow
+import net.nemerosa.ontrack.kdsl.spec.extension.scm.withMockScmRepository
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
