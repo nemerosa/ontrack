@@ -142,7 +142,9 @@ exit 1
 STUB
 chmod +x "$STUB_ROOT/bin/gh"
 
-# `git tag -l <version>`, the local half of the "already published" guard.
+# `git tag -l`, in both its shapes: with a version, the local half of the "already published"
+# guard; without one, the tag list the "is this the latest version" and "what was the previous
+# release" decisions read. And `git log`, the changelog fallback.
 cat > "$STUB_ROOT/bin/git" <<'STUB'
 #!/usr/bin/env bash
 set -uo pipefail
@@ -151,9 +153,22 @@ echo "$*" >> "$REL_STUB_DIR/calls.log"
 
 if [ "${1:-}" = "tag" ]; then
     wanted="${3:-}"
+    if [ -z "$wanted" ]; then
+        cat "$REL_STUB_DIR/tags" 2>/dev/null
+        exit 0
+    fi
     if [ -f "$REL_STUB_DIR/tags" ] && grep -qxF "$wanted" "$REL_STUB_DIR/tags"; then
         echo "$wanted"
     fi
+    exit 0
+fi
+
+if [ "${1:-}" = "log" ]; then
+    if [ -f "$REL_STUB_DIR/git_log_fails" ]; then
+        echo "fatal: bad revision" >&2
+        exit 128
+    fi
+    cat "$REL_STUB_DIR/git_log.md" 2>/dev/null
     exit 0
 fi
 
@@ -167,6 +182,8 @@ export PATH
 
 # Resets the stubs to a healthy default: 5.3.0-rc-100 is build 100, its CI run is 42, nothing
 # is published under 5.3.0 yet, the docs artefact is there, and the wiki page is written.
+#
+# `$1` is the Yontrack branch the build lives on, `main` unless a case says otherwise.
 setup_stub() {
     REL_STUB_DIR="$(mktemp -d "$STUB_ROOT/case.XXXXXX")" || { echo "FATAL: mktemp failed" >&2; exit 1; }
     export REL_STUB_DIR
@@ -202,6 +219,10 @@ MD
 
     : > "$REL_STUB_DIR/tags"
 
+    cat > "$REL_STUB_DIR/git_log.md" <<'MD'
+* #1701 Fix the thing (abc1234)
+MD
+
     # The wiki, as the workflow leaves it: a plain clone in a directory.
     REL_WIKI_DIR="$REL_STUB_DIR/wiki"
     export REL_WIKI_DIR
@@ -220,7 +241,7 @@ MD
 MD
 
     RELEASE_PROJECT=yontrack
-    RELEASE_BRANCH=main
+    RELEASE_BRANCH="${1:-main}"
     RELEASE_REPOSITORY=yontrack/yontrack
     RELEASE_BUILD_VERSION=5.3.0-rc-100
     RELEASE_VERSION=""
@@ -228,6 +249,15 @@ MD
     YONTRACK_TOKEN=token
     export RELEASE_PROJECT RELEASE_BRANCH RELEASE_REPOSITORY RELEASE_BUILD_VERSION \
         RELEASE_VERSION YONTRACK_URL YONTRACK_TOKEN
+
+    # release.sh reads these three out of the environment once, at load time - which for this
+    # suite was before any case ran. Re-derived here so a case can change the branch.
+    # shellcheck disable=SC2034  # read by the sourced release.sh, not by this file
+    REL_PROJECT="$RELEASE_PROJECT"
+    # shellcheck disable=SC2034  # read by the sourced release.sh, not by this file
+    REL_BRANCH="$RELEASE_BRANCH"
+    # shellcheck disable=SC2034  # read by the sourced release.sh, not by this file
+    REL_REPOSITORY="$RELEASE_REPOSITORY"
 
     GITHUB_OUTPUT="$REL_STUB_DIR/github_output"
     export GITHUB_OUTPUT
@@ -500,5 +530,165 @@ touch "$REL_STUB_DIR/changelog_fails"
 body="$(REL_VERSION=5.3.0 REL_BUILD_ID=100 rel_body 2>/dev/null)"; rc=$?
 assert_eq "0" "$rc" "body: survives a changelog that cannot be computed"
 assert_contains "$body" "wiki/Release-5.3.0" "body: still links the wiki page"
+
+# ===========================================================================
+# Versions: which one is highest, and what came before it
+# ===========================================================================
+
+# Field-by-field numeric comparison rather than `sort -V`: the release runs on ubuntu-latest but
+# this suite is run by hand on a developer machine too, and BSD sort's `-V` is not the same
+# function as GNU's. Three numbers compared as numbers has no such argument.
+
+# `rel_version_gt` answers with its exit status, which assert_eq cannot read.
+version_gt() { if rel_version_gt "$1" "$2"; then echo yes; else echo no; fi; }
+
+assert_eq "yes" "$(version_gt 5.4.0 5.3.9)" "rel_version_gt: a higher minor wins"
+assert_eq "yes" "$(version_gt 5.3.2 5.3.1)" "rel_version_gt: a higher patch wins"
+assert_eq "yes" "$(version_gt 6.0.0 5.99.99)" "rel_version_gt: a higher major wins"
+assert_eq "no" "$(version_gt 5.3.1 5.3.1)" "rel_version_gt: equal is not greater"
+assert_eq "no" "$(version_gt 5.3.1 5.3.2)" "rel_version_gt: a lower patch loses"
+
+# The one comparison a string sort gets wrong, and the one that would matter: 5.3.10 came after
+# 5.3.9, not before it.
+assert_eq "yes" "$(version_gt 5.3.10 5.3.9)" "rel_version_gt: 10 is greater than 9, not less"
+
+setup_stub
+cat > "$REL_STUB_DIR/tags" <<'TAGS'
+5.3.0
+5.3.1
+5.4.0
+5.4.1
+TAGS
+assert_eq "5.3.1" "$(rel_previous_version 5.3.2)" \
+    "rel_previous_version: the release a patch follows, not the newest release"
+assert_eq "5.4.1" "$(rel_previous_version 5.4.2)" \
+    "rel_previous_version: the newest release when the version is on top"
+assert_eq "" "$(rel_previous_version 5.3.0)" \
+    "rel_previous_version: empty when nothing came before"
+
+# Only release tags count. The repository carries `experimental-pipeline-427ea0a` and friends,
+# and a `5.3.1-rc-4` is a candidate rather than a release.
+setup_stub
+cat > "$REL_STUB_DIR/tags" <<'TAGS'
+5.3.0
+5.3.1-rc-4
+experimental-pipeline-427ea0a
+5.2.2
+TAGS
+assert_eq "5.3.0" "$(rel_previous_version 5.3.2)" \
+    "rel_previous_version: ignores anything that is not a released version"
+
+# ===========================================================================
+# resolve: the "Latest release" decision
+# ===========================================================================
+
+# `gh release create` defaults `make_latest` to true, so a 5.3.2 published after 5.4.0 would take
+# the repository's "Latest release" badge and flip the README's shields.io version - announcing a
+# patch of the previous minor as the current release. The decision is made here, next to
+# `rel_check_unpublished`, which already reads the tag list.
+
+setup_stub
+cat > "$REL_STUB_DIR/tags" <<'TAGS'
+5.3.0
+5.3.1
+TAGS
+out="$(RELEASE_BUILD_VERSION=5.4.0-rc-7 rel_resolve 2>&1)"; rc=$?
+assert_eq "0" "$rc" "resolve: succeeds on the newest version"
+assert_contains "$(outputs)" "latest=true" "resolve: the highest version becomes Latest"
+
+setup_stub
+cat > "$REL_STUB_DIR/tags" <<'TAGS'
+5.3.0
+5.3.1
+5.4.0
+TAGS
+cat > "$REL_STUB_DIR/search.json" <<'JSON'
+{"Id":"120","Name":"20260901055547-120","DisplayName":"5.3.2-rc-3"}
+JSON
+out="$(RELEASE_BUILD_VERSION=5.3.2-rc-3 rel_resolve 2>&1)"; rc=$?
+assert_eq "0" "$rc" "resolve: succeeds on a patch of the previous minor"
+assert_contains "$(outputs)" "version=5.3.2" "resolve: publishes the patch under its base version"
+assert_contains "$(outputs)" "latest=false" "resolve: a patch behind a newer minor is not Latest"
+
+# The very first release has no tags at all to compare against, and it is certainly the latest.
+setup_stub
+out="$(rel_resolve 2>&1)"; rc=$?
+assert_eq "0" "$rc" "resolve: succeeds with no tags at all"
+assert_contains "$(outputs)" "latest=true" "resolve: the first release is Latest"
+
+# ===========================================================================
+# resolve: a build on a branch other than main
+# ===========================================================================
+
+# A patch build lives on the Yontrack branch `release-5.3` - the escaped form of the SCM branch
+# `release/5.3`. `release.yml`'s `branch` input defaults to `main`, so before #1702 the GOLD
+# workflow, which passed only the version, resolved every patch against main and failed there.
+
+setup_stub release-5.3
+cat > "$REL_STUB_DIR/search.json" <<'JSON'
+{"Id":"120","Name":"20260901055547-120","DisplayName":"5.3.2-rc-3"}
+JSON
+out="$(RELEASE_BUILD_VERSION=5.3.2-rc-3 rel_resolve 2>&1)"; rc=$?
+assert_eq "0" "$rc" "resolve: succeeds against a release branch"
+assert_contains "$(calls)" "--branch release-5.3" "resolve: looks the build up on the branch it was given"
+assert_contains "$(outputs)" "build=20260901055547-120" "resolve: names the patch build to validate"
+
+setup_stub release-5.3
+touch "$REL_STUB_DIR/search_empty"
+out="$(rel_resolve 2>&1)"; rc=$?
+assert_eq "1" "$rc" "resolve: fails when the release branch does not have the version"
+assert_contains "$out" "release-5.3" "resolve: names the branch it looked on"
+
+# ===========================================================================
+# body: the changelog fallback
+# ===========================================================================
+
+# A freshly cut release branch has no previously RELEASE-promoted build to measure from - 5.3.1
+# was released from a build on main - so `--from-promotion RELEASE` returns nothing, on the one
+# kind of release where "what changed" is the whole point. The git range is the changelog there:
+# it is literally the cherry-picks.
+
+setup_stub
+echo "5.3.1" > "$REL_STUB_DIR/tags"
+touch "$REL_STUB_DIR/changelog_fails"
+body="$(REL_VERSION=5.3.2 REL_BUILD_ID=120 REL_SHA=abc1234def5678 rel_body 2>/dev/null)"; rc=$?
+assert_eq "0" "$rc" "body: succeeds when only the git fallback is available"
+assert_contains "$body" "#1701 Fix the thing" "body: falls back to the git log"
+assert_not_contains "$body" "No changelog available" "body: does not degrade to the empty notice"
+assert_contains "$(calls)" "5.3.1..abc1234def5678" "body: measures from the previous release to the build"
+
+# An empty changelog and a failing one are the same problem to whoever reads the release.
+setup_stub
+echo "5.3.1" > "$REL_STUB_DIR/tags"
+: > "$REL_STUB_DIR/changelog.md"
+body="$(REL_VERSION=5.3.2 REL_BUILD_ID=120 REL_SHA=abc1234def5678 rel_body 2>/dev/null)"; rc=$?
+assert_eq "0" "$rc" "body: succeeds when the changelog comes back empty"
+assert_contains "$body" "#1701 Fix the thing" "body: an empty changelog also falls back to git"
+
+# The Yontrack changelog wins when it has something to say: it carries the issue links and the
+# semantic sections, which a raw git log does not.
+setup_stub
+echo "5.3.1" > "$REL_STUB_DIR/tags"
+body="$(REL_VERSION=5.3.2 REL_BUILD_ID=120 REL_SHA=abc1234def5678 rel_body 2>/dev/null)"; rc=$?
+assert_contains "$body" "#1672" "body: keeps the Yontrack changelog when there is one"
+assert_not_contains "$body" "#1701 Fix the thing" "body: does not append the git log on top of it"
+assert_not_contains "$(calls)" "git log" "body: does not even ask git when it does not have to"
+
+# The fallback needs a boundary and a commit. With neither - the first release ever, or a caller
+# that did not pass the sha - the release still publishes, with the notice it had before.
+setup_stub
+touch "$REL_STUB_DIR/changelog_fails"
+body="$(REL_VERSION=5.3.0 REL_BUILD_ID=100 REL_SHA=abc1234def5678 rel_body 2>/dev/null)"; rc=$?
+assert_eq "0" "$rc" "body: survives having no previous release to measure from"
+assert_contains "$body" "No changelog available" "body: says so rather than showing nothing"
+assert_contains "$body" "wiki/Release-5.3.0" "body: still links the wiki page"
+
+setup_stub
+echo "5.3.1" > "$REL_STUB_DIR/tags"
+touch "$REL_STUB_DIR/changelog_fails"
+touch "$REL_STUB_DIR/git_log_fails"
+body="$(REL_VERSION=5.3.2 REL_BUILD_ID=120 REL_SHA=abc1234def5678 rel_body 2>/dev/null)"; rc=$?
+assert_eq "0" "$rc" "body: survives a git log that fails too"
+assert_contains "$body" "No changelog available" "body: falls all the way back to the notice"
 
 report_tests

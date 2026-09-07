@@ -12,12 +12,15 @@
 #
 #   resolve  Finds the build the version names, works out the version to publish, and refuses
 #            to publish over anything that already exists. Outputs `version`, `rc_version`,
-#            `build`, `build_id`, `run_id` and `sha`; every later step is driven by those.
+#            `build`, `build_id`, `run_id`, `sha` and `latest`; every later step is driven by
+#            those.
 #   docs     Finds the docs artefact on the CI run recorded on the build, before anything is
 #            published. Outputs `artifact_id`.
 #   wiki     Checks the release page exists in the wiki and is reachable from the index. A
 #            check, not a publication step - the page is written by a human before GOLD.
-#   body     Composes the GitHub release body: the wiki link first, the changelog second.
+#   body     Composes the GitHub release body: the wiki link first, the changelog second. Falls
+#            back to the git range when Yontrack has no changelog to give, which is the normal
+#            case on a freshly cut release branch.
 #
 # Environment:
 #   YONTRACK_URL           Yontrack instance
@@ -33,7 +36,8 @@
 #   REL_RC_VERSION         the rc version, i.e. the GHCR tag to re-tag from
 #   REL_BUILD_ID           Yontrack build id, for the changelog boundary
 #   REL_RUN_ID             CI run holding the docs artefact
-#   REL_SHA                commit the release targets
+#   REL_SHA                commit the release targets, and the upper bound of the changelog
+#                          fallback
 #
 # The Yontrack CLI must already be installed and configured; `gh` must be authenticated.
 
@@ -82,6 +86,64 @@ rel_base_version() {
 # would tag Docker Hub with a timestamp.
 rel_valid_version() {
     printf '%s' "$1" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'
+}
+
+# Whether $1 is strictly greater than $2, both `X.Y.Z`.
+#
+# Field by field as numbers, rather than `sort -V`: the release runs on ubuntu-latest, but
+# release-test.sh is run by hand on a developer machine too, and BSD `sort -V` is not GNU's. The
+# comparison that matters either way is 5.3.10 against 5.3.9, which any string ordering gets
+# backwards.
+rel_version_gt() {
+    local i av bv
+    local -a af bf
+    IFS=. read -r -a af <<< "$1"
+    IFS=. read -r -a bf <<< "$2"
+    for i in 0 1 2; do
+        av="${af[i]:-0}"
+        bv="${bf[i]:-0}"
+        [ "$av" -gt "$bv" ] && return 0
+        [ "$av" -lt "$bv" ] && return 1
+    done
+    return 1
+}
+
+# Every released version, from the git tags. `rel_valid_version`'s shape, and nothing else: the
+# repository also carries `experimental-pipeline-<sha>` tags and `-rc-` candidates, and neither is
+# a release.
+rel_version_tags() {
+    rel_git_tags | while read -r tag; do
+        rel_valid_version "$tag" && printf '%s\n' "$tag"
+    done
+}
+
+# Whether publishing $1 should move GitHub's "Latest release" badge, i.e. whether it is the
+# highest version this repository has ever released.
+#
+# `gh release create` defaults `make_latest` to true. Left at that default, a 5.3.2 patch
+# published after 5.4.0 takes the badge and flips the README's `shields.io/github/v/release`,
+# announcing a patch of the *previous* minor as the current release (#1702).
+rel_is_latest() {
+    local version="$1" tag
+    while read -r tag; do
+        [ -n "$tag" ] || continue
+        rel_version_gt "$tag" "$version" && return 1
+    done <<< "$(rel_version_tags)"
+    return 0
+}
+
+# The highest released version below $1, or empty when nothing came before it. The lower boundary
+# of the changelog fallback below.
+rel_previous_version() {
+    local version="$1" tag best=""
+    while read -r tag; do
+        [ -n "$tag" ] || continue
+        rel_version_gt "$version" "$tag" || continue
+        if [ -z "$best" ] || rel_version_gt "$tag" "$best"; then
+            best="$tag"
+        fi
+    done <<< "$(rel_version_tags)"
+    printf '%s' "$best"
 }
 
 # ---------------------------------------------------------------------------------------------
@@ -142,9 +204,19 @@ rel_build_details() {
 
 # Indirections, so the tests can drive the guards without a registry or a tag database.
 
-# Non-empty when the tag exists locally. The workflow checks out with `fetch-depth: 0`, so
-# every tag the repository has is here.
-rel_git_tags() { git tag -l "$1"; }
+# The repository's tags: all of them, or just the one named. The workflow checks out with
+# `fetch-depth: 0`, so every tag the repository has is here.
+rel_git_tags() {
+    if [ $# -gt 0 ]; then
+        git tag -l "$1"
+    else
+        git tag -l
+    fi
+}
+
+# The commits in a range, as a Markdown list. An indirection like the two above, so the changelog
+# fallback can be driven without a real history.
+rel_git_log() { git log --no-merges --pretty=format:'* %s (%h)' "$1..$2"; }
 
 # The HTTP status of a Docker Hub tag: 200 when published, 404 when not.
 rel_docker_status() {
@@ -233,13 +305,21 @@ rel_resolve() {
 
     rel_check_unpublished "$version" || return 1
 
+    # Decided here because this is where the tag list already is - `rel_check_unpublished` has
+    # just read it - and because it has to reach `gh release create` as an explicit
+    # `--latest=<true|false>`. See `rel_is_latest`.
+    local latest=false
+    rel_is_latest "$version" && latest=true
+
     rel_log "Releasing $rc_version (build $build_name) as $version, from CI run $run_id on $sha."
+    rel_log "Latest release: $latest."
     rel_output version "$version"
     rel_output rc_version "$rc_version"
     rel_output build "$build_name"
     rel_output build_id "$build_id"
     rel_output run_id "$run_id"
     rel_output sha "$sha"
+    rel_output latest "$latest"
     rel_summary "Releasing \`$rc_version\` as \`$version\` from [CI run $run_id](${GITHUB_SERVER_URL:-https://github.com}/$REL_REPOSITORY/actions/runs/$run_id)."
     return 0
 }
@@ -312,6 +392,24 @@ rel_changelog() {
         --format markdown
 }
 
+# The commits between the previous release and this one.
+#
+# The fallback for a patch: a freshly cut `release/5.3` has no previously RELEASE-promoted build
+# to measure from - 5.3.1 was released from a build on `main` - so `--from-promotion RELEASE`
+# comes back empty, on the one kind of release where "what changed" is the whole point. The git
+# range IS the changelog there: it is literally the cherry-picks (#1702).
+#
+# Fails, rather than inventing a range, when there is no previous release or no commit to measure
+# to. `release.yml` checks out with `fetch-depth: 0`, so every tag and ref is present when there
+# is one.
+rel_git_changelog() {
+    local version="${REL_VERSION:-}" sha="${REL_SHA:-}" previous
+    [ -n "$sha" ] || return 1
+    previous="$(rel_previous_version "$version")"
+    [ -n "$previous" ] || return 1
+    rel_git_log "$previous" "$sha"
+}
+
 # The GitHub release body: the wiki link first, the changelog second.
 #
 # End-user prose lives in the wiki, internals live in the release where developers look for
@@ -324,7 +422,14 @@ rel_body() {
     # A changelog that cannot be computed must not sink the release. The first release after
     # this pipeline lands has no previous RELEASE build to measure from, and the part a human
     # wrote - the wiki page - is there either way.
+    #
+    # Yontrack's changelog is preferred whenever it says anything: it carries the issue links and
+    # the semantic sections, which a raw git log does not. Only when it comes back empty - or
+    # fails, which reads the same to whoever opens the release - does the git range stand in.
     changelog="$(rel_changelog 2>/dev/null)" || changelog=""
+    if [ -z "$changelog" ]; then
+        changelog="$(rel_git_changelog 2>/dev/null)" || changelog=""
+    fi
 
     printf '## Release notes\n\n'
     printf '%s/%s/wiki/Release-%s\n\n' "${GITHUB_SERVER_URL:-https://github.com}" "$REL_REPOSITORY" "$version"

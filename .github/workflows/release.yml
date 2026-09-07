@@ -46,8 +46,13 @@ on:
         required: false
         default: yontrack
         type: string
+      # Passed by the GOLD promotion workflow as `${branch}`, which renders the Yontrack branch
+      # name: `main` for a normal release, `release-5.3` - the escaped form of the SCM branch
+      # `release/5.3` - for a patch. `resolve` looks the build up by display name in
+      # `<project>/<branch>`, so a patch resolved against the default would fail with
+      # "No build named 5.3.2-rc-N in yontrack/main" (#1702).
       branch:
-        description: 'Yontrack branch holding the build'
+        description: 'Yontrack branch holding the build (e.g. main, release-5.3)'
         required: false
         default: main
         type: string
@@ -321,14 +326,24 @@ jobs:
 
       # `--target` is the commit the build was made from, read off the build itself: this
       # workflow runs on `main` as it is today, which is not where the release is.
+      #
+      # `--latest` is spelled out because `gh` leaves GitHub's `make_latest` at its default of
+      # true, and a 5.3.2 patch published after 5.4.0 would take the repository's "Latest release"
+      # badge and flip the README's shields.io version. `resolve` works out which it is (#1702).
+      #
+      # `REL_SHA` is the upper bound of the changelog fallback: on a freshly cut release branch
+      # Yontrack has no previous RELEASE-promoted build to measure from, and the git range from
+      # the previous tag stands in.
       - name: Create the GitHub release
         id: release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.resolve.outputs.version }}
           SHA: ${{ steps.resolve.outputs.sha }}
+          LATEST: ${{ steps.resolve.outputs.latest }}
           REL_VERSION: ${{ steps.resolve.outputs.version }}
           REL_BUILD_ID: ${{ steps.resolve.outputs.build_id }}
+          REL_SHA: ${{ steps.resolve.outputs.sha }}
         run: |
           set -euo pipefail
           scripts/release.sh body > release-body.md
@@ -336,6 +351,7 @@ jobs:
           gh release create "$VERSION" \
             --title "$VERSION" \
             --target "$SHA" \
+            --latest="$LATEST" \
             --notes-file release-body.md
 
       # ------------------------------------------------------------------------------------

@@ -92,6 +92,39 @@ class VersionCalculatorTest {
         assertEquals("5.2.2", version)
     }
 
+    /**
+     * The patch-release case as it is actually run (#1702): `main` has moved on to 5.4 and its
+     * VERSION file says so, and a defect in 5.3 is fixed on `release/5.3`. The version has to come
+     * from the branch and the 5.3 tags alone - the VERSION file is not consulted on a release
+     * branch, and the 5.4 tags main has published since must not shift the patch number.
+     */
+    @Test
+    fun `a patch on the previous minor ignores the VERSION file and the newer tags`() {
+        val version = calculator(
+            githubRefName = "release/5.3",
+            gitBranch = "HEAD",
+            versionFile = "5.4",
+            tags = listOf("5.3.0", "5.3.1", "5.4.0", "5.4.1", "5.4.12"),
+        ).computeVersion()
+        assertEquals("5.3.2", version)
+    }
+
+    /**
+     * `findLatestPatchVersion` anchors its pattern at both ends, which is what keeps `5.3.10` and
+     * `5.3.1-rc-4` from being read as patches of 5.3. Pinned because a released `5.3.10` losing to
+     * `5.3.2` would republish a version that already shipped.
+     */
+    @Test
+    fun `a patch takes the highest patch number, not the last tag`() {
+        val version = calculator(
+            githubRefName = "release/5.3",
+            gitBranch = "HEAD",
+            versionFile = "5.4",
+            tags = listOf("5.3.0", "5.3.10", "5.3.2", "5.3.1-rc-4", "5.31.0"),
+        ).computeVersion()
+        assertEquals("5.3.11", version)
+    }
+
     @Test
     fun `release branch under GitHub Actions with no tag starts at zero`() {
         val version = calculator(

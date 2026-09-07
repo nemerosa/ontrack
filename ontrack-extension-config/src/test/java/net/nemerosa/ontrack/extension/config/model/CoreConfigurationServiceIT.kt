@@ -266,6 +266,102 @@ class CoreConfigurationServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    /**
+     * The `.yontrack/ci.yaml` inversion (#1702), in miniature, and the one assertion that encodes
+     * why it is written the way it is.
+     *
+     * `PromotionLevelConfiguration.merge` is additive only - `validations = (validations +
+     * other.validations).distinct()` - so a `custom.configs` block can ADD a validation to a
+     * promotion but can never remove one. "SILVER, but without DEMO.SMOKE on a release branch" is
+     * therefore not expressible as an override, and the config has to be inverted instead: the
+     * defaults declare the weakest SILVER - BRONZE alone, i.e. "the build is green" - and a
+     * `^main$` block adds the demo verification back on top.
+     *
+     * Someone will eventually try to tidy the `^main$` block back into the defaults. This is what
+     * fails when they do.
+     */
+    @Test
+    @AsAdminTest
+    fun `The demo verification is added to SILVER on main and not on a release branch`() {
+        val yaml = """
+            version: v1
+            configuration:
+              defaults:
+                branch:
+                  validations:
+                    unit-test: {}
+                    demo-smoke: {}
+                  promotions:
+                    BRONZE:
+                      validations:
+                        - unit-test
+                    SILVER:
+                      promotions:
+                        - BRONZE
+              custom:
+                configs:
+                  - conditions:
+                      - name: branch
+                        config: '^main${'$'}'
+                    branch:
+                      promotions:
+                        SILVER:
+                          validations:
+                            - demo-smoke
+        """.trimIndent()
+
+        val main = configTestSupport.configureBranch(
+            yaml = yaml,
+            ci = "generic",
+            scm = "mock",
+            env = EnvFixtures.generic(configuredProjectName, scmBranch = "main"),
+        )
+        assertSilver(main, validations = listOf("demo-smoke"))
+
+        val patch = configTestSupport.configureBranch(
+            yaml = yaml,
+            ci = "generic",
+            scm = "mock",
+            env = EnvFixtures.generic(configuredProjectName, scmBranch = "release/5.3"),
+        )
+        assertSilver(patch, validations = emptyList())
+
+        // The SCM branch is `release/5.3`; the Yontrack branch is the escaped form. Both names
+        // appear in the patch-release procedure and using the wrong one is the likeliest way to
+        // get it subtly wrong, so it is pinned here.
+        assertEquals("release-5.3", patch.name, "Yontrack branch name for release/5.3")
+
+        // The stamp itself stays declared on the release branch, so a patch that IS demoed can be
+        // stamped by hand. What changes is that SILVER no longer waits for it.
+        assertTrue(
+            structureService.getValidationStampListForBranch(patch.id).any { it.name == "demo-smoke" },
+            "The demo verification stamp still exists on the release branch"
+        )
+    }
+
+    /**
+     * The `SILVER` auto-promotion property actually stored on the [branch]: always keyed on
+     * `BRONZE`, and on the [validations] the branch's condition layer added to it.
+     */
+    private fun assertSilver(branch: Branch, validations: List<String>) {
+        val silver = structureService.findPromotionLevelByName(branch.project.name, branch.name, "SILVER")
+            .getOrNull()
+            ?: fail("Missing SILVER promotion on ${branch.name}")
+        val property = propertyService.getPropertyValue(silver, AutoPromotionPropertyType::class.java)
+        assertNotNull(property) { p ->
+            assertEquals(
+                validations.sorted(),
+                p.validationStamps.map { it.name }.sorted(),
+                "SILVER validations on ${branch.name}"
+            )
+            assertEquals(
+                listOf("BRONZE"),
+                p.promotionLevels.map { it.name },
+                "SILVER promotions on ${branch.name}"
+            )
+        }
+    }
+
     @Test
     @AsAdminTest
     fun `Validations and promotions additions in a condition`() {
