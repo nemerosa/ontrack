@@ -49,13 +49,26 @@ configuration:
             - DOCS
         # No workflow node of its own: BRONZE is what admits a build to the demo slot, the
         # slot deploys it and dispatches demo-smoke.yml, and DEMO.SMOKE landing green is the
-        # last prerequisite - so auto-promotion grants SILVER by itself. SILVER therefore
-        # means "running on the demo and verified there", which is what GOLD gets decided on.
+        # last prerequisite - so auto-promotion grants SILVER by itself.
+        #
+        # What is declared here is deliberately the WEAKER of the two meanings SILVER carries:
+        # BRONZE alone, i.e. "the build is green". The `^main$` block under `custom.configs`
+        # adds DEMO.SMOKE back, so on main SILVER still means "running on the demo and verified
+        # there", which is what GOLD gets decided on. On a release branch nothing adds it, and
+        # SILVER means "green on the release branch" - a patch is never deployed to the demo
+        # (that would roll the demo back off the current minor) and stamping DEMO.SMOKE by hand
+        # would assert a verification that never happened. GOLD stays the human gate either way;
+        # only what SILVER attests changes (#1702).
+        #
+        # Do NOT tidy the `^main$` block back into here. `PromotionLevelConfiguration.merge` is
+        # additive only - `validations = (validations + other.validations).distinct()` - so a
+        # `custom.configs` block can ADD a validation to a promotion but can never remove one.
+        # Whatever the defaults declare is imposed on every branch, so "declare DEMO.SMOKE here
+        # and override it away on release/*" is not expressible. Hence the inversion: the
+        # defaults declare the weakest form and each branch kind adds what it can satisfy.
         SILVER:
           promotions:
             - BRONZE
-          validations:
-            - DEMO.SMOKE
         # The human gate, and the only promotion in this chain granted by hand: what it records
         # is that someone looked at the demo running this exact build and wrote the release notes
         # for it. Its workflow below dispatches the publication (#1673).
@@ -78,9 +91,10 @@ configuration:
         # it on GOLD plus its own triggers' results is why both levels exist: a promotion whose
         # validations were its own triggers would be circular.
         #
-        # Nothing can be released now until the demo pipeline works end to end, since RELEASE
-        # requires GOLD requires SILVER requires DEMO.SMOKE. That is the intended constraint,
-        # not a side effect (#1673).
+        # On main, nothing can be released until the demo pipeline works end to end, since
+        # RELEASE requires GOLD requires SILVER requires DEMO.SMOKE. That is the intended
+        # constraint, not a side effect (#1673). On a release branch SILVER does not require
+        # DEMO.SMOKE - see the SILVER comment above - so a patch is gated on GOLD alone (#1702).
         RELEASE:
           promotions:
             - GOLD
@@ -124,6 +138,19 @@ configuration:
                     inputs:
                       - name: version
                         value: "${build.release}"
+                      # Which Yontrack branch holds the build. `release.yml` resolves the version
+                      # back to a build by display name in `<project>/<branch>`, and its `branch`
+                      # input defaults to `main` - so without this a patch would be looked up on
+                      # main and fail with "No build named 5.3.2-rc-N in yontrack/main" (#1702).
+                      #
+                      # This is the YONTRACK branch name, not the SCM one, which is exactly what
+                      # release.yml wants: workflow inputs render with `PlainEventRenderer`
+                      # (`render(entity, name) = name`) and NEW_PROMOTION_RUN's context carries
+                      # `eventBranch`, so it yields `main` on main and `release-5.3` - the escaped
+                      # form - on `release/5.3`. Safe on main: it renders what was already the
+                      # default.
+                      - name: branch
+                        value: "${branch}"
         RELEASE:
           - name: On internal release
             nodes:
@@ -397,3 +424,61 @@ configuration:
                 Yontrack ${build} has been released.
 
                 ${promotionRun.changelog?title=true&commitsOption=OPTIONAL}
+
+      # SILVER on main: adds the demo verification on top of the default's BRONZE, restoring
+      # "deployed to the demo and verified there" for a normal release.
+      #
+      # This belongs here and not in `defaults.branch.promotions.SILVER`, however much it looks
+      # like it belongs there - see the SILVER comment above. The merge is additive only, so
+      # anything the defaults declare is imposed on release branches too, and a patch has no
+      # DEMO.SMOKE to give. The defaults carry the weakest form; this block adds the main-only
+      # part (#1702).
+      #
+      # `BranchCondition` uses `Regex.matches()`, a full match, so the anchors are for the reader
+      # rather than for the engine - `main` would behave identically. They are kept because the
+      # `^release/.*$` block below genuinely needs the `.*`, and the two read as a pair.
+      - conditions:
+          - name: branch
+            config: '^main$'
+        branch:
+          promotions:
+            SILVER:
+              validations:
+                - DEMO.SMOKE
+
+      # SILVER on a release branch: the same promotion means something else, so it says something
+      # else. The default's text - "deployed to the demo", "has passed its smoke tests", a demo
+      # URL to go and look at - is false on all three counts for a patch.
+      #
+      # Notifications merge differently from promotions, and that is what makes this possible at
+      # all: `NotificationsCIConfigExtension.mergeConfig` uses `syncForward` with
+      # `equality { i, j -> i.name == j.name }`, so a same-named `On SILVER` REPLACES the default's
+      # subscription instead of adding a second one. The name therefore has to stay in step with
+      # the default's above, or this silently becomes an extra message rather than a replacement.
+      #
+      # The item is spelled out in full rather than leaning on the field-level merge: what a
+      # reader needs from this block is what actually gets sent on a release branch.
+      #
+      # `${branch}` renders the YONTRACK branch name, so the message reads `release-5.3` and not
+      # `release/5.3`. The change log goes last for the same reason as in the default: it can
+      # render nothing, and trailing it lets the message simply end.
+      - conditions:
+          - name: branch
+            config: '^release/.*$'
+        branch:
+          notificationsConfig:
+            notifications:
+              - name: On SILVER
+                promotion: SILVER
+                events:
+                  - new_promotion_run
+                channel: slack
+                channelConfig:
+                  channel: '#notifications'
+                  type: 'SUCCESS'
+                contentTemplate: |
+                  ${build} is green on ${branch}.
+
+                  Verify the fix, then decide on GOLD.
+
+                  ${promotionRun.semanticChangelog?issues=true&emojis=true}
