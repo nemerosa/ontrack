@@ -1,5 +1,13 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.scm
 
+import com.apollographql.apollo.api.Optional
+import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
+import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
+import net.nemerosa.ontrack.kdsl.connector.graphql.convert
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.MockScmDeleteRepositoryMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.MockScmRegisterCommitMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.MockScmRegisterIssueMutation
+import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.connector.parse
 import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.Build
@@ -17,8 +25,14 @@ import java.util.*
  * calls. The assertions written on top of it stay in the acceptance tests, which is where
  * their timeouts and their JUnit failures belong.
  *
- * The mock SCM is off unless `ontrack.config.extension.scm.mock.enabled` is set, so calls
- * made through this client answer with a 404 on an instance that has not enabled it.
+ * Registering commits and issues, and emptying a repository, go through **GraphQL**; files,
+ * branches and pull requests go through the REST endpoints of `MockSCMController`. The split
+ * is not aesthetic: a deployed instance is reached through an ingress routing `/graphql` and
+ * `/hook` to the backend and everything else to the Next UI, so the REST endpoints answer 404
+ * from anywhere but inside the cluster. What the demo seed needs is what had to move.
+ *
+ * Either way the mock SCM has to be enabled with `ontrack.config.extension.scm.mock.enabled`:
+ * without it neither the mutations nor the endpoints exist.
  */
 fun <T> withMockScmRepository(
     ontrack: Ontrack,
@@ -64,15 +78,16 @@ class MockScmRepositoryContext(
      * an issue with no type lands in the change log's untyped group.
      */
     fun repositoryIssue(key: String, message: String, type: String? = null) {
-        ontrack.connector.post(
-            "/extension/scm/mock/issue",
-            body = mapOf(
-                "name" to repository,
-                "key" to key,
-                "message" to message,
-                "type" to type,
+        ontrack.graphqlConnector.mutate(
+            MockScmRegisterIssueMutation(
+                repository = repository,
+                key = key,
+                message = message,
+                type = Optional.presentIfNotNull(type),
             )
-        )
+        ) {
+            it?.mockScmRegisterIssue?.payloadUserErrors?.convert()
+        }
     }
 
     /**
@@ -82,7 +97,11 @@ class MockScmRepositoryContext(
      * pointing at them, so anything re-registering the same commits starts here.
      */
     fun deleteRepository() {
-        ontrack.connector.delete("/extension/scm/mock/repository?repository=$repository")
+        ontrack.graphqlConnector.mutate(
+            MockScmDeleteRepositoryMutation(repository = repository)
+        ) {
+            it?.mockScmDeleteRepository?.payloadUserErrors?.convert()
+        }
     }
 
     /**
@@ -94,16 +113,19 @@ class MockScmRepositoryContext(
     fun repositoryCommit(
         message: String,
         branch: String = "main",
-    ): String {
-        return ontrack.connector.post(
-            "/extension/scm/mock/commit",
-            body = mapOf(
-                "name" to repository,
-                "scmBranch" to branch,
-                "message" to message,
+    ): String =
+        ontrack.graphqlConnector.mutate(
+            MockScmRegisterCommitMutation(
+                repository = repository,
+                scmBranch = branch,
+                message = message,
             )
-        ).body.asJson().path("commitId").asText()
-    }
+        ) {
+            it?.mockScmRegisterCommit?.payloadUserErrors?.convert()
+        }
+            ?.checkData { it.mockScmRegisterCommit?.commit }
+            ?.id
+            ?: throw GraphQLMissingDataException("Did not get back the registered commit")
 
     /**
      * Registering a commit in the repository and declaring it for the current build.

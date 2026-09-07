@@ -58,6 +58,12 @@ class MockSCMExtension(
     fun repository(name: String): MockRepository = repositories[name]
         ?: error("Repository $name not found")
 
+    /**
+     * The repository, or `null` when there is none — where [repository] fails and
+     * [repositoryOrCreate] would create one.
+     */
+    fun findRepository(name: String): MockRepository? = repositories[name]
+
     fun deleteRepository(repoName: String) {
         repositories.remove(repoName)
     }

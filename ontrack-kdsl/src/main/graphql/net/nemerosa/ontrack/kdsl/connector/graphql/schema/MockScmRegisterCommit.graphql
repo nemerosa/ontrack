@@ -1,0 +1,16 @@
+mutation MockScmRegisterCommit(
+    $repository: String!,
+    $scmBranch: String!,
+    $message: String!,
+) {
+    mockScmRegisterCommit(input: {
+        repository: $repository,
+        scmBranch: $scmBranch,
+        message: $message,
+    }) {
+        commit {
+            id
+        }
+        ...PayloadUserErrors
+    }
+}

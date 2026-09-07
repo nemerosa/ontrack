@@ -1,0 +1,15 @@
+mutation MockScmRegisterIssue(
+    $repository: String!,
+    $key: String!,
+    $message: String!,
+    $type: String,
+) {
+    mockScmRegisterIssue(input: {
+        repository: $repository,
+        key: $key,
+        message: $message,
+        type: $type,
+    }) {
+        ...PayloadUserErrors
+    }
+}

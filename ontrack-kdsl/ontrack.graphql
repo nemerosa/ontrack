@@ -109,6 +109,13 @@ type AddSlotWorkflowPayload implements Payload {
   slotWorkflow: SlotWorkflow
 }
 
+type ApplyDashboardsPayload implements PayloadInterface {
+  "Dashboards that were created or updated"
+  dashboards: [Dashboard!]!
+  "List of errors"
+  errors: [PayloadUserError]
+}
+
 "A named authorization"
 type Authorization {
   "Action to authorize"
@@ -492,6 +499,8 @@ type Branch implements Authorizable & ProjectEntity {
   ): [ValidationStamp!]!
   "Given a list of validation names, returns for each one the last validation run or null if the validation does not exist."
   validationStatuses(names: [String!]!): [ValidationRun!]!
+  "Workflows which have been launched by a notification on an event for this entity, most recent first. Resolved by scanning the 100 most recent workflow notification records for this entity, so the list may be truncated on entities which accumulate many of them, like a project or a branch."
+  workflowInstances: [WorkflowInstance!]!
 }
 
 "Information about a branch"
@@ -686,6 +695,8 @@ type Build implements Authorizable & ProjectEntity {
     "List of validation stamps"
     validationStamps: [String!]
   ): [Validation!]!
+  "Workflows which have been launched by a notification on an event for this entity, most recent first. Resolved by scanning the 100 most recent workflow notification records for this entity, so the list may be truncated on entities which accumulate many of them, like a project or a branch."
+  workflowInstances: [WorkflowInstance!]!
 }
 
 "Gathering information about the auto versioning around this build"
@@ -1150,6 +1161,8 @@ type CreateWebhookPayload implements Payload {
 }
 
 type Dashboard {
+  "Exports this dashboard as a YAML snippet ready to use with applyDashboards"
+  asYaml: String!
   authorizations: DashboardAuthorizations!
   name: String!
   userScope: DashboardContextUserScope!
@@ -3166,12 +3179,34 @@ type Message {
   type: MessageType!
 }
 
+"Output type for the mockScmDeleteRepository mutation."
+type MockScmDeleteRepositoryPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
+"Output type for the mockScmRegisterCommit mutation."
+type MockScmRegisterCommitPayload implements Payload {
+  "The registered commit"
+  commit: SCMCommit
+  "List of errors"
+  errors: [UserError]
+}
+
+"Output type for the mockScmRegisterIssue mutation."
+type MockScmRegisterIssuePayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 type Mutation {
   "Add a workflow into an existing slot"
   addSlotWorkflow(
     "Input for the mutation"
     input: AddSlotWorkflowInput
   ): AddSlotWorkflowPayload
+  "Applies a YAML list of dashboard definitions, creating or updating SHARED dashboards"
+  applyDashboards(input: ApplyDashboardsInput!): ApplyDashboardsPayload!
   "Bulk update of a promotion level"
   bulkUpdatePromotionLevelById(
     "Input for the mutation"
@@ -3905,6 +3940,21 @@ type Mutation {
     "Input for the mutation"
     input: MapGroupInput
   ): MapGroupPayload
+  "Deletes a mock SCM repository and everything it holds. The mock SCM keeps its repositories on the bean, where they outlive the entities pointing at them, and derives a commit id from the position of the commit on its branch ? so anything registering the same commits twice starts here."
+  mockScmDeleteRepository(
+    "Input for the mutation"
+    input: MockScmDeleteRepositoryInput
+  ): MockScmDeleteRepositoryPayload
+  "Registers a commit in a mock SCM repository, creating the repository and the branch if they are not there yet."
+  mockScmRegisterCommit(
+    "Input for the mutation"
+    input: MockScmRegisterCommitInput
+  ): MockScmRegisterCommitPayload
+  "Registers an issue in a mock SCM repository's issue service. Issues must be registered before the commits mentioning them: the mock SCM links a commit to an issue as the commit comes in."
+  mockScmRegisterIssue(
+    "Input for the mutation"
+    input: MockScmRegisterIssueInput
+  ): MockScmRegisterIssuePayload
   "Overriding a rule into a pipeline"
   overridePipelineRule(
     "Input for the mutation"
@@ -4799,6 +4849,8 @@ type Preferences {
   dashboardUuid: String
   "Selected branch view"
   selectedBranchViewKey: String
+  "Theme selected for the web UI"
+  themeMode: ThemeMode!
 }
 
 type Project implements Authorizable & ProjectEntity {
@@ -4940,6 +4992,8 @@ type Project implements Authorizable & ProjectEntity {
     "Validation stamp where to look for validation runs (regular expression, defaults to all)"
     validationStamp: String
   ): ValidationRunPaginated
+  "Workflows which have been launched by a notification on an event for this entity, most recent first. Resolved by scanning the 100 most recent workflow notification records for this entity, so the list may be truncated on entities which accumulate many of them, like a project or a branch."
+  workflowInstances: [WorkflowInstance!]!
 }
 
 type ProjectAuthorization {
@@ -5168,6 +5222,8 @@ type PromotionLevel implements Authorizable & ProjectEntity {
   name: String
   "Makes a promotion conditional based on the fact that a previous promotion has been granted."
   previousPromotionConditionProperty: Property
+  "Number of distinct builds which have been promoted to this level"
+  promotedBuildCount: Int!
   "List of promotions a promotion depends on before being applied."
   promotionDependenciesProperty: Property
   "List of runs for this promotion"
@@ -5201,6 +5257,8 @@ type PromotionLevel implements Authorizable & ProjectEntity {
   ): [Property!]!
   "List of actions available for this entity"
   userMenuActions: [UserMenuAction!]!
+  "Workflows which have been launched by a notification on an event for this entity, most recent first. Resolved by scanning the 100 most recent workflow notification records for this entity, so the list may be truncated on entities which accumulate many of them, like a project or a branch."
+  workflowInstances: [WorkflowInstance!]!
 }
 
 "Configurable field definition on a promotion level"
@@ -5272,6 +5330,8 @@ type PromotionRun implements Authorizable & ProjectEntity {
   ): [Property!]!
   "List of actions available for this entity"
   userMenuActions: [UserMenuAction!]!
+  "Workflows which have been launched by a notification on an event for this entity, most recent first. Resolved by scanning the 100 most recent workflow notification records for this entity, so the list may be truncated on entities which accumulate many of them, like a project or a branch."
+  workflowInstances: [WorkflowInstance!]!
 }
 
 "A field value stored on a promotion run"
@@ -5810,6 +5870,25 @@ type Query {
     projects: [String!],
     "ID of the build to"
     to: Int!
+  ): SCMChangeLog
+  "Query to get a change log between two builds, using their names or display names."
+  scmChangeLogByName(
+    "Name or display name of the build from"
+    from: String!,
+    "Name of the branch of the build from, used to disambiguate its name"
+    fromBranch: String,
+    "Name of the project"
+    project: String!,
+    """
+    List of projects to follow one by one for a get deep change log. Each item
+    in the list is either a project name, or a project name and qualifier separated
+    by a colon (:).
+    """
+    projects: [String!],
+    "Name or display name of the build to"
+    to: String!,
+    "Name of the branch of the build to, used to disambiguate its name"
+    toBranch: String
   ): SCMChangeLog
   "Performs a search in Ontrack"
   search(
@@ -7894,6 +7973,8 @@ type ValidationRun implements Authorizable & ProjectEntity {
   ): [ValidationRunStatus!]!
   "Associated validation stamp"
   validationStamp: ValidationStamp!
+  "Workflows which have been launched by a notification on an event for this entity, most recent first. Resolved by scanning the 100 most recent workflow notification records for this entity, so the list may be truncated on entities which accumulate many of them, like a project or a branch."
+  workflowInstances: [WorkflowInstance!]!
 }
 
 "Data associated with a validation run"
@@ -7998,6 +8079,8 @@ type ValidationStamp implements Authorizable & ProjectEntity {
     "Size of the page"
     size: Int = 20
   ): ValidationRunPaginated
+  "Workflows which have been launched by a notification on an event for this entity, most recent first. Resolved by scanning the 100 most recent workflow notification records for this entity, so the list may be truncated on entities which accumulate many of them, like a project or a branch."
+  workflowInstances: [WorkflowInstance!]!
 }
 
 "Validation stamp filter"
@@ -8479,6 +8562,13 @@ enum SlotPipelineStatus {
   RUNNING
 }
 
+"Theme selected by a user for the web UI"
+enum ThemeMode {
+  DARK
+  LIGHT
+  SYSTEM
+}
+
 "Defines how validation runs should be sorted"
 enum ValidationRunSortingMode {
   ID
@@ -8533,6 +8623,11 @@ input AddSlotWorkflowInput {
   trigger: SlotPipelineStatus!
   "workflowYaml field"
   workflowYaml: String!
+}
+
+input ApplyDashboardsInput {
+  "YAML list of dashboard definitions"
+  yaml: String!
 }
 
 "Filter when querying auto versioning processing orders"
@@ -8724,6 +8819,8 @@ input CancelSlotPipelineInput {
 input ChangeLogTemplatingServiceConfig {
   "Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence."
   allQualifiers: Boolean
+  "Maximum length of a commit message in a change log, ellipsis included. Only the first line of a commit message is ever rendered; set this to 0 to render that line in full."
+  commitsMaxLength: Int
   "Defines how to render commits for a change log"
   commitsOption: ChangeLogTemplatingCommitsOption
   "If a qualifier has no previous link, uses the default qualifier (empty) qualifier."
@@ -10158,6 +10255,34 @@ input MetricsEntryInput {
   value: Float!
 }
 
+"Input type for the mockScmDeleteRepository mutation."
+input MockScmDeleteRepositoryInput {
+  "Name of the mock SCM repository"
+  repository: String!
+}
+
+"Input type for the mockScmRegisterCommit mutation."
+input MockScmRegisterCommitInput {
+  "Commit message"
+  message: String!
+  "Name of the mock SCM repository"
+  repository: String!
+  "Branch of the repository the commit goes on"
+  scmBranch: String!
+}
+
+"Input type for the mockScmRegisterIssue mutation."
+input MockScmRegisterIssueInput {
+  "Issue key, of the `ABC-123` shape the mock issue service reads out of a commit message"
+  key: String!
+  "Issue summary"
+  message: String!
+  "Name of the mock SCM repository"
+  repository: String!
+  "Issue type, which is what a change log groups its issues by"
+  type: String
+}
+
 "Input type for the overridePipelineRule mutation."
 input OverridePipelineRuleInput {
   "admissionRuleConfigId field"
@@ -10442,6 +10567,8 @@ input SelectDashboardInput {
 input SemanticChangeLogTemplatingServiceConfig {
   "Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence."
   allQualifiers: Boolean
+  "Maximum length of a commit message in a change log, ellipsis included. Only the first line of a commit message is ever rendered; set this to 0 to render that line in full."
+  commitsMaxLength: Int
   "If a qualifier has no previous link, uses the default qualifier (empty) qualifier."
   defaultQualifierFallback: Boolean
   "Comma-separated list of project links to follow one by one for a get deep change log. Each item in the list is either a project name, or a project name and qualifier separated by a colon (:)."
@@ -10718,6 +10845,8 @@ input SetPreferencesInput {
   dashboardUuid: String
   "Selected branch view"
   selectedBranchViewKey: String
+  "Theme selected for the web UI"
+  themeMode: ThemeMode
 }
 
 "Input type for the setProjectAutoPromotionLevelPropertyById mutation."
@@ -11553,6 +11682,11 @@ input StandardBuildFilter {
   sinceValidationStamp: String
   "... with status"
   sinceValidationStampStatus: String
+  """
+  The build display name (its release label when set, its name otherwise) must match this regular expression.
+  The matching is case insensitive and partial - use ^ and $ to anchor the pattern.
+  """
+  withDisplayName: String
   "Builds with this promotion level"
   withPromotionLevel: String
   "With property"

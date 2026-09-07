@@ -1,0 +1,5 @@
+mutation MockScmDeleteRepository($repository: String!) {
+    mockScmDeleteRepository(input: {repository: $repository}) {
+        ...PayloadUserErrors
+    }
+}

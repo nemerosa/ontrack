@@ -114,6 +114,20 @@ repository** before registering anything in it. Commit ids are derived from the 
 position of the commit on it, so a second run registering on top of the first would give every
 commit a different id.
 
+The seed registers all of it **over GraphQL** — `mockScmRegisterCommit`,
+`mockScmRegisterIssue`, `mockScmDeleteRepository` — and not over the REST endpoints of
+`MockSCMController` beside them. A deployed instance is reached through an ingress that routes
+`/graphql` and `/hook` to the backend and everything else to the Next UI, so a
+`POST /extension/scm/mock/commit` against the demo answers 404 from the UI whatever the backend
+is configured with. That is what broke the first demo smoke run after this landed. The REST
+endpoints stay for what only ever runs inside the cluster: the Playwright fixture in
+`ontrack-web-tests/ontrack/extensions/scm/scm.js` and the files, branches and pull requests the
+acceptance tests use.
+
+Being reachable from outside also means the mutations are not content with an authenticated
+user: each one checks a global function, so the token the seed runs with has to be an
+administrator's — which it already had to be, to delete projects.
+
 ## Adding to the demo
 
 A feature is not done until the demo seed shows it — the definition of done in `CLAUDE.md`

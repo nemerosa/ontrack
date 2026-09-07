@@ -20,7 +20,6 @@ import net.nemerosa.ontrack.kdsl.spec.extension.scm.mockScmBuildCommitProperty
 import net.nemerosa.ontrack.kdsl.spec.extension.scm.mockScmProjectProperty
 import net.nemerosa.ontrack.kdsl.spec.setProperty
 import net.nemerosa.ontrack.yaml.Yaml
-import org.springframework.web.client.HttpClientErrorException.NotFound
 import java.time.LocalDateTime
 
 /**
@@ -61,20 +60,30 @@ class KdslDemoTarget(private val ontrack: Ontrack) : DemoTarget {
             .map { KdslDemoDashboardHandle(ontrack, it.uuid, it.name) }
 
     /**
-     * Registers an issue in a throwaway repository and deletes it again. The endpoints only
-     * exist when the mock SCM is enabled, so a 404 here is the answer being looked for.
+     * Registers an issue in a throwaway repository and deletes it again — the real calls the
+     * seed makes, so this covers the mutations existing at all (they do not, unless the mock
+     * SCM is enabled) and the token being allowed to use them.
+     *
+     * What the server said is repeated verbatim rather than diagnosed: the first version of
+     * this check asserted the property was missing, which sent the reader looking at
+     * configuration when the actual answer was a 404 from an ingress that never routed the
+     * REST endpoints to the backend.
      */
     override fun checkScmAvailable() {
         val probe = MockScmRepositoryContext(ontrack, PREFLIGHT_REPOSITORY)
         try {
             probe.repositoryIssue(key = "PREFLIGHT-1", message = "Checking the mock SCM is enabled")
             probe.deleteRepository()
-        } catch (_: NotFound) {
+        } catch (ex: Exception) {
+            // Any failure at all: the mutations missing (the mock SCM is off), the token not
+            // being an administrator's, the instance not answering. All of them mean the same
+            // thing here — this instance will not take the dataset — and all of them are worth
+            // knowing before the reset deletes anything.
             error(
-                "The mock SCM is not enabled on this instance, and the dataset needs it for its " +
-                        "change log. Set `ontrack.config.extension.scm.mock.enabled` " +
-                        "(`ONTRACK_CONFIG_EXTENSION_SCM_MOCK_ENABLED`) and run the seed again. " +
-                        "Nothing was deleted."
+                "The dataset needs the mock SCM for its change log, and this instance would not " +
+                        "take it. Check that `ontrack.config.extension.scm.mock.enabled` " +
+                        "(`ONTRACK_CONFIG_EXTENSION_SCM_MOCK_ENABLED`) is set and that the token is " +
+                        "an administrator's. Nothing was deleted.\n\nThe server said:\n${ex.message}"
             )
         }
     }
