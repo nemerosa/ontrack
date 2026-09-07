@@ -80,6 +80,11 @@ with a _Copy_ button — including for HTML, where the source is what you get, b
 of choosing a format is to paste the result somewhere else. The boundaries and the dependency
 changes stay: they answer which two builds this is about, whatever way you read it.
 
+![Semantic changelog](changelog-semantic.png)
+
+The classic view is the one shown in the sections above — the same changelog, read as
+boundaries, dependencies, commits and issues.
+
 Four options sit in the panel's own header:
 
 | Option    | Default    | Meaning                                                                          |
@@ -105,9 +110,10 @@ parameter keeps meaning "however *you* like to read it" for whoever opens it.
 
     The semantic changelog only shows commits whose subject carries a conventional-commit type,
     such as `feat(api): search owners by phone number`. On a project whose commit messages do
-    not follow that convention, the view says so instead of showing an empty panel — turn
-    _Commits_ on to read the commits as they are. See [Semantic changelogs](#semantic-changelogs)
-    for the same rendering used from a template.
+    not follow that convention, nothing survives that filter: with _Issues_ off the view says so
+    rather than showing an empty panel, and with _Issues_ on you get the issues section and no
+    type sections at all. Either way, turn _Commits_ on to read the commits as they are. See
+    [Semantic changelogs](#semantic-changelogs) for the same rendering used from a template.
 
 ### Using the UI across branches
 

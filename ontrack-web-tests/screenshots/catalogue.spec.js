@@ -82,6 +82,16 @@ test.describe('catalogue', () => {
         }
     })
 
+    test('names a string selector when an entry shoots one element', () => {
+        // Optional, but a non-string would be handed to `page.locator` and fail three minutes in
+        catalogue
+            .filter(entry => entry.element !== undefined)
+            .forEach(entry => {
+                expect(typeof entry.element, `element of ${entry.slug}`).toBe('string')
+                expect(entry.element.length, `element of ${entry.slug}`).toBeGreaterThan(0)
+            })
+    })
+
     test('has a ready function on every entry', () => {
         for (const entry of catalogue) {
             expect(typeof entry.ready, `ready of ${entry.slug}`).toBe('function')

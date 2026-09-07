@@ -8,7 +8,8 @@
  * It does not seed. `demo-smoke.yml` already resets and seeds the demo deterministically as
  * part of SILVER, and one system owning the demo's state is worth more than a guarantee here.
  *
- * The pages, and how to know each is ready, are in `catalogue.js`.
+ * The pages, how to know each is ready, and whether the shot is of the page or of one element,
+ * are in `catalogue.js`.
  */
 
 const fs = require('fs')
@@ -86,7 +87,11 @@ for (const entry of catalogue) {
         await entry.ready(page)
 
         const file = path.join(outputDir, screenshotFileName(version, entry.slug))
-        await page.screenshot({path: file, animations: 'disabled', caret: 'hide'})
+        // An entry naming an `element` is shot on that element rather than on the page. What
+        // documentation wants is usually one panel, and a full page carries whatever banner the
+        // instance happens to be showing.
+        const target = entry.element ? page.locator(entry.element) : page
+        await target.screenshot({path: file, animations: 'disabled', caret: 'hide'})
         console.log(`  ${path.basename(file)}`)
     })
 }

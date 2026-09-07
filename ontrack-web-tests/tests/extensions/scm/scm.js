@@ -96,6 +96,65 @@ export async function provisionChangeLog(
     }
 }
 
+/**
+ * Commit subjects carrying a conventional-commit type, which is the only kind the semantic
+ * change log shows: `SemanticChangelogRenderingServiceImpl` drops every untyped commit. The
+ * `commits` above are deliberately untyped and are what the empty state is provisioned from.
+ */
+export const semanticCommits = [
+    // Before the change log's first boundary, so it must not appear in it
+    "chore(deps): bump the shared library",
+    "feat(api): search owners by their phone number, closes ISS-31",
+    "test: cover the owner search endpoint",
+    "fix(export): write the CSV in UTF-8, closes ISS-32",
+    "docs: describe the export format",
+]
+
+export const semanticIssues = {
+    "ISS-31": {
+        summary: "Search owners by phone number",
+        type: "feature",
+    },
+    "ISS-32": {
+        summary: "CSV export mangles accented names",
+        type: "defect",
+    },
+}
+
+/**
+ * A change log the semantic view has something to render: two builds, the commits between them
+ * carrying `feat`, `test`, `fix` and `docs` subjects, and two issues for the `issues` option to
+ * put in a section of its own.
+ */
+export async function provisionSemanticChangeLog(ontrack) {
+    const mockSCMContext = createMockSCMContext(ontrack)
+    const project = await ontrack.createProject()
+    await mockSCMContext.configureProjectForMockSCM(project)
+
+    const branch = await project.createBranch()
+    await mockSCMContext.configureBranchForMockSCM(branch)
+
+    for (const key of Object.keys(semanticIssues)) {
+        const {summary, type} = semanticIssues[key]
+        await mockSCMContext.repositoryIssue({key, summary, type})
+    }
+
+    const from = await mockSCMContext.setBuildWithCommits(
+        branch.createBuild(),
+        semanticCommits.slice(0, 1),
+    )
+    const middle = await mockSCMContext.setBuildWithCommits(
+        branch.createBuild(),
+        semanticCommits.slice(1, 3),
+    )
+    const to = await mockSCMContext.setBuildWithCommits(
+        branch.createBuild(),
+        semanticCommits.slice(3),
+    )
+
+    return {from, middle, to, mockSCMContext}
+}
+
 export class SCMChangeLogPage {
 
     constructor(page, ontrack) {
@@ -199,6 +258,99 @@ export class SCMChangeLogPage {
             await expect(link).not.toBeVisible()
             await expect(text).not.toBeVisible()
         }
+    }
+
+    /**
+     * Goes to the change log page using the IDs of the builds, with any extra query parameters
+     * — which is how a change log link carrying a reading is shared.
+     */
+    async goToById({from, to, params = {}}) {
+        const query = new URLSearchParams({from: String(from.id), to: String(to.id), ...params})
+        await this.page.goto(`${this.ontrack.connection.ui}/extension/scm/changelog?${query.toString()}`)
+        await this.checkDisplayed()
+    }
+
+    /**
+     * Picks a way to read the change log from the command bar.
+     *
+     * @param name Label of the view — "Classic" or "Semantic"
+     */
+    async selectView(name) {
+        await this.page.getByRole('button', {name: 'View'}).click()
+        await this.page.getByRole('menuitem', {name, exact: true}).click()
+    }
+
+    /**
+     * The rendered semantic change log.
+     *
+     * Scoped to its test id, and never matched with a bare `getByText`: the option controls do
+     * a shallow `router.replace` without remounting, and Next's route announcer then holds a
+     * second copy of the page title, which an unscoped matcher double-matches.
+     */
+    semanticContent() {
+        return this.page.getByTestId('semantic-content')
+    }
+
+    async checkSemanticContent(text, {present = true} = {}) {
+        const locator = this.semanticContent()
+        if (present) {
+            await expect(locator).toContainText(text)
+        } else {
+            // Changing an option puts the cell back into loading, where `PageSection` swaps a
+            // Skeleton in and the content element is detached - and `not.toContainText` is
+            // satisfied by a locator matching nothing at all. Asserted together, and retried
+            // as a pair, so the absence is only ever read off a rendering which is there.
+            await expect(async () => {
+                await expect(locator).toBeVisible({timeout: 1000})
+                await expect(locator).not.toContainText(text, {timeout: 1000})
+            }).toPass()
+        }
+    }
+
+    /**
+     * The semantic view says the commits carry no conventional-commit types, rather than
+     * rendering a blank panel.
+     */
+    async checkSemanticEmpty() {
+        await expect(this.page.getByTestId('semantic-empty')).toBeVisible()
+        await expect(this.semanticContent()).not.toBeVisible()
+    }
+
+    /**
+     * Sets one of the semantic view's switches, clicking only when it is not already there —
+     * so a test says what it wants rather than what it toggles.
+     *
+     * The `?<option>=` parameter is written by the switch's own handler, so asking for the value
+     * the page already shows writes nothing: a `checkUrlParameter` after such a call would wait
+     * for a parameter nobody is going to write.
+     */
+    async setSemanticOption(name, value) {
+        const toggle = this.page.getByTestId(`semantic-option-${name}`)
+        await expect(toggle).toBeVisible()
+        const checked = await toggle.getAttribute('aria-checked') === 'true'
+        if (checked !== value) {
+            await toggle.click()
+        }
+        await expect(toggle).toHaveAttribute('aria-checked', String(value))
+    }
+
+    async selectSemanticFormat(label) {
+        await this.page.getByTestId('semantic-option-format').click()
+        // Scoped to the dropdown: the selected value carries the same title, so an unscoped
+        // match resolves to two elements.
+        await this.page.locator(`.ant-select-item-option[title="${label}"]`).click()
+    }
+
+    /**
+     * The reading is in the URL, which is what makes a change log link reproduce it for
+     * somebody else.
+     */
+    async checkUrlParameter(name, value) {
+        await expect(this.page).toHaveURL(new RegExp(`[?&]${name}=${value}(&|$)`))
+    }
+
+    async copySemanticContent() {
+        await this.page.getByTestId('semantic-copy').click()
     }
 
     async selectExportFormat(format) {

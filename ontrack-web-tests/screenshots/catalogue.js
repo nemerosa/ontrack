@@ -15,6 +15,7 @@
  * - `description` what the shot is for, printed in the run summary
  * - `path`        rooted path, appended to DEMO_URL
  * - `ready`       runs before the shutter, and is the only assertion this suite makes
+ * - `element`     optional selector: shoot this element instead of the whole page
  *
  * On `ready`: assert *positive evidence* that the data arrived - a populated row, a link named
  * after a seeded entity. Never a timeout, and never the absence of a loading indicator.
@@ -31,6 +32,12 @@ const SERVICE = 'petclinic'
 const MAIN = 'main'
 /** The fully-promoted build: BRONZE, SILVER, CANARY, GOLD, all validations green, with links. */
 const BUILD = '107'
+/**
+ * The change log's boundaries, given as the builds' *release* names: the permalink form takes
+ * display names, which the seed fixes, where build ids change on every reset.
+ */
+const CHANGELOG_FROM = '1.4.3'
+const CHANGELOG_TO = '1.4.6'
 const GOLD = 'GOLD'
 const SECURITY_SCAN = 'SECURITY.SCAN'
 /**
@@ -98,6 +105,34 @@ const catalogue = [
         ready: async (page) => {
             await expect(page.getByText(GOLD, {exact: true}).first()).toBeVisible()
             await expect(page.getByText(SECURITY_SCAN, {exact: true}).first()).toBeVisible()
+        },
+    },
+    {
+        slug: 'changelog',
+        description: 'The change log between two builds: boundaries, dependencies, commits and issues',
+        // `view=classic` is explicit: which view a change log opens on is a user preference, and
+        // the account this runs as may have chosen the other one.
+        path: `/extension/scm/${SERVICE}/changelog?from=${CHANGELOG_FROM}&to=${CHANGELOG_TO}&view=classic`,
+        ready: async (page) => {
+            // A commit the seed writes, scoped to the commits panel - which renders its own
+            // frame long before the change log has been computed.
+            await expect(page.locator('#commits').getByText('export the owners as CSV', {exact: false})).toBeVisible()
+            // The issues load separately, after the rest: their panel's title says "Loading..."
+            // until they are there.
+            await expect(page.locator('#issues .ant-card-head-title')).toHaveText('Issues')
+        },
+    },
+    {
+        slug: 'changelog-semantic',
+        description: 'The same change log read as a semantic change log, grouped by commit type',
+        path: `/extension/scm/${SERVICE}/changelog?from=${CHANGELOG_FROM}&to=${CHANGELOG_TO}`
+            + '&view=semantic&format=markdown&emojis=true&issues=true&commits=false',
+        // The panel alone: it carries its own controls, and it is what the documentation shows
+        // beside the classic view's panels.
+        element: '#semantic',
+        ready: async (page) => {
+            // The rendering itself, not the panel: the cell is visible while still loading.
+            await expect(page.getByTestId('semantic-content')).toContainText('Features')
         },
     },
     {
