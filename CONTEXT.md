@@ -61,6 +61,14 @@ build, which may belong to another branch.
 _Avoid_: stage, node, step. *Stage* is already refused for both promotion level and
 environment, and the pipeline view uses it for its promotion band.
 
+**Aggregate checkpoint**:
+One checkpoint standing for every validation stamp matched by an auto promotion
+pattern, rather than one checkpoint per stamp. It is labelled with the pattern,
+because that is what the configuration actually says: everything matching this,
+not these forty named things. A promotion whose stamps are named explicitly gets
+one checkpoint each instead.
+_Avoid_: group node, collapsed node, stamp group
+
 **Unlocks**:
 The delivery map edge meaning that reaching one checkpoint grants another by
 itself, as auto promotion does.
