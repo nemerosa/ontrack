@@ -35,7 +35,10 @@ const mockLevels = {
 // The widget resolves each end of the chart through its own query; the resolution is not what this
 // test is about, and the chart itself would only pull in an ECharts canvas jsdom cannot draw
 jest.mock("../../../../components/widgets/home/promotionChartUtils", () => ({
-    usePromotionLevel: (project, branch, promotionLevel) => mockLevels[promotionLevel],
+    usePromotionLevel: (project, branch, promotionLevel) => ({
+        promotionLevelObject: mockLevels[promotionLevel] ?? null,
+        notFound: !mockLevels[promotionLevel],
+    }),
 }))
 jest.mock("../../../../components/promotionLevels/E2ELeadTimeChart", () => () => null)
 
@@ -62,24 +65,25 @@ beforeEach(() => {
  */
 describe('E2ELeadTimeChartWidget title', () => {
 
-    const renderTitle = () => {
+    const renderTitle = ({targetPromotionLevel = "GOLD"} = {}) => {
         const setTitle = jest.fn()
-        render(
+        const body = render(
             <EventsContext.Provider value={{fireEvent: jest.fn(), subscribeToEvent: jest.fn()}}>
                 <DashboardWidgetCellContext.Provider value={{setTitle}}>
                     <E2ELeadTimeChartWidget
                         project="petclinic" branch="main" promotionLevel="BRONZE"
-                        targetProject="petclinic-ui" targetBranch="main" targetPromotionLevel="GOLD"
+                        targetProject="petclinic-ui" targetBranch="main" targetPromotionLevel={targetPromotionLevel}
                         interval="3m" period="1w"
                     />
                 </DashboardWidgetCellContext.Provider>
             </EventsContext.Provider>
         )
-        return render(
+        const title = render(
             <EventsContext.Provider value={{fireEvent: jest.fn(), subscribeToEvent: jest.fn()}}>
                 {setTitle.mock.calls.at(-1)[0]}
             </EventsContext.Provider>
         )
+        return {body, title}
     }
 
     it('links both promotion levels alongside their branches and projects', () => {
@@ -94,5 +98,16 @@ describe('E2ELeadTimeChartWidget title', () => {
         renderTitle()
         expect(screen.getByRole('link', {name: /BRONZE/})).toBeVisible()
         expect(screen.getByRole('link', {name: /GOLD/})).toBeVisible()
+    })
+
+    it('names a missing end with its configured names and says so', () => {
+        // Only the source end can be linked; the target is named as configured and flagged (#1694)
+        const {body, title} = renderTitle({targetPromotionLevel: "PLATINUM"})
+        expect(title.container).toHaveTextContent(/petclinic-ui\/main\/PLATINUM/)
+        expect(title.container).toHaveTextContent('(not found)')
+        expect(title.container.querySelectorAll('a').length).toBe(3)
+        expect(body.container.querySelector('.ant-alert')).toHaveTextContent(
+            'Promotion level PLATINUM does not exist on branch main of project petclinic-ui.'
+        )
     })
 })

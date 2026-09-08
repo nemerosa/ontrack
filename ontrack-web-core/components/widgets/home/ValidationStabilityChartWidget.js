@@ -1,42 +1,12 @@
-import {useContext, useEffect} from "react";
-import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import ValidationStampStabilityChart from "@components/validationStamps/ValidationStampStabilityChart";
-import ValidationChartTitle from "@components/widgets/home/ValidationChartTitle";
-import {useValidationStampByName} from "@components/widgets/home/ValidationChartUtils";
+import ValidationChartWidget from "@components/widgets/home/ValidationChartWidget";
 
-export default function ValidationStabilityChartWidget({project, branch, validationStamp, interval, period}) {
-
-    const {setTitle} = useContext(DashboardWidgetCellContext)
-
-    const {validationStampObject} = useValidationStampByName(project, branch, validationStamp)
-
-    useEffect(() => {
-        if (validationStampObject) {
-            setTitle(
-                <>
-                    <ValidationChartTitle
-                        prefix="Stability of"
-                        project={project}
-                        branch={branch}
-                        validationStamp={validationStampObject}
-                        interval={interval}
-                        period={period}
-                    />
-                </>
-            )
-        }
-    }, [validationStampObject, interval, period]);
-
+export default function ValidationStabilityChartWidget(props) {
     return (
-        <>
-            {
-                validationStampObject &&
-                <ValidationStampStabilityChart
-                    validationStamp={validationStampObject}
-                    interval={interval}
-                    period={period}
-                />
-            }
-        </>
+        <ValidationChartWidget
+            prefix="Stability of"
+            chart={ValidationStampStabilityChart}
+            {...props}
+        />
     )
 }

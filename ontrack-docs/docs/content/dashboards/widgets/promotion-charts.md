@@ -19,6 +19,13 @@ Four widgets display delivery metrics related to promotion levels. They all shar
 | `interval` | string | Bucket size for the chart (e.g. `"1d"`, `"1w"`). |
 | `period` | string | Time window to display (e.g. `"1M"`, `"3m"`). |
 
+## When the promotion level is missing
+
+The widget resolves the promotion level by name every time it is displayed. If the configured
+project, branch or promotion level does not exist any more, the widget title still names the
+configuration, marked as `(not found)`, and the widget body says what is missing instead of a
+chart. Edit the dashboard and reconfigure the widget to point it at an existing promotion level.
+
 ## Example
 
 ```yaml

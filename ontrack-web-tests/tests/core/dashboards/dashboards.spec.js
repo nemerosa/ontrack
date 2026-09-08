@@ -274,3 +274,67 @@ test('the move handle of a widget is displayed only in edition mode', async ({pa
     await expect(page.getByText('Dashboard in edition mode')).not.toBeVisible()
     await expect(page.locator('.ot-rgl-draggable-handle')).toHaveCount(0)
 })
+
+test('a chart widget whose promotion level was deleted says so instead of loading forever', async ({page, ontrack}) => {
+    const dashboardName = `missing-target-${Date.now()}`
+
+    // Provisioning
+    const project = await ontrack.createProject()
+    const branch = await project.createBranch()
+    const promotionLevel = await branch.createPromotionLevel()
+
+    const yaml = [
+        `- name: "${dashboardName}"`,
+        `  widgets:`,
+        `    - key: "home/PromotionLeadTimeChart"`,
+        `      layout: {x: 0, y: 0, w: 12, h: 25}`,
+        `      config:`,
+        `        project: "${project.name}"`,
+        `        branch: "${branch.name}"`,
+        `        promotionLevel: "${promotionLevel.name}"`,
+        `        interval: "3m"`,
+        `        period: "1w"`,
+    ].join('\n')
+
+    const data = await graphQLCallMutation(
+        ontrack.connection,
+        'applyDashboards',
+        applyDashboardsMutation,
+        {yaml}
+    )
+    const dashboardUuid = data.applyDashboards.dashboards[0].uuid
+
+    // The promotion level goes away after the dashboard was configured with it
+    await graphQLCallMutation(
+        ontrack.connection,
+        'deletePromotionLevelById',
+        `
+            mutation DeletePromotionLevel($id: Int!) {
+                deletePromotionLevelById(input: {id: $id}) {
+                    errors { message }
+                }
+            }
+        `,
+        {id: Number(promotionLevel.id)}
+    )
+
+    await login(page, ontrack)
+
+    // Displaying the dashboard using its URL, so that it does not become the
+    // dashboard of the user for the next tests
+    await page.goto(`${ontrack.connection.ui}/?dashboard=${dashboardUuid}`)
+
+    // The title still names what the widget was configured with, and says it is missing (issue #1694)
+    const widgetTitle = page.locator('.ant-card-head').filter({hasText: 'Lead time to'})
+    await expect(widgetTitle).toContainText(promotionLevel.name)
+    await expect(widgetTitle).toContainText(`${branch.name}@${project.name}`)
+    await expect(widgetTitle).toContainText('(not found)')
+
+    // The body explains what is missing and where to fix it. The alert is scoped to the widget:
+    // the page has other alerts, not least Next's route announcer.
+    const alert = page.locator('.ant-card').filter({hasText: 'Lead time to'}).getByRole('alert')
+    await expect(alert).toContainText(
+        `Promotion level ${promotionLevel.name} does not exist on branch ${branch.name} of project ${project.name}.`
+    )
+    await expect(alert).toContainText('Edit the dashboard to reconfigure this widget.')
+})

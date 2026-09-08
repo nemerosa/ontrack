@@ -51,12 +51,10 @@ const hrefs = () => screen.getAllByRole('link').map(link => link.getAttribute('h
  * These two components are the whole of the linking logic: the four promotion chart widgets and
  * the two validation chart widgets are pure call sites, so pinning the titles here covers all six.
  *
- * The fallback cases matter as much as the linked ones. `usePromotionLevel` starts on `{}`, which is
- * truthy, so the promotion widgets really do render this title once with nothing resolved - a title
- * that assumed `branch` were present would crash the whole dashboard cell rather than merely look
- * unfinished. The validation half cannot reach that state today (its hook starts `undefined` and the
- * widgets skip the title entirely), so its fallback case is a contract test, pinning the two titles
- * as symmetrical against #1694 changing either hook.
+ * The fallback cases matter as much as the linked ones. Both hooks start on `null` and the widgets
+ * set the title from the first render, so the configured names are what the user sees while the
+ * entity loads - and, marked as such, when it turns out not to exist (#1694). A title that assumed
+ * `branch` were present would crash the whole dashboard cell rather than merely look unfinished.
  */
 describe('PromotionChartTitle', () => {
 
@@ -90,19 +88,38 @@ describe('PromotionChartTitle', () => {
         expect(screen.getByText(/3m/)).toBeVisible()
     })
 
-    it('falls back to the configured names when the promotion level has no branch yet', () => {
-        // The widget's query starts on an empty object, so this render happens on every dashboard
+    it('falls back to the configured names while the promotion level is not loaded yet', () => {
         render_(<PromotionChartTitle
             prefix="Lead time to"
             project="petclinic"
             branch="main"
-            promotionLevel={{}}
+            promotionLevelName="GOLD"
+            promotionLevel={null}
             interval="3m"
             period="1w"
         />)
         expect(screen.queryAllByRole('link')).toHaveLength(0)
-        expect(screen.getByText(/main/)).toBeVisible()
-        expect(screen.getByText(/petclinic/)).toBeVisible()
+        expect(screen.getByText('GOLD')).toBeVisible()
+        expect(document.body).toHaveTextContent(/main@petclinic/)
+        expect(screen.queryByText('(not found)')).toBeNull()
+    })
+
+    it('marks the configured names as not found when the promotion level does not exist', () => {
+        render_(<PromotionChartTitle
+            prefix="Lead time to"
+            project="petclinic"
+            branch="main"
+            promotionLevelName="GOLD"
+            promotionLevel={null}
+            notFound={true}
+            interval="3m"
+            period="1w"
+        />)
+        expect(screen.queryAllByRole('link')).toHaveLength(0)
+        expect(screen.getByText('GOLD')).toBeVisible()
+        expect(document.body).toHaveTextContent(/main@petclinic/)
+        expect(screen.getByText('(not found)')).toBeVisible()
+        expect(screen.getByText(/3m/)).toBeVisible()
     })
 })
 
@@ -138,17 +155,36 @@ describe('ValidationChartTitle', () => {
         expect(screen.getByText(/3m/)).toBeVisible()
     })
 
-    it('falls back to the configured names when the validation stamp has no branch yet', () => {
+    it('falls back to the configured names while the validation stamp is not loaded yet', () => {
         render_(<ValidationChartTitle
             prefix="Stability of"
             project="petclinic"
             branch="main"
-            validationStamp={{}}
+            validationStampName="UNIT.TESTS"
+            validationStamp={null}
             interval="3m"
             period="1w"
         />)
         expect(screen.queryAllByRole('link')).toHaveLength(0)
-        expect(screen.getByText(/main/)).toBeVisible()
-        expect(screen.getByText(/petclinic/)).toBeVisible()
+        expect(screen.getByText('UNIT.TESTS')).toBeVisible()
+        expect(document.body).toHaveTextContent(/main@petclinic/)
+        expect(screen.queryByText('(not found)')).toBeNull()
+    })
+
+    it('marks the configured names as not found when the validation stamp does not exist', () => {
+        render_(<ValidationChartTitle
+            prefix="Stability of"
+            project="petclinic"
+            branch="main"
+            validationStampName="UNIT.TESTS"
+            validationStamp={null}
+            notFound={true}
+            interval="3m"
+            period="1w"
+        />)
+        expect(screen.queryAllByRole('link')).toHaveLength(0)
+        expect(screen.getByText('UNIT.TESTS')).toBeVisible()
+        expect(document.body).toHaveTextContent(/main@petclinic/)
+        expect(screen.getByText('(not found)')).toBeVisible()
     })
 })

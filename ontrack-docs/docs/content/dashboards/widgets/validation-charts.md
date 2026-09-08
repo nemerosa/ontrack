@@ -17,6 +17,13 @@ Two widgets display metrics related to validation stamps. They share the same co
 | `interval` | string | Bucket size for the chart (e.g. `"1d"`). |
 | `period` | string | Time window to display (e.g. `"1M"`). |
 
+## When the validation stamp is missing
+
+The widget resolves the validation stamp by name every time it is displayed. If the configured
+project, branch or validation stamp does not exist any more, the widget title still names the
+configuration, marked as `(not found)`, and the widget body says what is missing instead of a
+chart. Edit the dashboard and reconfigure the widget to point it at an existing validation stamp.
+
 ## Example
 
 ```yaml
