@@ -36,6 +36,42 @@ the selected build, so a build can be read without leaving the branch. It shares
 display primitives with the build view's widgets, not compositions.
 _Avoid_: build detail, build preview, build panel
 
+**Delivery map**:
+What a build on this branch has to pass through on its way to an environment: the
+branch's promotion levels and validation stamps, the project's slots, and the
+configured dependencies between them. It is configuration with progress painted
+onto it, not a history.
+_Avoid_: graph, dependency graph, pipeline graph. *Graph* is already taken twice
+over, by the slot graph service and by the planned build dependency query engine.
+
+**Delivery map view**:
+The branch content view that renders the delivery map, a peer of the *pipeline
+view* and the builds view.
+_Avoid_: graph view
+
+**Checkpoint**:
+One node of a delivery map, being a promotion level, a validation stamp or a slot.
+Every checkpoint names the latest build to have arrived at it and says what became
+of it there: a promotion level is arrived at by being promoted, a validation stamp
+by a run of any outcome whose status the checkpoint shows, a slot by a deployment.
+Arriving is therefore not the same as succeeding, and only a validation stamp can
+show a build that arrived and failed. On a promotion level and a validation stamp
+that build is always of this branch; on a slot it is the most recently deployed
+build, which may belong to another branch.
+_Avoid_: stage, node, step. *Stage* is already refused for both promotion level and
+environment, and the pipeline view uses it for its promotion band.
+
+**Unlocks**:
+The delivery map edge meaning that reaching one checkpoint grants another by
+itself, as auto promotion does.
+_Avoid_: triggers, leads to
+
+**Requires**:
+The delivery map edge meaning that a checkpoint cannot be reached until another
+has been, as promotion dependencies and slot admission rules do. It constrains;
+it does not act.
+_Avoid_: depends on, blocks
+
 **Promotion level**:
 A named, ordered rung a build can reach on a branch. The set is configured per
 branch and its size varies widely between projects; levels carry an ordinal
