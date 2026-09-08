@@ -34,6 +34,7 @@ class MockSCMExtension(
     private val propertyService: PropertyService,
     private val structureService: StructureService,
     private val issueServiceRegistry: IssueServiceRegistry,
+    private val mockSCMStore: MockSCMStore,
 ) : AbstractExtension(extensionFeature), SCMExtension {
 
     override fun getSCM(project: Project): SCM? =
@@ -49,23 +50,64 @@ class MockSCMExtension(
 
     private val repositories = mutableMapOf<String, MockRepository>()
 
-    fun registerRepository(name: String) {
-        repositories[name] = MockRepository(name)
+    /**
+     * Whether [repositories] has been filled from [mockSCMStore] yet.
+     *
+     * Loading happens on the first access rather than at bean creation: with the default
+     * [NoMockSCMStore] there is nothing to load, and where there is, the storage is a
+     * database the mock SCM has no reason to touch while the context is still starting.
+     */
+    private var loaded = false
+
+    @Synchronized
+    private fun repositories(): MutableMap<String, MockRepository> {
+        if (!loaded) {
+            mockSCMStore.loadAll().forEach { data ->
+                repositories[data.name] = MockRepository.fromData(data, ::saveRepository)
+            }
+            // Only once the load went through: a store that cannot answer at all - the database
+            // being down, say - must fail again on the next call rather than latch the mock SCM
+            // into looking permanently empty.
+            loaded = true
+        }
+        return repositories
     }
 
-    fun repositoryOrCreate(name: String): MockRepository = repositories.getOrPut(name) { MockRepository(name) }
+    private fun saveRepository(repository: MockRepository) {
+        mockSCMStore.save(repository.toData())
+    }
 
-    fun repository(name: String): MockRepository = repositories[name]
+    /**
+     * Registers an empty repository, discarding whatever the previous one of that name held —
+     * in the store as well, so that a re-registration does not leave the old commits behind
+     * for the next restart to bring back.
+     */
+    fun registerRepository(name: String) {
+        val repository = MockRepository(name, ::saveRepository)
+        repositories()[name] = repository
+        saveRepository(repository)
+    }
+
+    /**
+     * Unlike [registerRepository] this does not write the repository it creates: the read
+     * endpoints go through here, and an empty repository is what the next start would build
+     * anyway. It reaches the store as soon as anything is registered in it.
+     */
+    fun repositoryOrCreate(name: String): MockRepository =
+        repositories().getOrPut(name) { MockRepository(name, ::saveRepository) }
+
+    fun repository(name: String): MockRepository = repositories()[name]
         ?: error("Repository $name not found")
 
     /**
      * The repository, or `null` when there is none — where [repository] fails and
      * [repositoryOrCreate] would create one.
      */
-    fun findRepository(name: String): MockRepository? = repositories[name]
+    fun findRepository(name: String): MockRepository? = repositories()[name]
 
     fun deleteRepository(repoName: String) {
-        repositories.remove(repoName)
+        repositories().remove(repoName)
+        mockSCMStore.delete(repoName)
     }
 
     data class MockPullRequest(
@@ -88,6 +130,14 @@ class MockSCMExtension(
 
     class MockRepository(
         val name: String,
+        /**
+         * Called after every change to the repository, so that a [MockSCMStore] can keep up.
+         * It hands over the whole repository rather than the change, so that no partial write
+         * can leave the store disagreeing with this object about where a branch's commits stop
+         * — which is what commit ids are derived from. Like the rest of the mock SCM this
+         * assumes one writer: nothing here is safe against concurrent registrations.
+         */
+        private val onChange: (MockRepository) -> Unit = {},
     ) {
 
         private val revisionCount = AtomicLong(0)
@@ -107,6 +157,7 @@ class MockSCMExtension(
 
         fun registerIssue(key: String, message: String, vararg types: String) {
             issues[key] = MockIssue(name, key, message, types = types.toSet())
+            save()
         }
 
         /**
@@ -143,6 +194,8 @@ class MockSCMExtension(
                 existingIssue?.addCommitId(id)
             }
 
+            save()
+
             return id
         }
 
@@ -151,6 +204,7 @@ class MockSCMExtension(
                 mutableMapOf()
             }
             branch[path] = content
+            save()
         }
 
         fun getFile(scmBranch: String?, path: String) = files[scmBranch ?: ""]?.get(path)
@@ -158,10 +212,12 @@ class MockSCMExtension(
         fun deleteBranch(branch: String) {
             createdBranches.remove(branch)
             files.remove(branch)
+            save()
         }
 
         fun createBranch(sourceBranch: String, newBranch: String): String {
             createdBranches[newBranch] = sourceBranch
+            save()
             return newBranch
         }
 
@@ -194,6 +250,7 @@ class MockSCMExtension(
             }
 
             createdPullRequests += pr
+            save()
             return pr.toSCMPullRequest()
         }
 
@@ -345,6 +402,120 @@ class MockSCMExtension(
 
         fun forAllCommits(code: (SCMCommit) -> Unit) {
             branches.flatMap { it.commits }.forEach(code)
+        }
+
+        private fun save() {
+            onChange(this)
+        }
+
+        /**
+         * Snapshot of everything this repository holds, for a [MockSCMStore].
+         */
+        fun toData() = MockRepositoryData(
+            name = name,
+            revision = revisionCount.get(),
+            issues = issues.values.map { issue ->
+                MockIssueData(
+                    key = issue.key,
+                    message = issue.message,
+                    updateTime = issue.updateTime,
+                    types = issue.types,
+                    commits = issue.commits.toList(),
+                )
+            },
+            branches = branches.map { branch ->
+                MockBranchData(
+                    name = branch.name,
+                    commits = branch.commits.map { commit ->
+                        MockCommitData(
+                            id = commit.id,
+                            revision = commit.revision,
+                            message = commit.message,
+                            timestamp = commit.timestamp,
+                        )
+                    },
+                )
+            },
+            files = files.flatMap { (scmBranch, paths) ->
+                paths.map { (path, content) ->
+                    MockFileData(scmBranch = scmBranch, path = path, content = content)
+                }
+            },
+            createdBranches = createdBranches.map { (branch, from) ->
+                MockCreatedBranchData(branch = branch, from = from)
+            },
+            pullRequests = createdPullRequests.map { pr ->
+                MockPullRequestData(
+                    id = pr.id,
+                    from = pr.from,
+                    to = pr.to,
+                    title = pr.title,
+                    body = pr.body,
+                    approved = pr.approved,
+                    status = pr.status,
+                    reviewers = pr.reviewers,
+                )
+            },
+        )
+
+        private fun restore(data: MockRepositoryData) {
+            revisionCount.set(data.revision)
+            data.issues.forEach { issueData ->
+                val issue = MockIssue(
+                    repositoryName = name,
+                    key = issueData.key,
+                    message = issueData.message,
+                    types = issueData.types,
+                    updateTime = issueData.updateTime,
+                )
+                issueData.commits.forEach(issue::addCommitId)
+                issues[issueData.key] = issue
+            }
+            data.branches.forEach { branchData ->
+                branches += MockBranch(
+                    name = branchData.name,
+                    commits = branchData.commits.map { commitData ->
+                        MockCommit(
+                            repository = name,
+                            revision = commitData.revision,
+                            id = commitData.id,
+                            message = commitData.message,
+                            timestamp = commitData.timestamp,
+                        )
+                    }.toMutableList(),
+                )
+            }
+            data.files.forEach { fileData ->
+                files.getOrPut(fileData.scmBranch) { mutableMapOf() }[fileData.path] = fileData.content
+            }
+            data.createdBranches.forEach { createdBranchData ->
+                createdBranches[createdBranchData.branch] = createdBranchData.from
+            }
+            data.pullRequests.forEach { prData ->
+                createdPullRequests += MockPullRequest(
+                    from = prData.from,
+                    to = prData.to,
+                    id = prData.id,
+                    title = prData.title,
+                    body = prData.body,
+                    approved = prData.approved,
+                    status = prData.status,
+                    reviewers = prData.reviewers,
+                )
+            }
+        }
+
+        companion object {
+
+            /**
+             * Restores a repository from a snapshot, without calling [onChange] back: what is
+             * being read is what the store already holds.
+             */
+            fun fromData(
+                data: MockRepositoryData,
+                onChange: (MockRepository) -> Unit = {},
+            ): MockRepository =
+                MockRepository(data.name, onChange).apply { restore(data) }
         }
 
     }

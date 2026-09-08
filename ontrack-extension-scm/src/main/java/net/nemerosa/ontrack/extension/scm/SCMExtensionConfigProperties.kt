@@ -34,9 +34,21 @@ class SCMExtensionConfigProperties {
                     "Enable it only on demonstration or test instances - never on an instance tracking " +
                     "real deliveries, where it would let a project claim an SCM that answers with " +
                     "whatever anyone posted to it. Its data lives on the bean and does not survive a " +
-                    "restart."
+                    "restart unless `persistent` is set."
         )
         var enabled: Boolean = false
+
+        @APIDescription(
+            "Keeps the mock SCM's repositories in the database, so that its commits, issues, files " +
+                    "and pull requests survive a restart. Disabled by default: tests create their mock " +
+                    "data inside the test and would only pay for the writes. Set it on a long-lived " +
+                    "instance configured with the mock SCM - a demonstration instance, or a development " +
+                    "stack whose backend is restarted often - where losing the data means the change log " +
+                    "of an already-seeded project fails until the next reset. What it writes is an " +
+                    "implementation detail of the mock SCM and not a storage format to depend on. Has " +
+                    "no effect unless `enabled` is set."
+        )
+        var persistent: Boolean = false
     }
 
     class SCMCatalogConfigProperties {

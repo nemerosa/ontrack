@@ -63,6 +63,15 @@ which for the demo means an environment variable in its Helm values:
 | **Simulated gate** node executor (`executorId: mock`), which the CANARY promotion workflow is built on | `ontrack.config.extension.workflows.mock.enabled` | `ONTRACK_CONFIG_EXTENSION_WORKFLOWS_MOCK_ENABLED` |
 | **Mock SCM**, which the change log on `petclinic` is read from | `ontrack.config.extension.scm.mock.enabled` | `ONTRACK_CONFIG_EXTENSION_SCM_MOCK_ENABLED` |
 
+A third one is optional, and only on a long-lived instance:
+
+| Feature | Property | Helm value |
+|---------|----------|------------|
+| **Persistent mock SCM**, which keeps the seeded commits across a backend restart | `ontrack.config.extension.scm.mock.persistent` | `ONTRACK_CONFIG_EXTENSION_SCM_MOCK_PERSISTENT` |
+
+Without it the reset still works; what is lost is everything between one reset and the next
+restart — see [the change log](#the-change-log) below.
+
 Without the first, the reset fails partway through, after the deletions, with
 `Workflow node executor ID "mock" not found`. Without the second it fails the same way,
 when the seed posts the demo's commits to an endpoint that is not there. The dataset
@@ -99,15 +108,18 @@ none, so a project writing subjects any other way demonstrates an empty semantic
 is why the change log is not on the `yontrack` project, whose subjects come from this
 repository's own history and are overwhelmingly `#1234 Some message`.
 
-**The demo's change log is in memory and does not survive a backend restart.**
-`MockSCMExtension` keeps its repositories in a `mutableMapOf` on the bean. The demo resets on
-every deployment, but a pod restart in between leaves the project pointing at a repository the
-mock SCM no longer has. The build commit properties are in the database and survive, so the
-change log is not empty — it **fails**, with `Repository petclinic not found`, and so do the
-commit and issue info panels, until the next reset. The same applies locally:
-`scripts/dev-stack.sh restart backend` loses whatever the seed registered. This is accepted
-deliberately, for the reason above; a persistent mock SCM is filed separately as
-[#1701](https://github.com/yontrack/yontrack/issues/1701).
+**The demo's change log survives a backend restart only where the mock SCM is persistent.**
+`MockSCMExtension` keeps its repositories in a `mutableMapOf` on the bean, and unless
+`ontrack.config.extension.scm.mock.persistent` is set it keeps nothing else: a pod restart
+between two resets then leaves the project pointing at a repository the mock SCM no longer
+has. The build commit properties are in the database and survive, so the change log is not
+empty — it **fails**, with `Repository petclinic not found`, and so do the commit and issue
+info panels, until the next reset. Setting the property makes the mock SCM write each
+repository to the generic storage as it changes and read them back on start, which is what a
+demonstration instance wants; the local dev stack sets it already, so
+`scripts/dev-stack.sh restart backend` keeps whatever the seed registered. What it writes is
+an implementation detail of the mock SCM, not a storage format to depend on: it is there so
+that a demo does not go blank, and a future version is free to ignore whatever it finds.
 
 Because those repositories outlive the projects the reset deletes, the seed **empties the
 repository** before registering anything in it. Commit ids are derived from the branch and the
@@ -180,8 +192,9 @@ server involved.
 - **Another account's private dashboards survive.** The reset deletes every dashboard the
   seeding account can see: the shared ones and its own. Yontrack does not expose anyone
   else's private dashboards, so those are out of reach.
-- **The change log does not survive a backend restart.** See above: the mock SCM holds its
-  commits in memory, and the change log fails rather than reads empty once they are gone.
+- **The change log does not survive a backend restart unless the mock SCM is persistent.**
+  See above: without `ontrack.config.extension.scm.mock.persistent` the mock SCM holds its
+  commits in memory only, and the change log fails rather than reads empty once they are gone.
 - **Commits are not backdated.** The mock SCM stamps a commit with the time it is registered
   and its REST endpoint takes no time, so a change log between two builds dated a week apart
   shows commits dated within the same second of the reset. The same limitation as validation

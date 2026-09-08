@@ -346,6 +346,10 @@ ds_backend_up() {
     fi
     ds_kill_tier "$DS_BACKEND_PID" "backend" "$DS_PORT_APP" "$DS_PORT_MGMT"
 
+    # ONTRACK_CONFIG_EXTENSION_SCM_MOCK_PERSISTENT is set here rather than in the "dev"
+    # profile because the acceptance tests run on that same profile, create their mock SCM
+    # data inside the test, and would only pay for the writes. Here it means that a
+    # "restart backend" after a Kotlin change keeps whatever was seeded.
     ds_spawn "$DS_BACKEND_PID" "$DS_BACKEND_LOG" \
         env \
             SPRING_PROFILES_ACTIVE=dev \
@@ -361,6 +365,7 @@ ds_backend_up() {
             ONTRACK_CONFIG_SEARCH_INDEX_IMMEDIATE=true \
             ONTRACK_CONFIG_TEMPLATING_ERRORS=LOGGING_STACK \
             ONTRACK_EXTENSION_JIRA_CLIENT_TYPE=mock \
+            ONTRACK_CONFIG_EXTENSION_SCM_MOCK_PERSISTENT=true \
         "$DS_TOPLEVEL/gradlew" -p "$DS_TOPLEVEL" --no-daemon :ontrack-ui:bootRun
 
     ds_log "starting (first run compiles, this can take a few minutes)"

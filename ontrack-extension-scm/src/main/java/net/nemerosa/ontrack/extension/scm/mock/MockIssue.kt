@@ -10,6 +10,12 @@ data class MockIssue(
     override val key: String,
     val message: String,
     val types: Set<String>? = null,
+    /**
+     * Defaults to the time the issue is registered, and is a parameter only so that a
+     * repository restored from a [MockRepositoryData] keeps the times it was registered with
+     * instead of dating every issue from the restart.
+     */
+    override val updateTime: LocalDateTime = Time.now(),
 ) : Issue {
 
     val commits = mutableListOf<String>()
@@ -23,5 +29,4 @@ data class MockIssue(
     override val summary: String = message
     override val url: String = "mock://$repositoryName/issue/$key"
     override val status: IssueStatus = MockIssueStatus(name = "open")
-    override val updateTime: LocalDateTime = Time.now()
 }
