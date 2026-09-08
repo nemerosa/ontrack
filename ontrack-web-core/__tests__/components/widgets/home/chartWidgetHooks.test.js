@@ -69,6 +69,38 @@ describe.each([
         }
     })
 
+    it('does not report the new target as missing while it loads after a reconfiguration', async () => {
+        // A not-found widget gets pointed at an existing target: the previous answer must not
+        // stick to the new names while the new query is in flight
+        respondWith({[field]: null})
+        const {result, rerender} = renderHook(({name}) => useTarget("petclinic", "main", name), {
+            initialProps: {name: "GOLD"},
+        })
+        await waitFor(() => expect(result.current.notFound).toBe(true))
+        global.fetch = jest.fn(() => new Promise(() => {
+        }))
+        rerender({name: "SILVER"})
+        await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+        expect(result.current.notFound).toBe(false)
+        expect(result.current[key]).toBeNull()
+    })
+
+    it('exposes the error of a failed query', async () => {
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {
+        })
+        try {
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: false, status: 500,
+                json: async () => ({error: {response: {errors: [{message: "Boom"}]}}}),
+            })
+            const {result} = renderTarget("petclinic", "main", "GOLD")
+            await waitFor(() => expect(result.current.error).toBe("Boom"))
+            expect(result.current.notFound).toBe(false)
+        } finally {
+            consoleError.mockRestore()
+        }
+    })
+
     it('stays idle while the configuration is incomplete', () => {
         respondWith({[field]: target})
         const {result} = renderTarget("petclinic", "main", undefined)

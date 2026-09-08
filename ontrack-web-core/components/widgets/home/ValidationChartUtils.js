@@ -5,10 +5,10 @@ import {useQuery} from "@components/services/GraphQL";
  * Resolves the validation stamp a chart widget is configured with, by name.
  *
  * Same contract as `usePromotionLevel`: the loaded object or `null`, and `notFound` once the query
- * has answered with nothing. A failed query is neither.
+ * has answered with nothing. A failed query is neither, and comes back as `error`.
  */
 export const useValidationStampByName = (project, branch, validationStamp) => {
-    const {data, error, finished} = useQuery(
+    const {data, error, loading, finished} = useQuery(
         gql`
             query GetValidationStampByName(
                 $project: String!,
@@ -42,6 +42,9 @@ export const useValidationStampByName = (project, branch, validationStamp) => {
     )
     return {
         validationStampObject: data,
-        notFound: finished && !error && !data,
+        error,
+        // `finished` stays on from a previous answer when the configuration changes: the flag is
+        // held back while the new query loads, so that a stale answer is never pinned on new names
+        notFound: finished && !loading && !error && !data,
     }
 }

@@ -3,6 +3,7 @@ import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidget
 import {useValidationStampByName} from "@components/widgets/home/ValidationChartUtils";
 import ValidationChartTitle from "@components/widgets/home/ValidationChartTitle";
 import ChartTargetNotFound from "@components/widgets/home/ChartTargetNotFound";
+import ChartTargetError from "@components/widgets/home/ChartTargetError";
 
 /**
  * The frame shared by the two validation chart widgets: stability and metrics.
@@ -25,7 +26,7 @@ export default function ValidationChartWidget({
 
     const {setTitle} = useContext(DashboardWidgetCellContext)
 
-    const {validationStampObject, notFound} = useValidationStampByName(project, branch, validationStamp)
+    const {validationStampObject, notFound, error} = useValidationStampByName(project, branch, validationStamp)
 
     useEffect(() => {
         setTitle(
@@ -51,6 +52,10 @@ export default function ValidationChartWidget({
                     interval={interval}
                     period={period}
                 />
+            }
+            {
+                error &&
+                <ChartTargetError error={error}/>
             }
             {
                 notFound &&

@@ -141,6 +141,14 @@ describe('PromotionLeadTimeChartWidget', () => {
         expect(screen.getByRole('alert')).toHaveTextContent('Edit the dashboard to reconfigure this widget.')
     })
 
+    it('shows the error of a failed query instead of an empty body', () => {
+        mockUsePromotionLevel.mockReturnValue({promotionLevelObject: null, notFound: false, error: "Boom"})
+        const {body, title} = renderWidget(<PromotionLeadTimeChartWidget {...promotionProps}/>)
+        expect(title.container).not.toHaveTextContent('(not found)')
+        expect(body.container.querySelector('[data-testid="chart"]')).toBeNull()
+        expect(screen.getByRole('alert')).toHaveTextContent('Boom')
+    })
+
     it('keeps the chart options in the title in every state', () => {
         mockUsePromotionLevel.mockReturnValue({promotionLevelObject: null, notFound: true})
         const {title} = renderWidget(<PromotionLeadTimeChartWidget {...promotionProps}/>)
@@ -149,18 +157,40 @@ describe('PromotionLeadTimeChartWidget', () => {
 })
 
 describe.each([
-    ['PromotionFrequencyChartWidget', PromotionFrequencyChartWidget, mockUsePromotionLevel, 'promotionLevelObject', promotionProps, 'Frequency of', 'Promotion level GOLD'],
-    ['PromotionStabilityChartWidget', PromotionStabilityChartWidget, mockUsePromotionLevel, 'promotionLevelObject', promotionProps, 'Stability of', 'Promotion level GOLD'],
-    ['PromotionTTRChartWidget', PromotionTTRChartWidget, mockUsePromotionLevel, 'promotionLevelObject', promotionProps, 'TTR to', 'Promotion level GOLD'],
-    ['ValidationStabilityChartWidget', ValidationStabilityChartWidget, mockUseValidationStampByName, 'validationStampObject', validationProps, 'Stability of', 'Validation stamp UNIT.TESTS'],
-    ['ValidationMetricsChartWidget', ValidationMetricsChartWidget, mockUseValidationStampByName, 'validationStampObject', validationProps, 'Metrics of', 'Validation stamp UNIT.TESTS'],
-])('%s', (_, Widget, mockHook, key, props, prefix, missing) => {
+    {
+        widget: 'PromotionFrequencyChartWidget', Widget: PromotionFrequencyChartWidget,
+        mockHook: mockUsePromotionLevel, key: 'promotionLevelObject', props: promotionProps,
+        prefix: 'Frequency of', entity: 'Promotion level', name: 'GOLD',
+    },
+    {
+        widget: 'PromotionStabilityChartWidget', Widget: PromotionStabilityChartWidget,
+        mockHook: mockUsePromotionLevel, key: 'promotionLevelObject', props: promotionProps,
+        prefix: 'Stability of', entity: 'Promotion level', name: 'GOLD',
+    },
+    {
+        widget: 'PromotionTTRChartWidget', Widget: PromotionTTRChartWidget,
+        mockHook: mockUsePromotionLevel, key: 'promotionLevelObject', props: promotionProps,
+        prefix: 'TTR to', entity: 'Promotion level', name: 'GOLD',
+    },
+    {
+        widget: 'ValidationStabilityChartWidget', Widget: ValidationStabilityChartWidget,
+        mockHook: mockUseValidationStampByName, key: 'validationStampObject', props: validationProps,
+        prefix: 'Stability of', entity: 'Validation stamp', name: 'UNIT.TESTS',
+    },
+    {
+        widget: 'ValidationMetricsChartWidget', Widget: ValidationMetricsChartWidget,
+        mockHook: mockUseValidationStampByName, key: 'validationStampObject', props: validationProps,
+        prefix: 'Metrics of', entity: 'Validation stamp', name: 'UNIT.TESTS',
+    },
+])('$widget', ({Widget, mockHook, key, props, prefix, entity, name}) => {
 
     it('names the configured target while it is loading', () => {
         mockHook.mockReturnValue({[key]: null, notFound: false})
         const {title} = renderWidget(<Widget {...props}/>)
         expect(title).not.toBeNull()
-        expect(title.container).toHaveTextContent(new RegExp(`${prefix}\\s*${missing.split(' ')[2].replace('.', '\\.')}\\s*on\\s*main@petclinic`))
+        // The title pieces are laid out by an antd `Space`, with no whitespace between them
+        const escaped = name.replace('.', '\\.')
+        expect(title.container).toHaveTextContent(new RegExp(`${prefix}\\s*${escaped}\\s*on\\s*main@petclinic`))
         expect(title.container).not.toHaveTextContent('(not found)')
     })
 
@@ -170,7 +200,7 @@ describe.each([
         expect(title.container).toHaveTextContent('(not found)')
         expect(body.container.querySelector('[data-testid="chart"]')).toBeNull()
         expect(screen.getByRole('alert')).toHaveTextContent(
-            `${missing} does not exist on branch main of project petclinic.`
+            `${entity} ${name} does not exist on branch main of project petclinic.`
         )
     })
 })

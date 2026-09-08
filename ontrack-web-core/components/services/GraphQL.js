@@ -31,8 +31,12 @@ export const useQuery = (query, {
                     }
                 })
                 .finally(() => {
-                    setFinished(true)
-                    setLoading(false)
+                    // A request aborted by a change of the deps has been superseded: the new one
+                    // owns the loading state, and its answer is the one which finishes
+                    if (!controller.signal.aborted) {
+                        setFinished(true)
+                        setLoading(false)
+                    }
                 })
         }
         return () => {

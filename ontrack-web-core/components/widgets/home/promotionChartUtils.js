@@ -7,13 +7,14 @@ import {useQuery} from "@components/services/GraphQL";
  * Returns the loaded object as `promotionLevelObject`, `null` until the query has answered, and
  * `notFound` once it has answered with nothing: the configured project, branch or promotion level
  * does not exist (any more), or is not visible to the user. A failed query is neither loaded nor
- * not found, so that a network error is never reported as a deleted entity.
+ * not found - its message is returned as `error` - so that a network error is never reported as a
+ * deleted entity.
  *
  * The shape is shared with `useValidationStampByName`, so that the widgets tell the three states
  * apart the same way on both families (#1694).
  */
 export const usePromotionLevel = (project, branch, promotionLevel) => {
-    const {data, error, finished} = useQuery(
+    const {data, error, loading, finished} = useQuery(
         gql`
             query GetPromotionLevelByName(
                 $project: String!,
@@ -47,6 +48,9 @@ export const usePromotionLevel = (project, branch, promotionLevel) => {
     )
     return {
         promotionLevelObject: data,
-        notFound: finished && !error && !data,
+        error,
+        // `finished` stays on from a previous answer when the configuration changes: the flag is
+        // held back while the new query loads, so that a stale answer is never pinned on new names
+        notFound: finished && !loading && !error && !data,
     }
 }

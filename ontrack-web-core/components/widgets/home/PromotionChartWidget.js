@@ -3,6 +3,7 @@ import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidget
 import {usePromotionLevel} from "@components/widgets/home/promotionChartUtils";
 import PromotionChartTitle from "@components/widgets/home/PromotionChartTitle";
 import ChartTargetNotFound from "@components/widgets/home/ChartTargetNotFound";
+import ChartTargetError from "@components/widgets/home/ChartTargetError";
 
 /**
  * The frame shared by the four promotion chart widgets: lead time, frequency, stability and TTR.
@@ -27,7 +28,7 @@ export default function PromotionChartWidget({
 
     const {setTitle} = useContext(DashboardWidgetCellContext)
 
-    const {promotionLevelObject, notFound} = usePromotionLevel(project, branch, promotionLevel)
+    const {promotionLevelObject, notFound, error} = usePromotionLevel(project, branch, promotionLevel)
 
     useEffect(() => {
         setTitle(
@@ -53,6 +54,10 @@ export default function PromotionChartWidget({
                     interval={interval}
                     period={period}
                 />
+            }
+            {
+                error &&
+                <ChartTargetError error={error}/>
             }
             {
                 notFound &&

@@ -8,6 +8,7 @@ import ProjectLink from "@components/projects/ProjectLink";
 import BranchLink from "@components/branches/BranchLink";
 import E2ELeadTimeChart from "@components/promotionLevels/E2ELeadTimeChart";
 import ChartTargetNotFound from "@components/widgets/home/ChartTargetNotFound";
+import ChartTargetError from "@components/widgets/home/ChartTargetError";
 
 /**
  * One end of the end-to-end lead time title: `project/branch/PROMOTION`, linked once the promotion
@@ -91,6 +92,10 @@ export default function E2ELeadTimeChartWidget({
                     interval={interval}
                     period={period}
                 />
+            }
+            {
+                (source.error || target.error) &&
+                <ChartTargetError error={source.error || target.error}/>
             }
             {
                 source.notFound &&
