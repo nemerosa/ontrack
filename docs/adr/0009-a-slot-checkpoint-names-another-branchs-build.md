@@ -43,6 +43,14 @@ cannot get there from here" is the whole answer, and a build sitting beside it w
 it. Omitting such a slot altogether was rejected for the same reason the empty checkpoint was:
 someone would be left wondering why production is missing.
 
+An unreachable slot **keeps its edges**. A `requires` line still runs into it from the promotion
+level and from the slot its admission rules name, so the map draws a path to a checkpoint which
+says you cannot get there. That reads as a contradiction for about a second and then as the truth:
+the edges are the shape of the slot's configuration, which is real and unchanged, and the marking
+is what this particular branch is told about it. Dropping them was considered and rejected because
+it makes the two failure modes identical - a slot nobody wired up and a slot this branch is shut
+out of would both hang unconnected, and the first of those is the thing the map exists to surface.
+
 The ordering of the two halves of the map does not match, and is not made to. A slot's build is
 the most recently *deployed* one, ordered by pipeline number within the slot; a promotion level's
 and a validation stamp's is the *highest build*, ordered by build id. They usually agree, and

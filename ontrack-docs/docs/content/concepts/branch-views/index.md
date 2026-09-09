@@ -130,15 +130,15 @@ through on its way to an environment, and what depends on what*.
 
 ![The Delivery map view of a branch](branch-delivery-map-view.png)
 
-It is **configuration with progress painted onto it**, not a history. Every node is something a
-build has to reach - a checkpoint - and every line between two of them is a dependency someone
+It is **configuration with progress painted onto it**, not a history. Every checkpoint on it is
+something a build has to reach, and every line between two of them is a dependency someone
 configured. Nothing on it is inferred from what has happened; a map with no lines is a project
 whose promotion and deployment rules have not been written down, not a project with no history.
 
 ### Checkpoints
 
-A *checkpoint* is one node of the map. There are three kinds, and each one names the latest build
-to have **arrived** at it and when.
+A *checkpoint* is one of the things the map is made of. There are three kinds, and each one names
+the latest build to have **arrived** at it and when.
 
 | Checkpoint       | Arrived at by            | The build it names                                    |
 |------------------|--------------------------|-------------------------------------------------------|
@@ -153,8 +153,9 @@ Every promotion level of the branch is on the map, connected or not - a level wi
 behind it is exactly the thing you want to see. Validation stamps are the opposite: only the ones
 taking part in a dependency are drawn, because an unconnected stamp teaches nothing on a map whose
 subject is dependencies, and a branch with forty of them would have no readable layout. A promotion
-whose [auto promotion](../model/auto-promotion.md) selects stamps *by pattern* gets a single node
-labelled with the pattern, standing for all of them; click it to see the stamps it covers.
+whose [auto promotion](../model/auto-promotion.md) selects stamps *by pattern* gets one
+*aggregate checkpoint* labelled with the pattern, standing for all of them; click it to see the
+stamps it covers.
 
 ### Dependencies
 
@@ -217,13 +218,13 @@ cannot reach production at all.
 
 The map obeys the validation stamp filter, which sits above the view switch like every other filter
 and follows you from one view to the next. The filter touches validation stamps only: hiding a
-promotion level or a slot because of a *validation* filter would be a different claim entirely. A
-pattern node disappears when the filter leaves it standing for nothing, and any line left with a
-missing end goes with it.
+promotion level or a slot because of a *validation* filter would be a different claim entirely. An
+aggregate checkpoint disappears when the filter leaves it standing for nothing, and any line left
+with a missing end goes with it.
 
-Nodes can be dragged about; nothing on the map can be edited from it. It is a reading of the
+Checkpoints can be dragged about; nothing on the map can be edited from it. It is a reading of the
 configuration, and the configuration is changed where it lives - on the promotion level, on the
-branch, or on the slot the node links to.
+branch, or on the slot the checkpoint links to.
 
 ## Not to be confused with
 

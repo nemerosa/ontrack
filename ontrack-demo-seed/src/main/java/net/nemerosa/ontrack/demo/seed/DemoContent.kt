@@ -524,7 +524,7 @@ object DemoContent {
                     admissionRules = listOf(
                         SlotAdmissionRuleSpec(
                             name = "silver",
-                            ruleId = "promotion",
+                            ruleId = SlotAdmissionRules.PROMOTION,
                             config = mapOf("promotion" to SILVER),
                         ),
                     ),
@@ -543,7 +543,7 @@ object DemoContent {
                     admissionRules = listOf(
                         SlotAdmissionRuleSpec(
                             name = "gold",
-                            ruleId = "promotion",
+                            ruleId = SlotAdmissionRules.PROMOTION,
                             config = mapOf("promotion" to GOLD),
                         ),
                         // What draws the staging to production edge on the delivery map.
@@ -551,14 +551,14 @@ object DemoContent {
                         // their environments.
                         SlotAdmissionRuleSpec(
                             name = "staging",
-                            ruleId = "environment",
+                            ruleId = SlotAdmissionRules.ENVIRONMENT,
                             config = mapOf("environmentName" to STAGING, "qualifier" to ""),
                         ),
                         // Releases go out from `main` only, which is what makes production
                         // unreachable from the maintenance branch.
                         SlotAdmissionRuleSpec(
                             name = "mainOnly",
-                            ruleId = "branchPattern",
+                            ruleId = SlotAdmissionRules.BRANCH_PATTERN,
                             config = mapOf("includes" to listOf(MAIN)),
                         ),
                     ),

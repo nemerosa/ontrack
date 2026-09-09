@@ -63,6 +63,11 @@ class SlotDeliveryMapContributor(
                 // A stored rule configuration which no longer parses costs its own rule and nothing
                 // else. Letting it out would cost every slot of the project, since the map isolates
                 // a failing contributor as a whole and this contributor draws them all.
+                //
+                // Only the rule reading is guarded, and the queries below deliberately are not. A
+                // configuration whose shape has drifted is a fault in one row; a query that throws
+                // is a fault in the instance, and swallowing that one would draw a slot saying
+                // "never deployed" when the truth is that nobody could look.
                 try {
                     when (config.ruleId) {
                         PromotionSlotAdmissionRule.ID ->

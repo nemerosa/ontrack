@@ -308,18 +308,18 @@ class InMemoryDemoTarget(
         private fun check(rule: SlotAdmissionRuleSpec, build: InMemoryBuild) {
             val where = "${environment.name}/${project.name}"
             when (rule.ruleId) {
-                "promotion" -> {
+                SlotAdmissionRules.PROMOTION -> {
                     val promotion = rule.config["promotion"] as? String
                     require(promotion != null && build.promotions.any { it.first == promotion }) {
                         "$where only admits builds promoted to $promotion, and ${build.name} is not."
                     }
                 }
 
-                "branchPattern" -> require(branchIncluded(build.branch.name, rule.config)) {
+                SlotAdmissionRules.BRANCH_PATTERN -> require(branchIncludedByPattern(build.branch.name, rule.config)) {
                     "$where admits no build of ${build.branch.name}, and ${build.name} is one."
                 }
 
-                "environment" -> {
+                SlotAdmissionRules.ENVIRONMENT -> {
                     val previousName = rule.config["environmentName"] as? String
                     val previous = environments.find { it.name == previousName }
                         ?.slots?.find { it.project == project }
@@ -368,33 +368,11 @@ class InMemoryDemoTarget(
          */
         private val NAME = Regex("[A-Za-z0-9._-]+")
 
-        /**
-         * What a configured admission rule may be named - `SlotAdmissionRuleConfig.PATTERN`
-         * on the server side.
-         */
-        private val ADMISSION_RULE_NAME = Regex("[a-zA-Z][a-zA-Z0-9-]*")
-
         private fun checkName(name: String, what: String) {
             require(NAME.matches(name)) {
                 "$what name \"$name\" can only have letters, digits, dots, dashes or underscores."
             }
         }
 
-        /**
-         * `FilterHelper.includes` on the server side: whole-string, case-insensitive regular
-         * expressions.
-         */
-        private fun branchIncluded(branch: String, config: Map<String, Any>): Boolean {
-            @Suppress("UNCHECKED_CAST")
-            val includes = config["includes"] as? List<String> ?: emptyList()
-
-            @Suppress("UNCHECKED_CAST")
-            val excludes = config["excludes"] as? List<String> ?: emptyList()
-
-            fun matches(patterns: List<String>) = patterns.any {
-                it.toRegex(RegexOption.IGNORE_CASE).matches(branch)
-            }
-            return matches(includes) && !matches(excludes)
-        }
     }
 }

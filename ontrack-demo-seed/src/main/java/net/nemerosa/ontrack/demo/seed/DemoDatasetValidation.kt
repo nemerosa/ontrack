@@ -151,14 +151,14 @@ fun DemoDataset.validate() {
                 val build = builds.getValue(ref)
                 slot.admissionRules.forEach { rule ->
                     val required = rule.config["promotion"] as? String
-                    if (rule.ruleId == "promotion" && required != null &&
+                    if (rule.ruleId == SlotAdmissionRules.PROMOTION && required != null &&
                         required !in build.promotionLevels
                     ) {
                         problems += "The ${deployment.environment}/${ref.project} slot only admits " +
                                 "builds promoted to $required, and ${ref.build} of ${ref.branch} " +
                                 "is not."
                     }
-                    if (rule.ruleId == "branchPattern" && !branchIncluded(ref.branch, rule.config)) {
+                    if (rule.ruleId == SlotAdmissionRules.BRANCH_PATTERN && !branchIncludedByPattern(ref.branch, rule.config)) {
                         problems += "The ${deployment.environment}/${ref.project} slot admits no " +
                                 "build of ${ref.branch}, and ${ref.build} is one."
                     }
@@ -172,28 +172,6 @@ fun DemoDataset.validate() {
                 problems.joinToString("\n") { "- $it" }
     }
 }
-
-/**
- * The dataset's reading of a `branchPattern` admission rule - `FilterHelper.includes` on the
- * server side, whose patterns are whole-string, case-insensitive regular expressions.
- */
-private fun branchIncluded(branch: String, config: Map<String, Any>): Boolean {
-    @Suppress("UNCHECKED_CAST")
-    val includes = config["includes"] as? List<String> ?: emptyList()
-
-    @Suppress("UNCHECKED_CAST")
-    val excludes = config["excludes"] as? List<String> ?: emptyList()
-    fun matches(patterns: List<String>) = patterns.any {
-        it.toRegex(RegexOption.IGNORE_CASE).matches(branch)
-    }
-    return matches(includes) && !matches(excludes)
-}
-
-/**
- * What a configured admission rule may be named - `SlotAdmissionRuleConfig.PATTERN` on the
- * server side.
- */
-private val ADMISSION_RULE_NAME = Regex("[a-zA-Z][a-zA-Z0-9-]*")
 
 /**
  * What Yontrack accepts as an entity name — `NameDescription.NAME` on the server side.
