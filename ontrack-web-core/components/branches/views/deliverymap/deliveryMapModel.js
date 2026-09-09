@@ -33,25 +33,59 @@ export function toFlowNodes(checkpoints = []) {
 }
 
 /**
+ * How wide a line is drawn, and how big its arrowhead is.
+ *
+ * Which end an edge points at IS the content of a dependency, so the arrowhead is not decoration and
+ * is sized to be seen. React Flow's own defaults - a hairline and a 16px marker in its default grey -
+ * left the head all but invisible against the line (#1717).
+ */
+const EDGE_STROKE_WIDTH = 1.5
+const EDGE_MARKER_SIZE = 22
+
+/**
  * Builds the React Flow edges of a list of delivery map edges.
  *
  * The two kinds are drawn differently and not only labelled differently: `unlocks` acts, so it is a
  * solid line, while `requires` only constrains, so it is dashed. Colour is never the only carrier
- * here either - the dash pattern survives greyscale, and each edge is labelled in words.
+ * here - the dash pattern survives greyscale, and each edge is labelled in words. That is also why
+ * making the arrows more visible could not be done by colouring the two kinds differently.
+ *
+ * The label is read ALONG the arrow, and every edge runs from the prerequisite to whatever depends
+ * on it. So the `REQUIRES` edge is labelled "required by": read from its source, `SILVER requires
+ * GOLD` says the opposite of what the edge means, while `SILVER required by GOLD` says it. The edge
+ * *kind* is still **Requires**, which is the word `CONTEXT.md` fixes for it - this is that word
+ * rendered for the direction it is read in, not a second term.
+ *
+ * Reversing the arrow instead was the alternative and is worse: the direction is what elk lays the
+ * map out along, so a reversed `requires` edge would put GOLD to the left of SILVER and the map
+ * would stop reading left to right as a journey.
+ *
+ * @param edges The map's edges, as the server sent them
+ * @param color What to draw the lines and their arrowheads in. It has to come from the caller: the
+ * map is drawn in both light and dark mode, and this is a pure function with no theme to read.
+ * Omitted, React Flow's own default colour applies, which is why nothing here breaks without it.
  */
-export function toFlowEdges(edges = []) {
+export function toFlowEdges(edges = [], {color} = {}) {
     return edges.map(edge => ({
         id: edge.id,
         source: edge.source,
         target: edge.target,
         type: 'smoothstep',
-        label: edge.kind === 'REQUIRES' ? "requires" : "unlocks",
+        label: edge.kind === 'REQUIRES' ? "required by" : "unlocks",
         animated: false,
-        style: edge.kind === 'REQUIRES' ? {strokeDasharray: '6 4'} : undefined,
+        style: {
+            stroke: color,
+            strokeWidth: EDGE_STROKE_WIDTH,
+            // Dashed for `requires` only: it constrains where `unlocks` acts
+            strokeDasharray: edge.kind === 'REQUIRES' ? '6 4' : undefined,
+        },
         markerEnd: {
             type: MarkerType.ArrowClosed,
-            width: 16,
-            height: 16,
+            width: EDGE_MARKER_SIZE,
+            height: EDGE_MARKER_SIZE,
+            // The same colour as the line it ends: an arrowhead in a different shade reads as a
+            // separate mark rather than as the end of that line.
+            color,
         },
         data: {kind: edge.kind},
     }))

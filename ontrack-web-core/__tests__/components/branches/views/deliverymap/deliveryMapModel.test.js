@@ -68,19 +68,36 @@ describe('delivery map model', () => {
             expect(edge.target).toBe('promotion-level:12')
         })
 
-        it('labels each edge in words', () => {
+        it('labels each edge in words, read along the arrow', () => {
+            // Every edge runs from the prerequisite to what depends on it, and the label sits on the
+            // arrow, so it has to be true read from the SOURCE. "requires" is only true read the
+            // other way: `SILVER requires GOLD` says the opposite of what the edge means.
             expect(toFlowEdges([unlocks])[0].label).toBe("unlocks")
-            expect(toFlowEdges([requires])[0].label).toBe("requires")
+            expect(toFlowEdges([requires])[0].label).toBe("required by")
         })
 
         it('draws a requires edge dashed, because it constrains rather than acts', () => {
             // The dash survives greyscale, so the distinction does not rest on the label alone
             expect(toFlowEdges([requires])[0].style.strokeDasharray).toBeTruthy()
-            expect(toFlowEdges([unlocks])[0].style).toBeUndefined()
+            expect(toFlowEdges([unlocks])[0].style.strokeDasharray).toBeUndefined()
         })
 
-        it('points every edge at its target', () => {
-            expect(toFlowEdges([unlocks])[0].markerEnd).toBeTruthy()
+        it('points every edge at its target, in the colour it was given', () => {
+            const edge = toFlowEdges([unlocks], {color: '#123456'})[0]
+            expect(edge.markerEnd.color).toBe('#123456')
+            expect(edge.style.stroke).toBe('#123456')
+        })
+
+        it('draws the arrowhead and the line in one colour, so the arrow is part of the line', () => {
+            const [unlocksEdge, requiresEdge] = toFlowEdges([unlocks, requires], {color: '#123456'})
+            expect(unlocksEdge.markerEnd.color).toBe(unlocksEdge.style.stroke)
+            expect(requiresEdge.markerEnd.color).toBe(requiresEdge.style.stroke)
+        })
+
+        it('still draws without a colour, because the caller may have no theme to hand', () => {
+            const edge = toFlowEdges([unlocks])[0]
+            expect(edge.markerEnd).toBeTruthy()
+            expect(edge.style.strokeWidth).toBeTruthy()
         })
 
         it('maps nothing when there is nothing', () => {

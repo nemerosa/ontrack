@@ -163,10 +163,13 @@ stamps it covers.
 Lines run from the prerequisite to the thing that depends on it, and come in two kinds, drawn
 differently:
 
-| Kind         | Means                                                    | Comes from                                        |
-|--------------|-----------------------------------------------------------|---------------------------------------------------|
-| **unlocks**  | reaching the source grants the target by itself           | auto promotion                                    |
-| **requires** | the target cannot be reached until the source has been    | promotion dependencies, slot admission rules      |
+| Kind         | Means                                                    | Labelled  | Comes from                                   |
+|--------------|-----------------------------------------------------------|-----------|----------------------------------------------|
+| **unlocks**  | reaching the source grants the target by itself           | *unlocks* | auto promotion                               |
+| **requires** | the target cannot be reached until the source has been    | *required by* | promotion dependencies, slot admission rules |
+
+The label on a line is read **along the arrow**, which is why the second one reads *required by*
+rather than *requires*: `SILVER required by GOLD` is the line `GOLD requires SILVER` draws.
 
 The distinction matters because the two are configured in ways with opposite effects. Auto
 promotion *acts*: pass the validations and the promotion happens. A promotion dependency or an
