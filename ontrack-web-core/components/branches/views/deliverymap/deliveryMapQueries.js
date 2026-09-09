@@ -24,9 +24,7 @@ const gqlDeliveryMapCheckpoint = gql`
                 name
                 displayName
                 releaseProperty {
-                    value {
-                        name
-                    }
+                    value
                 }
             }
             time
