@@ -1,4 +1,4 @@
-import {useContext} from "react";
+import {useContext, useMemo} from "react";
 import {Space, Typography} from "antd";
 import {useQuery} from "@components/services/GraphQL";
 import CloseableAlert from "@components/common/CloseableAlert";
@@ -41,8 +41,16 @@ export default function DeliveryMapContentView({branch}) {
 
     // Derived from what is already in hand, not stored: a `useState` filled by an effect would leave
     // the graph laid out against an empty map for one render, and React Flow syncs its own layout
-    // against whatever it is given at that moment
-    const map = applyValidationStampFilter(data, vsfContext.selectedFilter)
+    // against whatever it is given at that moment.
+    //
+    // Memoised because the graph re-runs the elk layout whenever this changes IDENTITY, and
+    // narrowing by a filter builds a new object every time it is called. Without the memo, any
+    // re-render of this component while a filter is selected - starting inline edition of that
+    // filter, say - would reshuffle the whole map and throw away any node the user had dragged.
+    const map = useMemo(
+        () => applyValidationStampFilter(data, vsfContext.selectedFilter),
+        [data, vsfContext.selectedFilter],
+    )
 
     return (
         <Space direction="vertical" size={16} className="ot-line">

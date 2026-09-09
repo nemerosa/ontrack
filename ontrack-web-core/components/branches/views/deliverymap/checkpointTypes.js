@@ -19,8 +19,9 @@ import UnknownCheckpoint from "@components/branches/views/deliverymap/checkpoint
  * * `width` / `height` — what the layout reserves for a node of this kind, in pixels
  *
  * Sizes belong to the kind rather than to the node because elk needs them BEFORE anything is
- * rendered: an aggregate is taller than a promotion level whether or not it is expanded, and a
- * layout computed against one size and drawn at another overlaps.
+ * rendered, and a layout computed against one size and drawn at another overlaps. That is also why
+ * no checkpoint may grow after it is laid out: the aggregate shows its members in a popover, drawn
+ * outside the flow, rather than by growing to fit them.
  */
 export const checkpointTypes = {
     'promotion-level': {

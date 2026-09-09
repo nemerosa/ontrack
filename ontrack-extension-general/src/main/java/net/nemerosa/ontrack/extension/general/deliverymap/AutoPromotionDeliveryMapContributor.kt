@@ -33,6 +33,16 @@ class AutoPromotionDeliveryMapContributor(
         val checkpoints = mutableListOf<DeliveryMapCheckpoint>()
         val edges = mutableListOf<DeliveryMapEdge>()
 
+        // Building a validation stamp checkpoint costs a query for its latest run, and the same
+        // stamp is routinely selected by several promotion levels - by name for one and by pattern
+        // for another. Without this, a branch with forty stamps and four promotions each including
+        // ".*" runs a hundred and sixty of those queries to answer forty questions, and
+        // `DeliveryMapServiceImpl` then throws a hundred and twenty of the results away when it
+        // dedups by id. The cache is local to the call, so nothing is ever served stale.
+        val stampCheckpoints = mutableMapOf<ID, DeliveryMapCheckpoint>()
+        fun stampCheckpoint(validationStamp: ValidationStamp) =
+            stampCheckpoints.getOrPut(validationStamp.id) { checkpointFactory.validationStamp(validationStamp) }
+
         promotionLevels.forEach { promotionLevel ->
             val property = propertyService.getPropertyValue(promotionLevel, AutoPromotionPropertyType::class.java)
                 ?: return@forEach
@@ -57,7 +67,7 @@ class AutoPromotionDeliveryMapContributor(
             val (named, byPattern) = selected.partition { property.containsDirectValidationStamp(it) }
 
             named.forEach { validationStamp ->
-                checkpoints += checkpointFactory.validationStamp(validationStamp)
+                checkpoints += stampCheckpoint(validationStamp)
                 edges += DeliveryMapEdge.of(
                     kind = DeliveryMapEdgeKind.UNLOCKS,
                     source = DeliveryMapCheckpointTypes.validationStamp(validationStamp.id),
@@ -71,7 +81,7 @@ class AutoPromotionDeliveryMapContributor(
             // collapse into a single checkpoint labelled with the pattern, which is also the truer
             // reading of the configuration - everything matching this, not these forty things.
             if (byPattern.isNotEmpty()) {
-                val aggregate = aggregate(promotionLevel, property, byPattern)
+                val aggregate = aggregate(promotionLevel, property, byPattern.map(::stampCheckpoint))
                 checkpoints += aggregate
                 edges += DeliveryMapEdge.of(
                     kind = DeliveryMapEdgeKind.UNLOCKS,
@@ -89,7 +99,7 @@ class AutoPromotionDeliveryMapContributor(
     private fun aggregate(
         promotionLevel: PromotionLevel,
         property: AutoPromotionProperty,
-        members: List<ValidationStamp>,
+        members: List<DeliveryMapCheckpoint>,
     ) = DeliveryMapCheckpoint(
         // At most one aggregate per promotion level, which is what makes this id deterministic
         id = DeliveryMapCheckpointTypes.validationStampPattern(promotionLevel.id),
@@ -108,7 +118,7 @@ class AutoPromotionDeliveryMapContributor(
         // No arrival of its own: its members carry theirs, and what "arriving at forty stamps at
         // once" would mean is not something the configuration says
         arrival = null,
-        members = members.map(checkpointFactory::validationStamp),
+        members = members,
     )
 
 }

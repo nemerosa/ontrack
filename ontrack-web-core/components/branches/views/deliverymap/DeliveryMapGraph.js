@@ -30,15 +30,26 @@ export default function DeliveryMapGraph({map, height = 600}) {
     const [edges, setEdges] = useState([])
 
     useEffect(() => {
-        if (map) {
-            autoLayout({
-                nodes: toFlowNodes(map.checkpoints),
-                edges: toFlowEdges(map.edges),
-                nodeWidth: node => getCheckpointType(node.data?.checkpoint?.type).width,
-                nodeHeight: node => getCheckpointType(node.data?.checkpoint?.type).height,
-                setNodes,
-                setEdges,
-            })
+        if (!map) return
+        // elk answers asynchronously, so two map changes in quick succession - toggling stamps
+        // during inline edition of the validation stamp filter fires one per toggle - put two
+        // layouts in flight at once. Whichever resolves last would otherwise win, and a stale one
+        // paints checkpoints the current map no longer holds.
+        let current = true
+        autoLayout({
+            nodes: toFlowNodes(map.checkpoints),
+            edges: toFlowEdges(map.edges),
+            nodeWidth: node => getCheckpointType(node.data?.checkpoint?.type).width,
+            nodeHeight: node => getCheckpointType(node.data?.checkpoint?.type).height,
+            setNodes: nodes => {
+                if (current) setNodes(nodes)
+            },
+            setEdges: edges => {
+                if (current) setEdges(edges)
+            },
+        })
+        return () => {
+            current = false
         }
     }, [map])
 

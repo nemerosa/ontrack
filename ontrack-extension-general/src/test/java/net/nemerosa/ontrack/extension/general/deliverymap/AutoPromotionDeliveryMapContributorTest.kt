@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.general.deliverymap
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import net.nemerosa.ontrack.extension.general.AutoPromotionProperty
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.json.parse
@@ -30,6 +31,7 @@ class AutoPromotionDeliveryMapContributorTest {
 
     private lateinit var structureService: StructureService
     private lateinit var propertyService: PropertyService
+    private lateinit var checkpointFactory: DeliveryMapCheckpointFactory
     private lateinit var contributor: AutoPromotionDeliveryMapContributor
 
     @BeforeEach
@@ -40,19 +42,20 @@ class AutoPromotionDeliveryMapContributorTest {
                 listOf(quality, security, ciSmoke)
         propertyService = mockk()
         every { propertyService.getPropertyValue(any(), AutoPromotionPropertyType::class.java) } returns null
+        checkpointFactory = mockk<DeliveryMapCheckpointFactory>().apply {
+            every { validationStamp(any()) } answers {
+                val vs = firstArg<ValidationStamp>()
+                DeliveryMapCheckpoint(
+                    id = DeliveryMapCheckpointTypes.validationStamp(vs.id),
+                    type = DeliveryMapCheckpointTypes.VALIDATION_STAMP,
+                    name = vs.name,
+                )
+            }
+        }
         contributor = AutoPromotionDeliveryMapContributor(
             structureService = structureService,
             propertyService = propertyService,
-            checkpointFactory = mockk<DeliveryMapCheckpointFactory>().apply {
-                every { validationStamp(any()) } answers {
-                    val vs = firstArg<ValidationStamp>()
-                    DeliveryMapCheckpoint(
-                        id = DeliveryMapCheckpointTypes.validationStamp(vs.id),
-                        type = DeliveryMapCheckpointTypes.VALIDATION_STAMP,
-                        name = vs.name,
-                    )
-                }
-            },
+            checkpointFactory = checkpointFactory,
         )
     }
 
@@ -187,6 +190,16 @@ class AutoPromotionDeliveryMapContributorTest {
             listOf("validation-stamp-pattern:1", "validation-stamp-pattern:2"),
             contribution.checkpoints.map { it.id },
         )
+    }
+
+    @Test
+    fun `A stamp selected by two promotion levels is only read once`() {
+        // Building a stamp checkpoint costs a query for its latest run, and the same stamp is
+        // routinely selected by several promotions - by name for one and by pattern for another
+        autoPromotion(bronze, validationStamps = listOf(quality))
+        autoPromotion(silver, include = "QUALITY")
+        contribute()
+        verify(exactly = 1) { checkpointFactory.validationStamp(quality) }
     }
 
     @Test

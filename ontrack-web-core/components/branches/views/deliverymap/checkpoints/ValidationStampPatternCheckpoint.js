@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Button, Space, theme, Typography} from "antd";
+import {Button, Popover, Space, theme, Typography} from "antd";
 import {FaChevronDown, FaChevronRight} from "react-icons/fa";
 import ValidationStampCheckpoint
     from "@components/branches/views/deliverymap/checkpoints/ValidationStampCheckpoint";
@@ -12,9 +12,11 @@ import {summariseMembers} from "@components/branches/views/deliverymap/checkpoin
  * It is labelled with the PATTERN, because that is what the configuration actually says: everything
  * matching this, not these forty named things.
  *
- * Expanding shows the members INSIDE this node rather than adding nodes to the graph. Adding nodes
- * would re-run the layout and reshuffle the whole map under the user's cursor, which is the very
- * thing #1707 is about to spend an issue avoiding on refresh.
+ * Expanding opens a POPOVER rather than growing the node or adding graph nodes. Both of the
+ * alternatives break the layout, in the same way and for the same reason: elk is given each node's
+ * size before anything is rendered, so a node which grows after the fact covers whatever elk placed
+ * beneath it, and new nodes re-run the layout and reshuffle the map under the user's cursor. A
+ * popover is drawn outside the flow and costs the layout nothing.
  *
  * @param checkpoint The aggregate checkpoint to draw
  */
@@ -28,28 +30,32 @@ export default function ValidationStampPatternCheckpoint({checkpoint}) {
 
     return (
         <Space direction="vertical" size={token.marginXXS} style={{width: '100%'}}>
-            <Space size={token.marginXXS}>
-                <Typography.Text code>{checkpoint.name}</Typography.Text>
-            </Space>
-            <Button
-                type="text"
-                size="small"
-                icon={expanded ? <FaChevronDown/> : <FaChevronRight/>}
-                onClick={() => setExpanded(!expanded)}
-                data-testid={`checkpoint-expand-${checkpoint.id}`}
+            <Typography.Text code>{checkpoint.name}</Typography.Text>
+            <Popover
+                open={expanded}
+                onOpenChange={setExpanded}
+                trigger="click"
+                placement="right"
+                title={<Typography.Text code>{checkpoint.name}</Typography.Text>}
+                content={
+                    <Space direction="vertical" size={token.marginXXS}>
+                        {
+                            members.map(member =>
+                                <ValidationStampCheckpoint key={member.id} checkpoint={member}/>
+                            )
+                        }
+                    </Space>
+                }
             >
-                {`${passed} of ${total} passed`}
-            </Button>
-            {
-                expanded &&
-                <Space direction="vertical" size={token.marginXXS} style={{width: '100%'}}>
-                    {
-                        members.map(member =>
-                            <ValidationStampCheckpoint key={member.id} checkpoint={member}/>
-                        )
-                    }
-                </Space>
-            }
+                <Button
+                    type="text"
+                    size="small"
+                    icon={expanded ? <FaChevronDown/> : <FaChevronRight/>}
+                    data-testid={`checkpoint-expand-${checkpoint.id}`}
+                >
+                    {`${passed} of ${total} passed`}
+                </Button>
+            </Popover>
         </Space>
     )
 }
