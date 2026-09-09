@@ -1,0 +1,17 @@
+mutation SaveSlotAdmissionRuleConfig(
+    $slotId: String!,
+    $name: String!,
+    $description: String!,
+    $ruleId: String!,
+    $ruleConfig: JSON!,
+) {
+    saveSlotAdmissionRuleConfig(input: {
+        slotId: $slotId,
+        name: $name,
+        description: $description,
+        ruleId: $ruleId,
+        ruleConfig: $ruleConfig,
+    }) {
+        ...PayloadUserErrors
+    }
+}

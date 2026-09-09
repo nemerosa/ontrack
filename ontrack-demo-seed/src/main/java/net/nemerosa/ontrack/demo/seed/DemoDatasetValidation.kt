@@ -111,13 +111,57 @@ fun DemoDataset.validate() {
                 problems += "The ${environment.name} environment has a slot for ${slot.project}, " +
                         "which the dataset never creates."
             }
-            slot.deployed?.let { ref ->
-                if (ref !in buildRefs) {
-                    problems += "The ${environment.name} environment deploys ${ref.build} of " +
-                            "${ref.project}/${ref.branch}, which the dataset never creates."
-                } else if (ref.project != slot.project) {
-                    problems += "The ${environment.name} environment deploys a ${ref.project} build " +
-                            "on the ${slot.project} slot."
+            slot.admissionRules.forEach { rule ->
+                if (!ADMISSION_RULE_NAME.matches(rule.name)) {
+                    problems += "The ${environment.name}/${slot.project} slot names an admission " +
+                            "rule \"${rule.name}\"; a rule name starts with a letter and then has " +
+                            "letters, digits or dashes only."
+                }
+            }
+        }
+    }
+
+    // A deployment the server would refuse is the expensive kind of mistake: the demo would be
+    // deleted, rebuilt, and left with an empty slot. The two rules checkable from the dataset
+    // alone are checked here. The `environment` rule is not - it depends on what is deployed at
+    // that point in the sequence, which is the server's own reading of its own state.
+    val builds = projects.flatMap { project ->
+        project.branches.flatMap { branch ->
+            branch.builds.map { BuildRef(project.name, branch.name, it.name) to it }
+        }
+    }.toMap()
+    deployments.forEach { deployment ->
+        val ref = deployment.build
+        val environment = environments.find { it.name == deployment.environment }
+        val slot = environment?.slots?.find { it.project == ref.project }
+        when {
+            environment == null ->
+                problems += "A deployment names the ${deployment.environment} environment, " +
+                        "which the dataset never creates."
+
+            slot == null ->
+                problems += "A deployment puts a ${ref.project} build in ${deployment.environment}, " +
+                        "which has no slot for that project."
+
+            ref !in buildRefs ->
+                problems += "The ${deployment.environment} environment deploys ${ref.build} of " +
+                        "${ref.project}/${ref.branch}, which the dataset never creates."
+
+            else -> {
+                val build = builds.getValue(ref)
+                slot.admissionRules.forEach { rule ->
+                    val required = rule.config["promotion"] as? String
+                    if (rule.ruleId == "promotion" && required != null &&
+                        required !in build.promotionLevels
+                    ) {
+                        problems += "The ${deployment.environment}/${ref.project} slot only admits " +
+                                "builds promoted to $required, and ${ref.build} of ${ref.branch} " +
+                                "is not."
+                    }
+                    if (rule.ruleId == "branchPattern" && !branchIncluded(ref.branch, rule.config)) {
+                        problems += "The ${deployment.environment}/${ref.project} slot admits no " +
+                                "build of ${ref.branch}, and ${ref.build} is one."
+                    }
                 }
             }
         }
@@ -128,6 +172,28 @@ fun DemoDataset.validate() {
                 problems.joinToString("\n") { "- $it" }
     }
 }
+
+/**
+ * The dataset's reading of a `branchPattern` admission rule - `FilterHelper.includes` on the
+ * server side, whose patterns are whole-string, case-insensitive regular expressions.
+ */
+private fun branchIncluded(branch: String, config: Map<String, Any>): Boolean {
+    @Suppress("UNCHECKED_CAST")
+    val includes = config["includes"] as? List<String> ?: emptyList()
+
+    @Suppress("UNCHECKED_CAST")
+    val excludes = config["excludes"] as? List<String> ?: emptyList()
+    fun matches(patterns: List<String>) = patterns.any {
+        it.toRegex(RegexOption.IGNORE_CASE).matches(branch)
+    }
+    return matches(includes) && !matches(excludes)
+}
+
+/**
+ * What a configured admission rule may be named - `SlotAdmissionRuleConfig.PATTERN` on the
+ * server side.
+ */
+private val ADMISSION_RULE_NAME = Regex("[a-zA-Z][a-zA-Z0-9-]*")
 
 /**
  * What Yontrack accepts as an entity name — `NameDescription.NAME` on the server side.

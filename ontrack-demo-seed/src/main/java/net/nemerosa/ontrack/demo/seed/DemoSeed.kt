@@ -88,6 +88,7 @@ class DemoSeed(
             }
         }
 
+        val slots = mutableMapOf<Pair<String, String>, DemoSlot>()
         dataset.environments.forEach { spec ->
             log("Creating environment ${spec.name}")
             val environment = target.createEnvironment(
@@ -98,11 +99,22 @@ class DemoSeed(
             )
             spec.slots.forEach { slotSpec ->
                 val slot = environment.createSlot(projects.getValue(slotSpec.project), slotSpec.description)
-                slotSpec.deployed?.let { ref ->
-                    log("Deploying ${ref.build} of ${ref.project} to ${spec.name}")
-                    slot.deploy(builds.resolve(ref))
+                // Before any deployment: the rules are what a deployment is checked against, and
+                // adding them afterwards would leave the slot holding a build it now refuses
+                slotSpec.admissionRules.forEach { ruleSpec ->
+                    log("Adding admission rule ${ruleSpec.name} to slot ${spec.name}/${slotSpec.project}")
+                    slot.addAdmissionRule(ruleSpec)
                 }
+                slots[spec.name to slotSpec.project] = slot
             }
+        }
+
+        // After every slot exists, and in declaration order: an `environment` admission rule asks
+        // what is deployed in another slot at that moment
+        dataset.deployments.forEach { spec ->
+            val ref = spec.build
+            log("Deploying ${ref.build} of ${ref.project}/${ref.branch} to ${spec.environment}")
+            slots.getValue(spec.environment to ref.project).deploy(builds.resolve(ref))
         }
 
         dataset.dashboard?.let { dashboard ->

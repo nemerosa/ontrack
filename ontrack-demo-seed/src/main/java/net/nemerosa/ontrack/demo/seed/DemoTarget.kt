@@ -140,6 +140,11 @@ interface DemoSlot {
      * shows something.
      */
     fun deploy(build: DemoBuild)
+
+    /**
+     * Configures an admission rule on this slot.
+     */
+    fun addAdmissionRule(spec: SlotAdmissionRuleSpec)
 }
 
 /**

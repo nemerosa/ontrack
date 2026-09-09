@@ -68,6 +68,7 @@ object DemoContent {
             changelogProject(changelog),
         ),
         environments = environments(),
+        deployments = deployments(),
         dashboard = dashboard(),
     )
 
@@ -493,6 +494,23 @@ object DemoContent {
         ),
     )
 
+    /**
+     * Two environments, and the admission rules which say how a build gets into each.
+     *
+     * The rules are the point, not decoration. They are what the delivery map reads to join
+     * the slots to the rest of the map, and without them the demo would draw two slots
+     * floating unconnected beside the promotion levels - which is exactly the picture the
+     * map is meant to make you go and fix.
+     *
+     * Together they give the map of [SERVICE] one of each thing a slot checkpoint can be:
+     *
+     * * on [MAIN], staging holds a [MAINTENANCE] build, so the map shows a slot naming a
+     *   build of another branch and saying so;
+     * * on [MAINTENANCE], production is drawn **unreachable**, because its branch pattern
+     *   admits `main` alone and no build of the maintenance branch can ever deploy there;
+     * * both branches show the promotion edges into the slots, and the staging to production
+     *   edge between them.
+     */
     private fun environments() = listOf(
         EnvironmentSpec(
             name = STAGING,
@@ -503,7 +521,13 @@ object DemoContent {
                 SlotSpec(
                     project = SERVICE,
                     description = "Sample application on staging.",
-                    deployed = BuildRef(SERVICE, MAIN, "105"),
+                    admissionRules = listOf(
+                        SlotAdmissionRuleSpec(
+                            name = "silver",
+                            ruleId = "promotion",
+                            config = mapOf("promotion" to SILVER),
+                        ),
+                    ),
                 ),
             ),
         ),
@@ -516,10 +540,47 @@ object DemoContent {
                 SlotSpec(
                     project = SERVICE,
                     description = "Sample application in production.",
-                    deployed = BuildRef(SERVICE, MAIN, "104"),
+                    admissionRules = listOf(
+                        SlotAdmissionRuleSpec(
+                            name = "gold",
+                            ruleId = "promotion",
+                            config = mapOf("promotion" to GOLD),
+                        ),
+                        // What draws the staging to production edge on the delivery map.
+                        // Nothing else does: the map never joins two slots by the order of
+                        // their environments.
+                        SlotAdmissionRuleSpec(
+                            name = "staging",
+                            ruleId = "environment",
+                            config = mapOf("environmentName" to STAGING, "qualifier" to ""),
+                        ),
+                        // Releases go out from `main` only, which is what makes production
+                        // unreachable from the maintenance branch.
+                        SlotAdmissionRuleSpec(
+                            name = "mainOnly",
+                            ruleId = "branchPattern",
+                            config = mapOf("includes" to listOf(MAIN)),
+                        ),
+                    ),
                 ),
             ),
         ),
+    )
+
+    /**
+     * The demo's deployment history, in order. The order is load-bearing: production admits
+     * only what staging is holding at the time, so 1.4.2 has to pass through staging before
+     * it can go to production, and the maintenance build lands on staging afterwards.
+     *
+     * It leaves production on 1.4.2 while [MAIN] is already at 1.4.6, and staging occupied
+     * by a maintenance build under test - which is what a real pair of environments usually
+     * looks like, and is also the only arrangement in which the delivery map has all three
+     * of its slot readings to show.
+     */
+    private fun deployments() = listOf(
+        DeploymentSpec(STAGING, BuildRef(SERVICE, MAIN, "104")),
+        DeploymentSpec(PRODUCTION, BuildRef(SERVICE, MAIN, "104")),
+        DeploymentSpec(STAGING, BuildRef(SERVICE, MAINTENANCE, "89")),
     )
 
     /**

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.demo.seed
 
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.Build
 import net.nemerosa.ontrack.kdsl.spec.Ontrack
@@ -271,5 +272,13 @@ private class KdslDemoSlot(val slot: Slot) : DemoSlot {
         slot.createPipeline((build as KdslDemoBuild).build)
             .startDeploying()
             .finishDeployment()
+    }
+
+    override fun addAdmissionRule(spec: SlotAdmissionRuleSpec) {
+        slot.addAdmissionRule(
+            ruleId = spec.ruleId,
+            ruleConfig = spec.config.asJson(),
+            name = spec.name,
+        )
     }
 }

@@ -11,6 +11,15 @@ import java.time.LocalDateTime
 data class DemoDataset(
     val projects: List<ProjectSpec>,
     val environments: List<EnvironmentSpec> = emptyList(),
+    /**
+     * Deployments, run in the order they are declared, after every slot exists.
+     *
+     * They sit here rather than on the slot because their order is a fact about the demo as
+     * a whole and not about one slot: an `environment` admission rule asks what is deployed
+     * in another slot *right now*, so "staging, then production, then staging again" is a
+     * sequence no per-slot list can express.
+     */
+    val deployments: List<DeploymentSpec> = emptyList(),
     val dashboard: DemoDashboard? = null,
 )
 
@@ -151,13 +160,40 @@ data class EnvironmentSpec(
 )
 
 /**
- * @property deployed The build to run a full deployment for, so the environment shows
- * something rather than an empty slot.
+ * @property admissionRules What has to be true of a build before it can be deployed here.
+ * They are also what the delivery map reads to join a slot to the rest of the map: without
+ * one, a slot is drawn unconnected.
  */
 data class SlotSpec(
     val project: String,
     val description: String,
-    val deployed: BuildRef? = null,
+    val admissionRules: List<SlotAdmissionRuleSpec> = emptyList(),
+)
+
+/**
+ * One deployment run all the way to done, so a slot shows something rather than nothing.
+ *
+ * The slot is named by its environment and by the project of the build, which is enough
+ * while the demo gives a project at most one slot per environment.
+ */
+data class DeploymentSpec(
+    val environment: String,
+    val build: BuildRef,
+)
+
+/**
+ * One configured admission rule of a slot.
+ *
+ * @property name Unique within the slot; letters, digits and dashes only, starting with a
+ * letter.
+ * @property ruleId ID of the rule as the backend declares it - `promotion`, `environment`,
+ * `branchPattern`.
+ * @property config Configuration of the rule, whose shape is that rule's own.
+ */
+data class SlotAdmissionRuleSpec(
+    val name: String,
+    val ruleId: String,
+    val config: Map<String, Any>,
 )
 
 /**

@@ -235,6 +235,98 @@ class DemoSeedTest {
     }
 
     /**
+     * The delivery map's slot half has nothing to show without admission rules: they are what
+     * joins a slot to a promotion level and to another slot. This pins the demo's own story so
+     * that an edit which quietly drops it fails here rather than on the demo.
+     */
+    @Test
+    fun `the demo slots carry the admission rules the delivery map reads`() {
+        val target = InMemoryDemoTarget()
+        seed(target).run(DemoContent.dataset(changelog))
+        val snapshot = target.snapshot()
+
+        assertTrue("rule silver promotion" in snapshot, "Staging admits SILVER builds")
+        assertTrue("rule gold promotion" in snapshot, "Production admits GOLD builds")
+        assertTrue("rule staging environment" in snapshot, "Production requires staging")
+        assertTrue("rule mainOnly branchPattern" in snapshot, "Production takes main only")
+    }
+
+    /**
+     * The one thing the demo's slot story hangs on, and the one an edit is most likely to
+     * break: production holds a build of `main`, staging a build of the maintenance branch, so
+     * the delivery map of `main` has a slot naming another branch's build to draw.
+     */
+    @Test
+    fun `the demo leaves staging holding a maintenance build and production a main one`() {
+        val target = InMemoryDemoTarget()
+        seed(target).run(DemoContent.dataset(changelog))
+
+        val slots = target.environments()
+            .flatMap { (it as InMemoryDemoTarget.InMemoryEnvironment).slots }
+            .filter { it.project.name == DemoContent.SERVICE }
+            .associateBy { it.environment.name }
+
+        assertEquals("89", slots.getValue(DemoContent.STAGING).deployments.last().name)
+        assertEquals(
+            DemoContent.MAINTENANCE,
+            slots.getValue(DemoContent.STAGING).deployments.last().branch.name,
+        )
+        assertEquals("104", slots.getValue(DemoContent.PRODUCTION).deployments.last().name)
+        assertEquals(
+            DemoContent.MAIN,
+            slots.getValue(DemoContent.PRODUCTION).deployments.last().branch.name,
+        )
+    }
+
+    @Test
+    fun `a deployment of a build the slot would refuse is caught before anything is deleted`() {
+        // Not a theoretical case: the promotion and environment rules of the demo's own slots
+        // make the ORDER of its deployments load-bearing
+        val error = assertFailsWith<IllegalArgumentException> {
+            seed(InMemoryDemoTarget()).run(
+                DemoDataset(
+                    projects = listOf(
+                        ProjectSpec(
+                            name = "one",
+                            description = "",
+                            branches = listOf(
+                                BranchSpec(
+                                    name = "main",
+                                    description = "",
+                                    promotionLevels = listOf(PromotionLevelSpec("GOLD", "")),
+                                    builds = listOf(
+                                        BuildSpec(name = "1", description = "", creation = BuildCreation.DaysAgo(1)),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                    environments = listOf(
+                        EnvironmentSpec(
+                            name = "production",
+                            order = 100,
+                            description = "",
+                            slots = listOf(
+                                SlotSpec(
+                                    project = "one",
+                                    description = "",
+                                    admissionRules = listOf(
+                                        SlotAdmissionRuleSpec("gold", "promotion", mapOf("promotion" to "GOLD")),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                    deployments = listOf(
+                        DeploymentSpec("production", BuildRef("one", "main", "1")),
+                    ),
+                )
+            )
+        }
+        assertTrue("promoted to GOLD" in error.message.orEmpty(), error.message.orEmpty())
+    }
+
+    /**
      * The same rule, enforced on the whole dataset rather than only on the changelog: a
      * branch whose builds are declared newest first reads backwards in every view.
      */

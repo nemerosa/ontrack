@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.environments
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreatePipelineMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SaveSlotAdmissionRuleConfigMutation
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.spec.Build
 import net.nemerosa.ontrack.kdsl.spec.Project
@@ -34,6 +36,32 @@ class Slot(
             build = build,
             status = pipeline.status,
         )
+    }
+
+    /**
+     * Configures an admission rule on this slot.
+     *
+     * @param ruleId ID of the rule, as its `SlotAdmissionRule` declares it - `promotion`,
+     * `environment`, `branchPattern`...
+     * @param ruleConfig Configuration of the rule, whose shape is the rule's own
+     * @param name Name of the configured rule, unique within the slot. Letters, digits and dashes
+     * only, starting with a letter.
+     */
+    fun addAdmissionRule(
+        ruleId: String,
+        ruleConfig: JsonNode,
+        name: String = ruleId,
+        description: String = "",
+    ) {
+        graphqlConnector.mutate(
+            SaveSlotAdmissionRuleConfigMutation(
+                id,
+                name,
+                description,
+                ruleId,
+                ruleConfig,
+            )
+        ) { it?.saveSlotAdmissionRuleConfig?.payloadUserErrors?.convert() }
     }
 
 }

@@ -99,6 +99,7 @@ class InMemoryDemoTarget(
             add("environment ${environment.name} #${environment.order} \"${environment.description}\" ${environment.tags}")
             environment.slots.forEach { slot ->
                 add("  slot ${slot.project.name} \"${slot.description}\"")
+                slot.admissionRules.forEach { add("    rule ${it.name} ${it.ruleId} ${it.config}") }
                 slot.deployments.forEach { add("    deployed ${it.name}") }
             }
         }
@@ -265,23 +266,68 @@ class InMemoryDemoTarget(
             project as InMemoryProject
             require(project in projects) { "Slot points at deleted project ${project.name}" }
             require(slots.none { it.project == project }) { "Slot for ${project.name} already exists in $name" }
-            return InMemorySlot(project, description).also { slots += it }
+            return InMemorySlot(this, project, description).also { slots += it }
         }
     }
 
     inner class InMemorySlot(
+        val environment: InMemoryEnvironment,
         val project: InMemoryProject,
         val description: String,
     ) : DemoSlot {
 
+        val admissionRules = mutableListOf<SlotAdmissionRuleSpec>()
         val deployments = mutableListOf<InMemoryBuild>()
 
+        override fun addAdmissionRule(spec: SlotAdmissionRuleSpec) {
+            require(ADMISSION_RULE_NAME.matches(spec.name)) {
+                "Admission rule name \"${spec.name}\" starts with a letter and then has letters, " +
+                        "digits or dashes only."
+            }
+            require(admissionRules.none { it.name == spec.name }) {
+                "Admission rule ${spec.name} already exists in ${environment.name}/${project.name}"
+            }
+            admissionRules += spec
+        }
+
+        /**
+         * The rules are checked, not merely recorded. The demo's deployments are a SEQUENCE -
+         * an `environment` rule asks what the other slot is holding at that moment - and the
+         * one mistake it is easy to make is putting them in an order the server refuses,
+         * which on a real instance leaves the demo deleted and the slot empty.
+         */
         override fun deploy(build: DemoBuild) {
             build as InMemoryBuild
             require(build.branch.project == project) {
                 "Cannot deploy ${build.branch.project.name} build on the ${project.name} slot"
             }
+            admissionRules.forEach { rule -> check(rule, build) }
             deployments += build
+        }
+
+        private fun check(rule: SlotAdmissionRuleSpec, build: InMemoryBuild) {
+            val where = "${environment.name}/${project.name}"
+            when (rule.ruleId) {
+                "promotion" -> {
+                    val promotion = rule.config["promotion"] as? String
+                    require(promotion != null && build.promotions.any { it.first == promotion }) {
+                        "$where only admits builds promoted to $promotion, and ${build.name} is not."
+                    }
+                }
+
+                "branchPattern" -> require(branchIncluded(build.branch.name, rule.config)) {
+                    "$where admits no build of ${build.branch.name}, and ${build.name} is one."
+                }
+
+                "environment" -> {
+                    val previousName = rule.config["environmentName"] as? String
+                    val previous = environments.find { it.name == previousName }
+                        ?.slots?.find { it.project == project }
+                    require(previous?.deployments?.lastOrNull() == build) {
+                        "$where only admits what $previousName is holding, which is not ${build.name}."
+                    }
+                }
+            }
         }
     }
 
@@ -322,10 +368,33 @@ class InMemoryDemoTarget(
          */
         private val NAME = Regex("[A-Za-z0-9._-]+")
 
+        /**
+         * What a configured admission rule may be named - `SlotAdmissionRuleConfig.PATTERN`
+         * on the server side.
+         */
+        private val ADMISSION_RULE_NAME = Regex("[a-zA-Z][a-zA-Z0-9-]*")
+
         private fun checkName(name: String, what: String) {
             require(NAME.matches(name)) {
                 "$what name \"$name\" can only have letters, digits, dots, dashes or underscores."
             }
+        }
+
+        /**
+         * `FilterHelper.includes` on the server side: whole-string, case-insensitive regular
+         * expressions.
+         */
+        private fun branchIncluded(branch: String, config: Map<String, Any>): Boolean {
+            @Suppress("UNCHECKED_CAST")
+            val includes = config["includes"] as? List<String> ?: emptyList()
+
+            @Suppress("UNCHECKED_CAST")
+            val excludes = config["excludes"] as? List<String> ?: emptyList()
+
+            fun matches(patterns: List<String>) = patterns.any {
+                it.toRegex(RegexOption.IGNORE_CASE).matches(branch)
+            }
+            return matches(includes) && !matches(excludes)
         }
     }
 }

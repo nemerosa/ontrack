@@ -160,9 +160,18 @@ Two rules keep the demo reproducible, and
   matches — a fresh UUID would make the second run fail.
 
 `DemoDatasetValidation` checks the dataset against Yontrack's own rules — legal names, no
-promotion to a level the branch does not declare, no link to a build that is never created
-— **before** the reset deletes anything, and reports every problem at once. Destructive by
-design must not mean blank on failure.
+promotion to a level the branch does not declare, no link to a build that is never created,
+no deployment a slot's admission rules would refuse — **before** the reset deletes anything,
+and reports every problem at once. Destructive by design must not mean blank on failure.
+
+### Deployments are a sequence, not a slot property
+
+`DemoDataset.deployments` is an ordered list, run after every slot exists, rather than a
+`deployed` field on each slot. An `environment` admission rule asks what *another* slot is
+holding at that moment, so a demo where a build passes through staging on its way to
+production, and staging then takes another build, is a sequence no per-slot field can
+express. `InMemoryDemoTarget` enforces the admission rules as the server does, so an order
+the server would refuse fails in the unit tests rather than half-way through a real reset.
 
 ## How it is put together
 
