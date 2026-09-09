@@ -145,6 +145,7 @@ the latest build to have **arrived** at it and when.
 | Promotion level  | being promoted           | the latest build of this branch promoted there        |
 | Validation stamp | a run of *any* outcome   | the latest build of this branch run there, with its status |
 | Slot             | a deployment             | the most recently deployed build, **whatever its branch** |
+| Unresolved       | nothing, ever            | none - see [when a rule points at nothing](#when-a-rule-points-at-nothing) |
 
 Arriving is not the same as succeeding, which is why only the validation stamp shows a status: a
 build can arrive at a stamp and fail there, while a build cannot be promoted and fail.
@@ -179,10 +180,12 @@ project, and joins them to the rest from the slot's own admission rules:
 
 * a **promotion** admission rule draws a *requires* line from that promotion level to the slot. The
   promotion is resolved by name **on this branch**, so the same slot configuration produces a
-  different line on every branch - which is exactly why slots belong on a branch view at all. A rule
-  naming a promotion this branch does not have draws no line;
+  different line on every branch - which is exactly why slots belong on a branch view at all;
 * an **environment** admission rule - "must already be deployed in *staging*" - draws a *requires*
   line from that slot to this one.
+
+A rule naming something that does not exist still draws its line, into an
+[unresolved checkpoint](#when-a-rule-points-at-nothing).
 
 Slot-to-slot lines come **only** from that rule. The map deliberately does not fall back to the
 order of the environments, the way the project's slot graph does. Ordering says which environment
@@ -213,6 +216,34 @@ answer the map can give; leaving it out silently would leave you wondering why p
 Both pictures above are the same two slots, read from two branches of one project: the main branch
 reaches production and finds a maintenance build occupying staging, while the maintenance branch
 cannot reach production at all.
+
+### When a rule points at nothing
+
+Both slot admission rules name their target **by name**: "requires the *GOLD* promotion", "requires
+a deployment in *staging*". Nothing checks that the name matches anything. A rule can name a
+promotion level the branch does not have, or an environment the project has no slot in, and the
+configuration will be saved and will look perfectly healthy on the slot's own page.
+
+Until somebody tries to deploy. Then the deployment refuses, with *Promotion not existing*, and that
+is the first anyone hears of it.
+
+The map draws such a rule as an **unresolved checkpoint**: a node carrying the name the rule asked
+for, marked as matching nothing, with the rule's line running out of it as usual.
+
+![A slot admission rule naming a promotion and a slot which do not exist](branch-delivery-map-unresolved.png)
+
+Drawing nothing at all was the alternative, and it is the wrong one - the map would then quietly
+agree with the broken configuration. This is arguably the strongest reason to look at the map: it
+turns a misconfiguration nobody can see into something visible on a page people already open.
+
+An unresolved checkpoint is **never** what a checkpoint you are not allowed to see looks like.
+Something hidden by permissions is left out of the map entirely, together with every line touching
+it - it does not become an unresolved checkpoint, and it never will. The two would otherwise be
+impossible to tell apart, people would read "unresolved" as "probably just permissions", and the map
+would stop being trustworthy for exactly the case it exists to catch.
+
+The fix is never on the map, which is a reading of the configuration and not the configuration
+itself: either create what the rule names, or change the rule on the slot to name what exists.
 
 ### Filters, and what the map does with them
 

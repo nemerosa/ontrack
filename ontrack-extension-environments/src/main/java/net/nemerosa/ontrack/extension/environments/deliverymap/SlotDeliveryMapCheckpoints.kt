@@ -24,6 +24,20 @@ object SlotDeliveryMapCheckpoints {
      */
     fun slot(slotId: String): String = DeliveryMapCheckpointTypes.checkpointId(SLOT, slotId)
 
+    /**
+     * How a slot is labelled on the map, from the environment it is in and its qualifier.
+     *
+     * The project is left out: it is what the map is about, and the environment and the qualifier are
+     * what tell two slots of one project apart.
+     *
+     * One reading for both the slot which exists and the one an admission rule asked for and did not
+     * find (#1705). A rule naming `staging [demo]` has to name it on the map exactly as the real
+     * `staging [demo]` would be named, or the two cannot be compared by eye - which is the whole
+     * point of drawing the unresolved one.
+     */
+    fun label(environmentName: String, qualifier: String): String =
+        environmentName + (qualifier.takeIf { it.isNotBlank() }?.let { " [$it]" } ?: "")
+
 }
 
 /**

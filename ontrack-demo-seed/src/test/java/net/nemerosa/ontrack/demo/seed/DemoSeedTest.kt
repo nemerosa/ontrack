@@ -252,6 +252,36 @@ class DemoSeedTest {
     }
 
     /**
+     * The demo's one deliberately broken configuration, which the delivery map draws as two
+     * unresolved checkpoints (#1705). Both halves of it are easy to "fix" by accident - giving
+     * the UI a GOLD promotion level, or a staging slot - and either would quietly take away the
+     * thing the map exists to show.
+     */
+    @Test
+    fun `the demo keeps the UI production slot pointing at things which do not exist`() {
+        val dataset = DemoContent.dataset(changelog)
+
+        val ui = dataset.projects.single { it.name == DemoContent.UI }
+        assertTrue(
+            ui.branches.none { branch -> branch.promotionLevels.any { it.name == DemoContent.GOLD } },
+            "The UI declares no GOLD promotion level, so its production slot asks for one in vain",
+        )
+        assertTrue(
+            dataset.environments.single { it.name == DemoContent.STAGING }
+                .slots.none { it.project == DemoContent.UI },
+            "The UI has no staging slot, so its production slot requires a deployment which cannot happen",
+        )
+
+        val slot = dataset.environments.single { it.name == DemoContent.PRODUCTION }
+            .slots.single { it.project == DemoContent.UI }
+        assertEquals(
+            listOf(DemoContent.GOLD, DemoContent.STAGING),
+            slot.admissionRules.map { it.config.values.first() },
+            "The two rules still name what they cannot find",
+        )
+    }
+
+    /**
      * The one thing the demo's slot story hangs on, and the one an edit is most likely to
      * break: production holds a build of `main`, staging a build of the maintenance branch, so
      * the delivery map of `main` has a slot naming another branch's build to draw.

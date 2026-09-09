@@ -46,6 +46,25 @@ object SlotAdmissionRuleTestFixtures {
         ).asJson(),
     )
 
+    /**
+     * An environment rule naming an environment rather than an existing slot, for the cases where the
+     * slot it names is meant not to exist.
+     */
+    fun testEnvironmentAdmissionRuleConfig(
+        slot: Slot,
+        environmentName: String,
+        qualifier: String = Slot.DEFAULT_QUALIFIER,
+    ) = SlotAdmissionRuleConfig(
+        slot = slot,
+        name = "environment",
+        description = null,
+        ruleId = EnvironmentSlotAdmissionRule.ID,
+        ruleConfig = EnvironmentSlotAdmissionRuleConfig(
+            environmentName = environmentName,
+            qualifier = qualifier,
+        ).asJson(),
+    )
+
     fun testManualApprovalRuleConfig(
         slot: Slot,
     ) = SlotAdmissionRuleConfig(

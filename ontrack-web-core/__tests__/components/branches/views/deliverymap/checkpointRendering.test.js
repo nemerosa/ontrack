@@ -25,6 +25,8 @@ import ValidationStampCheckpoint
 import ValidationStampPatternCheckpoint
     from "@components/branches/views/deliverymap/checkpoints/ValidationStampPatternCheckpoint";
 import UnknownCheckpoint from "@components/branches/views/deliverymap/checkpoints/UnknownCheckpoint";
+import UnresolvedCheckpoint
+    from "@components/branches/views/deliverymap/checkpoints/UnresolvedCheckpoint";
 import SlotCheckpoint from "@components/extension/environments/deliverymap/SlotCheckpoint";
 
 beforeEach(() => {
@@ -209,6 +211,54 @@ describe('slot checkpoint', () => {
         expect(screen.getByText("production").closest('a')).toHaveAttribute(
             'href', '/extension/environments/slot/abc',
         )
+    })
+
+})
+
+describe('unresolved checkpoint', () => {
+
+    const unresolved = (reference, name) => ({
+        id: `unresolved:${reference}:${name}`,
+        type: 'unresolved',
+        name,
+        data: {reference},
+    })
+
+    it('names what the configuration asked for and says no promotion level matches it', () => {
+        withEvents(<UnresolvedCheckpoint checkpoint={unresolved('promotion-level', "GOLD")}/>)
+        expect(screen.getByText("GOLD")).toBeInTheDocument()
+        expect(screen.getByText("No such promotion level")).toBeInTheDocument()
+    })
+
+    it('says no slot matches an environment the project has none in', () => {
+        withEvents(<UnresolvedCheckpoint checkpoint={unresolved('slot', "integration")}/>)
+        expect(screen.getByText("integration")).toBeInTheDocument()
+        expect(screen.getByText("No such slot in this project")).toBeInTheDocument()
+    })
+
+    it('still says something about a kind of reference it has never heard of', () => {
+        // The set of checkpoint kinds is open, and so is the set of things a rule may reference
+        withEvents(<UnresolvedCheckpoint checkpoint={unresolved('deployment-window', "Friday freeze")}/>)
+        expect(screen.getByText("Friday freeze")).toBeInTheDocument()
+        expect(screen.getByText("Matches nothing")).toBeInTheDocument()
+    })
+
+    it('never reads as something hidden by permissions', () => {
+        // The distinction the feature lives or dies by: if the two looked alike, users would learn
+        // to read "unresolved" as "probably just permissions"
+        withEvents(<UnresolvedCheckpoint checkpoint={unresolved('promotion-level', "GOLD")}/>)
+        expect(screen.queryByText(/permission/i)).not.toBeInTheDocument()
+        expect(screen.getByTitle(/not something being hidden from you/)).toBeInTheDocument()
+    })
+
+    it('names no build, because nothing can arrive at something which does not exist', () => {
+        withEvents(<UnresolvedCheckpoint checkpoint={unresolved('promotion-level', "GOLD")}/>)
+        expect(screen.queryByText(/^Never /)).not.toBeInTheDocument()
+    })
+
+    it('links to nothing, because there is nothing to link to', () => {
+        const {container} = withEvents(<UnresolvedCheckpoint checkpoint={unresolved('slot', "integration")}/>)
+        expect(container.querySelector('a')).toBeNull()
     })
 
 })

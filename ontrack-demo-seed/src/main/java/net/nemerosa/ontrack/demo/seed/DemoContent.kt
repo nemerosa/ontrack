@@ -563,6 +563,33 @@ object DemoContent {
                         ),
                     ),
                 ),
+                // DELIBERATELY BROKEN, and the one thing in the dataset which is. Both rules
+                // below name something [UI] does not have: the project declares BRONZE and
+                // SILVER and never GOLD, and it has no staging slot at all. They are the two
+                // ways a slot admission rule can point at nothing, and the delivery map draws
+                // each as an unresolved checkpoint carrying the name that was asked for.
+                //
+                // It is a copy of the [SERVICE] slot beside it, because that is how the
+                // mistake is actually made: the rules were pasted from a project which does
+                // have a GOLD promotion and a staging slot. Nothing else surfaces it - the
+                // deployment answers "Promotion not existing" the day somebody first tries to
+                // deploy the UI, and not before - which is the argument for the whole feature.
+                SlotSpec(
+                    project = UI,
+                    description = "Front-end in production. Its admission rules are broken on purpose.",
+                    admissionRules = listOf(
+                        SlotAdmissionRuleSpec(
+                            name = "gold",
+                            ruleId = SlotAdmissionRules.PROMOTION,
+                            config = mapOf("promotion" to GOLD),
+                        ),
+                        SlotAdmissionRuleSpec(
+                            name = "staging",
+                            ruleId = SlotAdmissionRules.ENVIRONMENT,
+                            config = mapOf("environmentName" to STAGING, "qualifier" to ""),
+                        ),
+                    ),
+                ),
             ),
         ),
     )

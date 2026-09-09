@@ -16,6 +16,7 @@ describe('checkpoint type registry', () => {
             'validation-stamp',
             'validation-stamp-pattern',
             'slot',
+            'unresolved',
         ])
     })
 

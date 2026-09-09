@@ -99,7 +99,7 @@ class SlotDeliveryMapIT : AbstractQLKTITSupport() {
     }
 
     @Test
-    fun `A promotion admission rule naming no promotion level of this branch draws no edge`() {
+    fun `A promotion admission rule naming no promotion level of this branch draws an unresolved checkpoint`() {
         asAdmin {
             val production = slotTestSupport.slot()
             slotService.addAdmissionRuleConfig(
@@ -107,7 +107,38 @@ class SlotDeliveryMapIT : AbstractQLKTITSupport() {
             )
             production.project.branch {
                 promotionLevel("SILVER")
-                assertEquals(emptyList(), deliveryMap(this).edges.map { it.getRequiredTextField("id") })
+                val map = deliveryMap(this)
+                val unresolved = unresolvedCheckpoint(map)
+                assertEquals("GOLD", unresolved.getRequiredTextField("name"))
+                assertEquals("promotion-level", unresolved.path("data").getRequiredTextField("reference"))
+                assertNull(unresolved.path("arrival").takeIf { !it.isNull })
+                assertEquals(
+                    listOf("requires:unresolved:promotion-level:GOLD->slot:${production.id}"),
+                    map.edges.map { it.getRequiredTextField("id") },
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `An environment admission rule naming no slot of this project draws an unresolved checkpoint`() {
+        asAdmin {
+            val production = slotTestSupport.slot()
+            slotService.addAdmissionRuleConfig(
+                SlotAdmissionRuleTestFixtures.testEnvironmentAdmissionRuleConfig(
+                    production,
+                    environmentName = "integration",
+                )
+            )
+            production.project.branch {
+                val map = deliveryMap(this)
+                val unresolved = unresolvedCheckpoint(map)
+                assertEquals("integration", unresolved.getRequiredTextField("name"))
+                assertEquals("slot", unresolved.path("data").getRequiredTextField("reference"))
+                assertEquals(
+                    listOf("requires:unresolved:slot:integration->slot:${production.id}"),
+                    map.edges.map { it.getRequiredTextField("id") },
+                )
             }
         }
     }
@@ -189,10 +220,34 @@ class SlotDeliveryMapIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `A slot hidden by permissions never renders as unresolved`() {
+        // The distinction this feature lives or dies by: if a hidden checkpoint and a broken
+        // configuration looked alike, "unresolved" would come to read as "probably just permissions"
+        val production = asAdmin { slotTestSupport.slot() }
+        asAdmin {
+            slotService.addAdmissionRuleConfig(
+                SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(production, promotion = "GOLD")
+            )
+        }
+        val branch = asAdmin { production.project.branch(name = "main") }
+        asUserWithView(production.project) {
+            val map = deliveryMap(branch)
+            assertTrue(
+                map.checkpoints.none { it.getRequiredTextField("type") == "unresolved" },
+                "No unresolved checkpoint on the map",
+            )
+            assertEquals(emptyList(), map.edges.map { it.getRequiredTextField("id") })
+        }
+    }
+
     private data class RenderedMap(
         val checkpoints: List<JsonNode>,
         val edges: List<JsonNode>,
     )
+
+    private fun unresolvedCheckpoint(map: RenderedMap): JsonNode =
+        map.checkpoints.single { it.getRequiredTextField("type") == "unresolved" }
 
     private fun slotCheckpoint(map: RenderedMap, slot: Slot): JsonNode =
         map.checkpoints.single { it.getRequiredTextField("id") == "slot:${slot.id}" }

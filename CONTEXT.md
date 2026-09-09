@@ -76,6 +76,16 @@ such, and names no build - not even the one actually deployed in it. See ADR 000
 _Avoid_: blocked slot, forbidden slot, excluded slot. *Blocked* is what a build
 waiting on an admission rule is; this is about the branch, and is permanent.
 
+**Unresolved checkpoint**:
+The checkpoint standing for a name a configuration asked for and which matches
+nothing - a slot admission rule naming a promotion level the branch does not have,
+or an environment the project has no slot in. It carries that name, is marked as
+matching nothing, and names no build, there being nothing behind it to arrive at.
+It is never what a checkpoint hidden by permissions looks like: that one is left
+out of the map entirely, together with its edges.
+_Avoid_: missing checkpoint, broken checkpoint, orphan, dangling reference.
+*Missing* is what a hidden checkpoint is, and the two must not sound alike.
+
 **Unlocks**:
 The delivery map edge meaning that reaching one checkpoint grants another by
 itself, as auto promotion does.

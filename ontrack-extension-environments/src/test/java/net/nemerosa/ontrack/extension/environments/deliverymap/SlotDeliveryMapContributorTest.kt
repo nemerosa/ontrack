@@ -17,6 +17,7 @@ import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.deliverymap.DeliveryMapEdgeKind
+import net.nemerosa.ontrack.model.deliverymap.UnresolvedCheckpointData
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.junit.jupiter.api.BeforeEach
@@ -159,10 +160,41 @@ class SlotDeliveryMapContributorTest {
     }
 
     @Test
-    fun `A promotion admission rule naming no promotion level of this branch draws no edge`() {
-        // The name is resolved per branch, so the same slot yields a different edge on every branch
+    fun `A promotion admission rule naming no promotion level of this branch draws an unresolved checkpoint`() {
+        // The name is resolved per branch, so the same slot yields a different edge on every branch.
+        // Drawing nothing would make the map quietly agree with the broken configuration.
         rules(productionSlot, PromotionSlotAdmissionRule.ID to PromotionSlotAdmissionRuleConfig("GOLD"))
-        assertEquals(emptyList(), contributor.contribute(main).edges)
+
+        val contribution = contributor.contribute(main)
+        val unresolved = contribution.checkpoints.single { it.type == "unresolved" }
+        assertEquals("GOLD", unresolved.name, "Named by what the rule asked for")
+        assertEquals("unresolved:promotion-level:GOLD", unresolved.id)
+        assertEquals(
+            "promotion-level",
+            unresolved.data.parse<UnresolvedCheckpointData>().reference,
+            "Says which kind of thing was looked for",
+        )
+        assertNull(unresolved.arrival, "Nothing can arrive at something which does not exist")
+
+        val edge = contribution.edges.single()
+        assertEquals(DeliveryMapEdgeKind.REQUIRES, edge.kind)
+        assertEquals("unresolved:promotion-level:GOLD", edge.source)
+        assertEquals("slot:${productionSlot.id}", edge.target)
+    }
+
+    @Test
+    fun `Two slots asking for the same missing promotion share one unresolved checkpoint`() {
+        // One missing thing, one checkpoint - and the id has to be the same on the next fetch, or
+        // #1707 cannot keep the node where the user dragged it
+        rules(stagingSlot, PromotionSlotAdmissionRule.ID to PromotionSlotAdmissionRuleConfig("GOLD"))
+        rules(productionSlot, PromotionSlotAdmissionRule.ID to PromotionSlotAdmissionRuleConfig("GOLD"))
+
+        val contribution = contributor.contribute(main)
+        assertEquals(
+            listOf("unresolved:promotion-level:GOLD"),
+            contribution.checkpoints.filter { it.type == "unresolved" }.map { it.id },
+        )
+        assertEquals(2, contribution.edges.size, "One edge per slot, both from the same checkpoint")
     }
 
     @Test
@@ -175,12 +207,30 @@ class SlotDeliveryMapContributorTest {
     }
 
     @Test
-    fun `An environment admission rule naming another qualifier draws no edge`() {
+    fun `An environment admission rule naming no slot of this project draws an unresolved checkpoint`() {
+        rules(
+            productionSlot,
+            EnvironmentSlotAdmissionRule.ID to EnvironmentSlotAdmissionRuleConfig("integration"),
+        )
+
+        val contribution = contributor.contribute(main)
+        val unresolved = contribution.checkpoints.single { it.type == "unresolved" }
+        assertEquals("integration", unresolved.name)
+        assertEquals("unresolved:slot:integration", unresolved.id)
+        assertEquals("slot", unresolved.data.parse<UnresolvedCheckpointData>().reference)
+        assertEquals("unresolved:slot:integration", contribution.edges.single().source)
+    }
+
+    @Test
+    fun `An environment admission rule naming another qualifier is unresolved, qualifier and all`() {
+        // A slot of this project does exist in `staging`, but not the qualified one the rule names,
+        // so the checkpoint has to say which one was asked for
         rules(
             productionSlot,
             EnvironmentSlotAdmissionRule.ID to EnvironmentSlotAdmissionRuleConfig("staging", qualifier = "demo"),
         )
-        assertEquals(emptyList(), contributor.contribute(main).edges)
+        val unresolved = contributor.contribute(main).checkpoints.single { it.type == "unresolved" }
+        assertEquals("staging [demo]", unresolved.name)
     }
 
     @Test

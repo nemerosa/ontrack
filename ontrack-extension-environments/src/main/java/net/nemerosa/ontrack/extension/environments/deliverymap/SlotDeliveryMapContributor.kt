@@ -34,6 +34,12 @@ import kotlin.jvm.optionals.getOrNull
  * no edge, and the slots hang off their promotion checkpoints unconnected to each other. That is
  * sparser than the chain the project slot graph draws, and it is the reading which surfaces the
  * misconfiguration rather than inventing a dependency nobody declared.
+ *
+ * An admission rule naming something which does not exist - a promotion this branch does not have,
+ * an environment this project has no slot in - draws an *unresolved* checkpoint carrying the name it
+ * asked for (#1705). Both rules reference their target by name inside an opaque JSONB column, with
+ * no referential integrity behind them, so this is the only place the mistake ever becomes visible
+ * before somebody tries to deploy.
  */
 @Component
 class SlotDeliveryMapContributor(
@@ -54,6 +60,21 @@ class SlotDeliveryMapContributor(
 
         val checkpoints = mutableListOf<DeliveryMapCheckpoint>()
         val edges = mutableListOf<DeliveryMapEdge>()
+        // Keyed by id: several rules, on several slots, routinely ask for the same missing thing, and
+        // one missing thing is one checkpoint. Insertion-ordered so that the map's inputs keep the
+        // order the slots were read in.
+        val unresolved = LinkedHashMap<String, DeliveryMapCheckpoint>()
+
+        // Draws the edge a rule asks for, and - when the rule named something which matches nothing -
+        // the checkpoint it runs from.
+        fun requires(source: RuleSource, target: String) {
+            source.unresolved?.let { unresolved.putIfAbsent(it.id, it) }
+            edges += DeliveryMapEdge.of(
+                kind = DeliveryMapEdgeKind.REQUIRES,
+                source = source.id,
+                target = target,
+            )
+        }
 
         slots.forEach { slot ->
             val target = SlotDeliveryMapCheckpoints.slot(slot.id)
@@ -71,10 +92,10 @@ class SlotDeliveryMapContributor(
                 try {
                     when (config.ruleId) {
                         PromotionSlotAdmissionRule.ID ->
-                            promotionEdge(branch, config, target)?.let { edges += it }
+                            requires(promotionSource(branch, config), target)
 
                         EnvironmentSlotAdmissionRule.ID ->
-                            environmentEdge(slots, config, target)?.let { edges += it }
+                            requires(environmentSource(slots, config), target)
 
                         BranchPatternSlotAdmissionRule.ID ->
                             if (excludesBranch(branch, config)) unreachable = true
@@ -94,48 +115,82 @@ class SlotDeliveryMapContributor(
             checkpoints += checkpoint(branch, slot, unreachable)
         }
 
-        return DeliveryMapContribution(checkpoints = checkpoints, edges = edges)
+        return DeliveryMapContribution(
+            // The unresolved ones last: they are not slots, and reading the slots of the project as
+            // one run is what the layout is given.
+            checkpoints = checkpoints + unresolved.values,
+            edges = edges,
+        )
+    }
+
+    /**
+     * Where the edge of one admission rule runs from.
+     *
+     * @property id Id of the checkpoint the edge runs from, resolved or not
+     * @property unresolved The checkpoint to contribute, when the rule named something matching
+     * nothing. Null when the rule resolved, because the checkpoint it names is then a real one,
+     * contributed by whoever owns it - the core for a promotion level, this contributor for a slot.
+     */
+    private data class RuleSource(
+        val id: String,
+        val unresolved: DeliveryMapCheckpoint? = null,
+    ) {
+        companion object {
+            fun unresolved(reference: String, name: String): RuleSource {
+                val checkpoint = DeliveryMapCheckpoint.unresolved(reference, name)
+                return RuleSource(id = checkpoint.id, unresolved = checkpoint)
+            }
+        }
     }
 
     /**
      * The promotion level is resolved **per branch**, by name. The same slot configuration therefore
-     * yields a different edge on every branch, which is why slots belong on a branch view at all. A
-     * name matching no promotion level of this branch draws nothing; surfacing configuration which
-     * points at nothing is #1705's subject.
+     * yields a different edge on every branch, which is why slots belong on a branch view at all.
+     *
+     * A name matching no promotion level of this branch is drawn as an unresolved checkpoint carrying
+     * that name (#1705). The rule config is read directly rather than through
+     * `PromotionRelatedSlotAdmissionRule.isForPromotionLevel`, which answers yes or no against an
+     * existing promotion level and can never report the name which failed to resolve.
+     *
+     * There is no permission ambiguity to worry about here: promotion levels belong to the branch's
+     * own project, and the map already refused to be assembled at all without `ProjectView` on it.
      */
-    private fun promotionEdge(branch: Branch, config: SlotAdmissionRuleConfig, target: String): DeliveryMapEdge? {
+    private fun promotionSource(branch: Branch, config: SlotAdmissionRuleConfig): RuleSource {
         val ruleConfig = promotionSlotAdmissionRule.parseConfig(config.ruleConfig)
         val promotionLevel = structureService.findPromotionLevelByName(
             branch.project.name,
             branch.name,
             ruleConfig.promotion,
-        ).getOrNull() ?: return null
-        return DeliveryMapEdge.of(
-            kind = DeliveryMapEdgeKind.REQUIRES,
-            source = DeliveryMapCheckpointTypes.promotionLevel(promotionLevel.id),
-            target = target,
+        ).getOrNull() ?: return RuleSource.unresolved(
+            DeliveryMapCheckpointTypes.PROMOTION_LEVEL,
+            ruleConfig.promotion,
         )
+        return RuleSource(DeliveryMapCheckpointTypes.promotionLevel(promotionLevel.id))
     }
 
     /**
      * The rule names an environment and a qualifier; the slot it means is the one of *this* project
      * in that environment. Looking it up among the slots already fetched is both cheaper than asking
-     * again and the reason an edge is never drawn to a slot the user cannot see.
+     * again and what keeps the answer honest: a rule naming a slot which does not exist is a broken
+     * configuration and gets an unresolved checkpoint, and that must never be confused with a slot
+     * hidden by permissions.
+     *
+     * The two cannot be confused, because slot visibility is decided per *project* and never per
+     * slot - `EnvironmentList` globally, then `ProjectView` and `SlotView` on the slot's project. All
+     * the slots looked at here belong to the branch's project, so the user either sees all of them or
+     * none, and the "none" case has already returned above with an empty contribution.
      */
-    private fun environmentEdge(
-        slots: List<Slot>,
-        config: SlotAdmissionRuleConfig,
-        target: String,
-    ): DeliveryMapEdge? {
+    private fun environmentSource(slots: List<Slot>, config: SlotAdmissionRuleConfig): RuleSource {
         val ruleConfig = environmentSlotAdmissionRule.parseConfig(config.ruleConfig)
         val source = slots.firstOrNull {
             it.environment.name == ruleConfig.environmentName && it.qualifier == ruleConfig.qualifier
-        } ?: return null
-        return DeliveryMapEdge.of(
-            kind = DeliveryMapEdgeKind.REQUIRES,
-            source = SlotDeliveryMapCheckpoints.slot(source.id),
-            target = target,
+        } ?: return RuleSource.unresolved(
+            SlotDeliveryMapCheckpoints.SLOT,
+            // Qualifier and all: a rule naming `staging [demo]` where only `staging` exists is
+            // exactly the mistake worth seeing, and a checkpoint labelled `staging` would hide it.
+            SlotDeliveryMapCheckpoints.label(ruleConfig.environmentName, ruleConfig.qualifier),
         )
+        return RuleSource(SlotDeliveryMapCheckpoints.slot(source.id))
     }
 
     /**
@@ -160,9 +215,7 @@ class SlotDeliveryMapContributor(
         return DeliveryMapCheckpoint(
             id = SlotDeliveryMapCheckpoints.slot(slot.id),
             type = SlotDeliveryMapCheckpoints.SLOT,
-            // The project is what the map is about, so it is left out of the label; the environment
-            // and the qualifier are what tell two slots of one project apart.
-            name = slot.environment.name + (slot.qualifier.takeIf { it.isNotBlank() }?.let { " [$it]" } ?: ""),
+            name = SlotDeliveryMapCheckpoints.label(slot.environment.name, slot.qualifier),
             description = slot.description,
             data = SlotCheckpointData(
                 slotId = slot.id,

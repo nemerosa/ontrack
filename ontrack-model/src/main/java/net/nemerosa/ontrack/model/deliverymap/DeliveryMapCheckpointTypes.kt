@@ -31,6 +31,16 @@ object DeliveryMapCheckpointTypes {
      */
     const val VALIDATION_STAMP_PATTERN = "validation-stamp-pattern"
 
+    /**
+     * A name a configuration asked for and which matches nothing: a slot admission rule naming a
+     * promotion level this branch does not have, or an environment this project has no slot in.
+     *
+     * It is a kind of its own rather than a flag on the kind it failed to find, because there is no
+     * entity behind it: no id to link to, no build which could ever arrive at it. See
+     * [DeliveryMapCheckpoint.unresolved].
+     */
+    const val UNRESOLVED = "unresolved"
+
     fun promotionLevel(id: ID): String = checkpointId(PROMOTION_LEVEL, id.value.toString())
 
     fun validationStamp(id: ID): String = checkpointId(VALIDATION_STAMP, id.value.toString())
@@ -41,6 +51,19 @@ object DeliveryMapCheckpointTypes {
      */
     fun validationStampPattern(promotionLevelId: ID): String =
         checkpointId(VALIDATION_STAMP_PATTERN, promotionLevelId.value.toString())
+
+    /**
+     * The id of an unresolved checkpoint is built from the [reference] kind it looked for and the
+     * [name] it looked for, and from nothing else. Two rules asking for the same missing thing
+     * therefore land on one checkpoint rather than one each, and the id survives a refresh, which is
+     * what #1707 needs in order to keep the node where the user dragged it.
+     *
+     * The [reference] is part of the id because the two halves of the name space would otherwise
+     * meet: a promotion level called `staging` and an environment called `staging` are not the same
+     * missing thing.
+     */
+    fun unresolved(reference: String, name: String): String =
+        checkpointId(UNRESOLVED, "$reference:$name")
 
     /**
      * Namespaces a raw identifier under a checkpoint [type].

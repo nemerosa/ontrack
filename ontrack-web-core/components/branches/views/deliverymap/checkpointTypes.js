@@ -4,6 +4,7 @@ import ValidationStampCheckpoint
     from "@components/branches/views/deliverymap/checkpoints/ValidationStampCheckpoint";
 import ValidationStampPatternCheckpoint
     from "@components/branches/views/deliverymap/checkpoints/ValidationStampPatternCheckpoint";
+import UnresolvedCheckpoint from "@components/branches/views/deliverymap/checkpoints/UnresolvedCheckpoint";
 import UnknownCheckpoint from "@components/branches/views/deliverymap/checkpoints/UnknownCheckpoint";
 import SlotCheckpoint from "@components/extension/environments/deliverymap/SlotCheckpoint";
 
@@ -55,6 +56,13 @@ export const checkpointTypes = {
         component: SlotCheckpoint,
         width: 360,
         height: 110,
+    },
+    // A name a configuration asked for and which matches nothing. Two lines only - the name and what
+    // failed to match - so it is shorter than a slot, and no build line can ever appear on it.
+    'unresolved': {
+        component: UnresolvedCheckpoint,
+        width: 280,
+        height: 90,
     },
 }
 
