@@ -7,6 +7,7 @@ import java.time.ZoneOffset
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class DemoSeedTest {
@@ -250,6 +251,186 @@ class DemoSeedTest {
         assertTrue("rule staging environment" in snapshot, "Production requires staging")
         assertTrue("rule mainOnly branchPattern" in snapshot, "Production takes main only")
     }
+
+    /**
+     * The promotion half of the delivery map has nothing to draw without these two properties: the
+     * dependencies give it its *requires* edges between promotion levels, and auto promotion gives
+     * it its *unlocks* edges and every validation stamp checkpoint it has. This pins the demo's own
+     * story so that an edit which quietly drops it fails here rather than on the demo.
+     */
+    @Test
+    fun `the demo carries the promotion properties the delivery map reads`() {
+        val target = InMemoryDemoTarget()
+        seed(target).run(DemoContent.dataset(changelog))
+        val snapshot = target.snapshot()
+
+        assertTrue("depends on [${DemoContent.SILVER}]" in snapshot, "GOLD cannot be reached before SILVER")
+        assertTrue(
+            "auto promotion AutoPromotionSpec(validationStamps=[${DemoContent.BUILD}], " +
+                    "promotionLevels=[${DemoContent.BRONZE}], include=.*TESTS, exclude=)" in snapshot,
+            "SILVER is granted by BRONZE, by BUILD, and by the stamps matching the pattern",
+        )
+    }
+
+    /**
+     * The pattern is the only thing that produces an AGGREGATE checkpoint on the map, and it is the
+     * easiest half of the auto promotion to lose in an edit - the demo would still draw edges, just
+     * not that one. Pinned against the stamp names it has to select, and against the one it must
+     * not: a stamp outside every edge is what shows that the map draws only what takes part in one.
+     */
+    @Test
+    fun `the demo pattern selects the test stamps and leaves the security scan out`() {
+        val autoPromotion = DemoContent.dataset(changelog).projects
+            .single { it.name == DemoContent.SERVICE }
+            .branches.first()
+            .promotionLevels.single { it.name == DemoContent.SILVER }
+            .autoPromotion
+
+        assertNotNull(autoPromotion)
+        assertEquals(
+            listOf(DemoContent.UNIT_TESTS, DemoContent.INTEGRATION_TESTS),
+            listOf(DemoContent.UNIT_TESTS, DemoContent.INTEGRATION_TESTS, DemoContent.SECURITY_SCAN)
+                .filter { autoPromotionSelectsStamp(it, autoPromotion) },
+        )
+    }
+
+    /**
+     * Auto promotion must reproduce the promotions the dataset declares rather than add any: a
+     * promotion nobody wrote down would be stamped with the time of the reset instead of the
+     * build's own, and the counts the pipeline view shows would stop matching the dataset.
+     *
+     * The fake server does not fire auto promotions, so this checks the dataset's own consistency -
+     * that every build satisfying the rule is already declared as promoted by it.
+     */
+    @Test
+    fun `no build of the demo would be auto promoted beyond what the dataset declares`() {
+        DemoContent.dataset(changelog).projects.forEach { project ->
+            project.branches.forEach { branch ->
+                val passed = { build: BuildSpec, stamp: String ->
+                    build.validations.any { it.validationStamp == stamp && it.status == ValidationStatus.PASSED }
+                }
+                branch.promotionLevels.forEach { promotionLevel ->
+                    val autoPromotion = promotionLevel.autoPromotion ?: return@forEach
+                    branch.builds.forEach { build ->
+                        val satisfied =
+                            branch.validationStamps
+                                .map { it.name }
+                                .filter { autoPromotionSelectsStamp(it, autoPromotion) }
+                                .all { passed(build, it) } &&
+                                    autoPromotion.promotionLevels.all { it in build.promotionLevels }
+                        if (satisfied) {
+                            assertTrue(
+                                promotionLevel.name in build.promotionLevels,
+                                "Build ${build.name} of ${project.name}/${branch.name} satisfies the " +
+                                        "auto promotion of ${promotionLevel.name} and must declare it",
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `a promotion depending on a level the branch does not declare is caught before anything is deleted`() {
+        val error = assertFailsWith<IllegalArgumentException> {
+            seed(InMemoryDemoTarget()).run(
+                datasetWithPromotionLevels(PromotionLevelSpec("GOLD", "", dependsOn = listOf("SILVER")))
+            )
+        }
+        assertTrue("depends on SILVER" in error.message.orEmpty(), error.message.orEmpty())
+    }
+
+    @Test
+    fun `a promotion depending on itself is caught before anything is deleted`() {
+        val error = assertFailsWith<IllegalArgumentException> {
+            seed(InMemoryDemoTarget()).run(
+                datasetWithPromotionLevels(PromotionLevelSpec("GOLD", "", dependsOn = listOf("GOLD")))
+            )
+        }
+        assertTrue("depends on itself" in error.message.orEmpty(), error.message.orEmpty())
+    }
+
+    @Test
+    fun `an auto promotion naming a stamp the branch does not declare is caught before anything is deleted`() {
+        val error = assertFailsWith<IllegalArgumentException> {
+            seed(InMemoryDemoTarget()).run(
+                datasetWithPromotionLevels(
+                    PromotionLevelSpec(
+                        "GOLD", "",
+                        autoPromotion = AutoPromotionSpec(validationStamps = listOf("SMOKE")),
+                    )
+                )
+            )
+        }
+        assertTrue("auto promoted by SMOKE" in error.message.orEmpty(), error.message.orEmpty())
+    }
+
+    /**
+     * A pattern selecting nothing draws no aggregate checkpoint AND grants the promotion the moment
+     * anything else it names is satisfied: it reads as configuration and behaves as none. The
+     * product accepts it - it is what #1705 is about - but curated content must not carry one.
+     */
+    @Test
+    fun `an auto promotion pattern matching no stamp of the branch is caught before anything is deleted`() {
+        val error = assertFailsWith<IllegalArgumentException> {
+            seed(InMemoryDemoTarget()).run(
+                datasetWithPromotionLevels(
+                    PromotionLevelSpec("GOLD", "", autoPromotion = AutoPromotionSpec(include = ".*SMOKE")),
+                    validationStamps = listOf(ValidationStampSpec("BUILD", "")),
+                )
+            )
+        }
+        assertTrue("selects none of the branch" in error.message.orEmpty(), error.message.orEmpty())
+    }
+
+    /**
+     * The server refuses the promotion as it is created, so a build promoted to GOLD before the
+     * SILVER it depends on is refused even though it ends up carrying both. Caught from the dataset
+     * rather than discovered half-way through a reset that has already deleted the demo.
+     */
+    @Test
+    fun `a build promoted before the promotion it depends on is caught before anything is deleted`() {
+        val error = assertFailsWith<IllegalArgumentException> {
+            seed(InMemoryDemoTarget()).run(
+                datasetWithPromotionLevels(
+                    PromotionLevelSpec("SILVER", ""),
+                    PromotionLevelSpec("GOLD", "", dependsOn = listOf("SILVER")),
+                    builds = listOf(
+                        BuildSpec(
+                            name = "1",
+                            description = "",
+                            creation = BuildCreation.DaysAgo(1),
+                            promotionLevels = listOf("GOLD", "SILVER"),
+                        ),
+                    ),
+                )
+            )
+        }
+        assertTrue("promoted to GOLD before SILVER" in error.message.orEmpty(), error.message.orEmpty())
+    }
+
+    private fun datasetWithPromotionLevels(
+        vararg promotionLevels: PromotionLevelSpec,
+        validationStamps: List<ValidationStampSpec> = emptyList(),
+        builds: List<BuildSpec> = emptyList(),
+    ) = DemoDataset(
+        projects = listOf(
+            ProjectSpec(
+                name = "one",
+                description = "",
+                branches = listOf(
+                    BranchSpec(
+                        name = "main",
+                        description = "",
+                        promotionLevels = promotionLevels.toList(),
+                        validationStamps = validationStamps,
+                        builds = builds,
+                    ),
+                ),
+            ),
+        ),
+    )
 
     /**
      * The demo's one deliberately broken configuration, which the delivery map draws as two

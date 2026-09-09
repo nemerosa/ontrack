@@ -72,10 +72,41 @@ data class BranchSpec(
     val builds: List<BuildSpec> = emptyList(),
 )
 
+/**
+ * @property autoPromotion What grants this promotion by itself, when anything does. It is what the
+ * delivery map reads to draw its *unlocks* edges, and the only thing that puts a validation stamp on
+ * the map at all.
+ * @property dependsOn Promotion levels of the same branch this one cannot be reached before, named
+ * as the `PromotionDependenciesPropertyType` property names them. It constrains; it does not act,
+ * which is why it is a separate field from [autoPromotion] rather than a corner of it.
+ */
 data class PromotionLevelSpec(
     val name: String,
     val description: String,
     val workflow: WorkflowSpec? = null,
+    val autoPromotion: AutoPromotionSpec? = null,
+    val dependsOn: List<String> = emptyList(),
+)
+
+/**
+ * Auto promotion of one promotion level: the build reaching everything named here is promoted, with
+ * nobody having to do it.
+ *
+ * Everything is named rather than referenced, as the dataset names everything else. The property
+ * itself is written with entity *ids*, and resolving the names is `KdslDemoTarget`'s job.
+ *
+ * @property validationStamps Stamps named explicitly, each drawn as its own checkpoint on the
+ * delivery map.
+ * @property promotionLevels Promotion levels which grant this one.
+ * @property include Regular expression selecting stamps by name, whole-string as the server matches
+ * it. Stamps selected this way collapse into one *aggregate* checkpoint labelled with the pattern.
+ * @property exclude Regular expression removing stamps from what [include] selected.
+ */
+data class AutoPromotionSpec(
+    val validationStamps: List<String> = emptyList(),
+    val promotionLevels: List<String> = emptyList(),
+    val include: String = "",
+    val exclude: String = "",
 )
 
 /**

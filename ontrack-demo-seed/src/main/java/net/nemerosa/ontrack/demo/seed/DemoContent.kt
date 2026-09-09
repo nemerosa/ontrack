@@ -132,8 +132,52 @@ object DemoContent {
     private val integrationTests = ValidationStampSpec(INTEGRATION_TESTS, "Integration tests against a real database.")
     private val securityScan = ValidationStampSpec(SECURITY_SCAN, "Dependency and container scan.")
 
-    /** The full ladder, for the projects that show the whole delivery pipeline. */
-    private val fullPromotions = listOf(bronze, silver, gold)
+    /**
+     * SILVER as the full ladder carries it: granted by itself once the build is BRONZE, has built,
+     * and has passed every stamp whose name ends in TESTS.
+     *
+     * This is what gives the delivery map its *unlocks* edges, and auto promotion is the only thing
+     * that puts a validation stamp on the map at all. It says three different things on purpose:
+     * a promotion level granting a promotion, a stamp named explicitly, and a PATTERN - which the
+     * map collapses into one aggregate checkpoint labelled `.*TESTS`, standing for the stamps it
+     * matches rather than drawing one edge each.
+     *
+     * `SECURITY.SCAN` is deliberately outside the pattern, so that the demo also shows a stamp the
+     * map leaves out: only the stamps taking part in a dependency are drawn.
+     *
+     * It reproduces the promotions the dataset already declares rather than adding any. Every build
+     * below carrying SILVER is BRONZE with `BUILD` and both TESTS green, and the two that are not -
+     * 103 with a failed integration test, 106 with a failed unit test - satisfy neither rule. Auto
+     * promotion only ever fires for a build not already promoted, so the demo's promotions stay the
+     * curated ones, at their curated times.
+     */
+    private val silverAuto = silver.copy(
+        autoPromotion = AutoPromotionSpec(
+            validationStamps = listOf(BUILD),
+            promotionLevels = listOf(BRONZE),
+            include = ".*TESTS",
+        ),
+    )
+
+    /**
+     * GOLD as the full ladder carries it: a human still grants it, but never before SILVER.
+     *
+     * The map's other edge kind, and the counterpart to [silverAuto]: a dependency CONSTRAINS where
+     * auto promotion ACTS, and the two are drawn differently because a map showing them alike would
+     * say that a configuration grants a promotion when it only permits it.
+     *
+     * The server refuses a promotion whose dependencies are not already granted, so every build
+     * declaring GOLD below declares SILVER before it. `validate` checks that before a reset.
+     */
+    private val goldAfterSilver = gold.copy(dependsOn = listOf(SILVER))
+
+    /**
+     * The full ladder, for the projects that show the whole delivery pipeline.
+     *
+     * [LIBRARY] and [UI] keep the plain [bronze] and [silver]: they declare neither the stamps
+     * [silverAuto] names nor a GOLD for [goldAfterSilver] to sit above.
+     */
+    private val fullPromotions = listOf(bronze, silverAuto, goldAfterSilver)
 
     /** The full set of checks, for the same projects. */
     private val fullValidationStamps = listOf(buildStamp, unitTests, integrationTests, securityScan)
@@ -471,7 +515,11 @@ object DemoContent {
             BranchSpec(
                 name = MAIN,
                 description = "Commits since the last release.",
-                promotionLevels = fullPromotions,
+                // The plain ladder, NOT `fullPromotions`: its SILVER is auto promoted from BRONZE
+                // plus the stamps, and every build here is BRONZE with both of its stamps green, so
+                // the whole branch would promote itself to SILVER. This project's builds are one
+                // per commit and stop at BRONZE; the promotion story is [SERVICE]'s.
+                promotionLevels = listOf(bronze, silver, gold),
                 validationStamps = listOf(buildStamp, unitTests),
                 // Reversed: the entries arrive newest first - [ChangelogSource] sorts them,
                 // rather than leaving them in whatever order `git log` printed - and Yontrack

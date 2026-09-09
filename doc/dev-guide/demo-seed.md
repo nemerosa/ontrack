@@ -164,6 +164,30 @@ promotion to a level the branch does not declare, no link to a build that is nev
 no deployment a slot's admission rules would refuse — **before** the reset deletes anything,
 and reports every problem at once. Destructive by design must not mean blank on failure.
 
+### A name matching nothing is a typo here, even where the product allows it
+
+Some of what the dataset names is not checked by the server at all. A promotion dependency
+and a slot admission rule both name their target by name, with nothing behind the name, so
+Yontrack accepts a promotion that depends on a level the branch does not have — it is what
+the delivery map draws as an *unresolved checkpoint*.
+
+`validate` refuses one anyway. Curated content is read as a demonstration, and nobody looking
+at the demo can tell a deliberate dangling name from a mistake. The exception is deliberate
+and marked as such: the `petclinic-ui` production slot exists precisely to show what a broken
+admission rule looks like, and it is the only one.
+
+### Auto promotion has to reproduce the dataset, not add to it
+
+`PromotionLevelSpec.autoPromotion` configures a real server behaviour: the build reaching
+everything it names *is promoted*, by the server, at the moment the last validation lands. A
+rule the dataset's own builds satisfy without declaring the promotion therefore adds a
+promotion run nobody wrote down, stamped with the time of the reset rather than the build's
+own, and the counts every view shows stop matching the dataset.
+
+`DemoSeedTest` pins this: every build satisfying an auto promotion must already declare it.
+That is what keeps `fullPromotions` off the changelog project, whose builds stop at BRONZE
+with both stamps green and would otherwise promote themselves to SILVER on the next reset.
+
 ### Deployments are a sequence, not a slot property
 
 `DemoDataset.deployments` is an ordered list, run after every slot exists, rather than a

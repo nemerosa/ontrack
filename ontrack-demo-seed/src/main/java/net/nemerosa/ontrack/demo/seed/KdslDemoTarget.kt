@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.Build
 import net.nemerosa.ontrack.kdsl.spec.Ontrack
 import net.nemerosa.ontrack.kdsl.spec.Project
+import net.nemerosa.ontrack.kdsl.spec.PromotionLevel
+import net.nemerosa.ontrack.kdsl.spec.ValidationStamp
 import net.nemerosa.ontrack.kdsl.spec.dashboards.DashboardWidget
 import net.nemerosa.ontrack.kdsl.spec.dashboards.DashboardWidgetLayout
 import net.nemerosa.ontrack.kdsl.spec.dashboards.dashboards
@@ -14,6 +16,9 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.DashboardContextU
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.Environment
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.Slot
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.environments
+import net.nemerosa.ontrack.kdsl.spec.extension.general.AutoPromotionProperty
+import net.nemerosa.ontrack.kdsl.spec.extension.general.autoPromotion
+import net.nemerosa.ontrack.kdsl.spec.extension.general.promotionDependencies
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.NotificationsMgt
 import net.nemerosa.ontrack.kdsl.spec.extension.scm.MockScmRepositoryContext
 import net.nemerosa.ontrack.kdsl.spec.extension.scm.mockScmBranchProperty
@@ -183,6 +188,9 @@ private class KdslDemoBranch(
 
     private var scmBranch: String? = null
 
+    private val promotionLevels = mutableMapOf<String, PromotionLevel>()
+    private val validationStamps = mutableMapOf<String, ValidationStamp>()
+
     override fun configureScmBranch(scmBranch: String) {
         branch.mockScmBranchProperty = scmBranch
         this.scmBranch = scmBranch
@@ -200,6 +208,9 @@ private class KdslDemoBranch(
 
     override fun createPromotionLevel(name: String, description: String, workflow: WorkflowSpec?) {
         val promotionLevel = branch.createPromotionLevel(name, description)
+        // Kept as they are created, because the auto promotion property is written with entity IDS
+        // and there is no other way back from a name to one without a further query per lookup.
+        promotionLevels[name] = promotionLevel
         workflow?.let {
             NotificationsMgt(promotionLevel.connector).subscribe(
                 channel = "workflow",
@@ -211,7 +222,22 @@ private class KdslDemoBranch(
     }
 
     override fun createValidationStamp(name: String, description: String) {
-        branch.createValidationStamp(name, description)
+        validationStamps[name] = branch.createValidationStamp(name, description)
+    }
+
+    override fun setAutoPromotion(promotionLevel: String, spec: AutoPromotionSpec) {
+        // `validate` has already ruled out a name the branch does not declare, so a miss here is a
+        // fault in the seed's own ordering rather than in the dataset - hence `getValue`.
+        promotionLevels.getValue(promotionLevel).autoPromotion = AutoPromotionProperty(
+            validationStamps = spec.validationStamps.map { validationStamps.getValue(it).id },
+            promotionLevels = spec.promotionLevels.map { promotionLevels.getValue(it).id },
+            include = spec.include,
+            exclude = spec.exclude,
+        )
+    }
+
+    override fun setPromotionDependencies(promotionLevel: String, dependencies: List<String>) {
+        promotionLevels.getValue(promotionLevel).promotionDependencies = dependencies
     }
 
     override fun createBuild(name: String, description: String, creation: LocalDateTime): DemoBuild {

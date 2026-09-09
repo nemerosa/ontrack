@@ -134,6 +134,16 @@ class DemoSeed(
         spec.scmBranch?.let { branch.configureScmBranch(it) }
         spec.promotionLevels.forEach { branch.createPromotionLevel(it.name, it.description, it.workflow) }
         spec.validationStamps.forEach { branch.createValidationStamp(it.name, it.description) }
+        // A third pass, after both: auto promotion and promotion dependencies name other promotion
+        // levels and validation stamps of the same branch, and the property is written with their
+        // ids, so all of them have to exist first. Before the builds, so that a build promoted here
+        // is promoted against the configuration the demo ships with rather than against a branch
+        // still being configured.
+        spec.promotionLevels.forEach { promotionLevel ->
+            promotionLevel.autoPromotion?.let { branch.setAutoPromotion(promotionLevel.name, it) }
+            promotionLevel.dependsOn.takeIf { it.isNotEmpty() }
+                ?.let { branch.setPromotionDependencies(promotionLevel.name, it) }
+        }
         spec.builds.forEach { buildSpec ->
             val creation = buildSpec.creation.resolve(now)
             val build = branch.createBuild(buildSpec.name, buildSpec.description, creation)

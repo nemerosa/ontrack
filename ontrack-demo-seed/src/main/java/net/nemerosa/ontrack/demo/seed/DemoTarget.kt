@@ -101,6 +101,21 @@ interface DemoBranch {
 
     fun createPromotionLevel(name: String, description: String, workflow: WorkflowSpec? = null)
     fun createValidationStamp(name: String, description: String)
+
+    /**
+     * Configures what grants [promotionLevel] by itself.
+     *
+     * Separate from [createPromotionLevel] because the property is written with entity *ids*: every
+     * promotion level and every validation stamp of the branch has to exist before any of them can
+     * be named here.
+     */
+    fun setAutoPromotion(promotionLevel: String, spec: AutoPromotionSpec)
+
+    /**
+     * Configures the promotion levels [promotionLevel] cannot be reached before. Same ordering
+     * constraint as [setAutoPromotion], for the same reason.
+     */
+    fun setPromotionDependencies(promotionLevel: String, dependencies: List<String>)
     fun createBuild(name: String, description: String, creation: LocalDateTime): DemoBuild
 }
 

@@ -83,7 +83,11 @@ class InMemoryDemoTarget(
             project.branches.forEach { branch ->
                 add("  branch ${branch.name} \"${branch.description}\"")
                 branch.scmBranch?.let { add("    scm branch $it") }
-                branch.promotionLevels.forEach { add("    promotion level $it") }
+                branch.promotionLevels.forEach { promotionLevel ->
+                    add("    promotion level $promotionLevel")
+                    branch.autoPromotions[promotionLevel]?.let { add("      auto promotion $it") }
+                    branch.promotionDependencies[promotionLevel]?.let { add("      depends on $it") }
+                }
                 branch.validationStamps.forEach { add("    validation stamp $it") }
                 branch.builds.forEach { build ->
                     add("    build ${build.name} \"${build.description}\" at ${build.creation}")
@@ -170,6 +174,8 @@ class InMemoryDemoTarget(
         val validationStamps = mutableListOf<String>()
         val builds = mutableListOf<InMemoryBuild>()
         var scmBranch: String? = null
+        val autoPromotions = mutableMapOf<String, AutoPromotionSpec>()
+        val promotionDependencies = mutableMapOf<String, List<String>>()
 
         override fun configureScmBranch(scmBranch: String) {
             requireNotNull(project.scmRepositoryName) {
@@ -198,6 +204,33 @@ class InMemoryDemoTarget(
             checkName(name, "Validation stamp")
             require(name !in validationStamps) { "Validation stamp $name already exists in ${project.name}/${this.name}" }
             validationStamps += name
+        }
+
+        override fun setAutoPromotion(promotionLevel: String, spec: AutoPromotionSpec) {
+            requirePromotionLevel(promotionLevel)
+            // The property is written with entity ids, so the server cannot record a name it has
+            // nothing behind - which is what makes the ordering of the seed's passes load-bearing.
+            spec.promotionLevels.forEach(::requirePromotionLevel)
+            spec.validationStamps.forEach { stamp ->
+                require(stamp in validationStamps) {
+                    "Validation stamp $stamp does not exist in ${project.name}/${this.name}"
+                }
+            }
+            autoPromotions[promotionLevel] = spec
+        }
+
+        override fun setPromotionDependencies(promotionLevel: String, dependencies: List<String>) {
+            requirePromotionLevel(promotionLevel)
+            // The property names its dependencies rather than referencing them, so the server DOES
+            // accept a name matching nothing - #1705 draws it. The dataset refuses one anyway, in
+            // `validate`, and this fake stays as permissive as the server it stands for.
+            promotionDependencies[promotionLevel] = dependencies
+        }
+
+        private fun requirePromotionLevel(name: String) {
+            require(name in promotionLevels) {
+                "Promotion level $name does not exist in ${project.name}/${this.name}"
+            }
         }
 
         override fun createBuild(name: String, description: String, creation: LocalDateTime): DemoBuild {
@@ -229,6 +262,18 @@ class InMemoryDemoTarget(
         override fun promote(promotionLevel: String, description: String, at: LocalDateTime) {
             require(promotionLevel in branch.promotionLevels) {
                 "No promotion level $promotionLevel on ${branch.project.name}/${branch.name}"
+            }
+            // `PromotionRunDependenciesCheckExtension` refuses the promotion outright, as the
+            // promotion is created, so a build promoted to GOLD before SILVER is refused even
+            // though it ends up carrying both. One reading of the rule, shared with `validate`.
+            missingPromotionDependency(
+                alreadyPromoted = promotions.map { it.first },
+                dependencies = branch.promotionDependencies[promotionLevel].orEmpty(),
+            )?.let { missing ->
+                throw IllegalStateException(
+                    "$name of ${branch.project.name}/${branch.name} cannot be promoted to " +
+                            "$promotionLevel before $missing, which it depends on"
+                )
             }
             promotions += promotionLevel to at
         }

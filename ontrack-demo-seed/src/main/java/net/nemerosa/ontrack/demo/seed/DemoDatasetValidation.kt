@@ -50,9 +50,60 @@ fun DemoDataset.validate() {
             val validationStamps = branch.validationStamps.map { it.name }.toSet()
             branch.promotionLevels.forEach { checkName(it.name, "Promotion level") }
             branch.validationStamps.forEach { checkName(it.name, "Validation stamp") }
+            // The two promotion properties name other entities of the same branch, and a name
+            // matching nothing there is a typo rather than a demonstration. The product accepts
+            // such a name - it is exactly what the delivery map draws as an unresolved checkpoint,
+            // see #1705 - but curated content must not carry one: nobody looking at the demo can
+            // tell a deliberate one from a mistake.
+            branch.promotionLevels.forEach { promotionLevel ->
+                val where = "Promotion level ${promotionLevel.name} of ${project.name}/${branch.name}"
+                promotionLevel.dependsOn.forEach { dependency ->
+                    if (dependency == promotionLevel.name) {
+                        problems += "$where depends on itself."
+                    } else if (dependency !in promotionLevels) {
+                        problems += "$where depends on $dependency, which the branch does not declare."
+                    }
+                }
+                promotionLevel.autoPromotion?.let { autoPromotion ->
+                    autoPromotion.validationStamps.forEach { stamp ->
+                        if (stamp !in validationStamps) {
+                            problems += "$where is auto promoted by $stamp, " +
+                                    "which the branch does not declare."
+                        }
+                    }
+                    autoPromotion.promotionLevels.forEach { required ->
+                        if (required !in promotionLevels) {
+                            problems += "$where is auto promoted by $required, " +
+                                    "which the branch does not declare."
+                        }
+                    }
+                    // A pattern selecting nothing draws no aggregate checkpoint and grants the
+                    // promotion the moment anything else it names is satisfied - it reads as
+                    // configuration and behaves as none.
+                    if (autoPromotion.include.isNotBlank() &&
+                        validationStamps.none { autoPromotionSelectsStamp(it, autoPromotion) }
+                    ) {
+                        problems += "$where is auto promoted by validation stamps matching " +
+                                "\"${autoPromotion.include}\", which selects none of the branch's."
+                    }
+                }
+            }
+            val dependenciesOf = branch.promotionLevels.associate { it.name to it.dependsOn }
             branch.builds.forEach { build ->
                 checkName(build.name, "Build")
                 buildRefs += BuildRef(project.name, branch.name, build.name)
+                // Promotions are granted in the order they are declared, and the server refuses one
+                // whose dependencies are not already granted - so the order is load-bearing here in
+                // the same way the order of the deployments is.
+                val promoted = mutableListOf<String>()
+                build.promotionLevels.forEach { promotionLevel ->
+                    missingPromotionDependency(promoted, dependenciesOf[promotionLevel].orEmpty())
+                        ?.let { missing ->
+                            problems += "Build ${build.name} of ${project.name}/${branch.name} " +
+                                    "is promoted to $promotionLevel before $missing, which it depends on."
+                        }
+                    promoted += promotionLevel
+                }
                 if (build.commits.isNotEmpty() && branch.scmBranch == null) {
                     problems += "Build ${build.name} of ${project.name}/${branch.name} declares " +
                             "commits, but the branch follows no SCM branch."
