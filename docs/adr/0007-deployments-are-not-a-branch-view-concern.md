@@ -1,5 +1,11 @@
 # Deployments are not a branch-view concern
 
+> **Superseded in part by `0009-a-slot-checkpoint-names-another-branchs-build.md`.** Everything
+> below still holds for the **pipeline view**, whose promotion band this document is about. It does
+> not hold for the **delivery map view**, which draws the project's slots as checkpoints and names
+> the build deployed in each of them whatever branch that build belongs to. ADR 0009 records why
+> that exception was taken.
+
 The pipeline content view shows a build's environments as a **decoration on the
 timeline card**, and nowhere else. In particular the promotion stage band carries
 one card per promotion level and no card for an environment or a slot, and it will

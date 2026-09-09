@@ -1,17 +1,18 @@
 # Branch views
 
 A branch holds the same information whatever you came to it for, but not every question is best
-answered by the same layout. Yontrack therefore offers several *content views* for a branch - two
+answered by the same layout. Yontrack therefore offers several *content views* for a branch -
 interchangeable readings of the branch, sharing the same page, the same filters and the same
 permissions, and differing only in how they arrange what they show.
 
-| View                      | Reads the branch as                                              |
-|---------------------------|------------------------------------------------------------------|
-| [Builds](#the-builds-view)     | a list of builds, most recent first                         |
-| [Pipeline](#the-pipeline-view) | a promotion pipeline - what is release-ready right now      |
+| View                                  | Reads the branch as                                                     |
+|---------------------------------------|-------------------------------------------------------------------------|
+| [Builds](#the-builds-view)            | a list of builds, most recent first                                     |
+| [Pipeline](#the-pipeline-view)        | a promotion pipeline - what is release-ready right now                  |
+| [Delivery map](#the-delivery-map-view) | a map of what a build still has to pass through to reach an environment |
 
-The two are peers: one is never reached from inside the other, and neither is a sub-mode of the
-other. **Builds** is the default, and remains so for existing users.
+They are peers: one is never reached from inside another, and none is a sub-mode of another.
+**Builds** is the default, and remains so for existing users.
 
 ## Switching between views
 
@@ -27,7 +28,7 @@ Three things follow from picking a view:
 * an unknown or stale `?view=` value falls back to the Builds view rather than failing.
 
 The [build filter](../build-filtering/index.md) and the validation stamp filter sit *above* the
-view, not inside it. A filter you set in one view is still in force when you switch to the other.
+view, not inside it. A filter you set in one view is still in force when you switch to another.
 
 ## The Builds view
 
@@ -114,6 +115,107 @@ someone can be linked to directly. Opening such a link selects the build it name
 build is old enough not to be in the first page of the timeline.
 
 When no build is named, the most recent one is selected.
+
+## The Delivery map view
+
+!!! warning "Experimental"
+
+    The Delivery map view is experimental and still being refined. It is marked as such in the
+    product, with a flask icon next to its entry in the View menu and a dismissible banner on the
+    view itself. Feedback is welcome in
+    [GitHub Discussions](https://github.com/yontrack/yontrack/discussions).
+
+The Delivery map answers a third question: *what does a build on this branch still have to pass
+through on its way to an environment, and what depends on what*.
+
+It is **configuration with progress painted onto it**, not a history. Every node is something a
+build has to reach - a checkpoint - and every line between two of them is a dependency someone
+configured. Nothing on it is inferred from what has happened; a map with no lines is a project
+whose promotion and deployment rules have not been written down, not a project with no history.
+
+### Checkpoints
+
+A *checkpoint* is one node of the map. There are three kinds, and each one names the latest build
+to have **arrived** at it and when.
+
+| Checkpoint       | Arrived at by            | The build it names                                    |
+|------------------|--------------------------|-------------------------------------------------------|
+| Promotion level  | being promoted           | the latest build of this branch promoted there        |
+| Validation stamp | a run of *any* outcome   | the latest build of this branch run there, with its status |
+| Slot             | a deployment             | the most recently deployed build, **whatever its branch** |
+
+Arriving is not the same as succeeding, which is why only the validation stamp shows a status: a
+build can arrive at a stamp and fail there, while a build cannot be promoted and fail.
+
+Every promotion level of the branch is on the map, connected or not - a level with no configuration
+behind it is exactly the thing you want to see. Validation stamps are the opposite: only the ones
+taking part in a dependency are drawn, because an unconnected stamp teaches nothing on a map whose
+subject is dependencies, and a branch with forty of them would have no readable layout. A promotion
+whose [auto promotion](../model/auto-promotion.md) selects stamps *by pattern* gets a single node
+labelled with the pattern, standing for all of them; click it to see the stamps it covers.
+
+### Dependencies
+
+Lines run from the prerequisite to the thing that depends on it, and come in two kinds, drawn
+differently:
+
+| Kind         | Means                                                    | Comes from                                        |
+|--------------|-----------------------------------------------------------|---------------------------------------------------|
+| **unlocks**  | reaching the source grants the target by itself           | auto promotion                                    |
+| **requires** | the target cannot be reached until the source has been    | promotion dependencies, slot admission rules      |
+
+The distinction matters because the two are configured in ways with opposite effects. Auto
+promotion *acts*: pass the validations and the promotion happens. A promotion dependency or an
+admission rule only *constrains*: it permits, and something else still has to do the promoting or
+the deploying.
+
+### Slots on the map
+
+The map draws every [slot](../../integrations/environments/environments.md) of the branch's
+project, and joins them to the rest from the slot's own admission rules:
+
+* a **promotion** admission rule draws a *requires* line from that promotion level to the slot. The
+  promotion is resolved by name **on this branch**, so the same slot configuration produces a
+  different line on every branch - which is exactly why slots belong on a branch view at all. A rule
+  naming a promotion this branch does not have draws no line;
+* an **environment** admission rule - "must already be deployed in *staging*" - draws a *requires*
+  line from that slot to this one.
+
+Slot-to-slot lines come **only** from that rule. The map deliberately does not fall back to the
+order of the environments, the way the project's slot graph does. Ordering says which environment
+comes first; it never says that one deployment requires another. Where nobody configured the rule
+there is no line, and the slots hang off their promotion checkpoints without joining up to each
+other.
+
+That makes the map look sparser than the chain drawn on the project's environments page, and the
+sparseness is the point: it is the reading which shows you a slot nobody wired up, rather than one
+which invents a dependency you never declared. Adding the environment admission rule to the slot
+both fixes the deployment and fills in the line.
+
+Two things about a slot are unlike every other checkpoint.
+
+**A slot may name a build from another branch.** A slot shows what is deployed in it, and what is
+deployed in production is a fact about the project rather than about the branch you happen to be
+reading. When that build is not of this branch, the map says so beside it. The alternative - showing
+nothing - would read as *nothing is in production*, which is the most damaging thing the map could
+get wrong.
+
+**A slot this branch can never reach is marked unreachable, and names no build.** If an admission
+rule excludes the branch by name or pattern, no build of it can ever deploy there however far it is
+promoted. Such a slot is still drawn, because "you cannot get there from here" is the most important
+answer the map can give; leaving it out silently would leave you wondering why production is missing.
+
+### Filters, and what the map does with them
+
+The map obeys the validation stamp filter, which sits above the view switch like every other filter
+and follows you from one view to the next. The filter touches validation stamps only: hiding a
+promotion level or a slot because of a *validation* filter would be a different claim entirely. A
+pattern node disappears when the filter leaves it standing for nothing, and any line left with a
+missing end goes with it.
+
+Nodes can be dragged about; nothing on the map can be edited from it. It is a reading of the
+configuration, and the configuration is changed where it lives - on the promotion level, on the
+branch, or on the slot the node links to.
 
 ## Not to be confused with
 

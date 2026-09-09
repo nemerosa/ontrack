@@ -69,6 +69,13 @@ not these forty named things. A promotion whose stamps are named explicitly gets
 one checkpoint each instead.
 _Avoid_: group node, collapsed node, stamp group
 
+**Unreachable slot**:
+A slot checkpoint no build of the branch being read can ever be deployed to,
+because an admission rule excludes the branch outright. It is drawn, marked as
+such, and names no build - not even the one actually deployed in it. See ADR 0009.
+_Avoid_: blocked slot, forbidden slot, excluded slot. *Blocked* is what a build
+waiting on an admission rule is; this is about the branch, and is permanent.
+
 **Unlocks**:
 The delivery map edge meaning that reaching one checkpoint grants another by
 itself, as auto promotion does.
