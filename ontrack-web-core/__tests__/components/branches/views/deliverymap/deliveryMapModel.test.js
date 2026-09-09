@@ -5,6 +5,7 @@ import {
     isMapEmpty,
     toFlowEdges,
     toFlowNodes,
+    withEdgeColor,
 } from "@components/branches/views/deliverymap/deliveryMapModel"
 
 describe('delivery map model', () => {
@@ -82,22 +83,44 @@ describe('delivery map model', () => {
             expect(toFlowEdges([unlocks])[0].style.strokeDasharray).toBeUndefined()
         })
 
-        it('points every edge at its target, in the colour it was given', () => {
-            const edge = toFlowEdges([unlocks], {color: '#123456'})[0]
-            expect(edge.markerEnd.color).toBe('#123456')
-            expect(edge.style.stroke).toBe('#123456')
-        })
-
-        it('draws the arrowhead and the line in one colour, so the arrow is part of the line', () => {
-            const [unlocksEdge, requiresEdge] = toFlowEdges([unlocks, requires], {color: '#123456'})
-            expect(unlocksEdge.markerEnd.color).toBe(unlocksEdge.style.stroke)
-            expect(requiresEdge.markerEnd.color).toBe(requiresEdge.style.stroke)
-        })
-
-        it('still draws without a colour, because the caller may have no theme to hand', () => {
+        it('points every edge at its target, with an arrowhead big enough to see', () => {
             const edge = toFlowEdges([unlocks])[0]
             expect(edge.markerEnd).toBeTruthy()
-            expect(edge.style.strokeWidth).toBeTruthy()
+            // React Flow leaves SVG's `markerUnits` at `strokeWidth`, so what it is given is a
+            // multiple of the line width. The rendered head is that times the stroke, and has to
+            // stay bigger than React Flow's own 16px default whatever the stroke becomes.
+            expect(edge.markerEnd.width * edge.style.strokeWidth).toBeGreaterThan(16)
+        })
+
+        it('leaves the colour out, because it belongs to the theme and not to the kind', () => {
+            const edge = toFlowEdges([unlocks])[0]
+            expect(edge.style.stroke).toBeUndefined()
+            expect(edge.markerEnd.color).toBeUndefined()
+        })
+
+        it('names an edge kind it has never heard of instead of calling it unlocks', () => {
+            // The kinds are a CLOSED set on the server, so this is not the open registry the
+            // checkpoint kinds have. It matters anyway: calling an unknown kind "unlocks" would
+            // claim a configuration ACTS, which is the one error the two kinds exist to keep apart.
+            const edge = toFlowEdges([{...requires, kind: 'SUPERSEDES'}])[0]
+            expect(edge.label).toBe('SUPERSEDES')
+            expect(edge.style.strokeDasharray).toBeUndefined()
+        })
+
+        it('paints the line and its arrowhead in one colour', () => {
+            // An arrowhead in another shade reads as a separate mark rather than as the end of the
+            // line it belongs to
+            const [edge] = withEdgeColor(toFlowEdges([unlocks]), '#123456')
+            expect(edge.style.stroke).toBe('#123456')
+            expect(edge.markerEnd.color).toBe('#123456')
+        })
+
+        it('keeps everything else of an edge when painting it', () => {
+            // Painting happens at render, on edges the layout has already been computed from
+            const [edge] = withEdgeColor(toFlowEdges([requires]), '#123456')
+            expect(edge.label).toBe("required by")
+            expect(edge.style.strokeDasharray).toBeTruthy()
+            expect(edge.markerEnd.type).toBe(toFlowEdges([requires])[0].markerEnd.type)
         })
 
         it('maps nothing when there is nothing', () => {

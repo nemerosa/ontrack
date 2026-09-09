@@ -38,9 +38,31 @@ export function toFlowNodes(checkpoints = []) {
  * Which end an edge points at IS the content of a dependency, so the arrowhead is not decoration and
  * is sized to be seen. React Flow's own defaults - a hairline and a 16px marker in its default grey -
  * left the head all but invisible against the line (#1717).
+ *
+ * The marker is expressed in PIXELS here and divided below, because React Flow leaves SVG's
+ * `markerUnits` at `strokeWidth`: what it is given is a multiple of the line's width, not a size.
+ * Written the other way round, changing [EDGE_STROKE_WIDTH] would silently rescale every arrowhead.
  */
 const EDGE_STROKE_WIDTH = 1.5
-const EDGE_MARKER_SIZE = 22
+const EDGE_MARKER_PX = 33
+
+/**
+ * How each edge kind is drawn, keyed by the kind's own name.
+ *
+ * `DeliveryMapEdgeKind` is a CLOSED set on the server - unlike the set of checkpoint kinds - so this
+ * is not the open registry `checkpointTypes` is, and a kind missing from here is a model change
+ * rather than an extension. The fallback below exists for a narrower reason: labelling an unknown
+ * kind "unlocks" would claim that a configuration ACTS when nothing here knows whether it does, and
+ * that is the one error `DeliveryMapEdgeKind` was split in two to prevent.
+ *
+ * @property label What the edge says, read ALONG the arrow - see `toFlowEdges`
+ * @property strokeDasharray Dashed for the kind which only constrains, absent for the one which
+ * acts. The dash survives greyscale, which is why the two kinds are not told apart by colour.
+ */
+const edgeKinds = {
+    UNLOCKS: {label: "unlocks"},
+    REQUIRES: {label: "required by", strokeDasharray: '6 4'},
+}
 
 /**
  * Builds the React Flow edges of a list of delivery map edges.
@@ -60,34 +82,58 @@ const EDGE_MARKER_SIZE = 22
  * map out along, so a reversed `requires` edge would put GOLD to the left of SILVER and the map
  * would stop reading left to right as a journey.
  *
+ * The colour is NOT set here: it is theme-dependent, and applied by [withEdgeColor] at render time.
+ * Everything this function decides comes from the edge's kind alone, which is what makes it a pure
+ * mapping the layout can be computed from once.
+ *
  * @param edges The map's edges, as the server sent them
- * @param color What to draw the lines and their arrowheads in. It has to come from the caller: the
- * map is drawn in both light and dark mode, and this is a pure function with no theme to read.
- * Omitted, React Flow's own default colour applies, which is why nothing here breaks without it.
  */
-export function toFlowEdges(edges = [], {color} = {}) {
+export function toFlowEdges(edges = []) {
+    return edges.map(edge => {
+        // An unrecognised kind is labelled with its own name and drawn solid: it says what the
+        // server called it and claims nothing further.
+        const {label = edge.kind, strokeDasharray} = edgeKinds[edge.kind] ?? {}
+        return {
+            id: edge.id,
+            source: edge.source,
+            target: edge.target,
+            type: 'smoothstep',
+            label,
+            animated: false,
+            style: {
+                strokeWidth: EDGE_STROKE_WIDTH,
+                strokeDasharray,
+            },
+            markerEnd: {
+                type: MarkerType.ArrowClosed,
+                width: EDGE_MARKER_PX / EDGE_STROKE_WIDTH,
+                height: EDGE_MARKER_PX / EDGE_STROKE_WIDTH,
+            },
+            data: {kind: edge.kind},
+        }
+    })
+}
+
+/**
+ * Paints laid-out edges in the theme's colour.
+ *
+ * Kept apart from [toFlowEdges] so that a change of theme repaints the map without relaying it out:
+ * the layout runs in an effect keyed on the map, and adding the colour to that effect's inputs would
+ * make switching to dark mode throw away every node the user had dragged.
+ *
+ * The line and its arrowhead take the SAME colour. An arrowhead in another shade reads as a separate
+ * mark rather than as the end of that line - and colour is never what tells the two edge kinds apart,
+ * which is the dash's job precisely because a dash survives greyscale.
+ *
+ * @param edges Edges from [toFlowEdges], laid out or not
+ * @param color What to paint them. Required: React Flow's own default is the near-invisible grey
+ * #1717 exists to fix, so falling back to it would be the bug rather than a safe default.
+ */
+export function withEdgeColor(edges, color) {
     return edges.map(edge => ({
-        id: edge.id,
-        source: edge.source,
-        target: edge.target,
-        type: 'smoothstep',
-        label: edge.kind === 'REQUIRES' ? "required by" : "unlocks",
-        animated: false,
-        style: {
-            stroke: color,
-            strokeWidth: EDGE_STROKE_WIDTH,
-            // Dashed for `requires` only: it constrains where `unlocks` acts
-            strokeDasharray: edge.kind === 'REQUIRES' ? '6 4' : undefined,
-        },
-        markerEnd: {
-            type: MarkerType.ArrowClosed,
-            width: EDGE_MARKER_SIZE,
-            height: EDGE_MARKER_SIZE,
-            // The same colour as the line it ends: an arrowhead in a different shade reads as a
-            // separate mark rather than as the end of that line.
-            color,
-        },
-        data: {kind: edge.kind},
+        ...edge,
+        style: {...edge.style, stroke: color},
+        markerEnd: {...edge.markerEnd, color},
     }))
 }
 

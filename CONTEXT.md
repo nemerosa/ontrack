@@ -94,7 +94,10 @@ _Avoid_: triggers, leads to
 **Requires**:
 The delivery map edge meaning that a checkpoint cannot be reached until another
 has been, as promotion dependencies and slot admission rules do. It constrains;
-it does not act.
+it does not act. It is drawn labelled *required by*, because the label is read
+along the arrow and the arrow runs from the prerequisite: the line for "GOLD
+requires SILVER" reads *SILVER required by GOLD*. That is this word rendered for
+the direction it is read in, not a second term.
 _Avoid_: depends on, blocks
 
 **Promotion level**:

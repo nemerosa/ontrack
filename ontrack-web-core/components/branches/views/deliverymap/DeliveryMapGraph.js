@@ -1,10 +1,10 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {theme} from "antd";
 import {applyNodeChanges, Background, Controls, ReactFlow} from "reactflow";
 import {autoLayout} from "@components/links/GraphUtils";
 import CheckpointNode from "@components/branches/views/deliverymap/CheckpointNode";
 import {getCheckpointType} from "@components/branches/views/deliverymap/checkpointTypes";
-import {toFlowEdges, toFlowNodes} from "@components/branches/views/deliverymap/deliveryMapModel";
+import {toFlowEdges, toFlowNodes, withEdgeColor} from "@components/branches/views/deliverymap/deliveryMapModel";
 
 // Defined once, outside the component: React Flow warns and re-creates every node when this object
 // changes identity between renders
@@ -27,9 +27,9 @@ const nodeTypes = {
  */
 export default function DeliveryMapGraph({map, height = 600}) {
 
-    // The edges are drawn in a theme colour rather than React Flow's own, whose default all but
-    // hides the arrowheads (#1717). It is read here and passed down because `toFlowEdges` is a pure
-    // function: a hook inside it would make the mapping untestable on its own.
+    // The edges are painted in a theme colour rather than React Flow's own, whose default all but
+    // hides the arrowheads (#1717). Read here and applied below because the mapping is a pure
+    // function: a hook inside it would make it untestable on its own.
     const {token} = theme.useToken()
     const edgeColor = token.colorTextTertiary
 
@@ -45,7 +45,7 @@ export default function DeliveryMapGraph({map, height = 600}) {
         let current = true
         autoLayout({
             nodes: toFlowNodes(map.checkpoints),
-            edges: toFlowEdges(map.edges, {color: edgeColor}),
+            edges: toFlowEdges(map.edges),
             nodeWidth: node => getCheckpointType(node.data?.checkpoint?.type).width,
             nodeHeight: node => getCheckpointType(node.data?.checkpoint?.type).height,
             setNodes: nodes => {
@@ -58,7 +58,11 @@ export default function DeliveryMapGraph({map, height = 600}) {
         return () => {
             current = false
         }
-    }, [map, edgeColor])
+    }, [map])
+
+    // Painted at render rather than inside the layout effect: a change of theme then repaints the
+    // map instead of relaying it out, which would throw away every node the user had dragged.
+    const paintedEdges = useMemo(() => withEdgeColor(edges, edgeColor), [edges, edgeColor])
 
     const onNodesChange = useCallback(
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -69,7 +73,7 @@ export default function DeliveryMapGraph({map, height = 600}) {
         <div style={{height, width: '100%'}} data-testid="delivery-map-graph">
             <ReactFlow
                 nodes={nodes}
-                edges={edges}
+                edges={paintedEdges}
                 nodeTypes={nodeTypes}
                 onNodesChange={onNodesChange}
                 fitView={true}
