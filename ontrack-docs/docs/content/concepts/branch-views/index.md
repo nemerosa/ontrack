@@ -128,6 +128,8 @@ When no build is named, the most recent one is selected.
 The Delivery map answers a third question: *what does a build on this branch still have to pass
 through on its way to an environment, and what depends on what*.
 
+![The Delivery map view of a branch](branch-delivery-map-view.png)
+
 It is **configuration with progress painted onto it**, not a history. Every node is something a
 build has to reach - a checkpoint - and every line between two of them is a dependency someone
 configured. Nothing on it is inferred from what has happened; a map with no lines is a project
@@ -204,6 +206,12 @@ get wrong.
 rule excludes the branch by name or pattern, no build of it can ever deploy there however far it is
 promoted. Such a slot is still drawn, because "you cannot get there from here" is the most important
 answer the map can give; leaving it out silently would leave you wondering why production is missing.
+
+![A maintenance branch whose production slot is unreachable](branch-delivery-map-unreachable.png)
+
+Both pictures above are the same two slots, read from two branches of one project: the main branch
+reaches production and finds a maintenance build occupying staging, while the maintenance branch
+cannot reach production at all.
 
 ### Filters, and what the map does with them
 

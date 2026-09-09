@@ -46,11 +46,14 @@ export const checkpointTypes = {
         width: 260,
         height: 110,
     },
-    // Taller than a promotion level: a slot has a third line to draw, saying either that its build
-    // comes from another branch or that this branch can never reach it
+    // Wider and taller than a promotion level. The width is set by the longest thing a slot ever
+    // says - "Unreachable from this branch" - and the height by the third line it may draw, saying
+    // either that its build comes from another branch or that this branch can never reach it.
+    // Measured against the widest content on purpose: a node narrower than its reservation only
+    // leaves a gap, while one wider than it covers whatever elk placed beside it.
     'slot': {
         component: SlotCheckpoint,
-        width: 260,
+        width: 360,
         height: 110,
     },
 }

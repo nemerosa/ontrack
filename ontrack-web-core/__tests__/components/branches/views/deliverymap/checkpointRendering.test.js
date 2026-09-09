@@ -200,7 +200,7 @@ describe('slot checkpoint', () => {
         // "You cannot get there from here" is the most important answer the map can give; omitting
         // the slot silently would leave someone wondering why production is missing
         withEvents(<SlotCheckpoint checkpoint={slot({unreachable: true})}/>)
-        expect(screen.getByText("No build of this branch can be deployed here")).toBeInTheDocument()
+        expect(screen.getByText("Unreachable from this branch")).toBeInTheDocument()
         expect(screen.queryByText("Never deployed")).not.toBeInTheDocument()
     })
 

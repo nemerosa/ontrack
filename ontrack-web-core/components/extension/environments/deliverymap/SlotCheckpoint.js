@@ -28,15 +28,25 @@ export default function SlotCheckpoint({checkpoint}) {
         <Space direction="vertical" size={0}>
             {/* To the slot rather than to the environment: the admission rules the map only draws
                 the shape of are readable on the slot page */}
+            {/* The name is the link itself rather than a `Typography.Text` inside one: antd's
+                Text sets its own colour, which would leave a slot looking unlike every other
+                checkpoint on the map, all of which name a linked entity */}
             <Link href={slotUri({id: slotId})} title="Slot details and configuration">
-                <Typography.Text strong>{checkpoint.name}</Typography.Text>
+                {checkpoint.name}
             </Link>
             {
                 unreachable ?
-                    <Typography.Text type="secondary" italic>
+                    // Short enough to fit the width `checkpointTypes` reserves for the node.
+                    // Nothing here may overflow it: elk lays the map out against that width, and
+                    // a node drawn wider than it was laid out covers whatever sits beside it.
+                    <Typography.Text
+                        type="secondary"
+                        italic
+                        title="An admission rule of this slot excludes this branch, so no build of it can ever be deployed here, however far it is promoted."
+                    >
                         <Space size={4}>
                             <FaBan/>
-                            No build of this branch can be deployed here
+                            Unreachable from this branch
                         </Space>
                     </Typography.Text> :
                     <>
