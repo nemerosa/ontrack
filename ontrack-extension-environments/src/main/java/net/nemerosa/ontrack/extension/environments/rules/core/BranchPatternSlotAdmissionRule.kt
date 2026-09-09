@@ -29,8 +29,24 @@ class BranchPatternSlotAdmissionRule(
 
     override fun isBuildEligible(build: Build, slot: Slot, config: BranchPatternSlotAdmissionRuleConfig): Boolean =
         // TODO Last branch criteria
+        isBranchEligible(build.branch.name, config)
+
+    /**
+     * Whether a branch is included by the patterns at all, asked of the branch alone.
+     *
+     * This is the branch half of [isBuildEligible], split out rather than copied because the
+     * delivery map asks the same question of a branch with no build in hand: a pattern which
+     * excludes the branch means no build of it can EVER be deployed to the slot, however far it is
+     * promoted, and the map draws such a slot as unreachable. Two hand-written readings of one
+     * pattern would be free to drift, and a map disagreeing with the deployment is worse than no
+     * map.
+     *
+     * `lastBranchOnly` is deliberately not part of it. It is a fact about the branches which exist
+     * right now rather than about this branch, so it belongs to deployability and is applied there.
+     */
+    fun isBranchEligible(branchName: String, config: BranchPatternSlotAdmissionRuleConfig): Boolean =
         FilterHelper.includes(
-            text = build.branch.name,
+            text = branchName,
             includes = config.includes,
             excludes = config.excludes,
         )
