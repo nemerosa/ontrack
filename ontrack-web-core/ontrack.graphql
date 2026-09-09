@@ -419,6 +419,8 @@ type Branch implements Authorizable & ProjectEntity {
     "Fully qualified name of the decoration type"
     type: String
   ): [Decoration!]!
+  "What a build on this branch has to pass through on its way to an environment"
+  deliveryMap: DeliveryMap!
   description: String
   disabled: Boolean!
   "Display name for this branch or the branch's name if not available"
@@ -1185,6 +1187,54 @@ type Decoration {
   error: String
   "Extension feature"
   feature: ExtensionFeatureDescription
+}
+
+"What a build on a branch has to pass through on its way to an environment"
+type DeliveryMap {
+  "Nodes of the map"
+  checkpoints: [DeliveryMapCheckpoint!]!
+  "Dependencies between the checkpoints"
+  edges: [DeliveryMapEdge!]!
+}
+
+"Latest build to have arrived at a checkpoint, and what became of it there"
+type DeliveryMapArrival {
+  "Latest build to have arrived at this checkpoint"
+  build: Build!
+  "What became of the build here, null when arriving is the whole outcome"
+  status: ValidationRunStatusID
+  "When the build arrived"
+  time: LocalDateTime!
+}
+
+"One node of a delivery map"
+type DeliveryMapCheckpoint {
+  "Latest build to have arrived at this checkpoint, and what became of it there"
+  arrival: DeliveryMapArrival
+  "Kind-specific payload, read by the renderer selected by the type"
+  data: JSON!
+  "Description of the checkpoint"
+  description: String
+  "Identifier, stable across fetches and unique across kinds"
+  id: String!
+  "Checkpoints an aggregate checkpoint stands for, empty for every other kind"
+  members: [DeliveryMapCheckpoint!]!
+  "Label of the checkpoint"
+  name: String!
+  "Kind of checkpoint, selecting how it is rendered"
+  type: String!
+}
+
+"A dependency between two checkpoints of a delivery map"
+type DeliveryMapEdge {
+  "Identifier, stable across fetches"
+  id: String!
+  "What the dependency means"
+  kind: DeliveryMapEdgeKind!
+  "ID of the checkpoint the dependency runs from"
+  source: String!
+  "ID of the checkpoint the dependency runs to"
+  target: String!
 }
 
 "Output type for the deleteAccountGroup mutation."
@@ -8422,6 +8472,14 @@ enum DashboardContextUserScope {
   BUILT_IN
   PRIVATE
   SHARED
+}
+
+"What an edge of a delivery map means"
+enum DeliveryMapEdgeKind {
+  "Reaching the source grants the target by itself, as auto promotion does"
+  UNLOCKS
+  "The target cannot be reached until the source has been. It constrains; it does not act"
+  REQUIRES
 }
 
 "State a hook request can be in"

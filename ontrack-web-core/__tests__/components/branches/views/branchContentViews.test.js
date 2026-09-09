@@ -7,11 +7,18 @@ import {
 // Each content view drags its whole region tree in; only the registry is under test here
 jest.mock("../../../../components/branches/views/BuildsContentView", () => () => <div/>)
 jest.mock("../../../../components/branches/views/pipeline/PipelineContentView", () => () => <div/>)
+jest.mock("../../../../components/branches/views/deliverymap/DeliveryMapContentView", () => () => <div/>)
 
 describe('branch content view registry', () => {
 
-    it('registers the builds and the pipeline views', () => {
-        expect(branchContentViews.map(it => it.key)).toEqual(['builds', 'pipeline'])
+    it('registers the builds, pipeline and delivery map views', () => {
+        expect(branchContentViews.map(it => it.key)).toEqual(['builds', 'pipeline', 'delivery-map'])
+    })
+
+    it('names the delivery map for the concept, never for how it draws', () => {
+        // "Graph" is taken twice over already, by the slot graph service and by the planned build
+        // dependency query engine
+        expect(getBranchContentView('delivery-map').name).toBe("Delivery map")
     })
 
     it('names the pipeline view for what it reads, not for how it draws', () => {
@@ -27,9 +34,10 @@ describe('branch content view registry', () => {
         expect(getBranchContentView('builds').name).toBe("Builds")
     })
 
-    it('marks the pipeline view as experimental, and only that one', () => {
-        // The badge is what invites the feedback which should inform making this view the default
+    it('marks the new views as experimental, and never the legacy one', () => {
+        // The badge is what invites the feedback which should inform making a view the default
         expect(getBranchContentView('pipeline').experimental).toBe(true)
+        expect(getBranchContentView('delivery-map').experimental).toBe(true)
         expect(getBranchContentView('builds').experimental).toBeFalsy()
     })
 
