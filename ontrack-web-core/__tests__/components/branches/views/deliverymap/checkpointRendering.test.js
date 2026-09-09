@@ -25,6 +25,7 @@ import ValidationStampCheckpoint
 import ValidationStampPatternCheckpoint
     from "@components/branches/views/deliverymap/checkpoints/ValidationStampPatternCheckpoint";
 import UnknownCheckpoint from "@components/branches/views/deliverymap/checkpoints/UnknownCheckpoint";
+import SlotCheckpoint from "@components/extension/environments/deliverymap/SlotCheckpoint";
 
 beforeEach(() => {
     // The entity icon fetches its image on mount; it is not what these tests are about
@@ -154,17 +155,75 @@ describe('aggregate checkpoint', () => {
 
 })
 
+describe('slot checkpoint', () => {
+
+    const slot = (data, arrival) => ({
+        id: 'slot:abc',
+        type: 'slot',
+        name: "production",
+        data: {slotId: 'abc', unreachable: false, otherBranch: null, ...data},
+        arrival,
+    })
+
+    it('names the most recently deployed build', () => {
+        withEvents(<SlotCheckpoint checkpoint={slot({}, {
+            build: build("20260901-4"),
+            time: "2026-09-01T10:00:00",
+        })}/>)
+        expect(screen.getByText("production")).toBeInTheDocument()
+        expect(screen.getByText("20260901-4")).toBeInTheDocument()
+    })
+
+    it('says in words when nothing has ever been deployed there', () => {
+        withEvents(<SlotCheckpoint checkpoint={slot({})}/>)
+        expect(screen.getByText("Never deployed")).toBeInTheDocument()
+    })
+
+    it('names the branch when the deployed build belongs to another one', () => {
+        // The deliberate exception to ADR 0007: a slot shows what is deployed, whatever its branch
+        withEvents(<SlotCheckpoint checkpoint={slot({otherBranch: "release-1.3"}, {
+            build: build("20260901-5"),
+            time: "2026-09-01T10:00:00",
+        })}/>)
+        expect(screen.getByText("from release-1.3")).toBeInTheDocument()
+    })
+
+    it('says nothing about the branch when the deployed build is of this one', () => {
+        withEvents(<SlotCheckpoint checkpoint={slot({}, {
+            build: build("20260901-6"),
+            time: "2026-09-01T10:00:00",
+        })}/>)
+        expect(screen.queryByText(/^from /)).not.toBeInTheDocument()
+    })
+
+    it('marks a slot this branch can never reach, and names no build for it', () => {
+        // "You cannot get there from here" is the most important answer the map can give; omitting
+        // the slot silently would leave someone wondering why production is missing
+        withEvents(<SlotCheckpoint checkpoint={slot({unreachable: true})}/>)
+        expect(screen.getByText("No build of this branch can be deployed here")).toBeInTheDocument()
+        expect(screen.queryByText("Never deployed")).not.toBeInTheDocument()
+    })
+
+    it('links to the slot, where the admission rules can actually be read', () => {
+        withEvents(<SlotCheckpoint checkpoint={slot({})}/>)
+        expect(screen.getByText("production").closest('a')).toHaveAttribute(
+            'href', '/extension/environments/slot/abc',
+        )
+    })
+
+})
+
 describe('unknown checkpoint', () => {
 
     it('still draws the name and the arrival of a kind it has never heard of', () => {
         // An extension contributes its own kinds; one unrecognised kind must not take the map with it
         withEvents(<UnknownCheckpoint checkpoint={{
-            id: 'slot:abc',
-            type: 'slot',
-            name: "production",
+            id: 'deployment-window:abc',
+            type: 'deployment-window',
+            name: "Friday freeze",
             arrival: {build: build("20260901-4"), time: "2026-09-01T10:00:00"},
         }}/>)
-        expect(screen.getByText("production")).toBeInTheDocument()
+        expect(screen.getByText("Friday freeze")).toBeInTheDocument()
         expect(screen.getByText("20260901-4")).toBeInTheDocument()
     })
 

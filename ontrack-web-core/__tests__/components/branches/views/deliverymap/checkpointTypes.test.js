@@ -6,14 +6,16 @@ import {summariseMembers} from "@components/branches/views/deliverymap/checkpoin
 jest.mock("../../../../../components/branches/views/deliverymap/checkpoints/PromotionLevelCheckpoint", () => () => <div/>)
 jest.mock("../../../../../components/branches/views/deliverymap/checkpoints/ValidationStampCheckpoint", () => () => <div/>)
 jest.mock("../../../../../components/branches/views/deliverymap/checkpoints/ValidationStampPatternCheckpoint", () => () => <div/>)
+jest.mock("../../../../../components/extension/environments/deliverymap/SlotCheckpoint", () => () => <div/>)
 
 describe('checkpoint type registry', () => {
 
-    it('registers the three kinds the core contributes', () => {
+    it('registers the kinds shipped with the product, core and extension alike', () => {
         expect(Object.keys(checkpointTypes)).toEqual([
             'promotion-level',
             'validation-stamp',
             'validation-stamp-pattern',
+            'slot',
         ])
     })
 
@@ -31,7 +33,7 @@ describe('checkpoint type registry', () => {
     })
 
     it.each([
-        ['a kind an extension contributes', 'slot'],
+        ['a kind no shipped extension contributes', 'deployment-window'],
         ['an undefined kind', undefined],
         ['an empty kind', ''],
     ])('falls back rather than failing for %s', (_, type) => {

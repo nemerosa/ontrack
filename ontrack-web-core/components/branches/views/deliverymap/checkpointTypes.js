@@ -5,13 +5,20 @@ import ValidationStampCheckpoint
 import ValidationStampPatternCheckpoint
     from "@components/branches/views/deliverymap/checkpoints/ValidationStampPatternCheckpoint";
 import UnknownCheckpoint from "@components/branches/views/deliverymap/checkpoints/UnknownCheckpoint";
+import SlotCheckpoint from "@components/extension/environments/deliverymap/SlotCheckpoint";
 
 /**
  * Registry of the checkpoint kinds this frontend can draw.
  *
  * The set of kinds is OPEN on the server: an extension contributes a kind the core has never heard
- * of, as the environments extension will for slots in #1704. A registry keyed by the kind's own
- * string is what lets a new kind be added by adding a component and a line here.
+ * of, as the environments extension does for `slot`. A registry keyed by the kind's own string is
+ * what lets a new kind be added by adding a component and a line here.
+ *
+ * The entry for a kind an extension contributes names that extension's component, which is a core to
+ * extension import the decoration seam would avoid with a dynamic one. It is accepted here because
+ * the sizes below cannot be: elk needs them before anything is rendered, so they belong to the
+ * registry whatever else does, and a registry which named the kind for its size while loading its
+ * component by path would name it twice for one gain.
  *
  * Each entry carries:
  *
@@ -36,6 +43,13 @@ export const checkpointTypes = {
     },
     'validation-stamp-pattern': {
         component: ValidationStampPatternCheckpoint,
+        width: 260,
+        height: 110,
+    },
+    // Taller than a promotion level: a slot has a third line to draw, saying either that its build
+    // comes from another branch or that this branch can never reach it
+    'slot': {
+        component: SlotCheckpoint,
         width: 260,
         height: 110,
     },
