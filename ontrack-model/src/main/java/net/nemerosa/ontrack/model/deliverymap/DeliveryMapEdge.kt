@@ -22,4 +22,17 @@ data class DeliveryMapEdge(
     val source: String,
     @APIDescription("ID of the checkpoint the dependency runs to")
     val target: String,
-)
+) {
+    companion object {
+        /**
+         * Builds an edge with a deterministic id, so that a refresh sees the same edge rather than a
+         * new one - the same reason checkpoint ids are deterministic.
+         */
+        fun of(kind: DeliveryMapEdgeKind, source: String, target: String) = DeliveryMapEdge(
+            id = "${kind.name.lowercase()}:$source->$target",
+            kind = kind,
+            source = source,
+            target = target,
+        )
+    }
+}
