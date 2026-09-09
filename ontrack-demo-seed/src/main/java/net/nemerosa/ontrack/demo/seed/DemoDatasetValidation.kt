@@ -59,21 +59,29 @@ fun DemoDataset.validate() {
                 val where = "Promotion level ${promotionLevel.name} of ${project.name}/${branch.name}"
                 promotionLevel.dependsOn.forEach { dependency ->
                     if (dependency == promotionLevel.name) {
-                        problems += "$where depends on itself."
+                        problems += "$where requires itself."
                     } else if (dependency !in promotionLevels) {
-                        problems += "$where depends on $dependency, which the branch does not declare."
+                        problems += "$where requires $dependency, which the branch does not declare."
                     }
                 }
                 promotionLevel.autoPromotion?.let { autoPromotion ->
-                    autoPromotion.validationStamps.forEach { stamp ->
-                        if (stamp !in validationStamps) {
-                            problems += "$where is auto promoted by $stamp, " +
-                                    "which the branch does not declare."
-                        }
+                    // The server treats an auto promotion naming nothing as absent -
+                    // `AutoPromotionProperty.isEmpty` and the listener returns before promoting
+                    // anything - so this is dead configuration rather than a hazard. Curated
+                    // content must not carry it either way: it draws no edge and grants nothing,
+                    // and a reader would take it for a rule that does.
+                    if (autoPromotion.validationStamps.isEmpty() &&
+                        autoPromotion.promotionLevels.isEmpty() &&
+                        autoPromotion.include.isBlank()
+                    ) {
+                        problems += "$where is auto promoted by nothing at all."
                     }
-                    autoPromotion.promotionLevels.forEach { required ->
-                        if (required !in promotionLevels) {
-                            problems += "$where is auto promoted by $required, " +
+                    listOf(
+                        autoPromotion.validationStamps to validationStamps,
+                        autoPromotion.promotionLevels to promotionLevels,
+                    ).forEach { (named, declared) ->
+                        named.filterNot { it in declared }.forEach { missing ->
+                            problems += "$where is auto promoted by $missing, " +
                                     "which the branch does not declare."
                         }
                     }
@@ -100,7 +108,7 @@ fun DemoDataset.validate() {
                     missingPromotionDependency(promoted, dependenciesOf[promotionLevel].orEmpty())
                         ?.let { missing ->
                             problems += "Build ${build.name} of ${project.name}/${branch.name} " +
-                                    "is promoted to $promotionLevel before $missing, which it depends on."
+                                    "is promoted to $promotionLevel before $missing, which it requires."
                         }
                     promoted += promotionLevel
                 }

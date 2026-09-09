@@ -272,7 +272,7 @@ class InMemoryDemoTarget(
             )?.let { missing ->
                 throw IllegalStateException(
                     "$name of ${branch.project.name}/${branch.name} cannot be promoted to " +
-                            "$promotionLevel before $missing, which it depends on"
+                            "$promotionLevel before $missing, which it requires"
                 )
             }
             promotions += promotionLevel to at

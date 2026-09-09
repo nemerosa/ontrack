@@ -262,12 +262,20 @@ class DemoSeedTest {
     fun `the demo carries the promotion properties the delivery map reads`() {
         val target = InMemoryDemoTarget()
         seed(target).run(DemoContent.dataset(changelog))
-        val snapshot = target.snapshot()
 
-        assertTrue("depends on [${DemoContent.SILVER}]" in snapshot, "GOLD cannot be reached before SILVER")
-        assertTrue(
-            "auto promotion AutoPromotionSpec(validationStamps=[${DemoContent.BUILD}], " +
-                    "promotionLevels=[${DemoContent.BRONZE}], include=.*TESTS, exclude=)" in snapshot,
+        // Read off the fake server rather than out of the dataset: what is under test is that the
+        // seed APPLIES them, in a pass late enough for every name they use to resolve.
+        val branch = (target.projects().single { it.name == DemoContent.SERVICE } as InMemoryDemoTarget.InMemoryProject)
+            .branches.single { it.name == DemoContent.MAIN }
+
+        assertEquals(listOf(DemoContent.SILVER), branch.promotionDependencies[DemoContent.GOLD])
+        assertEquals(
+            AutoPromotionSpec(
+                validationStamps = listOf(DemoContent.BUILD),
+                promotionLevels = listOf(DemoContent.BRONZE),
+                include = DemoContent.TESTS_PATTERN,
+            ),
+            branch.autoPromotions[DemoContent.SILVER],
             "SILVER is granted by BRONZE, by BUILD, and by the stamps matching the pattern",
         )
     }
@@ -307,7 +315,7 @@ class DemoSeedTest {
         DemoContent.dataset(changelog).projects.forEach { project ->
             project.branches.forEach { branch ->
                 val passed = { build: BuildSpec, stamp: String ->
-                    build.validations.any { it.validationStamp == stamp && it.status == ValidationStatus.PASSED }
+                    build.validations.any { it.validationStamp == stamp && validationStatusPasses(it.status) }
                 }
                 branch.promotionLevels.forEach { promotionLevel ->
                     val autoPromotion = promotionLevel.autoPromotion ?: return@forEach
@@ -338,7 +346,7 @@ class DemoSeedTest {
                 datasetWithPromotionLevels(PromotionLevelSpec("GOLD", "", dependsOn = listOf("SILVER")))
             )
         }
-        assertTrue("depends on SILVER" in error.message.orEmpty(), error.message.orEmpty())
+        assertTrue("requires SILVER" in error.message.orEmpty(), error.message.orEmpty())
     }
 
     @Test
@@ -348,7 +356,7 @@ class DemoSeedTest {
                 datasetWithPromotionLevels(PromotionLevelSpec("GOLD", "", dependsOn = listOf("GOLD")))
             )
         }
-        assertTrue("depends on itself" in error.message.orEmpty(), error.message.orEmpty())
+        assertTrue("requires itself" in error.message.orEmpty(), error.message.orEmpty())
     }
 
     @Test

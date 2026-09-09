@@ -25,15 +25,27 @@ internal fun autoPromotionSelectsStamp(name: String, spec: AutoPromotionSpec): B
 }
 
 /**
- * The first promotion a build is missing out of the ones its promotion depends on, or null when it
- * is missing none.
+ * Whether a validation of this status counts as passed for an auto promotion.
+ *
+ * `ValidationRunStatusID.isPassed` on the server side, where `PASSED` and `FIXED` pass and `WARNING`
+ * deliberately does not. Read through here rather than compared to `PASSED` at each use: the
+ * dataset's [ValidationStatus] is a subset of what Yontrack knows, and the day it gains `FIXED` -
+ * which is how it gains any status - a comparison against `PASSED` alone starts answering wrongly
+ * about a build the server would have promoted.
+ */
+internal fun validationStatusPasses(status: ValidationStatus): Boolean =
+    status == ValidationStatus.PASSED
+
+/**
+ * The first promotion a build is missing out of the ones its promotion requires, or null when it is
+ * missing none.
  *
  * `PromotionRunDependenciesCheckExtension` on the server side, which refuses the promotion outright.
  * The order matters as much as the set: the check runs as the promotion is created, so a build
  * promoted to GOLD before SILVER is refused even though it ends up carrying both.
  *
  * @param alreadyPromoted The promotions the build carries at that moment, in order
- * @param dependencies What the promotion being granted depends on
+ * @param dependencies What the promotion being granted requires
  */
 internal fun missingPromotionDependency(alreadyPromoted: List<String>, dependencies: List<String>): String? =
     dependencies.firstOrNull { it !in alreadyPromoted }

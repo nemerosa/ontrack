@@ -100,7 +100,10 @@ data class PromotionLevelSpec(
  * @property promotionLevels Promotion levels which grant this one.
  * @property include Regular expression selecting stamps by name, whole-string as the server matches
  * it. Stamps selected this way collapse into one *aggregate* checkpoint labelled with the pattern.
- * @property exclude Regular expression removing stamps from what [include] selected.
+ * @property exclude Regular expression removing stamps from what [include] selected. No dataset uses
+ * it yet, and it is here rather than left out because `autoPromotionSelectsStamp` has to repeat the
+ * server's selection rule in full: a reading which ignored `exclude` would answer wrongly the first
+ * time anything set it, and would do so silently.
  */
 data class AutoPromotionSpec(
     val validationStamps: List<String> = emptyList(),

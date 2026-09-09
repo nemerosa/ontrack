@@ -39,6 +39,14 @@ object DemoContent {
     const val INTEGRATION_TESTS = "INTEGRATION.TESTS"
     const val SECURITY_SCAN = "SECURITY.SCAN"
 
+    /**
+     * What [silverAuto] selects its validation stamps by. A constant because the demo is read
+     * against it in more than one place, and because it is the one piece of the dataset's
+     * vocabulary that is a pattern rather than a name: it must keep matching [UNIT_TESTS] and
+     * [INTEGRATION_TESTS] and keep missing [SECURITY_SCAN].
+     */
+    const val TESTS_PATTERN = ".*TESTS"
+
     const val STAGING = "staging"
     const val PRODUCTION = "production"
 
@@ -139,11 +147,20 @@ object DemoContent {
      * This is what gives the delivery map its *unlocks* edges, and auto promotion is the only thing
      * that puts a validation stamp on the map at all. It says three different things on purpose:
      * a promotion level granting a promotion, a stamp named explicitly, and a PATTERN - which the
-     * map collapses into one aggregate checkpoint labelled `.*TESTS`, standing for the stamps it
+     * map collapses into one aggregate checkpoint labelled with the pattern, standing for the stamps it
      * matches rather than drawing one edge each.
      *
      * `SECURITY.SCAN` is deliberately outside the pattern, so that the demo also shows a stamp the
      * map leaves out: only the stamps taking part in a dependency are drawn.
+     *
+     * #1716 sketched this differently - `BUILD` *and* `UNIT.TESTS` named, and the pattern on BRONZE -
+     * and both departures are deliberate. Naming a stamp is the more specific statement of the two,
+     * so a stamp named AND matched by the pattern stays its own checkpoint and leaves the aggregate
+     * standing for one thing: naming `UNIT.TESTS` here would produce a one-member aggregate, which
+     * teaches nothing about what an aggregate is for. And BRONZE has to stay manual, because the
+     * only rule that would reproduce the BRONZE promotions the dataset already declares is the same
+     * one SILVER carries - both sets are identical, and a level granted by the very rule below it
+     * would be a second edge saying what the first already says.
      *
      * It reproduces the promotions the dataset already declares rather than adding any. Every build
      * below carrying SILVER is BRONZE with `BUILD` and both TESTS green, and the two that are not -
@@ -155,7 +172,7 @@ object DemoContent {
         autoPromotion = AutoPromotionSpec(
             validationStamps = listOf(BUILD),
             promotionLevels = listOf(BRONZE),
-            include = ".*TESTS",
+            include = TESTS_PATTERN,
         ),
     )
 
@@ -178,6 +195,16 @@ object DemoContent {
      * [silverAuto] names nor a GOLD for [goldAfterSilver] to sit above.
      */
     private val fullPromotions = listOf(bronze, silverAuto, goldAfterSilver)
+
+    /**
+     * The same three rungs carrying no configuration at all, for [CHANGELOG].
+     *
+     * Its builds are one per commit and stop at BRONZE with both of their stamps green, which is
+     * exactly what [silverAuto] grants SILVER for: given [fullPromotions], the whole branch would
+     * promote itself to SILVER on the next reset. `DemoSeedTest` fails on that rather than letting
+     * it reach a server. The promotion story is [SERVICE]'s.
+     */
+    private val plainPromotions = listOf(bronze, silver, gold)
 
     /** The full set of checks, for the same projects. */
     private val fullValidationStamps = listOf(buildStamp, unitTests, integrationTests, securityScan)
@@ -515,11 +542,7 @@ object DemoContent {
             BranchSpec(
                 name = MAIN,
                 description = "Commits since the last release.",
-                // The plain ladder, NOT `fullPromotions`: its SILVER is auto promoted from BRONZE
-                // plus the stamps, and every build here is BRONZE with both of its stamps green, so
-                // the whole branch would promote itself to SILVER. This project's builds are one
-                // per commit and stop at BRONZE; the promotion story is [SERVICE]'s.
-                promotionLevels = listOf(bronze, silver, gold),
+                promotionLevels = plainPromotions,
                 validationStamps = listOf(buildStamp, unitTests),
                 // Reversed: the entries arrive newest first - [ChangelogSource] sorts them,
                 // rather than leaving them in whatever order `git log` printed - and Yontrack

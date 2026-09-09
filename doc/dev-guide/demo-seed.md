@@ -168,8 +168,8 @@ and reports every problem at once. Destructive by design must not mean blank on 
 
 Some of what the dataset names is not checked by the server at all. A promotion dependency
 and a slot admission rule both name their target by name, with nothing behind the name, so
-Yontrack accepts a promotion that depends on a level the branch does not have — it is what
-the delivery map draws as an *unresolved checkpoint*.
+Yontrack accepts a promotion that requires a level the branch does not have — it is what the
+delivery map draws as an *unresolved checkpoint*.
 
 `validate` refuses one anyway. Curated content is read as a demonstration, and nobody looking
 at the demo can tell a deliberate dangling name from a mistake. The exception is deliberate
