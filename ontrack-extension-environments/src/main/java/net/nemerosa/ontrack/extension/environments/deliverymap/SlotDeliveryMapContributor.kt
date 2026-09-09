@@ -188,6 +188,12 @@ class SlotDeliveryMapContributor(
             SlotDeliveryMapCheckpoints.SLOT,
             // Qualifier and all: a rule naming `staging [demo]` where only `staging` exists is
             // exactly the mistake worth seeing, and a checkpoint labelled `staging` would hide it.
+            //
+            // The id #1707 keeps a position by is therefore built from the label rather than from
+            // the two fields separately. A rule whose `environmentName` is literally `staging [demo]`
+            // then shares a checkpoint with one naming `staging` qualified `demo` - and can, because
+            // nothing validates the field, which is this issue's whole subject. Both are unresolved
+            // and say the same thing, so the collision costs nothing worth the extra id shape.
             SlotDeliveryMapCheckpoints.label(ruleConfig.environmentName, ruleConfig.qualifier),
         )
         return RuleSource(SlotDeliveryMapCheckpoints.slot(source.id))

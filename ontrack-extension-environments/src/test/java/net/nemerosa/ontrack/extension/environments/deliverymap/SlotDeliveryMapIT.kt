@@ -223,7 +223,16 @@ class SlotDeliveryMapIT : AbstractQLKTITSupport() {
     @Test
     fun `A slot hidden by permissions never renders as unresolved`() {
         // The distinction this feature lives or dies by: if a hidden checkpoint and a broken
-        // configuration looked alike, "unresolved" would come to read as "probably just permissions"
+        // configuration looked alike, "unresolved" would come to read as "probably just permissions".
+        //
+        // The rule below WOULD be unresolved if it were read at all - the branch has no GOLD - so
+        // this pins the whole outcome and not only the absence of a placeholder: the slot goes, its
+        // rule is never read, and nothing is drawn in its place.
+        //
+        // It cannot fail at the level of one rule, and that is the point rather than a gap: slot
+        // visibility is decided per project, so there is no such thing as a half-visible set of
+        // slots to read a rule against. The contributor returns an empty contribution before any
+        // rule is looked at. Were that ever to become per-slot, this test would start failing.
         val production = asAdmin { slotTestSupport.slot() }
         asAdmin {
             slotService.addAdmissionRuleConfig(
@@ -233,6 +242,10 @@ class SlotDeliveryMapIT : AbstractQLKTITSupport() {
         val branch = asAdmin { production.project.branch(name = "main") }
         asUserWithView(production.project) {
             val map = deliveryMap(branch)
+            assertTrue(
+                map.checkpoints.none { it.getRequiredTextField("type") == "slot" },
+                "The slot itself is gone, which is the case being tested",
+            )
             assertTrue(
                 map.checkpoints.none { it.getRequiredTextField("type") == "unresolved" },
                 "No unresolved checkpoint on the map",

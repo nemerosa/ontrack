@@ -61,6 +61,10 @@ object DeliveryMapCheckpointTypes {
      * The [reference] is part of the id because the two halves of the name space would otherwise
      * meet: a promotion level called `staging` and an environment called `staging` are not the same
      * missing thing.
+     *
+     * This is the one checkpoint id built out of a *name* rather than out of an id or a UUID, and it
+     * is not escaped. It does not need to be: an entity name is `[A-Za-z0-9._-]+` and can hold no
+     * separator, so two different names cannot produce one id.
      */
     fun unresolved(reference: String, name: String): String =
         checkpointId(UNRESOLVED, "$reference:$name")

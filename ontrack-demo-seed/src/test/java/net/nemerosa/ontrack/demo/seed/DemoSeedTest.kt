@@ -276,7 +276,7 @@ class DemoSeedTest {
             .slots.single { it.project == DemoContent.UI }
         assertEquals(
             listOf(DemoContent.GOLD, DemoContent.STAGING),
-            slot.admissionRules.map { it.config.values.first() },
+            slot.admissionRules.map { it.config["promotion"] ?: it.config["environmentName"] },
             "The two rules still name what they cannot find",
         )
     }

@@ -47,6 +47,12 @@ export default function UnresolvedCheckpoint({checkpoint}) {
 }
 
 /**
+ * The half of every tooltip which must never drift between the cases below: whatever failed to
+ * match, the reason is a broken configuration and never a permission.
+ */
+const NOT_HIDDEN = "The configuration is broken; this is not something being hidden from you."
+
+/**
  * What to say about a name which matched nothing, by the kind of thing that was looked for.
  *
  * A kind this frontend does not know still gets an answer: the set of checkpoint kinds is open, so an
@@ -54,25 +60,24 @@ export default function UnresolvedCheckpoint({checkpoint}) {
  *
  * @param reference Kind of checkpoint the configuration asked for
  */
-export function unresolvedWording(reference) {
+function unresolvedWording(reference) {
     switch (reference) {
         case 'promotion-level':
             return {
                 text: "No such promotion level",
-                tooltip: "An admission rule requires this promotion, but this branch has no promotion level of that name. " +
-                    "The configuration is broken; this is not something being hidden from you.",
+                tooltip: "An admission rule requires this promotion, but this branch has no promotion level of " +
+                    `that name. ${NOT_HIDDEN}`,
             }
         case 'slot':
             return {
                 text: "No such slot in this project",
-                tooltip: "An admission rule requires a deployment in this environment, but this project has no slot there. " +
-                    "The configuration is broken; this is not something being hidden from you.",
+                tooltip: "An admission rule requires a deployment in this environment, but this project has no " +
+                    `slot there. ${NOT_HIDDEN}`,
             }
         default:
             return {
                 text: "Matches nothing",
-                tooltip: "A configuration names this, and nothing matches it. " +
-                    "The configuration is broken; this is not something being hidden from you.",
+                tooltip: `A configuration names this, and nothing matches it. ${NOT_HIDDEN}`,
             }
     }
 }

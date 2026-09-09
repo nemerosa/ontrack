@@ -510,6 +510,10 @@ object DemoContent {
      *   admits `main` alone and no build of the maintenance branch can ever deploy there;
      * * both branches show the promotion edges into the slots, and the staging to production
      *   edge between them.
+     *
+     * [UI] then contributes the one case [SERVICE] cannot: a production slot whose rules name
+     * things which do not exist, drawn as **unresolved** checkpoints. It is the dataset's only
+     * deliberately broken configuration, and the comment beside it says why it is there.
      */
     private fun environments() = listOf(
         EnvironmentSpec(

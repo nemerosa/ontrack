@@ -227,8 +227,8 @@ configuration will be saved and will look perfectly healthy on the slot's own pa
 Until somebody tries to deploy. Then the deployment refuses, with *Promotion not existing*, and that
 is the first anyone hears of it.
 
-The map draws such a rule as an **unresolved checkpoint**: a node carrying the name the rule asked
-for, marked as matching nothing, with the rule's line running out of it as usual.
+The map draws such a rule as an **unresolved checkpoint**, carrying the name the rule asked for and
+marked as matching nothing, with the rule's line running out of it as usual.
 
 ![A slot admission rule naming a promotion and a slot which do not exist](branch-delivery-map-unresolved.png)
 
