@@ -48,6 +48,28 @@ test.describe('the mobile UI on a phone', () => {
         await expect(page.getByTestId('mobile-nav-home')).toHaveAttribute('aria-current', 'page')
     })
 
+    test('the header carries the brand, not the word set in the UI font', async ({page, ontrack}) => {
+        await signInOnPhone(page, ontrack)
+        await page.goto(`${ontrack.connection.ui}/mobile`)
+
+        // Both marks actually decode - a `next/image` pointing at nothing still
+        // leaves an <img> in the DOM, so being visible proves too little.
+        for (const testId of ['mobile-logo', 'mobile-wordmark']) {
+            const mark = page.getByTestId(testId)
+            await expect(mark).toBeVisible()
+            expect(await mark.evaluate(img => img.naturalWidth)).toBeGreaterThan(0)
+        }
+
+        // And at their own aspect ratios. Squashing a drawn wordmark is the
+        // failure this guards - the desktop `NavBar` puts the 8.08:1 mark in a
+        // 120x24 box, and Next says so.
+        for (const [testId, width, height] of [['mobile-logo', 27, 24], ['mobile-wordmark', 129, 16]]) {
+            const box = await page.getByTestId(testId).boundingBox()
+            expect(box.width).toBeCloseTo(width, 0)
+            expect(box.height).toBeCloseTo(height, 0)
+        }
+    })
+
     test('the shell renders in both themes', async ({page, ontrack}) => {
         await signInOnPhone(page, ontrack)
 

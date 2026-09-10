@@ -32,6 +32,26 @@ sign-in page under `app/(auth)`. It is therefore covered by neither `pages/_docu
 the provider stack in `pages/_app.js`, and assembles its own in `app/mobile/MobileProviders.js`.
 Theme resolution before the first paint uses the same `themeInitScript` both other roots use.
 
+### The header's brand
+
+The identity is the two brand marks, `yontrack-logo.svg` and `yontrack-text.svg`, and not the
+word "Yontrack" set in the UI font: the wordmark is a drawn typeface in brand lilac, and
+typing the name loses both the letterforms and the colour. Both marks carry their own colours
+— brand green and brand lilac — which read on the header's purple in either theme, because
+the header is that purple in both.
+
+Each is drawn at **its own aspect ratio** (27×24 and 129×16). Next compares what it renders
+against the `width`/`height` it was given and warns when the two disagree, which is what the
+desktop `NavBar` does by putting the 8.08:1 wordmark in a 120×24 box. The wordmark is set
+shorter than the mark is tall because at the mark's 24px it would be 194px wide — half of a
+375px header.
+
+`priority` is deliberately not set on either. Next reports the mark as the largest contentful
+paint and suggests it, but adding it does not silence the warning and Next 13 implements it by
+passing React a camelCase `fetchPriority`, which React 18.3 rejects on every render. Both marks
+are inline SVGs of about a kilobyte, served straight from `/public` — `next/image` passes SVGs
+through rather than sending them to the optimizer, which answers `400` for them.
+
 ## The redirect
 
 `middleware.js` sends phones to `/mobile`:

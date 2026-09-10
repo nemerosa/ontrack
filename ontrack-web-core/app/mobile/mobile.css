@@ -62,11 +62,26 @@ html, body {
 .ot-mobile-brand {
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: var(--ot-header-fg);
-    font-weight: 600;
-    font-size: 16px;
+    /* The mark and the wordmark are one lockup, not two things side by side. */
+    gap: 6px;
+    /* Keeps the lockup whole when a long name pushes from the other side. */
+    flex: 0 0 auto;
     text-decoration: none;
+}
+
+.ot-mobile-logo,
+.ot-mobile-wordmark {
+    /*
+     * Blocks the baseline gap an inline image leaves under itself, which would
+     * otherwise sit the two marks a pixel off each other.
+     */
+    display: block;
+    /*
+     * Neither mark shrinks, however long the signed-in name is - a squashed
+     * wordmark is worse than a truncated name, which `.ot-mobile-user` already
+     * handles.
+     */
+    flex: 0 0 auto;
 }
 
 .ot-mobile-user {
