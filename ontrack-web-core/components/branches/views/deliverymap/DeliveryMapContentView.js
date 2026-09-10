@@ -1,6 +1,7 @@
 import {useContext, useEffect, useMemo, useState} from "react";
-import {Space, Typography} from "antd";
+import {Alert, Space, Typography} from "antd";
 import {useQuery} from "@components/services/GraphQL";
+import {AutoRefreshButton, AutoRefreshContext, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
 import CloseableAlert from "@components/common/CloseableAlert";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {ValidationStampFilterContext} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
@@ -30,12 +31,28 @@ import DeliveryMapNoDependencies from "@components/branches/views/deliverymap/De
  * map by it.
  *
  * What it does own is the branch head in its header - the build every checkpoint's lag is counted
- * against - and whether the validation stamps are drawn at all, which is a way of reading this one
- * graph rather than a statement about the branch.
+ * against - whether the validation stamps are drawn at all, and its own auto refresh. All three are
+ * ways of reading this one graph rather than statements about the branch.
+ *
+ * The auto refresh context is provided HERE and consumed by the view below, which is why the two are
+ * separate components: a component cannot read a context it provides itself.
  *
  * @param branch Branch being displayed
  */
 export default function DeliveryMapContentView({branch}) {
+    return (
+        <AutoRefreshContextProvider>
+            <DeliveryMapContent branch={branch}/>
+        </AutoRefreshContextProvider>
+    )
+}
+
+/**
+ * The view itself, inside the auto refresh context.
+ *
+ * @param branch Branch being displayed
+ */
+function DeliveryMapContent({branch}) {
 
     const vsfContext = useContext(ValidationStampFilterContext)
 
@@ -53,11 +70,15 @@ export default function DeliveryMapContentView({branch}) {
         setShowValidationStamps(shown)
     }
 
-    const {data, loading, finished} = useQuery(
+    // Refetched on every tick of the auto refresh, as `BranchLinksGraph` does it: the count is an
+    // effect dependency rather than an `onRefresh` callback, so the query owns its own reloading.
+    const {autoRefreshCount} = useContext(AutoRefreshContext)
+
+    const {data, error, finished} = useQuery(
         gqlDeliveryMap,
         {
             variables: {branchId: Number(branch.id)},
-            deps: [branch],
+            deps: [branch, autoRefreshCount],
             initialData: null,
             dataFn: data => data.branch?.deliveryMap,
         }
@@ -99,10 +120,34 @@ export default function DeliveryMapContentView({branch}) {
                     </Typography.Text>
                 }
             />
-            {/* `useQuery` starts with `loading` false and only flips it inside its effect, so a view
-                which must never render as "loaded" before the first fetch resolves reads both */}
-            <LoadingContainer loading={loading || !finished}>
+            {/* Only until the FIRST answer, never on a refresh. `useQuery` raises `loading` again
+                on every refetch, and reading it here would replace the map with a skeleton once a
+                minute - which unmounts the graph, and takes the layout and every node the user had
+                dragged with it. `finished` stays true once the first fetch has answered, which is
+                exactly the "have we ever had a map" this needs. */}
+            <LoadingContainer loading={!finished}>
+                {/* Above the empty state as well as above the map: the header is this view's
+                    toolbar, and a control which comes and goes with the data is a control the
+                    reader cannot count on. A branch with nothing on its map still has a latest
+                    build, and still refreshes. */}
+                <DeliveryMapHeader
+                    head={data?.head}
+                    extra={<AutoRefreshButton size="small"/>}
+                />
                 {
+                    // A failed fetch is said in words. It is NOT left to the empty state: a refresh
+                    // which fails - a backend restart, one bad response out of sixty - nulls the
+                    // data, and "this branch has nothing on its map" is then a claim about the
+                    // branch which happens to be false. The header stays above it, so the reader can
+                    // still turn the refresh off.
+                    error ?
+                        <Alert
+                            type="error"
+                            showIcon
+                            data-testid="delivery-map-error"
+                            message="The delivery map could not be loaded"
+                            description={error}
+                        /> :
                     isMapEmpty(map) ?
                         <DeliveryMapEmpty/> :
                         <>
@@ -111,7 +156,6 @@ export default function DeliveryMapContentView({branch}) {
                                 hiding the stamps - or filtering them out - must not make the map
                                 ask for configuration which is already there. */}
                             {hasNoDependencies(data) && <DeliveryMapNoDependencies/>}
-                            <DeliveryMapHeader head={data?.head}/>
                             <DeliveryMapGraph
                                 map={map}
                                 showValidationStamps={showValidationStamps}

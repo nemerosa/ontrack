@@ -160,6 +160,62 @@ export function hasNoDependencies(map) {
 }
 
 /**
+ * What the SHAPE of a map is, as one comparable value: which checkpoints it holds and which edges
+ * join them, and nothing else.
+ *
+ * The delivery map refreshes itself, and almost nothing on it changes minute to minute - the
+ * configuration is static, and only the build on each checkpoint moves. Re-running the elk layout on
+ * every fetch would reshuffle the whole map under the reader's cursor once a minute, which is worse
+ * than not refreshing at all. The layout therefore runs when THIS value changes, and the node
+ * contents are updated in place the rest of the time - see [withCheckpointContents].
+ *
+ * Deliberately blind to three things:
+ *
+ * * the arrival of each checkpoint, which is precisely what moves between two fetches;
+ * * the ORDER the checkpoints and edges come back in, which is not the shape of the map - the ids
+ *   are sorted here so that a reordering alone never costs a relayout;
+ * * the members of an aggregate, which are drawn inside their own node, on demand, and cost the
+ *   layout nothing whatever they are.
+ *
+ * @param map The map as the server sent it, narrowed or not
+ */
+export function topologyKey(map) {
+    if (!map) return '[[],[]]'
+    const checkpoints = (map.checkpoints ?? []).map(it => it.id).sort()
+    const edges = (map.edges ?? []).map(it => it.id).sort()
+    return JSON.stringify([checkpoints, edges])
+}
+
+/**
+ * Carries the checkpoints of a freshly fetched map onto the nodes already laid out.
+ *
+ * The other half of [topologyKey]: when the shape has not changed there is nothing to lay out again,
+ * and what a refresh has to do is put the new build on each node WITHOUT touching its position. Node
+ * ids are checkpoint ids (see [toFlowNodes]), which is what makes the two sides match up.
+ *
+ * A node whose checkpoint is not in the new map is left exactly as it is rather than dropped: its
+ * absence means the topology changed, so a layout is already on its way, and removing it here would
+ * blank it in the meantime.
+ *
+ * The SAME array comes back when nothing changed, because a new array is a new render of every node
+ * in the graph.
+ *
+ * @param nodes The React Flow nodes, as the layout left them
+ * @param checkpoints The checkpoints of the map just fetched
+ */
+export function withCheckpointContents(nodes = [], checkpoints = []) {
+    const byId = new Map(checkpoints.map(it => [it.id, it]))
+    let changed = false
+    const refreshed = nodes.map(node => {
+        const checkpoint = byId.get(node.id)
+        if (!checkpoint || checkpoint === node.data?.checkpoint) return node
+        changed = true
+        return {...node, data: {...node.data, checkpoint}}
+    })
+    return changed ? refreshed : nodes
+}
+
+/**
  * The checkpoint kinds a validation stamp is drawn as.
  *
  * The aggregate belongs here as much as the stamp itself: it IS validation stamps, standing for the

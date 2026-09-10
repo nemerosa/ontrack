@@ -46,6 +46,13 @@ describe('delivery map header', () => {
         expect(screen.getByTestId('delivery-map-header')).toHaveTextContent("No build on this branch yet")
     })
 
+    it("carries the controls acting on the whole view", () => {
+        // The auto refresh button: the header is the view's toolbar, and the controls acting on the
+        // drawing itself sit in the graph's own control bar instead
+        render(<DeliveryMapHeader head={head} extra={<button>Auto refresh</button>}/>)
+        expect(screen.getByRole('button', {name: "Auto refresh"})).toBeInTheDocument()
+    })
+
     it("survives a build with no creation time", () => {
         render(<DeliveryMapHeader head={{id: 42, name: "20260901-7", displayName: "20260901-7"}}/>)
         expect(screen.getByTestId('delivery-map-header')).toHaveTextContent("20260901-7")

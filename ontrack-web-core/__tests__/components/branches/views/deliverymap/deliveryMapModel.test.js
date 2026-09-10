@@ -5,6 +5,8 @@ import {
     isMapEmpty,
     toFlowEdges,
     toFlowNodes,
+    topologyKey,
+    withCheckpointContents,
     withEdgeColor,
     withValidationStamps,
 } from "@components/branches/views/deliverymap/deliveryMapModel"
@@ -293,6 +295,124 @@ describe('validation stamps shown or hidden on a delivery map', () => {
     it('has nothing to hide on a map which is not there yet', () => {
         expect(withValidationStamps(null, false)).toBeNull()
         expect(withValidationStamps(undefined, false)).toBeUndefined()
+    })
+
+})
+
+describe('topology of a delivery map', () => {
+
+    const checkpoint = (id, arrival) => ({id, type: 'promotion-level', name: id, arrival})
+    const edge = (source, target) => ({id: `${source}->${target}`, kind: 'UNLOCKS', source, target})
+
+    const map = {
+        checkpoints: [checkpoint('promotion-level:12'), checkpoint('promotion-level:13')],
+        edges: [edge('promotion-level:12', 'promotion-level:13')],
+    }
+
+    it('is the same map after a refresh which changed nothing', () => {
+        // The whole point: a refresh every sixty seconds must not re-run the layout and reshuffle
+        // the map under the reader's cursor
+        // A fetch brings back new objects every time, so the comparison cannot be on identity
+        const refetched = JSON.parse(JSON.stringify(map))
+        expect(topologyKey(refetched)).toBe(topologyKey(map))
+    })
+
+    it('is unchanged when only the builds moved', () => {
+        // The configuration is static; what moves minute to minute is which build has arrived where
+        const moved = {
+            ...map,
+            checkpoints: [
+                checkpoint('promotion-level:12', {build: {id: 42}, lag: 0}),
+                checkpoint('promotion-level:13'),
+            ],
+        }
+        expect(topologyKey(moved)).toBe(topologyKey(map))
+    })
+
+    it('is unchanged when the checkpoints come back in another order', () => {
+        // Order is not the shape: two fetches naming the same checkpoints describe the same map
+        const reordered = {...map, checkpoints: [...map.checkpoints].reverse()}
+        expect(topologyKey(reordered)).toBe(topologyKey(map))
+    })
+
+    it('changes when a checkpoint appears', () => {
+        const grown = {...map, checkpoints: [...map.checkpoints, checkpoint('slot:abc')]}
+        expect(topologyKey(grown)).not.toBe(topologyKey(map))
+    })
+
+    it('changes when a checkpoint disappears', () => {
+        const shrunk = {...map, checkpoints: [map.checkpoints[0]]}
+        expect(topologyKey(shrunk)).not.toBe(topologyKey(map))
+    })
+
+    it('changes when an edge appears', () => {
+        const joined = {...map, edges: [...map.edges, edge('promotion-level:13', 'slot:abc')]}
+        expect(topologyKey(joined)).not.toBe(topologyKey(map))
+    })
+
+    it('changes when an edge disappears', () => {
+        expect(topologyKey({...map, edges: []})).not.toBe(topologyKey(map))
+    })
+
+    it("is unchanged by an aggregate's members", () => {
+        // Members are drawn inside their aggregate, on demand: they are content, not shape, and the
+        // node reserves the same room whatever they are
+        const withMembers = {
+            ...map,
+            checkpoints: [{...map.checkpoints[0], members: [checkpoint('validation-stamp:3')]}, map.checkpoints[1]],
+        }
+        expect(topologyKey(withMembers)).toBe(topologyKey(map))
+    })
+
+    it('has a value for a map which is not there yet', () => {
+        expect(topologyKey(null)).toBe(topologyKey(undefined))
+        expect(topologyKey(null)).not.toBe(topologyKey(map))
+    })
+
+})
+
+describe('refreshing the contents of laid-out nodes', () => {
+
+    const checkpoint = (id, lag) => ({id, type: 'promotion-level', name: id, arrival: {lag}})
+
+    const node = (checkpoint) => ({
+        id: checkpoint.id,
+        type: CHECKPOINT_NODE_TYPE,
+        position: {x: 100, y: 200},
+        data: {checkpoint, visible: true},
+    })
+
+    it('carries the new checkpoint without touching the position', () => {
+        // What #1707 exists for: the build on a checkpoint moves, the node stays where it was put
+        const nodes = [node(checkpoint('promotion-level:12', 5))]
+        const refreshed = withCheckpointContents(nodes, [checkpoint('promotion-level:12', 0)])
+        expect(refreshed[0].data.checkpoint.arrival.lag).toBe(0)
+        expect(refreshed[0].position).toEqual({x: 100, y: 200})
+    })
+
+    it('keeps everything else the layout put on the node', () => {
+        const nodes = [node(checkpoint('promotion-level:12', 5))]
+        const refreshed = withCheckpointContents(nodes, [checkpoint('promotion-level:12', 0)])
+        expect(refreshed[0].type).toBe(CHECKPOINT_NODE_TYPE)
+        expect(refreshed[0].data.visible).toBe(true)
+    })
+
+    it('leaves a node alone when its checkpoint is not in the new map', () => {
+        // The topology changed, so a layout is already on its way; dropping the node here would
+        // blank it in the meantime
+        const nodes = [node(checkpoint('promotion-level:12', 5))]
+        expect(withCheckpointContents(nodes, [])).toBe(nodes)
+    })
+
+    it('gives back the very same array when nothing changed', () => {
+        // Identity matters: a new array is a new render of every node in the graph
+        const same = checkpoint('promotion-level:12', 5)
+        const nodes = [node(same)]
+        expect(withCheckpointContents(nodes, [same])).toBe(nodes)
+    })
+
+    it('has nothing to do before the first layout', () => {
+        expect(withCheckpointContents([], [checkpoint('promotion-level:12', 0)])).toEqual([])
     })
 
 })

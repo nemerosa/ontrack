@@ -89,6 +89,17 @@ is drawn in either case.
 _Avoid_: staleness, drift, age. *Age* is the arrival's timestamp, which is a
 different reading and is drawn beside it.
 
+**Map topology**:
+The shape of a delivery map: which checkpoints it holds and which edges join
+them, and nothing else - not which build has arrived where, not the order the
+server listed them in, and not the members of an aggregate. The delivery map
+view refreshes itself and lays itself out again only when its topology changes,
+because almost nothing else on it changes minute to minute and a map which
+reshuffles under the cursor once a minute is worse than one which does not
+refresh.
+_Avoid_: layout, shape, structure. *Layout* is what elk computes FROM the
+topology, and the two must not be used for each other.
+
 **Unreachable slot**:
 A slot checkpoint no build of the branch being read can ever be deployed to,
 because an admission rule excludes the branch outright. It is drawn, marked as

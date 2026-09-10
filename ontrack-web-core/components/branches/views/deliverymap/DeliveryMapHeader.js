@@ -13,12 +13,21 @@ import TimestampText from "@components/common/TimestampText";
  * Labelled "Latest build", which is what the pipeline view's own stat calls it. The two views name
  * one fact one way; *branch head* is the word for it in `CONTEXT.md` and in the code.
  *
+ * It is also the view's toolbar, carrying whatever acts on the whole view - the auto refresh button.
+ * The controls which act on the DRAWING - the layout and the validation stamps - sit in the graph's
+ * own control bar instead, where the other graphs of the product put theirs.
+ *
  * @param head The branch's latest build, null on a branch with no build at all
+ * @param extra Controls acting on the whole view, drawn after the build
  */
-export default function DeliveryMapHeader({head}) {
+export default function DeliveryMapHeader({head, extra}) {
 
     const {token} = theme.useToken()
 
+    // One `Space` rather than a full-width flex row with the controls pushed to the far right: this
+    // header sits inside a `Skeleton` which renders no wrapper of its own once it has loaded, so a
+    // `width: 100%` here resolves against a shrink-to-fit box and folds "Latest build" onto three
+    // lines. Left-aligned is also what the pipeline view's toolbar does.
     return (
         <Space size={token.marginXS} data-testid="delivery-map-header">
             <Typography.Text
@@ -40,8 +49,11 @@ export default function DeliveryMapHeader({head}) {
                     </> :
                     // Said in words rather than left blank: it is also why no checkpoint on the map
                     // carries a lag marker, and the reader should not have to guess at the link
-                    <Typography.Text type="secondary" italic>No build on this branch yet</Typography.Text>
+                    <Typography.Text type="secondary" italic>
+                        No build on this branch yet
+                    </Typography.Text>
             }
+            {extra}
         </Space>
     )
 }
