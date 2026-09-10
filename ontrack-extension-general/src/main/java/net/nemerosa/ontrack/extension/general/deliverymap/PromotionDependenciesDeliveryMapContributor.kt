@@ -18,10 +18,10 @@ import org.springframework.stereotype.Component
  * Contributes no checkpoint: both ends of every edge here are promotion levels, which the core puts
  * on the map already.
  *
- * `PreviousPromotionConditionProperty` is deliberately not a source here. It is not per-promotion
- * configuration, it cascades from promotion level down to a global setting, and if that setting is on
- * it would draw a requires edge between every consecutive pair of promotion levels on every branch -
- * a chain over the whole map arriving as a side effect rather than as a decision. It is filed as #1710.
+ * `PreviousPromotionConditionProperty` is a third source of *requires* edges, drawn by
+ * [PreviousPromotionConditionDeliveryMapContributor]. It is a contributor of its own because it is
+ * resolved through a cascade rather than read off the promotion level, and where it names the same
+ * directed pair as a dependency here, both build the same edge id and the map keeps one line.
  */
 @Component
 class PromotionDependenciesDeliveryMapContributor(

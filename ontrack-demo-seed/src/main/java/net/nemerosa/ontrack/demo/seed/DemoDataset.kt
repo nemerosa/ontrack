@@ -79,6 +79,11 @@ data class BranchSpec(
  * @property dependsOn Promotion levels of the same branch this one cannot be reached before, named
  * as the `PromotionDependenciesPropertyType` property names them. It constrains; it does not act,
  * which is why it is a separate field from [autoPromotion] rather than a corner of it.
+ * @property requiresPreviousPromotion Whether this promotion cannot be granted before the level
+ * immediately below it in the branch's order. It names nothing, because the condition names nothing:
+ * the `PreviousPromotionConditionPropertyType` property is a bare boolean and the server reads the
+ * predecessor off the branch's own order. Set on the promotion level here rather than on the branch
+ * or the project, which is where the demo would otherwise put a chain on every ladder it has.
  */
 data class PromotionLevelSpec(
     val name: String,
@@ -86,6 +91,7 @@ data class PromotionLevelSpec(
     val workflow: WorkflowSpec? = null,
     val autoPromotion: AutoPromotionSpec? = null,
     val dependsOn: List<String> = emptyList(),
+    val requiresPreviousPromotion: Boolean = false,
 )
 
 /**

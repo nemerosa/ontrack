@@ -96,6 +96,32 @@ fun DemoDataset.validate() {
                     }
                 }
             }
+            // The condition constrains the level immediately below in the branch's own order, so
+            // the dataset's declaration order IS the configuration here
+            val promotionOrder = branch.promotionLevels.map { it.name }
+            branch.promotionLevels.forEachIndexed { index, promotionLevel ->
+                if (!promotionLevel.requiresPreviousPromotion) return@forEachIndexed
+                val where = "Promotion level ${promotionLevel.name} of ${project.name}/${branch.name}"
+                if (index == 0) {
+                    problems += "$where requires the previous promotion, but it is the first of the " +
+                            "branch and has none: the condition constrains nothing and draws nothing."
+                } else {
+                    val previous = promotionOrder[index - 1]
+                    // Decision 5 of #1710: a requires duplicating an unlocks is not drawn, so a demo
+                    // showing the condition on a pair which auto promotes would show nothing at all
+                    if (previous in promotionLevel.autoPromotion?.promotionLevels.orEmpty()) {
+                        problems += "$where requires the previous promotion, $previous, which also " +
+                                "auto promotes into it: the delivery map draws the unlocks only."
+                    }
+                }
+            }
+            val previousRequiredBy = branch.promotionLevels
+                .filter { it.requiresPreviousPromotion }
+                .mapNotNull { spec ->
+                    promotionOrder.indexOf(spec.name).takeIf { it > 0 }
+                        ?.let { spec.name to promotionOrder[it - 1] }
+                }
+                .toMap()
             val dependenciesOf = branch.promotionLevels.associate { it.name to it.dependsOn }
             branch.builds.forEach { build ->
                 checkName(build.name, "Build")
@@ -110,6 +136,11 @@ fun DemoDataset.validate() {
                             problems += "Build ${build.name} of ${project.name}/${branch.name} " +
                                     "is promoted to $promotionLevel before $missing, which it requires."
                         }
+                    previousRequiredBy[promotionLevel]?.takeIf { it !in promoted }?.let { previous ->
+                        problems += "Build ${build.name} of ${project.name}/${branch.name} " +
+                                "is promoted to $promotionLevel before $previous, which comes " +
+                                "before it on the branch."
+                    }
                     promoted += promotionLevel
                 }
                 if (build.commits.isNotEmpty() && branch.scmBranch == null) {

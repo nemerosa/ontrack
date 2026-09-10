@@ -5,10 +5,13 @@ import {withValidationStamps} from "@components/branches/views/deliverymap/deliv
  * What the reader can take off the delivery map, and how each of those is taken off.
  *
  * A LIST rather than one boolean, because this is not going to stay at one entry: the notification
- * and workflow checkpoints of #1711 and the previous-promotion edges of #1710 are both things a
- * reader will want out of the way while reading the rest. Adding one is an entry here - a label, an
- * icon, and how it narrows the map - and nothing else changes: the toolbar draws itself from this
- * list, and the view folds the list over the map.
+ * and workflow checkpoints of #1711 are a thing a reader will want out of the way while reading the
+ * rest. Adding one is an entry here - a label, an icon, and how it narrows the map - and nothing
+ * else changes: the toolbar draws itself from this list, and the view folds the list over the map.
+ *
+ * The previous-promotion edges of #1710 are deliberately NOT an entry: they are drawn as ordinary
+ * *requires* edges, so there is nothing to filter on short of hiding every requires edge, explicit
+ * promotion dependencies included.
  *
  * That is also why these controls are LABELLED and live in the view's toolbar rather than as icons in
  * the graph's control bar: three unlabelled eyes stacked in a corner say nothing about what each of

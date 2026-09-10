@@ -18,6 +18,7 @@ import net.nemerosa.ontrack.kdsl.spec.extension.environments.Slot
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.environments
 import net.nemerosa.ontrack.kdsl.spec.extension.general.AutoPromotionProperty
 import net.nemerosa.ontrack.kdsl.spec.extension.general.autoPromotion
+import net.nemerosa.ontrack.kdsl.spec.extension.general.previousPromotionCondition
 import net.nemerosa.ontrack.kdsl.spec.extension.general.promotionDependencies
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.NotificationsMgt
 import net.nemerosa.ontrack.kdsl.spec.extension.scm.MockScmRepositoryContext
@@ -238,6 +239,10 @@ private class KdslDemoBranch(
 
     override fun setPromotionDependencies(promotionLevel: String, dependencies: List<String>) {
         promotionLevels.getValue(promotionLevel).promotionDependencies = dependencies
+    }
+
+    override fun setPreviousPromotionCondition(promotionLevel: String, required: Boolean) {
+        promotionLevels.getValue(promotionLevel).previousPromotionCondition = required
     }
 
     override fun createBuild(name: String, description: String, creation: LocalDateTime): DemoBuild {

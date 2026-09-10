@@ -116,6 +116,17 @@ interface DemoBranch {
      * constraint as [setAutoPromotion], for the same reason.
      */
     fun setPromotionDependencies(promotionLevel: String, dependencies: List<String>)
+
+    /**
+     * Requires the promotion level immediately below [promotionLevel] in the branch's order before
+     * [promotionLevel] can be granted.
+     *
+     * Named nothing, unlike [setPromotionDependencies]: the condition is a bare boolean and the
+     * server resolves the predecessor from the branch's own promotion level order. It still comes
+     * after [createPromotionLevel] for every level of the branch, because that order is what it
+     * reads.
+     */
+    fun setPreviousPromotionCondition(promotionLevel: String, required: Boolean)
     fun createBuild(name: String, description: String, creation: LocalDateTime): DemoBuild
 }
 

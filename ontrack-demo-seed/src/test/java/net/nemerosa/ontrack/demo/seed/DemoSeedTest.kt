@@ -8,6 +8,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class DemoSeedTest {
@@ -314,6 +315,36 @@ class DemoSeedTest {
             ),
             branch.autoPromotions[DemoContent.SILVER],
             "SILVER is granted by BRONZE, by BUILD, and by the stamps matching the pattern",
+        )
+    }
+
+    /**
+     * The map's third source of a *requires*, which is the easiest of the three to lose in an edit:
+     * it names nothing, so nothing in the dataset points at it and no other assertion notices when
+     * it goes. It lives on [DemoContent.LIBRARY] precisely because the pair it constrains carries
+     * nothing else, which is also what makes a silent loss invisible on the demo itself.
+     */
+    @Test
+    fun `the demo carries the previous promotion condition the delivery map reads`() {
+        val target = InMemoryDemoTarget()
+        seed(target).run(DemoContent.dataset(changelog))
+
+        val branch = (target.projects().single { it.name == DemoContent.LIBRARY } as InMemoryDemoTarget.InMemoryProject)
+            .branches.single { it.name == DemoContent.MAIN }
+
+        assertEquals(
+            setOf(DemoContent.SILVER),
+            branch.previousPromotionRequired,
+            "SILVER cannot be granted before BRONZE, and nothing on SILVER names BRONZE to say so",
+        )
+        assertEquals(
+            DemoContent.BRONZE,
+            branch.previousPromotionLevel(DemoContent.SILVER),
+            "The condition reads the branch's promotion level order, so the order is the configuration",
+        )
+        assertNull(
+            branch.autoPromotions[DemoContent.SILVER],
+            "An auto promotion from BRONZE would suppress the very edge this exists to show (ADR 0010)",
         )
     }
 

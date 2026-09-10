@@ -2,19 +2,20 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.extension.api.PromotionRunCheckExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
-import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 
 /**
  * [PromotionRunCheckExtension] based on the [PreviousPromotionConditionPropertyType] property value.
+ *
+ * The cascade itself lives in [PreviousPromotionConditionService], which the delivery map also reads:
+ * what this check refuses and what the map draws are then the same answer by construction.
  */
 @Component
 class PreviousPromotionConditionCheckExtension(
         private val structureService: StructureService,
-        private val propertyService: PropertyService,
         extensionFeature: GeneralExtensionFeature,
-        private val cachedSettingsService: CachedSettingsService
+        private val previousPromotionConditionService: PreviousPromotionConditionService,
 ) : AbstractExtension(extensionFeature), PromotionRunCheckExtension {
 
     override fun checkPromotionRunCreation(promotionRun: PromotionRun) {
@@ -31,60 +32,21 @@ class PreviousPromotionConditionCheckExtension(
             val build = promotionRun.build
             val previousPromotions = structureService.getPromotionRunsForBuildAndPromotionLevel(build, previousPromotion)
             val previousPromotionGranted = previousPromotions.isNotEmpty()
-            // If previous promotion NOT granted, we have to check the properties
+            // If previous promotion NOT granted, we have to check the configuration
             // If not, this does not matter
             if (!previousPromotionGranted) {
-                // Promotion level first...
-                checkPreviousPromotionConditionProperty(previousPromotion, promotion, promotionRun.promotionLevel)
-                        // ... then branch
-                        && checkPreviousPromotionConditionProperty(previousPromotion, promotion, promotionRun.promotionLevel.branch)
-                        // ... then project
-                        && checkPreviousPromotionConditionProperty(previousPromotion, promotion, promotionRun.promotionLevel.branch.project)
-                        // ... then settings
-                        && checkPreviousPromotionConditionSettings(previousPromotion, promotion)
+                val resolution = previousPromotionConditionService.resolvePreviousPromotionCondition(promotion)
+                if (resolution.required) {
+                    // Which exception says WHERE the refusal comes from, which is the question the
+                    // user actually asks - the delivery map deliberately does not answer it
+                    val source = resolution.source
+                    throw if (source != null) {
+                        PreviousPromotionRequiredException(previousPromotion, promotion, source)
+                    } else {
+                        PreviousPromotionRequiredGlobalException(previousPromotion, promotion)
+                    }
+                }
             }
-        }
-    }
-
-    /**
-     * Returns `false` if the condition has been checked explicitly OK and that there is no need to check further.
-     */
-    private fun checkPreviousPromotionConditionSettings(
-            previousPromotion: PromotionLevel,
-            promotion: PromotionLevel
-    ): Boolean {
-        val settings = cachedSettingsService.getCachedSettings(PreviousPromotionConditionSettings::class.java)
-        return if (settings.previousPromotionRequired) {
-            throw PreviousPromotionRequiredGlobalException(
-                    previousPromotion,
-                    promotion
-            )
-        } else {
-            false // No need to check further
-        }
-    }
-
-    /**
-     * Returns `false` if the condition has been checked explicitly OK and that there is no need to check further.
-     */
-    private fun checkPreviousPromotionConditionProperty(
-            previousPromotion: PromotionLevel,
-            promotion: PromotionLevel,
-            entity: ProjectEntity
-    ): Boolean {
-        val property: PreviousPromotionConditionProperty? = propertyService.getProperty(entity, PreviousPromotionConditionPropertyType::class.java).value
-        return if (property != null) {
-            if (property.previousPromotionRequired) {
-                throw PreviousPromotionRequiredException(
-                        previousPromotion,
-                        promotion,
-                        entity
-                )
-            } else {
-                false // No need to check further
-            }
-        } else {
-            true // Could not check at this level, need to go on
         }
     }
 

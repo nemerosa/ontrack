@@ -12,11 +12,14 @@ import org.springframework.stereotype.Service
 /**
  * Assembles the delivery map of a branch out of its contributors.
  *
- * This service owns four rules, and deliberately no more: everything about *what* a checkpoint is
+ * This service owns five rules, and deliberately no more: everything about *what* a checkpoint is
  * belongs to the contributor which knows the configuration behind it. The fourth is the branch head
  * and the lag counted from it, which is here rather than in the contributors precisely because every
  * checkpoint has to answer it the same way - a lag measured differently by two contributors would be
- * read as a difference between the checkpoints rather than between the contributors.
+ * read as a difference between the checkpoints rather than between the contributors. The fifth,
+ * [withoutShadowedRequires], is the first rule here which reads one contributor's edge against
+ * another's, and it is here for the same reason: no contributor can see enough of the map to apply
+ * it.
  */
 @Service
 class DeliveryMapServiceImpl(
@@ -54,9 +57,11 @@ class DeliveryMapServiceImpl(
         // may not see it - takes its edges with it, and it is why a missing end never renders as an
         // unresolved checkpoint: the unresolved checkpoints of #1705 are contributed on purpose, by
         // a contributor which knows a rule pointed at nothing, and are real nodes of the map.
-        val edges = contributions.flatMap { it.edges }
-            .filter { it.source in checkpoints && it.target in checkpoints }
-            .distinctBy { it.id }
+        val edges = withoutShadowedRequires(
+            contributions.flatMap { it.edges }
+                .filter { it.source in checkpoints && it.target in checkpoints }
+                .distinctBy { it.id }
+        )
 
         // One count per BUILD rather than per checkpoint: every promotion level of a branch routinely
         // names the same build, and a map of twenty checkpoints would otherwise run twenty queries to
@@ -69,6 +74,30 @@ class DeliveryMapServiceImpl(
             edges = edges,
             head = head,
         )
+    }
+
+    /**
+     * Drops every *requires* edge whose directed pair already carries an *unlocks*.
+     *
+     * If reaching A grants B by itself, a constraint saying B cannot be reached before A is a
+     * constraint which can never fire: auto promotion goes through the same promotion path as every
+     * other promotion, so the check does run - and passes, because the prerequisite it names is the
+     * very level that triggered the promotion. Drawing both would put two lines with opposite
+     * readings on one pair and tell the reader that something might block, when nothing can.
+     *
+     * The rule is deliberately GENERAL - any directed pair, whichever contributor produced either
+     * edge - rather than restricted to the previous-promotion condition of #1710 which prompted it.
+     * It therefore also drops an explicit `PromotionDependenciesProperty` edge shadowing an auto
+     * promotion; that dependency is dead configuration, and one *unlocks* is the accurate picture.
+     * Special-casing by checkpoint type or by source would give the map two rules where one is true.
+     *
+     * It removes something a user configured from the view, which is why it is a named function with
+     * this comment rather than one more clause in the chain above.
+     */
+    private fun withoutShadowedRequires(edges: List<DeliveryMapEdge>): List<DeliveryMapEdge> {
+        val unlocked = edges.filter { it.kind == DeliveryMapEdgeKind.UNLOCKS }
+            .mapTo(mutableSetOf()) { it.source to it.target }
+        return edges.filterNot { it.kind == DeliveryMapEdgeKind.REQUIRES && (it.source to it.target) in unlocked }
     }
 
     /**

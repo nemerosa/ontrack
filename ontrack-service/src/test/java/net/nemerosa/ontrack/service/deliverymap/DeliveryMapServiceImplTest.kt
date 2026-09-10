@@ -50,6 +50,12 @@ class DeliveryMapServiceImplTest {
         target = target,
     )
 
+    private fun unlocks(source: String, target: String) =
+        DeliveryMapEdge.of(DeliveryMapEdgeKind.UNLOCKS, source, target)
+
+    private fun requires(source: String, target: String) =
+        DeliveryMapEdge.of(DeliveryMapEdgeKind.REQUIRES, source, target)
+
     private fun contributor(contribution: DeliveryMapContribution): DeliveryMapContributor =
         mockk<DeliveryMapContributor>().apply {
             every { contribute(branch) } returns contribution
@@ -179,6 +185,82 @@ class DeliveryMapServiceImplTest {
             contributor(DeliveryMapContribution(edges = listOf(edge("a", "b")))),
         )
         assertEquals(listOf("a->b"), map.edges.map { it.id })
+    }
+
+    @Test
+    fun `A requires duplicating an unlocks on the same directed pair is not drawn`() {
+        // The unlocks already says everything: the requires it shadows can never fire
+        val map = map(
+            contributor(
+                DeliveryMapContribution(
+                    checkpoints = listOf(checkpoint("a"), checkpoint("b")),
+                    edges = listOf(
+                        unlocks("a", "b"),
+                        requires("a", "b"),
+                    ),
+                )
+            ),
+        )
+        assertEquals(listOf("unlocks:a->b"), map.edges.map { it.id })
+    }
+
+    @Test
+    fun `The suppression is per directed pair - the opposite direction survives`() {
+        val map = map(
+            contributor(
+                DeliveryMapContribution(
+                    checkpoints = listOf(checkpoint("a"), checkpoint("b")),
+                    edges = listOf(
+                        unlocks("a", "b"),
+                        requires("b", "a"),
+                    ),
+                )
+            ),
+        )
+        assertEquals(listOf("unlocks:a->b", "requires:b->a"), map.edges.map { it.id })
+    }
+
+    @Test
+    fun `The suppression works across contributors`() {
+        // The rule is the map's, not one contributor's: the two edges routinely come from two
+        // different pieces of configuration read by two different extensions
+        val map = map(
+            contributor(
+                DeliveryMapContribution(
+                    checkpoints = listOf(checkpoint("a"), checkpoint("b")),
+                    edges = listOf(unlocks("a", "b")),
+                )
+            ),
+            contributor(DeliveryMapContribution(edges = listOf(requires("a", "b")))),
+        )
+        assertEquals(listOf("unlocks:a->b"), map.edges.map { it.id })
+    }
+
+    @Test
+    fun `A requires with no unlocks on its pair is kept`() {
+        val map = map(
+            contributor(
+                DeliveryMapContribution(
+                    checkpoints = listOf(checkpoint("a"), checkpoint("b"), checkpoint("c")),
+                    edges = listOf(unlocks("a", "b"), requires("b", "c")),
+                )
+            ),
+        )
+        assertEquals(listOf("unlocks:a->b", "requires:b->c"), map.edges.map { it.id })
+    }
+
+    @Test
+    fun `An unlocks whose requires was dropped is not itself affected by the drop`() {
+        // The unlocks keeps its own id and its place in the insertion order
+        val map = map(
+            contributor(
+                DeliveryMapContribution(
+                    checkpoints = listOf(checkpoint("a"), checkpoint("b")),
+                    edges = listOf(requires("a", "b"), unlocks("a", "b")),
+                )
+            ),
+        )
+        assertEquals(listOf("unlocks:a->b"), map.edges.map { it.id })
     }
 
     @Test

@@ -144,6 +144,11 @@ class DemoSeed(
             promotionLevel.autoPromotion?.let { branch.setAutoPromotion(promotionLevel.name, it) }
             promotionLevel.dependsOn.takeIf { it.isNotEmpty() }
                 ?.let { branch.setPromotionDependencies(promotionLevel.name, it) }
+            // The condition names nothing, but it reads the branch's promotion level order, so it
+            // belongs in this pass with the two properties which do name things
+            if (promotionLevel.requiresPreviousPromotion) {
+                branch.setPreviousPromotionCondition(promotionLevel.name, true)
+            }
         }
         spec.builds.forEach { buildSpec ->
             val creation = buildSpec.creation.resolve(now)

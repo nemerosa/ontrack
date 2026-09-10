@@ -190,10 +190,32 @@ object DemoContent {
     private val goldAfterSilver = gold.copy(dependsOn = listOf(SILVER))
 
     /**
+     * The map's third source of a *requires*, on [LIBRARY] alone: SILVER cannot be granted before
+     * BRONZE, and nothing on SILVER names BRONZE to say so.
+     *
+     * The `PreviousPromotionConditionPropertyType` property is a bare boolean; the server reads the
+     * predecessor off the branch's promotion level ORDER. The demo sets it on one promotion level of
+     * one branch rather than on a project or in the settings, which is where it is far more usually
+     * set in real life - and where it would put the same chain on every ladder of every demo project,
+     * arriving as a side effect rather than as something to look at.
+     *
+     * [LIBRARY] is the branch for it because its two rungs carry nothing else: BRONZE does not auto
+     * promote into SILVER, so the edge is not suppressed by the rule in ADR 0010, and no promotion
+     * dependency names the same pair, so the line the demo exists to show is this property's own. On
+     * [SERVICE], every consecutive pair is already spoken for - BRONZE unlocks SILVER, SILVER is
+     * required by GOLD - and the condition would draw nothing new anywhere.
+     *
+     * Both builds below are promoted BRONZE then SILVER, in that order, so the condition never
+     * refuses one. `validate` checks that before a reset.
+     */
+    private val silverAfterBronze = silver.copy(requiresPreviousPromotion = true)
+
+    /**
      * The full ladder, for the projects that show the whole delivery pipeline.
      *
-     * [LIBRARY] and [UI] keep the plain [bronze] and [silver]: they declare neither the stamps
-     * [silverAuto] names nor a GOLD for [goldAfterSilver] to sit above.
+     * [UI] keeps the plain [bronze] and [silver], and [LIBRARY] the plain [bronze] and
+     * [silverAfterBronze]: neither declares the stamps [silverAuto] names, nor a GOLD for
+     * [goldAfterSilver] to sit above.
      */
     private val fullPromotions = listOf(bronze, silverAuto, goldAfterSilver)
 
@@ -220,7 +242,7 @@ object DemoContent {
             BranchSpec(
                 name = MAIN,
                 description = "Main development branch.",
-                promotionLevels = listOf(bronze, silver),
+                promotionLevels = listOf(bronze, silverAfterBronze),
                 validationStamps = listOf(buildStamp, unitTests),
                 builds = listOf(
                     BuildSpec(

@@ -191,7 +191,7 @@ differently:
 | Kind         | Means                                                    | Labelled  | Comes from                                   |
 |--------------|-----------------------------------------------------------|-----------|----------------------------------------------|
 | **unlocks**  | reaching the source grants the target by itself           | *unlocks* | auto promotion                               |
-| **requires** | the target cannot be reached until the source has been    | *required by* | promotion dependencies, slot admission rules |
+| **requires** | the target cannot be reached until the source has been    | *required by* | promotion dependencies, slot admission rules, the previous promotion condition |
 
 The label on a line is read **along the arrow**, which is why the second one reads *required by*
 rather than *requires*: `SILVER required by GOLD` is the line `GOLD requires SILVER` draws.
@@ -200,6 +200,40 @@ The distinction matters because the two are configured in ways with opposite eff
 promotion *acts*: pass the validations and the promotion happens. A promotion dependency or an
 admission rule only *constrains*: it permits, and something else still has to do the promoting or
 the deploying.
+
+#### The previous promotion condition
+
+The [previous promotion condition](../../generated/properties/property-net.nemerosa.ontrack.extension.general.PreviousPromotionConditionPropertyType.md) is the third source of
+*requires* lines, and the only one that is not configured on the thing it constrains. It says that a
+promotion cannot be granted before the level immediately below it on the branch, and it is looked up
+in turn on the **promotion level**, then the **branch**, then the **project**, then in the global
+settings — the first of those to carry it decides, whichever way it answers. A `false` on the
+promotion level therefore genuinely overrides a `true` on the project; it is an answer, not a gap.
+
+The map draws the line wherever that lookup ends in *yes*, wherever the answer came from. Drawing it
+only where the property sits on the promotion level itself would show a strict subset of what will
+actually block, and an absent line reads as *nothing stops me*.
+
+What the map does **not** say is where in that chain the condition was set — a line looks the same
+whether it comes from the promotion level or from the global settings, and it looks the same as a
+promotion dependency naming the same pair. Where both say the same thing, one line is drawn. The
+question this leaves open — *why can I not promote?* — is answered exactly by trying: the refusal
+names the entity that decided.
+
+Because only the level immediately below is ever named, a branch with five promotion levels draws at
+most four of these lines: one path down the ladder, not a web across it.
+
+#### A requires that duplicates an unlocks is not drawn
+
+Where the same directed pair carries both kinds — A auto-promotes into B, *and* something says B
+requires A — only the **unlocks** line is drawn. Auto promotion goes through the same promotion path
+as everything else, so the constraint is checked and passes, every time, because the level that
+would block is the one that just triggered the promotion. It can never fire, and two lines with
+opposite readings on one pair would say that something might block when nothing can.
+
+This applies to every source of a *requires*, promotion dependencies included: a dependency
+shadowing an auto promotion is configuration that can never have an effect, and the map shows the
+one line that is true.
 
 ### Slots on the map
 

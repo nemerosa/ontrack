@@ -124,12 +124,23 @@ _Avoid_: triggers, leads to
 
 **Requires**:
 The delivery map edge meaning that a checkpoint cannot be reached until another
-has been, as promotion dependencies and slot admission rules do. It constrains;
-it does not act. It is drawn labelled *required by*, because the label is read
-along the arrow and the arrow runs from the prerequisite: the line for "GOLD
-requires SILVER" reads *SILVER required by GOLD*. That is this word rendered for
-the direction it is read in, not a second term.
+has been, as promotion dependencies, slot admission rules and the previous
+promotion condition do. It constrains; it does not act. It is drawn labelled
+*required by*, because the label is read along the arrow and the arrow runs from
+the prerequisite: the line for "GOLD requires SILVER" reads *SILVER required by
+GOLD*. That is this word rendered for the direction it is read in, not a second
+term. A requires edge says a constraint holds; it does not say where the
+constraint was configured, and two sources naming the same directed pair draw one
+edge. See ADR 0010 for the requires which is not drawn at all.
 _Avoid_: depends on, blocks
+
+**Previous promotion condition**:
+The rule that a promotion cannot be granted before the promotion level
+immediately below it in the branch's order. Unlike the other sources of a
+requires, it is resolved through a cascade - promotion level, then branch, then
+project, then global settings - where the first level carrying it decides,
+whichever way it answers.
+_Avoid_: promotion ordering, sequential promotions
 
 **Promotion level**:
 A named, ordered rung a build can reach on a branch. The set is configured per

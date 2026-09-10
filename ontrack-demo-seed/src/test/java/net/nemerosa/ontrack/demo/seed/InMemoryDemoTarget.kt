@@ -87,6 +87,7 @@ class InMemoryDemoTarget(
                     add("    promotion level $promotionLevel")
                     branch.autoPromotions[promotionLevel]?.let { add("      auto promotion $it") }
                     branch.promotionDependencies[promotionLevel]?.let { add("      depends on $it") }
+                    if (promotionLevel in branch.previousPromotionRequired) add("      requires the previous promotion")
                 }
                 branch.validationStamps.forEach { add("    validation stamp $it") }
                 branch.builds.forEach { build ->
@@ -176,6 +177,7 @@ class InMemoryDemoTarget(
         var scmBranch: String? = null
         val autoPromotions = mutableMapOf<String, AutoPromotionSpec>()
         val promotionDependencies = mutableMapOf<String, List<String>>()
+        val previousPromotionRequired = mutableSetOf<String>()
 
         override fun configureScmBranch(scmBranch: String) {
             requireNotNull(project.scmRepositoryName) {
@@ -227,6 +229,22 @@ class InMemoryDemoTarget(
             promotionDependencies[promotionLevel] = dependencies
         }
 
+        override fun setPreviousPromotionCondition(promotionLevel: String, required: Boolean) {
+            requirePromotionLevel(promotionLevel)
+            if (required) {
+                previousPromotionRequired += promotionLevel
+            } else {
+                previousPromotionRequired -= promotionLevel
+            }
+        }
+
+        /**
+         * The promotion level immediately below [promotionLevel] in this branch's order, which is
+         * what the condition names - and `null` for the first level, which has none.
+         */
+        fun previousPromotionLevel(promotionLevel: String): String? =
+            promotionLevels.indexOf(promotionLevel).takeIf { it > 0 }?.let { promotionLevels[it - 1] }
+
         private fun requirePromotionLevel(name: String) {
             require(name in promotionLevels) {
                 "Promotion level $name does not exist in ${project.name}/${this.name}"
@@ -274,6 +292,18 @@ class InMemoryDemoTarget(
                     "$name of ${branch.project.name}/${branch.name} cannot be promoted to " +
                             "$promotionLevel before $missing, which it requires"
                 )
+            }
+            // `PreviousPromotionConditionCheckExtension` refuses the promotion the same way, and
+            // reads the predecessor off the branch's promotion level ORDER rather than off a name
+            if (promotionLevel in branch.previousPromotionRequired) {
+                branch.previousPromotionLevel(promotionLevel)
+                    ?.takeIf { previous -> previous !in promotions.map { it.first } }
+                    ?.let { previous ->
+                        throw IllegalStateException(
+                            "$name of ${branch.project.name}/${branch.name} cannot be promoted to " +
+                                    "$promotionLevel before $previous, which comes before it"
+                        )
+                    }
             }
             promotions += promotionLevel to at
         }
