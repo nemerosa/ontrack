@@ -2,8 +2,11 @@ import {activeMobileNavKey, MOBILE_NAV_ITEMS} from "@components/mobile/layout/mo
 
 describe('MOBILE_NAV_ITEMS', () => {
 
-    it('offers home, projects and search', () => {
-        expect(MOBILE_NAV_ITEMS.map(item => item.key)).toEqual(['home', 'projects', 'search'])
+    it('offers home and projects, and nothing that leads nowhere', () => {
+        // Search was a third tab over a placeholder screen. Global search stays
+        // desktop-only for 5.4, so one of three thumb-level destinations was
+        // spent on a dead end - worse than two that work.
+        expect(MOBILE_NAV_ITEMS.map(item => item.key)).toEqual(['home', 'projects'])
     })
 
     it('keeps every destination inside the mobile UI', () => {
@@ -25,7 +28,12 @@ describe('activeMobileNavKey', () => {
         // A project screen reached from the Projects tab keeps that tab lit.
         expect(activeMobileNavKey('/mobile/projects')).toEqual('projects')
         expect(activeMobileNavKey('/mobile/projects/12')).toEqual('projects')
-        expect(activeMobileNavKey('/mobile/search')).toEqual('search')
+    })
+
+    it('lights nothing on a screen no tab owns any more', () => {
+        // `/mobile/search` is gone with its tab; a stale bookmark to it now
+        // 404s rather than lighting a tab that is not there.
+        expect(activeMobileNavKey('/mobile/search')).toBeNull()
     })
 
     it('does not light home for every mobile screen', () => {

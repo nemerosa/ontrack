@@ -12,11 +12,12 @@ const renderAt = (pathname) => {
 
 describe('MobileBottomNav', () => {
 
-    it('offers the three destinations', () => {
+    it('offers its destinations, and no dead ends', () => {
         renderAt('/mobile')
         expect(screen.getByTestId('mobile-nav-home')).toHaveAttribute('href', '/mobile')
         expect(screen.getByTestId('mobile-nav-projects')).toHaveAttribute('href', '/mobile/projects')
-        expect(screen.getByTestId('mobile-nav-search')).toHaveAttribute('href', '/mobile/search')
+        // Search led to a placeholder; global search stays desktop-only for 5.4.
+        expect(screen.queryByTestId('mobile-nav-search')).toBeNull()
     })
 
     it('marks the current tab, for the eye and for a screen reader alike', () => {

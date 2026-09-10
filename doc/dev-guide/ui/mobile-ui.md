@@ -119,7 +119,6 @@ the interstitial, which may well be right, but should be a choice rather than an
 | Project | `/mobile/project/[id]` | The project's branches, limited and filterable |
 | Branch | `/mobile/branch/[id]` | The branch's latest builds, as cards |
 | Build | `/mobile/build/[id]` | The decision surface: promotions, deployments, validations |
-| Search | `/mobile/search` | Not built yet — placeholder |
 | Interstitial | `/mobile/desktop-only` | A route with no mobile equivalent |
 
 Home → project → branch → build is the path the mobile UI exists for, and all of it stays
@@ -319,14 +318,17 @@ does not move.
 
 ## Adding a mobile screen
 
-1. Add the page under `app/mobile/`, replacing its `MobileScreenPending` placeholder if it has
-   one. Keep the page itself to the route and put the screen in a client component beside it,
-   as `app/mobile/page.js` and `app/mobile/HomeScreen.js` do.
+1. Add the page under `app/mobile/`. Keep the page itself to the route and put the screen in a
+   client component beside it, as `app/mobile/page.js` and `app/mobile/HomeScreen.js` do.
 2. Add the desktop route it stands in for to `components/mobile/mobileRoutes.js`, so phones
    stop getting the interstitial for it: `EQUIVALENTS` for a fixed path, `ENTITY_EQUIVALENTS`
    for one carrying an id.
 3. If it belongs in the bottom bar, add it to `MOBILE_NAV_ITEMS` in
    `components/mobile/layout/mobileNav.js` — and think hard first: three destinations are what
-   fits a thumb.
+   fits a thumb, and a tab is earned by a screen that works, not promised by one that does not.
+   The bar shipped with a third tab, Search, over a placeholder screen; global search stays
+   desktop-only for 5.4 (see #1723), so the tab was removed rather than left pointing at a dead
+   end. A phone following a link to `/search` still gets the interstitial, which names the
+   destination and offers the desktop page.
 4. Cover it in `ontrack-web-tests/tests/core/mobile.spec.js`, whose tests run in a phone
    browser context.
