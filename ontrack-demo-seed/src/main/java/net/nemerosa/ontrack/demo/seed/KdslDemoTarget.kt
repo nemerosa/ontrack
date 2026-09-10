@@ -265,8 +265,8 @@ private class KdslDemoBuild(val build: Build) : DemoBuild {
         build.promote(promotionLevel, description, at)
     }
 
-    override fun validate(validationStamp: String, status: ValidationStatus, description: String) {
-        build.validate(validationStamp, status.name, description)
+    override fun validate(validationStamp: String, status: ValidationStatus, description: String, at: LocalDateTime) {
+        build.validate(validationStamp, status.name, description, at)
     }
 
     override fun linkTo(build: DemoBuild) {

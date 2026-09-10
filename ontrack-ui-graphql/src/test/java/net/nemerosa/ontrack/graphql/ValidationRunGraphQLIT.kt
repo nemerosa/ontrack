@@ -8,6 +8,8 @@ import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDa
 import net.nemerosa.ontrack.extension.general.validation.TextValidationDataType
 import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.isNullOrNullNode
+import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.structure.config
@@ -15,6 +17,7 @@ import net.nemerosa.ontrack.model.structure.data
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -66,6 +69,74 @@ class ValidationRunGraphQLIT : AbstractQLKTITSupport() {
                     assertTrue(
                         data["createValidationRun"]["validationRun"].isNullOrNullNode(),
                         "Validation run not returned"
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a validation run at a given time`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    val time = LocalDateTime.of(2024, 3, 14, 9, 30)
+                    val data = run(
+                        """
+                        mutation CreateValidationRun {
+                            createValidationRunById(input: {
+                                buildId: $id,
+                                validationStamp: "${vs.name}",
+                                validationRunStatus: "PASSED",
+                                dateTime: "2024-03-14T09:30:00"
+                            }) {
+                                validationRun {
+                                    id
+                                }
+                            }
+                        }
+                    """
+                    )
+                    val id = assertNoUserError(data, "createValidationRunById")
+                        .path("validationRun").path("id").asInt()
+                    // `ValidationRun.signature` reads through to the last status, so the status
+                    // is the one thing to assert - the run has no time of its own to differ from it.
+                    val run = structureService.getValidationRun(ID.of(id))
+                    assertEquals(time, run.lastStatus.signature.time)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a validation run without a time stamps it with the current time`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    val before = Time.now()
+                    val data = run(
+                        """
+                        mutation CreateValidationRun {
+                            createValidationRunById(input: {
+                                buildId: $id,
+                                validationStamp: "${vs.name}",
+                                validationRunStatus: "PASSED"
+                            }) {
+                                validationRun {
+                                    id
+                                }
+                            }
+                        }
+                    """
+                    )
+                    val id = assertNoUserError(data, "createValidationRunById")
+                        .path("validationRun").path("id").asInt()
+                    val run = structureService.getValidationRun(ID.of(id))
+                    assertTrue(
+                        !run.signature.time.isBefore(before.minusMinutes(1)),
+                        "Validation run is stamped with the current time",
                     )
                 }
             }

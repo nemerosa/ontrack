@@ -9199,6 +9199,8 @@ input CreateValidationRunByIdInput {
   data: JSON
   "Type of the data to associated with the validation"
   dataTypeId: String
+  "Validation run date/time"
+  dateTime: LocalDateTime
   "Validation description"
   description: String
   "Run info"
@@ -9217,6 +9219,8 @@ input CreateValidationRunByReleaseInput {
   data: JSON
   "Type of the data to associated with the validation"
   dataTypeId: String
+  "Validation run date/time"
+  dateTime: LocalDateTime
   "Validation description"
   description: String
   "Project name"
@@ -9239,6 +9243,8 @@ input CreateValidationRunInput {
   data: JSON
   "Type of the data to associated with the validation"
   dataTypeId: String
+  "Validation run date/time"
+  dateTime: LocalDateTime
   "Validation description"
   description: String
   "Project name"

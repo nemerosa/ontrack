@@ -162,21 +162,44 @@ class DemoSeed(
                 .map { message -> branch.registerCommit(message) }
                 .lastOrNull()
                 ?.let { build.setCommit(it) }
-            // One hour per rung, so the promotions of a build are ordered and the lead time
-            // charts have something other than a flat zero to draw - but squeezed into whatever
-            // time the build actually has behind it, because the newest build of the dataset is
-            // hours old and an hour per rung would date its promotions in the FUTURE. A checkpoint
-            // saying a build was promoted in four hours' time reads as a defect in Yontrack.
-            val rungs = buildSpec.promotionLevels.size
-            if (rungs > 0) {
-                val available = Duration.between(creation, now).coerceAtLeast(Duration.ZERO)
-                val step = minOf(Duration.ofHours(1), available.dividedBy(rungs.toLong()))
-                buildSpec.promotionLevels.forEachIndexed { index, promotionLevel ->
-                    build.promote(promotionLevel, "", creation.plus(step.multipliedBy(index + 1L)))
-                }
+            // One hour per step, so the validations and the promotions of a build are ordered and
+            // the lead time charts have something other than a flat zero to draw - but squeezed
+            // into whatever time the build actually has behind it, because the newest build of the
+            // dataset is hours old and an hour per step would date its ladder in the FUTURE. A
+            // checkpoint saying a build was promoted in four hours' time reads as a defect in
+            // Yontrack.
+            //
+            // Validations take the lower steps and the promotions climb on top of them: a
+            // validation is what grants the promotions naming it, so a run dated after them -
+            // which is what every run was, being stamped at the moment of the reset (#1718) -
+            // reads as the stamp having run hours after the promotion it granted.
+            val validationCount = buildSpec.validations.size
+            val promotionCount = buildSpec.promotionLevels.size
+            val steps = validationCount + promotionCount
+            val available = Duration.between(creation, now).coerceAtLeast(Duration.ZERO)
+            // One step MORE than the ladder has, when the hour has to give: the squeeze otherwise
+            // lands the top rung exactly on the reset, and the newest build of the demo - the one
+            // every visitor looks at first - reads as having been promoted a few seconds ago.
+            val step = if (steps > 0) {
+                minOf(Duration.ofHours(1), available.dividedBy(steps + 1L))
+            } else {
+                Duration.ZERO
             }
-            buildSpec.validations.forEach { validation ->
-                build.validate(validation.validationStamp, validation.status, validation.description)
+            // The promotions are still CREATED before the validations, whatever the times say.
+            // `AutoPromotionEventListener` promotes a build the moment a run completes the set a
+            // level names, and it stamps that run with the time of the call rather than with the
+            // time of the validation - so seeding the runs first would hand the demo a second,
+            // same-level promotion dated at the reset, which is the very reading this is fixing.
+            buildSpec.promotionLevels.forEachIndexed { index, promotionLevel ->
+                build.promote(promotionLevel, "", creation.plus(step.multipliedBy(validationCount + index + 1L)))
+            }
+            buildSpec.validations.forEachIndexed { index, validation ->
+                build.validate(
+                    validation.validationStamp,
+                    validation.status,
+                    validation.description,
+                    creation.plus(step.multipliedBy(index + 1L)),
+                )
             }
         }
     }

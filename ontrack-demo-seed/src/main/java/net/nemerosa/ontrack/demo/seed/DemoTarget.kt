@@ -140,7 +140,14 @@ interface DemoBuild {
 
     fun promote(promotionLevel: String, description: String, at: LocalDateTime)
 
-    fun validate(validationStamp: String, status: ValidationStatus, description: String)
+    /**
+     * Records a run of [validationStamp] at [at].
+     *
+     * The time is passed in for the same reason [promote] takes one: a run stamped with the moment
+     * of the reset reads as having happened seconds ago whatever the age of the build it names, and
+     * on a delivery map that puts the stamp *after* the promotion it granted (#1718).
+     */
+    fun validate(validationStamp: String, status: ValidationStatus, description: String, at: LocalDateTime)
 
     /**
      * Records that this build uses [build].

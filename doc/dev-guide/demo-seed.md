@@ -164,6 +164,25 @@ promotion to a level the branch does not declare, no link to a build that is nev
 no deployment a slot's admission rules would refuse — **before** the reset deletes anything,
 and reports every problem at once. Destructive by design must not mean blank on failure.
 
+### A build's history is a ladder, not an instant
+
+A build carries a creation time from the dataset; its validation runs and its promotion runs are
+dated *by the seed*, one hour apart, climbing from that creation time. The validations take the
+lower steps and the promotions climb on top of them, because a validation is what grants the
+promotions naming it: a run dated after them reads as the stamp having run hours after the
+promotion it granted (#1718).
+
+Two things bound the ladder. It is squeezed into whatever time the build actually has behind it —
+the newest build of the dataset is hours old, and an hour per step would date its top rungs in the
+future, which reads as a defect in Yontrack rather than in the dataset. And the promotion runs are
+still *created* before the validation runs, whatever their times say: `AutoPromotionEventListener`
+promotes a build the moment a run completes the set a level names, stamping that promotion with the
+time of the call, so seeding the runs first would add a second same-level promotion dated at the
+reset.
+
+`DemoSeedTest.nothing of the demo is dated after the reset which created it` pins the bounds for
+builds, promotions and validations alike.
+
 ### A name matching nothing is a typo here, even where the product allows it
 
 Some of what the dataset names is not checked by the server at all. A promotion dependency
@@ -233,9 +252,6 @@ server involved.
 
 ## What it does not do
 
-- **Validation runs are not backdated.** Builds and promotion runs carry the dataset's
-  times; Yontrack's `createValidationRun` mutation takes no time, so a build dated two weeks
-  ago shows validation runs stamped at reset time. Fixing this needs a server-side change.
 - **The shared dashboard is not selected for visitors.** Yontrack only ever selects a
   dashboard for the account that saved it, so a visitor lands on the built-in dashboard and
   picks `Yontrack demo` from the list.
@@ -247,8 +263,9 @@ server involved.
   commits in memory only, and the change log fails rather than reads empty once they are gone.
 - **Commits are not backdated.** The mock SCM stamps a commit with the time it is registered
   and its REST endpoint takes no time, so a change log between two builds dated a week apart
-  shows commits dated within the same second of the reset. The same limitation as validation
-  runs, for the same reason, and it would need a server-side change to fix.
+  shows commits dated within the same second of the reset. Validation runs used to share this
+  limitation and no longer do (#1718); the mock SCM's endpoint still takes no time, so fixing
+  this one needs a server-side change of its own.
 - **`KdslDemoTarget` has no automated test.** The seed is destructive by definition, so it
   cannot share an instance with the acceptance suite. Changes to it are verified by running
   the program against a throwaway instance — the local dev stack does fine — twice, and

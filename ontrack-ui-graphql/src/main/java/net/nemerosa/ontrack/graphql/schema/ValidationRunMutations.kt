@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.exceptions.ValidationRunDataJSONInputException
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 import kotlin.jvm.optionals.getOrNull
 
 @Component
@@ -93,7 +94,10 @@ class ValidationRunMutations(
                 validationRunStatusId = input.validationRunStatus?.let(validationRunStatusService::getValidationRunStatus),
                 dataTypeId = input.dataTypeId,
                 data = parseValidationRunData(build, input.validationStamp, input.dataTypeId, input.data),
-                description = input.description
+                description = input.description,
+                // Backdating a run is what lets a seeded or replayed history read as the history it
+                // stands for; without it every run is stamped with the moment it was pushed.
+                signature = input.dateTime?.let { securityService.currentSignature.withTime(it) },
             )
         )
         // Run info
@@ -146,6 +150,7 @@ class ValidationRunMutations(
 
 interface ValidationRunInput {
     val validationStamp: String
+    val dateTime: LocalDateTime?
     val validationRunStatus: String?
     val description: String?
     val dataTypeId: String?
@@ -164,6 +169,8 @@ class CreateValidationRunInput(
     override val validationStamp: String,
     @APIDescription("Validation run status")
     override val validationRunStatus: String?,
+    @APIDescription("Validation run date/time")
+    override val dateTime: LocalDateTime?,
     @APIDescription("Validation description")
     override val description: String?,
     @APIDescription("Type of the data to associated with the validation")
@@ -184,6 +191,8 @@ class CreateValidationRunByReleaseInput(
     override val validationStamp: String,
     @APIDescription("Validation run status")
     override val validationRunStatus: String?,
+    @APIDescription("Validation run date/time")
+    override val dateTime: LocalDateTime?,
     @APIDescription("Validation description")
     override val description: String?,
     @APIDescription("Type of the data to associated with the validation")
@@ -202,6 +211,8 @@ class CreateValidationRunByIdInput(
     override val validationStamp: String,
     @APIDescription("Validation run status")
     override val validationRunStatus: String?,
+    @APIDescription("Validation run date/time")
+    override val dateTime: LocalDateTime?,
     @APIDescription("Validation description")
     override val description: String?,
     @APIDescription("Type of the data to associated with the validation")

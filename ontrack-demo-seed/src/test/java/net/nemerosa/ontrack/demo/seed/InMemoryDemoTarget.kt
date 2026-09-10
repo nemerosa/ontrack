@@ -95,7 +95,7 @@ class InMemoryDemoTarget(
                     build.releaseVersion?.let { add("      release $it") }
                     build.commitId?.let { add("      built from $it") }
                     build.promotions.forEach { add("      promotion ${it.first} at ${it.second}") }
-                    build.validations.forEach { add("      validation ${it.first} ${it.second}") }
+                    build.validations.forEach { add("      validation ${it.stamp} ${it.status} at ${it.at}") }
                     build.links.forEach { add("      uses ${it.branch.project.name}/${it.name}") }
                 }
             }
@@ -270,7 +270,7 @@ class InMemoryDemoTarget(
         // on the JVM, the same way `releaseVersion` does with setRelease.
         var commitId: String? = null
         val promotions = mutableListOf<Pair<String, LocalDateTime>>()
-        val validations = mutableListOf<Pair<String, ValidationStatus>>()
+        val validations = mutableListOf<InMemoryValidation>()
         val links = mutableListOf<InMemoryBuild>()
 
         override fun setRelease(release: String) {
@@ -308,11 +308,16 @@ class InMemoryDemoTarget(
             promotions += promotionLevel to at
         }
 
-        override fun validate(validationStamp: String, status: ValidationStatus, description: String) {
+        override fun validate(
+            validationStamp: String,
+            status: ValidationStatus,
+            description: String,
+            at: LocalDateTime,
+        ) {
             require(validationStamp in branch.validationStamps) {
                 "No validation stamp $validationStamp on ${branch.project.name}/${branch.name}"
             }
-            validations += validationStamp to status
+            validations += InMemoryValidation(validationStamp, status, at)
         }
 
         override fun linkTo(build: DemoBuild) {
@@ -405,6 +410,16 @@ class InMemoryDemoTarget(
             }
         }
     }
+
+    /**
+     * One run of a validation stamp on a build, with the time the seed dated it at — which is
+     * a fact about the demo the same way a promotion's time is (#1718).
+     */
+    data class InMemoryValidation(
+        val stamp: String,
+        val status: ValidationStatus,
+        val at: LocalDateTime,
+    )
 
     /**
      * A mock SCM repository, reproducing the only part of `MockSCMExtension` the seed can

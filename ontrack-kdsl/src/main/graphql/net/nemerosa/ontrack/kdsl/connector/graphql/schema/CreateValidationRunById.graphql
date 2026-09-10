@@ -3,12 +3,14 @@ mutation CreateValidationRunById(
     $validationStamp: String!,
     $validationRunStatus: String,
     $description: String,
+    $dateTime: LocalDateTime,
 ) {
     createValidationRunById(input: {
         buildId: $buildId,
         validationStamp: $validationStamp,
         validationRunStatus: $validationRunStatus,
         description: $description,
+        dateTime: $dateTime,
     }) {
         validationRun {
             ...ValidationRunFragment

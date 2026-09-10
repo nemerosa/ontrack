@@ -65,18 +65,21 @@ class Build(
      * @param validationStamp Name of the validation stamp
      * @param status Status of the run, defaults to the stamp's own default when null
      * @param description Description of the run
+     * @param dateTime Time of the run, defaults to the moment of the call when null
      * @return Validation run
      */
     fun validate(
         validationStamp: String,
         status: String? = null,
         description: String? = null,
+        dateTime: LocalDateTime? = null,
     ): ValidationRun = graphqlConnector.mutate(
         CreateValidationRunByIdMutation(
             id.toInt(),
             validationStamp,
             Optional.presentIfNotNull(status),
             Optional.presentIfNotNull(description),
+            Optional.presentIfNotNull(dateTime),
         )
     ) {
         it?.createValidationRunById?.payloadUserErrors?.convert()

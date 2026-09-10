@@ -11,6 +11,59 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+/**
+ * An [InMemoryDemoTarget] which also records the order the seed calls it in.
+ *
+ * The fake records state, and state says nothing about ordering: a build promoted then validated
+ * and one validated then promoted leave the same snapshot. On a real instance the two differ, so
+ * the order is worth a test of its own.
+ */
+private class RecordingDemoTarget(
+    private val delegate: InMemoryDemoTarget,
+    private val record: (String) -> Unit,
+) : DemoTarget by delegate {
+
+    override fun createProject(name: String, description: String): DemoProject =
+        RecordingProject(delegate.createProject(name, description), record)
+
+    private class RecordingProject(
+        private val delegate: DemoProject,
+        private val record: (String) -> Unit,
+    ) : DemoProject by delegate {
+        override fun createBranch(name: String, description: String): DemoBranch =
+            RecordingBranch(delegate.createBranch(name, description), record)
+    }
+
+    private class RecordingBranch(
+        private val delegate: DemoBranch,
+        private val record: (String) -> Unit,
+    ) : DemoBranch by delegate {
+        override fun createBuild(name: String, description: String, creation: LocalDateTime): DemoBuild =
+            RecordingBuild(delegate.createBuild(name, description, creation), record)
+    }
+
+    private class RecordingBuild(
+        private val delegate: DemoBuild,
+        private val record: (String) -> Unit,
+    ) : DemoBuild by delegate {
+
+        override fun promote(promotionLevel: String, description: String, at: LocalDateTime) {
+            record("promote $promotionLevel")
+            delegate.promote(promotionLevel, description, at)
+        }
+
+        override fun validate(
+            validationStamp: String,
+            status: ValidationStatus,
+            description: String,
+            at: LocalDateTime,
+        ) {
+            record("validate $validationStamp")
+            delegate.validate(validationStamp, status, description, at)
+        }
+    }
+}
+
 class DemoSeedTest {
 
     private val clock = Clock.fixed(Instant.parse("2026-09-01T10:15:30Z"), ZoneOffset.UTC)
@@ -166,6 +219,27 @@ class DemoSeedTest {
                             !time.isBefore(build.creation),
                             "Promotion $promotion of build ${build.name} is dated before the build",
                         )
+                    }
+                    // A validation grants the promotions it is named by, so it is dated inside the
+                    // same window as they are and, on top of that, before the first of them: a
+                    // stamp reading as having run after the promotion it granted is what #1718 is.
+                    val firstPromotion = build.promotions.minOfOrNull { it.second }
+                    build.validations.forEach { validation ->
+                        assertTrue(
+                            !validation.at.isAfter(now),
+                            "Validation ${validation.stamp} of build ${build.name} is dated in the future",
+                        )
+                        assertTrue(
+                            !validation.at.isBefore(build.creation),
+                            "Validation ${validation.stamp} of build ${build.name} is dated before the build",
+                        )
+                        if (firstPromotion != null) {
+                            assertTrue(
+                                !validation.at.isAfter(firstPromotion),
+                                "Validation ${validation.stamp} of build ${build.name} is dated " +
+                                        "after the first promotion of the build",
+                            )
+                        }
                     }
                 }
             }
@@ -528,6 +602,88 @@ class DemoSeedTest {
             )
         }
         assertTrue("promoted to GOLD before SILVER" in error.message.orEmpty(), error.message.orEmpty())
+    }
+
+    /**
+     * The exact ladder, on a build with room for it: the validations take the lower steps and the
+     * promotions climb on top of them, an hour apart. Pinned rather than left to the invariant test
+     * because "before the first promotion" is satisfied by a run dated at the build's creation too,
+     * and a run stamped at the same instant as the build it belongs to reads no better than one
+     * stamped at the reset.
+     */
+    @Test
+    fun `validations are dated an hour apart, below the promotions of the same build`() {
+        val target = InMemoryDemoTarget()
+        seed(target).run(
+            datasetWithPromotionLevels(
+                PromotionLevelSpec("SILVER", ""),
+                PromotionLevelSpec("GOLD", ""),
+                validationStamps = listOf(
+                    ValidationStampSpec("BUILD", ""),
+                    ValidationStampSpec("TESTS", ""),
+                ),
+                builds = listOf(
+                    BuildSpec(
+                        name = "1",
+                        description = "",
+                        // Two days back, so the four steps of the ladder all get their full hour
+                        creation = BuildCreation.DaysAgo(2),
+                        promotionLevels = listOf("SILVER", "GOLD"),
+                        validations = listOf(
+                            ValidationSpec("BUILD", ValidationStatus.PASSED),
+                            ValidationSpec("TESTS", ValidationStatus.PASSED),
+                        ),
+                    ),
+                ),
+            )
+        )
+
+        val build = (target.projects().single() as InMemoryDemoTarget.InMemoryProject)
+            .branches.single().builds.single()
+        assertEquals(
+            listOf(
+                "BUILD" to build.creation.plusHours(1),
+                "TESTS" to build.creation.plusHours(2),
+            ),
+            build.validations.map { it.stamp to it.at },
+        )
+        assertEquals(
+            listOf(
+                "SILVER" to build.creation.plusHours(3),
+                "GOLD" to build.creation.plusHours(4),
+            ),
+            build.promotions,
+        )
+    }
+
+    /**
+     * The promotions are created BEFORE the validations however the times read, because
+     * `AutoPromotionEventListener` promotes a build as soon as a run completes the set a level
+     * names and stamps that promotion with the time of the call. Seeding the runs first would hand
+     * the demo a second promotion on the same level, dated at the reset — which is the reading
+     * #1718 exists to remove.
+     */
+    @Test
+    fun `a build is promoted before its validations are recorded`() {
+        val calls = mutableListOf<String>()
+        val target = RecordingDemoTarget(InMemoryDemoTarget(), calls::add)
+        seed(target).run(
+            datasetWithPromotionLevels(
+                PromotionLevelSpec("SILVER", ""),
+                validationStamps = listOf(ValidationStampSpec("BUILD", "")),
+                builds = listOf(
+                    BuildSpec(
+                        name = "1",
+                        description = "",
+                        creation = BuildCreation.DaysAgo(1),
+                        promotionLevels = listOf("SILVER"),
+                        validations = listOf(ValidationSpec("BUILD", ValidationStatus.PASSED)),
+                    ),
+                ),
+            )
+        )
+
+        assertEquals(listOf("promote SILVER", "validate BUILD"), calls)
     }
 
     private fun datasetWithPromotionLevels(
