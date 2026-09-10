@@ -18,10 +18,11 @@
  */
 
 import {gql} from "graphql-request"
-import {Empty, Tag} from "antd"
+import {Tag} from "antd"
 import {useQuery} from "@components/services/GraphQL"
 import MobileScreen from "@components/mobile/layout/MobileScreen"
 import MobileAsyncContent from "@components/mobile/layout/MobileAsyncContent"
+import MobileEmpty from "@components/mobile/layout/MobileEmpty"
 import {MobileEntityGroup, MobileEntityRow} from "@components/mobile/entities/MobileEntityList"
 import {MobileFilterInput, useMobileFilter} from "@components/mobile/entities/MobileFilter"
 import MobileFavourite from "@components/mobile/favourites/MobileFavourite"
@@ -71,19 +72,17 @@ export default function MobileProjectListScreen() {
                 isEmpty={projects.length === 0}
                 rows={6}
                 empty={
-                    <div data-testid="mobile-projects-empty">
-                        <Empty
-                            image={Empty.PRESENTED_IMAGE_SIMPLE}
-                            description={
-                                // Two different facts, and telling them apart is
-                                // the difference between "type something else"
-                                // and "there is nothing here to find".
-                                filter.filtering
-                                    ? `No project matches "${filter.filter}".`
-                                    : "There is no project on this instance yet."
-                            }
-                        />
-                    </div>
+                    <MobileEmpty
+                        testId="mobile-projects-empty"
+                        description={
+                            // Two different facts, and telling them apart is the
+                            // difference between "type something else" and
+                            // "there is nothing here to find".
+                            filter.filtering
+                                ? `No project matches "${filter.filter}".`
+                                : "There is no project on this instance yet."
+                        }
+                    />
                 }
             >
                 <MobileEntityGroup

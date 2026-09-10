@@ -38,10 +38,20 @@ ontrack-extension-*/node_modules
 /casc
 
 
-# `build` above is unanchored, so it also matches the net.nemerosa.ontrack.build *package*
-# directory under buildSrc, silently dropping any new source file added there.
+# `build` above is unanchored, so it matches every directory called `build` anywhere in the
+# tree - including source directories that have nothing to do with a Gradle output. Each one
+# has to be re-included by name, and the *directory* itself has to be: git never descends into
+# an excluded directory, so negating a file inside one does nothing.
+#
+# The failure is silent in the worst way - the files exist on disk, the app runs, the tests
+# pass, and `git status` shows nothing - so a new one is only noticed once a fresh checkout
+# cannot build.
+#
+# The net.nemerosa.ontrack.build *package* under buildSrc:
 !buildSrc/src/main/kotlin/net/nemerosa/ontrack/build/
 !buildSrc/src/test/kotlin/net/nemerosa/ontrack/build/
+# The mobile UI's build screen, which is a route named after the entity it shows:
+!ontrack-web-core/app/mobile/build/
 
 # Local development stack state (scripts/dev-stack.sh)
 .yontrack-dev/

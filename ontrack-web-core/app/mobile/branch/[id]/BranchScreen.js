@@ -17,13 +17,15 @@
 import {useState} from "react"
 import {gql} from "graphql-request"
 import Link from "next/link"
-import {Button, Empty, Spin, Tag} from "antd"
+import {Button, Spin, Tag} from "antd"
 import {useQuery} from "@components/services/GraphQL"
 import MobileScreen from "@components/mobile/layout/MobileScreen"
 import MobileAsyncContent from "@components/mobile/layout/MobileAsyncContent"
+import MobileEmpty from "@components/mobile/layout/MobileEmpty"
 import MobileFavourite from "@components/mobile/favourites/MobileFavourite"
 import {useFavouriteRefresh} from "@components/mobile/favourites/useFavouriteRefresh"
 import MobileBuildCard from "@components/mobile/builds/MobileBuildCard"
+import {useMobileBranchDeployments} from "@components/mobile/builds/useMobileDeployments"
 import {mobileProjectUri} from "@components/mobile/mobileRoutes"
 
 /**
@@ -87,19 +89,6 @@ export default function MobileBranchScreen({id}) {
                                     image
                                 }
                             }
-                            # Where the build is *now*, which is the question a
-                            # phone user has. The full pipeline history is a
-                            # desktop surface.
-                            currentDeployments {
-                                id
-                                slot {
-                                    id
-                                    environment {
-                                        id
-                                        name
-                                    }
-                                }
-                            }
                         }
                     }
                 }
@@ -110,6 +99,14 @@ export default function MobileBranchScreen({id}) {
             deps: [id, size, refresh],
         }
     )
+
+    /*
+     * Deployments are a query of their own, and deliberately - see
+     * `useMobileDeployments`. `currentDeployments` is absent from the schema on
+     * an instance with no environments licence, which would fail the document
+     * above and take the whole screen with it rather than one badge strip.
+     */
+    const deploymentsByBuild = useMobileBranchDeployments(id, size)
 
     const branch = query.data?.branch
     const builds = branch?.buildsPaginated?.pageItems ?? []
@@ -154,17 +151,21 @@ export default function MobileBranchScreen({id}) {
                 isEmpty={builds.length === 0}
                 rows={6}
                 empty={
-                    <div data-testid="mobile-builds-empty">
-                        <Empty
-                            image={Empty.PRESENTED_IMAGE_SIMPLE}
-                            description="This branch has no build yet."
-                        />
-                    </div>
+                    <MobileEmpty
+                        testId="mobile-builds-empty"
+                        description="This branch has no build yet."
+                    />
                 }
             >
                 <ul className="ot-mobile-cards" data-testid="mobile-builds">
                     {
-                        builds.map(build => <MobileBuildCard key={build.id} build={build}/>)
+                        builds.map(build =>
+                            <MobileBuildCard
+                                key={build.id}
+                                build={build}
+                                deployments={deploymentsByBuild[String(build.id)]}
+                            />
+                        )
                     }
                 </ul>
                 {

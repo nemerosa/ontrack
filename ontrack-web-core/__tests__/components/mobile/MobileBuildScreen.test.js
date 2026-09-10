@@ -2,9 +2,21 @@ import "@testing-library/jest-dom"
 import {render, screen} from "@testing-library/react"
 
 let queryResult = {data: null, loading: false, error: null, finished: true}
+/*
+ * The screen runs two queries, and they are not interchangeable: deployments are
+ * asked for separately so that an instance without the environments licence -
+ * where `currentDeployments` is absent from the schema - loses that section
+ * alone instead of the whole document. The mock has to be able to fail one and
+ * not the other, or that isolation is untested.
+ */
+let deploymentsResult = null
 
 jest.mock("../../../components/services/GraphQL", () => ({
-    useQuery: () => queryResult,
+    useQuery: (query) => (
+        deploymentsResult && String(query).includes('MobileBuildDeployments')
+            ? deploymentsResult
+            : queryResult
+    ),
     callGraphQL: jest.fn(),
 }))
 
@@ -69,6 +81,7 @@ const refused = (name, action) => ({name, action, authorized: false})
 
 beforeEach(() => {
     switchToDesktopUI.mockClear()
+    deploymentsResult = null
 })
 
 describe('the mobile build screen', () => {
@@ -157,6 +170,31 @@ describe('the mobile build screen', () => {
             render(<MobileBuildScreen id="100"/>)
             expect(screen.getByTestId('mobile-build-deployments')).toHaveTextContent(/not deployed/i)
         })
+
+        it('loses only this section when the instance has no environments feature', () => {
+            // `currentDeployments` is contributed by the environments extension
+            // and only registered when the licence enables it, so without it the
+            // field is absent from the *schema* and a query naming it fails
+            // validation - taking the whole document with it. Asking separately
+            // is what keeps the rest of the screen alive.
+            build({promotions: [promotion(900, 500, 'BRONZE')]})
+            deploymentsResult = {data: null, loading: false, error: "Validation error", finished: true}
+            render(<MobileBuildScreen id="100"/>)
+            expect(screen.getByTestId('mobile-build-deployments')).toHaveTextContent(/not available on this instance/i)
+            // Everything else still there.
+            expect(screen.getByTestId('mobile-build-promotion-900')).toBeInTheDocument()
+            expect(screen.getByTestId('mobile-screen-title')).toHaveTextContent('1.4.0')
+        })
+
+        it('does not call an unavailable section empty', () => {
+            // "Deployed nowhere" is a fact about the build; "unavailable" is a
+            // fact about the instance, and saying the first for the second
+            // would be a lie on the screen whose job is a decision.
+            build()
+            deploymentsResult = {data: null, loading: false, error: "Validation error", finished: true}
+            render(<MobileBuildScreen id="100"/>)
+            expect(screen.getByTestId('mobile-build-deployments')).not.toHaveTextContent(/not deployed anywhere/i)
+        })
     })
 
     describe('validations', () => {
@@ -185,6 +223,21 @@ describe('the mobile build screen', () => {
             build({validations: [validation(700, 'BUILD', 'PASSED')]})
             render(<MobileBuildScreen id="100"/>)
             expect(screen.getByTestId('mobile-build-validation-700').querySelector('a')).toBeNull()
+        })
+
+        it('says when there were more validations than it shows', () => {
+            // Silently showing 50 of 80 would let a reader conclude the build is
+            // green on evidence the screen never displayed.
+            const many = Array.from({length: 51}, (_, index) => validation(700 + index, `STAMP-${index}`, 'PASSED'))
+            build({validations: many})
+            render(<MobileBuildScreen id="100"/>)
+            expect(screen.getByTestId('mobile-build-validations-truncated')).toBeInTheDocument()
+        })
+
+        it('says nothing about more validations when the list is whole', () => {
+            build({validations: [validation(700, 'BUILD', 'PASSED')]})
+            render(<MobileBuildScreen id="100"/>)
+            expect(screen.queryByTestId('mobile-build-validations-truncated')).not.toBeInTheDocument()
         })
 
         it('says so when the build has no validation', () => {

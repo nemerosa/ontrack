@@ -17,10 +17,11 @@
  */
 
 import {gql} from "graphql-request"
-import {Empty, Space, Tag, Typography} from "antd"
+import {Space, Tag, Typography} from "antd"
 import {useQuery} from "@components/services/GraphQL"
 import MobileScreen from "@components/mobile/layout/MobileScreen"
 import MobileAsyncContent from "@components/mobile/layout/MobileAsyncContent"
+import MobileEmpty from "@components/mobile/layout/MobileEmpty"
 import {MobileEntityGroup, MobileEntityRow} from "@components/mobile/entities/MobileEntityList"
 import {MobileFilterInput, useMobileFilter} from "@components/mobile/entities/MobileFilter"
 import {branchNamePattern} from "@components/mobile/entities/branchNamePattern"
@@ -139,19 +140,17 @@ export default function MobileProjectScreen({id}) {
                 isEmpty={branches.length === 0}
                 rows={6}
                 empty={
-                    <div data-testid="mobile-branches-empty">
-                        <Empty
-                            image={Empty.PRESENTED_IMAGE_SIMPLE}
-                            description={
-                                // Two different facts, and telling them apart is
-                                // the difference between "type something else"
-                                // and "there is nothing here to find".
-                                filter.filtering
-                                    ? `No branch matches "${filter.filter}".`
-                                    : "This project has no branch yet."
-                            }
-                        />
-                    </div>
+                    <MobileEmpty
+                        testId="mobile-branches-empty"
+                        description={
+                            // Two different facts, and telling them apart is the
+                            // difference between "type something else" and
+                            // "there is nothing here to find".
+                            filter.filtering
+                                ? `No branch matches "${filter.filter}".`
+                                : "This project has no branch yet."
+                        }
+                    />
                 }
             >
                 <MobileEntityGroup
@@ -181,13 +180,11 @@ export default function MobileProjectScreen({id}) {
                 </MobileEntityGroup>
                 {
                     truncated &&
-                    <Typography.Paragraph
-                        type="secondary"
-                        className="ot-mobile-note"
-                        data-testid="mobile-branches-truncated"
-                    >
-                        {`Showing the ${MOBILE_BRANCH_LIMIT} most recently active branches. Filter by name to find another.`}
-                    </Typography.Paragraph>
+                    <div className="ot-mobile-note" data-testid="mobile-branches-truncated">
+                        <Typography.Text type="secondary">
+                            {`Showing the ${MOBILE_BRANCH_LIMIT} most recently active branches. Filter by name to find another.`}
+                        </Typography.Text>
+                    </div>
                 }
             </MobileAsyncContent>
         </MobileScreen>

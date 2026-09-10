@@ -99,6 +99,13 @@ of the easy alternatives is acceptable: silently serving the desktop page costs 
 readable UI the redirect exists to give them, and silently dropping them on the mobile home
 loses what they came for.
 
+**A route named after an entity can be swallowed by `.gitignore`.** `/mobile/build/[id]` lives
+in a directory called `build`, and the repository's `.gitignore` carries an unanchored `build`
+for Gradle output — so the screen's files were ignored, and silently: they exist on disk, the
+app runs, the unit tests pass and `git status` shows nothing. Only a fresh checkout notices.
+Each such directory has to be re-included by name in `.gitignore`, and the *directory* itself
+has to be, because git never descends into an excluded one.
+
 **Adding a desktop route means deciding what a phone following a link to it should see.** That
 decision is recorded in this map — a desktop route added without one silently sends phones to
 the interstitial, which may well be right, but should be a choice rather than an oversight.
@@ -191,7 +198,8 @@ it happened, how far it has been promoted, and where it is deployed.
   name**. The acceptance criterion is that promotions read without zooming, and a 16px medal
   on a phone is a coloured dot.
 - Deployments are `Build.currentDeployments` — where the build is *now*, which is the question
-  a phone user has; the pipeline history is a desktop surface.
+  a phone user has; the pipeline history is a desktop surface. **Asked for in a query of its
+  own** — see below.
 
   **Known gap: qualified slots are not shown.** `currentDeployments` declares its `qualifier`
   argument with a default of `""`, and `findSlotsByProject` treats that as a *strict* filter
@@ -225,6 +233,28 @@ survives greyscale.
 The actions sit directly under the identity rather than at the foot of the screen. The issue
 lists them last, but a validation list can be long and a user who already knows they want to
 promote should not scroll past every stamp to reach the button.
+
+#### Deployments are a separate query, deliberately
+
+`Build.currentDeployments` is contributed by the environments extension, and
+`GQLBuildSlotPipelinesFieldContributor` only registers it when
+`environmentsLicense.environmentFeatureEnabled`. On an instance without that licence the
+field is **absent from the schema**, not merely empty — so a query naming it fails
+*validation*, and a GraphQL validation failure fails the whole document. A single query would
+therefore take identity, promotions, validations and both action buttons down with it, and
+the screen would read "Could not load the build" on the strength of a licence it never
+mentions.
+
+The desktop UI does not hit this because its environments panel is its own component with its
+own query: only that panel breaks. `useMobileDeployments` gives the mobile screens the same
+isolation — one hook for a build, one for a page of a branch's builds — and its `error` is an
+expected state rather than a bug. The build screen says "Deployments are not available on this
+instance", which is a different sentence from "This build is not deployed anywhere"; a build
+card on the branch screen simply draws no badges, the difference not being worth a sentence
+there.
+
+Any future mobile query naming a field an extension contributes conditionally needs the same
+treatment.
 
 #### The action entry points
 
@@ -271,8 +301,11 @@ What the two screens send differs, and the difference matters:
 
 `MobileEntityGroup` and `MobileEntityRow` are the mobile UI's one list: a name, a line of
 context under it, and a single trailing action. `MobileSection` is the heading half on its
-own, for the sections that are a list *or* a line saying there is none — the build screen's
-three. `MobileEntityGroup` is that plus the list, so the two cannot drift apart. Plain `ul`/`li` rather than antd's `List`,
+own; `MobileSectionList` is that plus "a list, or a line saying there is none" — the build
+screen's three sections; `MobileEntityGroup` is the heading plus a list that its screen has
+already decided is non-empty. All three share the heading, so they cannot drift apart.
+`MobileEmpty` is the one-line empty state itself, in one voice, using antd's simple image
+rather than the desktop-sized default illustration. Plain `ul`/`li` rather than antd's `List`,
 whose paddings and split lines are sized for a desktop page — and which is a layout
 component, on the wrong side of the boundary above.
 

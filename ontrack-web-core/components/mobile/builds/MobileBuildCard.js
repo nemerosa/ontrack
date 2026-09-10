@@ -36,13 +36,17 @@ import {mobileBuildUri} from "@components/mobile/mobileRoutes"
 const MEDAL_SIZE = 20
 
 /**
- * @param {Object} build A build with `displayName`, `creation`, `promotionRuns`
- *   and `currentDeployments`.
+ * @param {Object} build A build with `displayName`, `creation` and
+ *   `promotionRuns`.
+ * @param {Array} [deployments] Where the build is currently deployed. Passed in
+ *   rather than read off the build, because it comes from a query of its own -
+ *   see `useMobileDeployments` for why. Absent means either "nowhere" or "this
+ *   instance has no environments feature", and a card draws both the same way:
+ *   no badges. The build screen is where the difference is worth spelling out.
  */
-export default function MobileBuildCard({build}) {
+export default function MobileBuildCard({build, deployments = []}) {
 
     const promotions = build.promotionRuns ?? []
-    const deployments = build.currentDeployments ?? []
 
     return (
         <li className="ot-mobile-card" data-testid={`mobile-build-${build.id}`}>

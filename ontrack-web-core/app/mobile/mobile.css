@@ -313,10 +313,6 @@ html, body {
     margin-top: 0;
 }
 
-/* Inside the stack the gap already spaces this; it needs no margin of its own. */
-.ot-mobile-stack .ot-mobile-note {
-    margin: 0 !important;
-}
 
 /*
  * The card list: the branch screen's builds - see
@@ -412,11 +408,12 @@ html, body {
 
 /*
  * What comes under a list - the line saying what was left out, or the button
- * that gets more. `!important` because one of the two is an antd
- * `Typography.Paragraph`, whose own margins are sized for a desktop page.
+ * that gets more. Always a plain block, never an antd `Typography.Paragraph`:
+ * that carries its own desktop-sized margins, and beating them needs an
+ * `!important` which then has to be beaten again inside `.ot-mobile-stack`.
  */
 .ot-mobile-note {
-    margin: 12px 0 0 0 !important;
+    margin: 12px 0 0 0;
     font-size: 13px;
 }
 

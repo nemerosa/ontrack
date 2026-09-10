@@ -4,9 +4,21 @@ import {fireEvent, render, screen} from "@testing-library/react"
 let queryResult = {data: null, loading: false, error: null, finished: true}
 /** The options the screen handed `useQuery` on its last render. */
 let queryOptions
+/*
+ * The screen runs two queries. Deployments are asked for separately so that an
+ * instance without the environments licence - where `currentDeployments` is
+ * absent from the schema - loses the deployment badges alone rather than the
+ * whole screen. This lets a test fail one without the other.
+ */
+let deploymentsResult = null
+
+const isDeployments = (query) => String(query).includes('MobileBranchDeployments')
 
 jest.mock("../../../components/services/GraphQL", () => ({
     useQuery: (query, options) => {
+        if (isDeployments(query)) {
+            return deploymentsResult ?? queryResult
+        }
         queryOptions = options
         return queryResult
     },
@@ -55,6 +67,7 @@ describe('the mobile branch screen', () => {
 
     beforeEach(() => {
         queryOptions = undefined
+        deploymentsResult = null
     })
 
     it('is the branch, named, and says which project it belongs to', () => {
@@ -128,6 +141,18 @@ describe('the mobile branch screen', () => {
         branch([build(100, '1', {deployments: [[800, 'staging']]})])
         render(<MobileBranchScreen id="10"/>)
         expect(screen.getByTestId('mobile-deployment-800')).toHaveTextContent('staging')
+    })
+
+    it('keeps the builds when the instance has no environments feature', () => {
+        // `currentDeployments` is contributed by the environments extension and
+        // only registered when the licence enables it, so a query naming it
+        // fails validation outright on an instance without one. Asking for the
+        // deployments separately is what stops that taking the build list down.
+        branch([build(100, '1', {deployments: [[800, 'staging']]})])
+        deploymentsResult = {data: null, loading: false, error: "Validation error", finished: true}
+        render(<MobileBranchScreen id="10"/>)
+        expect(screen.getByTestId('mobile-build-100')).toHaveTextContent('1')
+        expect(screen.queryByTestId('mobile-deployment-800')).not.toBeInTheDocument()
     })
 
     it('shows nothing about promotions or deployments when a build has neither', () => {
