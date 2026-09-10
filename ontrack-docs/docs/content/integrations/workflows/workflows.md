@@ -150,6 +150,17 @@ never clamped away). Use _Open workflow_ to read the exact graph.
 
 Enable _auto refresh_ on the section to watch a running workflow progress in place.
 
+### Workflows on the delivery map
+
+A branch's [Delivery map](../../concepts/branch-views/index.md#workflows-on-the-map) draws workflows as checkpoints of
+their own, so that what a promotion set off is read beside the promotion itself. It shows the workflows of the promotion
+run the map names — that build's promotion, and no other — each with its status, how long it took, and a link to the run.
+
+The same view draws the workflows configured on a project's [environment slots](../environments/environments.md), where
+the trigger matters: a workflow on `CANDIDATE` or `RUNNING` is a hard gate the deployment cannot get past until it
+passes, and the map draws it as a prerequisite of the slot. One that has never run is drawn all the same — it is very
+often the reason nothing has ever been deployed there.
+
 ## Workflows settings
 
 Workflow statuses are saved by default for 14 days.

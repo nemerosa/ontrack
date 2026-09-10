@@ -137,8 +137,9 @@ whose promotion and deployment rules have not been written down, not a project w
 
 ### Checkpoints
 
-A *checkpoint* is one of the things the map is made of. The three main kinds each name the latest
-build to have **arrived** at it and when.
+A *checkpoint* is one of the things the map is made of. The first three kinds below each name the
+latest build to have **arrived** at it and when; the other three name no build, and the table says
+why.
 
 | Checkpoint       | Arrived at by            | The build it names                                    |
 |------------------|--------------------------|-------------------------------------------------------|
@@ -149,8 +150,10 @@ build to have **arrived** at it and when.
 | Slot workflow    | nothing - see [workflows on the map](#workflows-on-the-map) | none: it would repeat its slot's build |
 | Unresolved       | nothing, ever            | none - see [when a rule points at nothing](#when-a-rule-points-at-nothing) |
 
-Arriving is not the same as succeeding, which is why only the validation stamp shows a status: a
-build can arrive at a stamp and fail there, while a build cannot be promoted and fail.
+Arriving is not the same as succeeding, which is why the validation stamp is the only one of the
+three to show a status *for the build it names*: a build can arrive at a stamp and fail there, while
+a build cannot be promoted and fail. The workflow kinds show a status too, but it is the status of a
+workflow **run** rather than of a build — nothing arrives at them.
 
 ![A validation stamp showing a build which arrived and failed](branch-delivery-map-failed.png)
 

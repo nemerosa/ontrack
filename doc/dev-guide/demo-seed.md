@@ -224,6 +224,21 @@ It also declares one validation rather than four, which is the point rather than
 build that does not compile never runs its tests, so the aggregate checkpoint and every promotion
 level stay a build behind while the branch head shows a failure.
 
+### Slot workflows are configured after the deployments
+
+`SlotSpec.workflows` is walked in a pass of its own, once every deployment has run — unlike
+`admissionRules`, which are added with the slot and *before* them.
+
+A slot workflow on `CANDIDATE` or `RUNNING` is a hard gate: the server refuses to start, and to
+finish, a deployment whose check is not ok. Configuring one before the deployments would therefore
+leave every deployment in the dataset waiting on a workflow — and a workflow runs asynchronously, so
+the seed would either have to poll for a gate it configured itself or fail at random. A reset that
+is destructive by design cannot be flaky.
+
+The cost is that the demo's slot workflows read *Not started* on the delivery map. That is a real
+state and worth showing — a gate nobody has run is the interesting case — and workflows which have
+**run** are shown on the promotion side instead, by the CANARY pair, one passing and one failing.
+
 ### Deployments are a sequence, not a slot property
 
 `DemoDataset.deployments` is an ordered list, run after every slot exists, rather than a
