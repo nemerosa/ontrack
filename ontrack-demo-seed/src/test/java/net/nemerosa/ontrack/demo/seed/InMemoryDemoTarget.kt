@@ -105,6 +105,7 @@ class InMemoryDemoTarget(
             environment.slots.forEach { slot ->
                 add("  slot ${slot.project.name} \"${slot.description}\"")
                 slot.admissionRules.forEach { add("    rule ${it.name} ${it.ruleId} ${it.config}") }
+                slot.workflows.forEach { add("    workflow on ${it.trigger}: ${it.yaml.lines().first()}") }
                 slot.deployments.forEach { add("    deployed ${it.name}") }
             }
         }
@@ -357,6 +358,7 @@ class InMemoryDemoTarget(
     ) : DemoSlot {
 
         val admissionRules = mutableListOf<SlotAdmissionRuleSpec>()
+        val workflows = mutableListOf<SlotWorkflowSpec>()
         val deployments = mutableListOf<InMemoryBuild>()
 
         override fun addAdmissionRule(spec: SlotAdmissionRuleSpec) {
@@ -368,6 +370,18 @@ class InMemoryDemoTarget(
                 "Admission rule ${spec.name} already exists in ${environment.name}/${project.name}"
             }
             admissionRules += spec
+        }
+
+        /**
+         * The trigger is checked rather than merely recorded: it is a server enum, and a typo in
+         * the dataset would only be found by a reset failing against a real instance.
+         */
+        override fun addWorkflow(spec: SlotWorkflowSpec) {
+            require(spec.trigger in SLOT_WORKFLOW_TRIGGERS) {
+                "Slot workflow trigger \"${spec.trigger}\" is not one of $SLOT_WORKFLOW_TRIGGERS " +
+                        "in ${environment.name}/${project.name}"
+            }
+            workflows += spec
         }
 
         /**
@@ -457,6 +471,12 @@ class InMemoryDemoTarget(
          * the API, not over its model classes.
          */
         private val NAME = Regex("[A-Za-z0-9._-]+")
+
+        /**
+         * `SlotPipelineStatus` on the server side, as far as a slot workflow is concerned.
+         * `CANCELLED` is a state a pipeline reaches, never a moment a workflow is fired at.
+         */
+        private val SLOT_WORKFLOW_TRIGGERS = listOf("CANDIDATE", "RUNNING", "DONE")
 
         private fun checkName(name: String, what: String) {
             require(NAME.matches(name)) {

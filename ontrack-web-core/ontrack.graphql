@@ -8484,6 +8484,8 @@ enum DeliveryMapEdgeKind {
   UNLOCKS
   "The target cannot be reached until the source has been. It constrains; it does not act"
   REQUIRES
+  "Reaching the source sets the target off, and nothing waits for the result"
+  EMITS
 }
 
 "State a hook request can be in"

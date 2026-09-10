@@ -136,6 +136,20 @@ object DemoContent {
         workflow = canaryWorkflow(performanceGateFails = true),
     )
 
+    /**
+     * A one-node workflow for a slot, kept deliberately smaller than [canaryWorkflow]: what a slot
+     * workflow demonstrates on the delivery map is its TRIGGER and the direction of its edge, not
+     * the shape of its graph, which the promotion side already shows.
+     */
+    private fun slotWorkflow(name: String, text: String) = """
+        name: $name
+        nodes:
+          - id: check
+            executorId: mock
+            data:
+                text: $text
+    """.trimIndent()
+
     private val buildStamp = ValidationStampSpec(BUILD, "Compilation and packaging.")
     private val unitTests = ValidationStampSpec(UNIT_TESTS, "Unit tests.")
     private val integrationTests = ValidationStampSpec(INTEGRATION_TESTS, "Integration tests against a real database.")
@@ -652,6 +666,26 @@ object DemoContent {
                             name = "silver",
                             ruleId = SlotAdmissionRules.PROMOTION,
                             config = mapOf("promotion" to SILVER),
+                        ),
+                    ),
+                    // The one slot with workflows, on two triggers, so that the delivery map shows
+                    // a slot straddling its own column: the CANDIDATE workflow is a hard gate and
+                    // is drawn as a *requires* running INTO the slot, while the DONE workflow runs
+                    // once the deployment is over and is drawn as an *emits* running OUT of it.
+                    //
+                    // Both read "Not started", because the seed configures slot workflows after the
+                    // deployments it asks for - see `DemoSeed`. That is the state worth showing
+                    // anyway: a gate nobody has run is very often the reason nothing newer has been
+                    // deployed, and the map is where that becomes visible. Workflows that have RUN
+                    // are shown on the promotion side, by [canaryPass] and [canaryFail].
+                    workflows = listOf(
+                        SlotWorkflowSpec(
+                            trigger = "CANDIDATE",
+                            yaml = slotWorkflow("Staging readiness", "Check the staging window is open"),
+                        ),
+                        SlotWorkflowSpec(
+                            trigger = "DONE",
+                            yaml = slotWorkflow("Staging announcement", "Announce the deployment"),
                         ),
                     ),
                 ),

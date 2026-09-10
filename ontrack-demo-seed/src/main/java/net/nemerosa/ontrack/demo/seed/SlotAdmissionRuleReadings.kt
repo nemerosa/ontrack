@@ -35,6 +35,15 @@ internal object SlotAdmissionRules {
 internal val ADMISSION_RULE_NAME = Regex("[a-zA-Z][a-zA-Z0-9-]*")
 
 /**
+ * The moments of a deployment a slot workflow can be fired at - `SlotPipelineStatus` on the server
+ * side, minus `CANCELLED`, which is a state a pipeline reaches rather than a moment.
+ *
+ * Named here, and checked by [validate], because a typo in a trigger would otherwise only be found
+ * by a reset failing against a real instance.
+ */
+internal val SLOT_WORKFLOW_TRIGGERS = listOf("CANDIDATE", "RUNNING", "DONE")
+
+/**
  * `FilterHelper.includes` on the server side, whose patterns are whole-string,
  * case-insensitive regular expressions.
  */

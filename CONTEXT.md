@@ -58,6 +58,9 @@ Arriving is therefore not the same as succeeding, and only a validation stamp ca
 show a build that arrived and failed. On a promotion level and a validation stamp
 that build is always of this branch; on a slot it is the most recently deployed
 build, which may belong to another branch.
+The two workflow kinds are the exception nothing arrives at: a *workflow checkpoint*
+and a *slot workflow checkpoint* name no build, because theirs would always be the
+one the checkpoint beside them already names.
 _Avoid_: stage, node, step. *Stage* is already refused for both promotion level and
 environment, and the pipeline view uses it for its promotion band.
 
@@ -68,6 +71,25 @@ because that is what the configuration actually says: everything matching this,
 not these forty named things. A promotion whose stamps are named explicitly gets
 one checkpoint each instead.
 _Avoid_: group node, collapsed node, stamp group
+
+**Workflow checkpoint**:
+The checkpoint standing for a workflow a promotion set off, drawn as a consequence
+of its promotion level. It names the workflow, says where the run got to and how
+long it took, and links to that run. It names no build - its build would always be
+the one its promotion level already names. It exists only where a run left a
+notification record behind, so a promotion level never yet promoted has none, even
+when subscriptions exist.
+_Avoid_: notification checkpoint, subscription checkpoint. A workflow is one channel
+among several and the map draws no other.
+
+**Slot workflow checkpoint**:
+The checkpoint standing for a workflow configured on a slot, for one of the three
+moments of a deployment. Unlike a *workflow checkpoint* it is configuration, so it
+is drawn whether or not it has ever run - a `CANDIDATE` workflow which never ran is
+not dormant, it is why nothing has ever deployed there. Its trigger decides which
+edge it gets: `CANDIDATE` and `RUNNING` are hard gates and are *required by* their
+slot, while `DONE` is *emitted* by it.
+_Avoid_: deployment workflow, slot gate
 
 **Branch head**:
 The branch's latest build, stated once in the delivery map view's header and
@@ -133,6 +155,15 @@ term. A requires edge says a constraint holds; it does not say where the
 constraint was configured, and two sources naming the same directed pair draw one
 edge. See ADR 0010 for the requires which is not drawn at all.
 _Avoid_: depends on, blocks
+
+**Emits**:
+The delivery map edge meaning that reaching one checkpoint sets another off, with
+nothing waiting for the result: a promotion firing its notification workflows, a
+slot firing the workflows configured for the end of a deployment. It runs from the
+checkpoint to its consequence, like every other edge running from what happens
+first. It neither grants nor constrains, which is why it could not be either of the
+other two. See ADR 0011.
+_Avoid_: triggers, fires, notifies. *Triggers* is already refused for *unlocks*.
 
 **Previous promotion condition**:
 The rule that a promotion cannot be granted before the promotion level

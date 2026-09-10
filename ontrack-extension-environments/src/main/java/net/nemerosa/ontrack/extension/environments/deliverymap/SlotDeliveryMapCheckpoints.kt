@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.extension.environments.deliverymap
 
 import net.nemerosa.ontrack.common.api.APIDescription
+import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.model.deliverymap.DeliveryMapCheckpointTypes
+import java.time.LocalDateTime
 
 /**
- * The checkpoint kind the environments extension contributes to a delivery map.
+ * The checkpoint kinds the environments extension contributes to a delivery map.
  *
  * It lives here rather than in `DeliveryMapCheckpointTypes` because the set of checkpoint kinds is
  * open: the core names the kinds it contributes itself, and an extension names its own. The id is
@@ -23,6 +26,27 @@ object SlotDeliveryMapCheckpoints {
      * id or a validation stamp id in the shared namespace.
      */
     fun slot(slotId: String): String = DeliveryMapCheckpointTypes.checkpointId(SLOT, slotId)
+
+    /**
+     * A workflow configured on a slot, for one of the three moments of a deployment.
+     *
+     * A kind of its own rather than the workflows extension's `workflow` with a trigger added to its
+     * payload: `checkpointTypes.js` fixes a node's height per KIND, before anything is rendered, and
+     * a slot workflow draws the extra line naming its trigger. They also have different ids and
+     * belong to different modules.
+     */
+    const val SLOT_WORKFLOW = "slot-workflow"
+
+    /**
+     * A slot workflow is identified by the CONFIGURATION it is, never by the run.
+     *
+     * `SlotWorkflow.id` is a persisted UUID which survives every pipeline, while
+     * `SlotWorkflowInstance.id` is minted per run - and a checkpoint id which changed on every
+     * deployment would change the map's topology with it, forcing a relayout and moving every node
+     * the reader had placed (#1707).
+     */
+    fun slotWorkflow(slotWorkflowId: String): String =
+        DeliveryMapCheckpointTypes.checkpointId(SLOT_WORKFLOW, slotWorkflowId)
 
     /**
      * How a slot is labelled on the map, from the environment it is in and its qualifier.
@@ -59,4 +83,42 @@ data class SlotCheckpointData(
     val unreachable: Boolean,
     @APIDescription("Branch of the deployed build, when it is not the branch of the map")
     val otherBranch: String?,
+)
+
+/**
+ * Payload of a [SlotDeliveryMapCheckpoints.SLOT_WORKFLOW] checkpoint.
+ *
+ * The checkpoint carries no [net.nemerosa.ontrack.model.deliverymap.DeliveryMapArrival]: its build
+ * would always be the one the slot beside it already names, so an arrival here would repeat that
+ * build one node further along. What became of the run is said by [status] instead.
+ *
+ * Everything but [slotWorkflowId] and [trigger] is null on a workflow which has never run, which is
+ * a state a slot workflow really has and a promotion workflow cannot: slot workflows are
+ * configuration, and are drawn whether or not any pipeline ever reached them.
+ *
+ * @property slotWorkflowId The configured workflow this checkpoint is, stable across pipelines
+ * @property trigger Which moment of a deployment fires it. `CANDIDATE` and `RUNNING` are hard gates
+ * - a deployment cannot start, or cannot finish, until they pass - which is why those two are drawn
+ * as *requires* into the slot while `DONE` is drawn as *emits* out of it.
+ * @property workflowInstanceId The run to link to, null when it has never run
+ * @property status Where the run got to, null when it has never run
+ * @property startTime When the run started, null when it has never run or no node has started. The
+ * renderer counts elapsed time from it while the run is unfinished, because [durationMs] is 0 until
+ * the last node ends.
+ * @property durationMs How long the run took, 0 while it is still running and null when it has
+ * never run
+ */
+data class SlotWorkflowCheckpointData(
+    @APIDescription("ID of the workflow configured on the slot")
+    val slotWorkflowId: String,
+    @APIDescription("Moment of a deployment which fires this workflow")
+    val trigger: SlotPipelineStatus,
+    @APIDescription("ID of the workflow instance, null when the workflow has never run")
+    val workflowInstanceId: String?,
+    @APIDescription("Status of the workflow instance, null when the workflow has never run")
+    val status: WorkflowInstanceStatus?,
+    @APIDescription("When the workflow started, null when it has never run")
+    val startTime: LocalDateTime?,
+    @APIDescription("How long the workflow took, 0 while running and null when it has never run")
+    val durationMs: Long?,
 )

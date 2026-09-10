@@ -74,6 +74,22 @@ class DeliveryMapCheckpointFactoryImplTest {
     }
 
     @Test
+    fun `A promotion level checkpoint names the run its arrival is`() {
+        // What ties the workflows drawn beside the checkpoint to the promotion it names (#1711)
+        every { structureService.getLastPromotionRunForPromotionLevel(bronze) } returns PromotionRun(
+            id = ID.of(100),
+            build = build,
+            promotionLevel = bronze,
+            signature = Signature.of(time, "test"),
+            description = null,
+        )
+        assertEquals(
+            100,
+            factory.promotionLevel(bronze).data.parse<PromotionLevelCheckpointData>().promotionRunId,
+        )
+    }
+
+    @Test
     fun `Validation stamp checkpoint carries a namespaced id and the validation stamp payload`() {
         every { structureService.getValidationRunsForValidationStamp(quality, 0, 1) } returns emptyList()
         val checkpoint = factory.validationStamp(quality)

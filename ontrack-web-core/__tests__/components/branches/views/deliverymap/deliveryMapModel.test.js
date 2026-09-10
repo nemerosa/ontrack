@@ -9,6 +9,7 @@ import {
     withCheckpointContents,
     withEdgeColor,
     withValidationStamps,
+    withWorkflows,
 } from "@components/branches/views/deliverymap/deliveryMapModel"
 
 describe('delivery map model', () => {
@@ -65,6 +66,13 @@ describe('delivery map model', () => {
             target: 'promotion-level:12',
         }
 
+        const emits = {
+            id: 'emits:promotion-level:12->workflow:12:Canary',
+            kind: 'EMITS',
+            source: 'promotion-level:12',
+            target: 'workflow:12:Canary',
+        }
+
         it('keeps the edge id, source and target', () => {
             const edge = toFlowEdges([unlocks])[0]
             expect(edge.id).toBe(unlocks.id)
@@ -84,6 +92,18 @@ describe('delivery map model', () => {
             // The dash survives greyscale, so the distinction does not rest on the label alone
             expect(toFlowEdges([requires])[0].style.strokeDasharray).toBeTruthy()
             expect(toFlowEdges([unlocks])[0].style.strokeDasharray).toBeUndefined()
+        })
+
+        it('labels an emits edge for what it is, and never as a constraint', () => {
+            // A workflow set off by a promotion neither grants it nor gates it (ADR 0011)
+            expect(toFlowEdges([emits])[0].label).toBe("emits")
+        })
+
+        it('gives each of the three kinds a dash pattern of its own', () => {
+            // Colour is never what tells them apart, because it does not survive greyscale
+            const patterns = [unlocks, requires, emits]
+                .map(it => toFlowEdges([it])[0].style.strokeDasharray)
+            expect(new Set(patterns).size).toBe(3)
         })
 
         it('points every edge at its target, with an arrowhead big enough to see', () => {
@@ -295,6 +315,51 @@ describe('validation stamps shown or hidden on a delivery map', () => {
     it('has nothing to hide on a map which is not there yet', () => {
         expect(withValidationStamps(null, false)).toBeNull()
         expect(withValidationStamps(undefined, false)).toBeUndefined()
+    })
+
+})
+
+describe('workflows shown or hidden on a delivery map', () => {
+
+    const promotion = {id: 'promotion-level:12', type: 'promotion-level', name: "SILVER"}
+    const slot = {id: 'slot:abc', type: 'slot', name: "production"}
+    const quality = {id: 'validation-stamp:1', type: 'validation-stamp', name: "QUALITY"}
+    const workflow = {id: 'workflow:12:Canary', type: 'workflow', name: "Canary"}
+    const slotWorkflow = {id: 'slot-workflow:sw-1', type: 'slot-workflow', name: "Smoke tests"}
+
+    const map = {
+        checkpoints: [promotion, slot, quality, workflow, slotWorkflow],
+        edges: [
+            {id: 'a', kind: 'UNLOCKS', source: quality.id, target: promotion.id},
+            {id: 'b', kind: 'EMITS', source: promotion.id, target: workflow.id},
+            {id: 'c', kind: 'REQUIRES', source: slotWorkflow.id, target: slot.id},
+        ],
+    }
+
+    it('leaves the map alone when the workflows are shown', () => {
+        expect(withWorkflows(map, true)).toBe(map)
+    })
+
+    it('takes BOTH workflow kinds off with one toggle', () => {
+        // A reader who wants workflows out of the way wants all of them out of the way, whichever
+        // extension contributed them
+        const hidden = withWorkflows(map, false)
+        expect(hidden.checkpoints.map(it => it.type))
+            .toEqual(['promotion-level', 'slot', 'validation-stamp'])
+    })
+
+    it('drops the edges of the checkpoints it removed, and keeps the others', () => {
+        const hidden = withWorkflows(map, false)
+        expect(hidden.edges.map(it => it.id)).toEqual(['a'])
+    })
+
+    it('does not mutate the map it was given', () => {
+        withWorkflows(map, false)
+        expect(map.checkpoints).toHaveLength(5)
+    })
+
+    it('has nothing to narrow before the map arrives', () => {
+        expect(withWorkflows(null, false)).toBeNull()
     })
 
 })

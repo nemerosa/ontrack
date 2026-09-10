@@ -16,6 +16,8 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.DashboardContextU
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.Environment
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.Slot
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.environments
+import net.nemerosa.ontrack.kdsl.spec.extension.environments.workflows.addWorkflow
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.SlotPipelineStatus
 import net.nemerosa.ontrack.kdsl.spec.extension.general.AutoPromotionProperty
 import net.nemerosa.ontrack.kdsl.spec.extension.general.autoPromotion
 import net.nemerosa.ontrack.kdsl.spec.extension.general.previousPromotionCondition
@@ -310,6 +312,13 @@ private class KdslDemoSlot(val slot: Slot) : DemoSlot {
             ruleId = spec.ruleId,
             ruleConfig = spec.config.asJson(),
             name = spec.name,
+        )
+    }
+
+    override fun addWorkflow(spec: SlotWorkflowSpec) {
+        slot.addWorkflow(
+            trigger = SlotPipelineStatus.valueOf(spec.trigger),
+            workflowYaml = spec.yaml,
         )
     }
 }

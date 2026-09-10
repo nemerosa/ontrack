@@ -56,12 +56,14 @@ const EDGE_MARKER_PX = 33
  * that is the one error `DeliveryMapEdgeKind` was split in two to prevent.
  *
  * @property label What the edge says, read ALONG the arrow - see `toFlowEdges`
- * @property strokeDasharray Dashed for the kind which only constrains, absent for the one which
- * acts. The dash survives greyscale, which is why the two kinds are not told apart by colour.
+ * @property strokeDasharray One pattern per kind, and never a colour: solid for the kind which
+ * ACTS, dashed for the one which only CONSTRAINS, dotted for the one which sets something off and
+ * waits for nothing. A dash pattern survives greyscale, which a colour does not.
  */
 const edgeKinds = {
     UNLOCKS: {label: "unlocks"},
     REQUIRES: {label: "required by", strokeDasharray: '6 4'},
+    EMITS: {label: "emits", strokeDasharray: '1 4'},
 }
 
 /**
@@ -242,6 +244,34 @@ function keepCheckpoints(map, kept) {
         checkpoints: kept,
         edges: (map.edges ?? []).filter(edge => ids.has(edge.source) && ids.has(edge.target)),
     }
+}
+
+/**
+ * The checkpoint kinds a workflow is drawn as.
+ *
+ * The two are contributed by different extensions and are separate kinds - they have different ids,
+ * different link targets and different heights - but they are one thing to a reader deciding whether
+ * to look at workflows at all, which is why one toggle covers both.
+ */
+const WORKFLOW = 'workflow'
+const SLOT_WORKFLOW = 'slot-workflow'
+const workflowKinds = [WORKFLOW, SLOT_WORKFLOW]
+
+/**
+ * Shows or hides the workflows of a map, on the promotion side and the slot side alike.
+ *
+ * ON by default, like every other entry: the preference records what has been turned OFF. Turning it
+ * off is for reading the promotion and deployment shape of a branch whose workflows crowd it.
+ *
+ * @param map The map, narrowed or not
+ * @param show Whether the workflows are drawn
+ */
+export function withWorkflows(map, show = true) {
+    if (!map || show) return map
+    return keepCheckpoints(
+        map,
+        (map.checkpoints ?? []).filter(it => !workflowKinds.includes(it.type)),
+    )
 }
 
 /**

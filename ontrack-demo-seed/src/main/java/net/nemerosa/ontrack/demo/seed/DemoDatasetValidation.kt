@@ -208,6 +208,12 @@ fun DemoDataset.validate() {
                             "letters, digits or dashes only."
                 }
             }
+            slot.workflows.forEach { workflow ->
+                if (workflow.trigger !in SLOT_WORKFLOW_TRIGGERS) {
+                    problems += "The ${environment.name}/${slot.project} slot has a workflow on " +
+                            "\"${workflow.trigger}\", which is not one of $SLOT_WORKFLOW_TRIGGERS."
+                }
+            }
         }
     }
 

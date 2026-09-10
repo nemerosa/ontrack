@@ -22,6 +22,9 @@ class DeliveryMapCheckpointFactoryImpl(
             data = PromotionLevelCheckpointData(
                 promotionLevelId = promotionLevel.id(),
                 image = promotionLevel.isImage,
+                // The run behind the arrival below, named so that the workflows drawn beside this
+                // checkpoint (#1711) can be read as belonging to the promotion it names
+                promotionRunId = run?.id(),
             ).asJson(),
             // No status: a promotion level is arrived at by being promoted, and arriving is the whole
             // outcome. There is no such thing as a build which is promoted and failed.

@@ -137,14 +137,16 @@ whose promotion and deployment rules have not been written down, not a project w
 
 ### Checkpoints
 
-A *checkpoint* is one of the things the map is made of. There are three kinds, and each one names
-the latest build to have **arrived** at it and when.
+A *checkpoint* is one of the things the map is made of. The three main kinds each name the latest
+build to have **arrived** at it and when.
 
 | Checkpoint       | Arrived at by            | The build it names                                    |
 |------------------|--------------------------|-------------------------------------------------------|
 | Promotion level  | being promoted           | the latest build of this branch promoted there        |
 | Validation stamp | a run of *any* outcome   | the latest build of this branch run there, with its status |
 | Slot             | a deployment             | the most recently deployed build, **whatever its branch** |
+| Workflow         | nothing - see [workflows on the map](#workflows-on-the-map) | none: it would repeat its promotion level's build |
+| Slot workflow    | nothing - see [workflows on the map](#workflows-on-the-map) | none: it would repeat its slot's build |
 | Unresolved       | nothing, ever            | none - see [when a rule points at nothing](#when-a-rule-points-at-nothing) |
 
 Arriving is not the same as succeeding, which is why only the validation stamp shows a status: a
@@ -185,21 +187,25 @@ which reads as a fact rather than as a mistake.
 
 ### Dependencies
 
-Lines run from the prerequisite to the thing that depends on it, and come in two kinds, drawn
-differently:
+Lines run from what happens first to what follows it, and come in three kinds, drawn differently:
 
-| Kind         | Means                                                    | Labelled  | Comes from                                   |
-|--------------|-----------------------------------------------------------|-----------|----------------------------------------------|
-| **unlocks**  | reaching the source grants the target by itself           | *unlocks* | auto promotion                               |
-| **requires** | the target cannot be reached until the source has been    | *required by* | promotion dependencies, slot admission rules, the previous promotion condition |
+| Kind         | Means                                                    | Labelled  | Drawn        | Comes from                                   |
+|--------------|-----------------------------------------------------------|-----------|--------------|----------------------------------------------|
+| **unlocks**  | reaching the source grants the target by itself           | *unlocks* | solid        | auto promotion                               |
+| **requires** | the target cannot be reached until the source has been    | *required by* | dashed   | promotion dependencies, slot admission rules, the previous promotion condition, a slot's `CANDIDATE` and `RUNNING` workflows |
+| **emits**    | reaching the source sets the target off, and nothing waits for it | *emits* | dotted | a promotion's workflows, a slot's `DONE` workflows |
 
 The label on a line is read **along the arrow**, which is why the second one reads *required by*
 rather than *requires*: `SILVER required by GOLD` is the line `GOLD requires SILVER` draws.
 
-The distinction matters because the two are configured in ways with opposite effects. Auto
+The kinds are told apart by their **dash pattern** and by their label, never by colour: a dash
+survives greyscale and colour blindness.
+
+The distinction matters because the three are configured in ways with different effects. Auto
 promotion *acts*: pass the validations and the promotion happens. A promotion dependency or an
 admission rule only *constrains*: it permits, and something else still has to do the promoting or
-the deploying.
+the deploying. A workflow set off by a promotion does neither: it happens *because of* the
+promotion, and the promotion does not wait to see how it goes.
 
 #### The previous promotion condition
 
@@ -279,6 +285,63 @@ Both pictures above are the same two slots, read from two branches of one projec
 reaches production and finds a maintenance build occupying staging, while the maintenance branch
 cannot reach production at all.
 
+### Workflows on the map
+
+A [workflow](../../integrations/workflows/workflows.md) is drawn as a checkpoint of its own, so that
+what a promotion set off, and what a slot is waiting on, are read beside the promotion and the slot
+themselves rather than on another page.
+
+The two sides behave differently, and the difference is worth knowing.
+
+**A promotion's workflows are drawn from what actually ran.** A workflow reaches a promotion level
+through a notification subscription on the promotion event, and the only trace of it is the
+notification record the run left behind. So the map shows the workflows of the run the promotion
+level names — that build's promotion, and no other — and a promotion level that has **never been
+promoted shows no workflows at all**, even when subscriptions are configured on it. Notification
+records and workflow instances are both cleaned up on a retention schedule, so an old promotion can
+legitimately end up showing none either.
+
+Those workflows are joined to their promotion level by an **emits** line. Nothing about the
+promotion depends on them: they run once it has been granted, and it does not wait to see how they
+go.
+
+**A slot's workflows are drawn from its configuration**, whether or not anything has ever run. Each
+one says which of the three moments of a deployment fires it, and that is what decides how it is
+joined to its slot:
+
+| Trigger         | What it does                                             | Line                        |
+|-----------------|----------------------------------------------------------|-----------------------------|
+| **on candidate**| the deployment cannot start until it passes              | *requires*, into the slot   |
+| **on running**  | the deployment cannot finish until it passes             | *requires*, into the slot   |
+| **on done**     | runs once the deployment is over; nothing waits for it   | *emits*, out of the slot    |
+
+The first two are **hard gates**, unconditionally and with no admission rule involved. A slot
+carrying workflows on several triggers therefore straddles its own column, its gates to the left and
+its consequences to the right.
+
+A slot workflow that has never run is still drawn, and so is its line. That matters most for the
+gates: a workflow on *candidate* that never ran is not dormant — it is very often the reason nothing
+has ever deployed to that slot, and saying so is the most useful thing the map can offer about it.
+
+The run each slot workflow shows comes from the slot's **current** pipeline when there is one, and
+from the last deployed pipeline otherwise. The slot checkpoint's own build keeps coming from the last
+*deployed* pipeline alone, so the map never claims a build has arrived somewhere it has not.
+
+Every workflow checkpoint names its workflow, says where the run got to and how long it has taken so
+far, and links to the run itself. A workflow still going shows the time elapsed since it started; the
+value moves when the map refreshes, and does not tick.
+
+**Show › Workflows** in the toolbar takes both kinds off the map at once, together with the lines
+touching them. One toggle rather than two: a reader who wants workflows out of the way wants all of
+them out of the way.
+
+!!! note "Two workflows of one promotion sharing a name"
+
+    On the promotion side a workflow checkpoint is identified by its promotion level and its
+    **name**, because there is no configured object behind it the map can reach. Two subscriptions on
+    one promotion level whose workflows happen to share a name therefore collapse into a single
+    checkpoint. Renaming one of them separates them again.
+
 ### When a rule points at nothing
 
 Both slot admission rules name their target **by name**: "requires the *GOLD* promotion", "requires
@@ -323,8 +386,9 @@ Two sets of controls, and the difference between them is worth knowing.
 Validation stamps** takes every stamp checkpoint off the map, aggregates included, together with the
 lines which ended on one. It is on by default - a map opening on a chain of promotions with no
 visible cause hides the very thing which explains them - and off is worth having on a branch whose
-stamps outnumber everything else on screen. The choice is remembered in **your browser**, per screen
-rather than per account, unlike the view selection itself.
+stamps outnumber everything else on screen. **Show › Workflows** does the same for both kinds of
+[workflow checkpoint](#workflows-on-the-map). Each choice is remembered in **your browser**, per
+screen rather than per account, unlike the view selection itself.
 
 **How the map is drawn** is the small control bar in the corner of the graph: zoom, fit, and a
 **layout** button which puts the map back in order after you have dragged it about. Checkpoints can be

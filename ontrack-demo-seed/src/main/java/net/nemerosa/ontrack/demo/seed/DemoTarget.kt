@@ -178,6 +178,11 @@ interface DemoSlot {
      * Configures an admission rule on this slot.
      */
     fun addAdmissionRule(spec: SlotAdmissionRuleSpec)
+
+    /**
+     * Configures a workflow on this slot, for one of the three moments of a deployment.
+     */
+    fun addWorkflow(spec: SlotWorkflowSpec)
 }
 
 /**

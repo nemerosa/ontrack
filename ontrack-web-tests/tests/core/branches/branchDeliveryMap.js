@@ -50,6 +50,23 @@ class BranchDeliveryMapPage {
     }
 
     /**
+     * A workflow a promotion set off. Its id is built from the promotion level and the workflow's
+     * NAME - there is no configured object behind it the map can key on, which is why two workflows
+     * of one promotion sharing a name collapse into one checkpoint.
+     */
+    workflowCheckpoint(promotionLevel, workflowName) {
+        return this.checkpoint(`workflow:${promotionLevel.id}:${workflowName}`)
+    }
+
+    /**
+     * A workflow configured on a slot, keyed on the CONFIGURATION rather than on any run: a
+     * per-run id would change the map's topology on every deployment.
+     */
+    slotWorkflowCheckpoint(slotWorkflow) {
+        return this.checkpoint(`slot-workflow:${slotWorkflow.id}`)
+    }
+
+    /**
      * The checkpoint a configuration asked for and which matches nothing. Its id is built from what
      * was looked for and the name that was asked for, and from nothing else.
      */
@@ -110,6 +127,18 @@ class BranchDeliveryMapPage {
         } else {
             await expect(this.validationStampsToggle()).not.toBeChecked()
         }
+    }
+
+    /**
+     * ONE toggle for both workflow kinds: a reader who wants workflows out of the way wants all of
+     * them out of the way, whichever extension contributed them.
+     */
+    workflowsToggle() {
+        return this.page.getByTestId('delivery-map-show-workflows')
+    }
+
+    async toggleWorkflows() {
+        await this.workflowsToggle().click()
     }
 
     // --- Empty states -------------------------------------------------------

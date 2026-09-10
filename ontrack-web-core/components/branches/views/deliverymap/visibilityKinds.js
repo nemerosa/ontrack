@@ -1,13 +1,13 @@
-import {FaStamp} from "react-icons/fa";
-import {withValidationStamps} from "@components/branches/views/deliverymap/deliveryMapModel";
+import {FaProjectDiagram, FaStamp} from "react-icons/fa";
+import {withValidationStamps, withWorkflows} from "@components/branches/views/deliverymap/deliveryMapModel";
 
 /**
  * What the reader can take off the delivery map, and how each of those is taken off.
  *
- * A LIST rather than one boolean, because this is not going to stay at one entry: the notification
- * and workflow checkpoints of #1711 are a thing a reader will want out of the way while reading the
- * rest. Adding one is an entry here - a label, an icon, and how it narrows the map - and nothing
- * else changes: the toolbar draws itself from this list, and the view folds the list over the map.
+ * A LIST rather than one boolean, and #1711 is what it was written for: its workflow checkpoints
+ * are a thing a reader wants out of the way while reading the rest. Adding one is an entry here - a
+ * label, an icon, and how it narrows the map - and nothing else changes: the toolbar draws itself
+ * from this list, and the view folds the list over the map.
  *
  * The previous-promotion edges of #1710 are deliberately NOT an entry: they are drawn as ordinary
  * *requires* edges, so there is nothing to filter on short of hiding every requires edge, explicit
@@ -31,6 +31,15 @@ export const visibilityKinds = [
         icon: <FaStamp/>,
         title: "The validation stamps which grant the promotions, and the patterns standing for them",
         apply: (map, shown) => withValidationStamps(map, shown),
+    },
+    {
+        id: 'workflows',
+        label: "Workflows",
+        icon: <FaProjectDiagram/>,
+        title: "The workflows a promotion sets off, and the ones configured on each slot",
+        // ONE entry for both checkpoint kinds: a reader who wants workflows out of the way wants
+        // all of them out of the way, whichever extension contributed them
+        apply: (map, shown) => withWorkflows(map, shown),
     },
 ]
 

@@ -7,6 +7,8 @@ import ValidationStampPatternCheckpoint
 import UnresolvedCheckpoint from "@components/branches/views/deliverymap/checkpoints/UnresolvedCheckpoint";
 import UnknownCheckpoint from "@components/branches/views/deliverymap/checkpoints/UnknownCheckpoint";
 import SlotCheckpoint from "@components/extension/environments/deliverymap/SlotCheckpoint";
+import WorkflowCheckpoint from "@components/extension/workflows/deliverymap/WorkflowCheckpoint";
+import SlotWorkflowCheckpoint from "@components/extension/environments/deliverymap/SlotWorkflowCheckpoint";
 
 /**
  * Registry of the checkpoint kinds this frontend can draw.
@@ -60,6 +62,22 @@ export const checkpointTypes = {
     'slot': {
         component: SlotCheckpoint,
         width: 430,
+        height: 110,
+    },
+    // A workflow fired by a promotion. Two lines - the name and the run - so no taller than a
+    // promotion level; wider, because a workflow name is free text rather than an entity name and
+    // routinely reads as a sentence ("Canary verification").
+    'workflow': {
+        component: WorkflowCheckpoint,
+        width: 320,
+        height: 90,
+    },
+    // Taller than a promotion workflow by exactly the line naming its trigger, which a promotion
+    // workflow has no equivalent of. A KIND of its own rather than a flag on `workflow` precisely
+    // because that height is fixed per kind, before anything is rendered.
+    'slot-workflow': {
+        component: SlotWorkflowCheckpoint,
+        width: 320,
         height: 110,
     },
     // A name a configuration asked for and which matches nothing. Two lines only - the name and what

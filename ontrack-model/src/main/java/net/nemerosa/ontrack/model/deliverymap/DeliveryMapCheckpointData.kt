@@ -7,12 +7,20 @@ import net.nemerosa.ontrack.common.api.APIDescription
  *
  * It carries what the checkpoint's renderer needs on top of the name and the description every
  * checkpoint has: the id to link to the promotion level, and whether it has an image to draw.
+ *
+ * @property promotionRunId The run the checkpoint's own arrival is, and therefore the run whose
+ * workflows are drawn beside this checkpoint (#1711). [DeliveryMapArrival] names the build and not
+ * the run, and a build can be promoted to one level several times, so without this the map states
+ * an arrival and a set of workflows with nothing saying they belong to the same promotion. Null on
+ * a promotion level nothing has ever been promoted to, which is also the case with no workflows.
  */
 data class PromotionLevelCheckpointData(
     @APIDescription("ID of the promotion level")
     val promotionLevelId: Int,
     @APIDescription("Does the promotion level have an image?")
     val image: Boolean,
+    @APIDescription("ID of the promotion run the checkpoint's arrival is, null when never promoted")
+    val promotionRunId: Int? = null,
 )
 
 /**

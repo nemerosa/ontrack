@@ -227,6 +227,22 @@ data class SlotSpec(
     val project: String,
     val description: String,
     val admissionRules: List<SlotAdmissionRuleSpec> = emptyList(),
+    val workflows: List<SlotWorkflowSpec> = emptyList(),
+)
+
+/**
+ * A workflow run at one of the three moments of a deployment on a slot.
+ *
+ * The trigger is what the delivery map reads to decide which way the slot's line runs:
+ * `CANDIDATE` and `RUNNING` are hard gates and are drawn as *requires* into the slot, while
+ * `DONE` runs once the deployment is over and is drawn as *emits* out of it.
+ *
+ * @property trigger `CANDIDATE`, `RUNNING` or `DONE`
+ * @property yaml The workflow definition, in the format `ontrack.workflows.saveYamlWorkflow` accepts.
+ */
+data class SlotWorkflowSpec(
+    val trigger: String,
+    val yaml: String,
 )
 
 /**

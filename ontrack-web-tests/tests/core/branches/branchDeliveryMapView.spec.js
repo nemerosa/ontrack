@@ -2,6 +2,10 @@ const {expect} = require("@playwright/test");
 const {login} = require("../login");
 const {BranchDeliveryMapPage} = require("./branchDeliveryMap");
 const {test} = require("../../fixtures/connection");
+const {generate} = require("@ontrack/utils");
+const {graphQLCall} = require("@ontrack/graphql");
+const {gql} = require("graphql-request");
+const {waitUntilCondition} = require("../../support/timing");
 
 /**
  * The delivery map branch content view: what a build on this branch has to pass through on its way to
@@ -161,4 +165,106 @@ test('a branch with nothing on its map says so instead of drawing an empty recta
 
     await map.checkEmpty()
     await map.checkNoBuildYet()
+})
+
+/**
+ * Subscribes a promotion level to a workflow launched on every promotion.
+ *
+ * One node is enough: what the map draws is the workflow's name, its status and its duration, never
+ * the shape of its graph - that is the workflow instance page's job, and the checkpoint links to it.
+ */
+const subscribeToWorkflow = async (promotionLevel, name) => {
+    await promotionLevel.subscribe({
+        name: `Subscription ${name}`,
+        events: ['new_promotion_run'],
+        channel: 'workflow',
+        channelConfig: {
+            workflow: {
+                name,
+                nodes: [{id: "check", executorId: "mock", data: {text: "Checking"}}],
+            },
+        },
+    })
+}
+
+/**
+ * The workflow reaches the map through the notification record its run leaves behind, and that run
+ * is asynchronous - so the map is asked until it holds the checkpoint, before a browser opens it.
+ */
+const waitForWorkflowCheckpoint = async (page, ontrack, branch, id) => {
+    await waitUntilCondition({
+        page,
+        condition: async () => {
+            const data = await graphQLCall(
+                ontrack.connection,
+                gql`
+                    query DeliveryMapCheckpoints($branchId: Int!) {
+                        branch(id: $branchId) {
+                            deliveryMap { checkpoints { id } }
+                        }
+                    }
+                `,
+                {branchId: Number(branch.id)},
+            )
+            return data.branch.deliveryMap.checkpoints.some(it => it.id === id)
+        },
+        message: `Workflow checkpoint ${id} not on the map within 5 seconds`,
+    })
+}
+
+test('the workflows a promotion set off are drawn beside it, as consequences', async ({page, ontrack}) => {
+    const project = await ontrack.createProject()
+    const branch = await project.createBranch()
+    const silver = await branch.createPromotionLevel("SILVER")
+
+    const workflowName = generate("wf-")
+    await subscribeToWorkflow(silver, workflowName)
+
+    const build = await branch.createBuild()
+    await build.promote(silver)
+
+    await waitForWorkflowCheckpoint(page, ontrack, branch, `workflow:${silver.id}:${workflowName}`)
+
+    await login(page, ontrack)
+    const map = new BranchDeliveryMapPage(page, branch)
+    await map.goTo()
+
+    const workflow = map.workflowCheckpoint(silver, workflowName)
+    await expect(workflow).toBeVisible()
+    await expect(workflow).toContainText(workflowName)
+
+    // EMITS, never requires: the workflow runs once the promotion has been granted, and the
+    // promotion does not wait to see how it goes (ADR 0011)
+    await map.checkEdgeCount("emits", 1)
+    await map.checkEdgeCount("required by", 0)
+
+    // It names no build of its own: that build would always be the one SILVER already names
+    await map.checkCheckpointHasNoLag(workflow)
+
+    // One toggle takes every workflow off the map, and is remembered in the browser
+    await map.toggleWorkflows()
+    await expect(workflow).toBeHidden()
+    await expect(map.promotionCheckpoint(silver)).toBeVisible()
+    await page.reload()
+    await map.checkOnPage()
+    await expect(workflow).toBeHidden()
+})
+
+test('a promotion level which has never been promoted draws no workflow', async ({page, ontrack}) => {
+    // A workflow is only reachable through the records of the runs which fired it, so a subscription
+    // alone puts nothing on the map. The asymmetry with the slot side is deliberate.
+    const project = await ontrack.createProject()
+    const branch = await project.createBranch()
+    const silver = await branch.createPromotionLevel("SILVER")
+
+    const workflowName = generate("wf-")
+    await subscribeToWorkflow(silver, workflowName)
+    await branch.createBuild()
+
+    await login(page, ontrack)
+    const map = new BranchDeliveryMapPage(page, branch)
+    await map.goTo()
+
+    await expect(map.promotionCheckpoint(silver)).toBeVisible()
+    await expect(map.workflowCheckpoint(silver, workflowName)).toBeHidden()
 })

@@ -118,6 +118,19 @@ class DemoSeed(
             slots.getValue(spec.environment to ref.project).deploy(builds.resolve(ref))
         }
 
+        // AFTER the deployments, unlike the admission rules. A `CANDIDATE` or `RUNNING` workflow is
+        // a hard gate: the deployment cannot start, or cannot finish, until it has passed, and a
+        // workflow runs asynchronously. Configuring one first would leave every deployment below
+        // racing a workflow, which is how a reset that has to be reliable becomes flaky.
+        dataset.environments.forEach { spec ->
+            spec.slots.forEach { slotSpec ->
+                slotSpec.workflows.forEach { workflowSpec ->
+                    log("Adding ${workflowSpec.trigger} workflow to slot ${spec.name}/${slotSpec.project}")
+                    slots.getValue(spec.name to slotSpec.project).addWorkflow(workflowSpec)
+                }
+            }
+        }
+
         dataset.dashboard?.let { dashboard ->
             log("Saving dashboard ${dashboard.name}")
             target.saveDashboard(dashboard)

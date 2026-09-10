@@ -7,6 +7,8 @@ jest.mock("../../../../../components/branches/views/deliverymap/checkpoints/Prom
 jest.mock("../../../../../components/branches/views/deliverymap/checkpoints/ValidationStampCheckpoint", () => () => <div/>)
 jest.mock("../../../../../components/branches/views/deliverymap/checkpoints/ValidationStampPatternCheckpoint", () => () => <div/>)
 jest.mock("../../../../../components/extension/environments/deliverymap/SlotCheckpoint", () => () => <div/>)
+jest.mock("../../../../../components/extension/workflows/deliverymap/WorkflowCheckpoint", () => () => <div/>)
+jest.mock("../../../../../components/extension/environments/deliverymap/SlotWorkflowCheckpoint", () => () => <div/>)
 
 describe('checkpoint type registry', () => {
 
@@ -16,6 +18,8 @@ describe('checkpoint type registry', () => {
             'validation-stamp',
             'validation-stamp-pattern',
             'slot',
+            'workflow',
+            'slot-workflow',
             'unresolved',
         ])
     })

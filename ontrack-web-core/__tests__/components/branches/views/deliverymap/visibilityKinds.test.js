@@ -60,8 +60,10 @@ describe('narrowing a delivery map by what is shown', () => {
 
     const promotion = {id: 'promotion-level:12', type: 'promotion-level', name: "SILVER"}
     const stamp = {id: 'validation-stamp:1', type: 'validation-stamp', name: "QUALITY"}
+    const workflow = {id: 'workflow:12:Canary', type: 'workflow', name: "Canary"}
+    const slotWorkflow = {id: 'slot-workflow:sw-1', type: 'slot-workflow', name: "Smoke tests"}
     const map = {
-        checkpoints: [promotion, stamp],
+        checkpoints: [promotion, stamp, workflow, slotWorkflow],
         edges: [{id: 'e', kind: 'UNLOCKS', source: stamp.id, target: promotion.id}],
     }
 
@@ -71,8 +73,20 @@ describe('narrowing a delivery map by what is shown', () => {
 
     it('takes the validation stamps off when they are turned off', () => {
         const narrowed = applyVisibility(map, {'validation-stamps': false})
-        expect(narrowed.checkpoints.map(it => it.id)).toEqual(['promotion-level:12'])
+        expect(narrowed.checkpoints.map(it => it.type))
+            .toEqual(['promotion-level', 'workflow', 'slot-workflow'])
         expect(narrowed.edges).toEqual([])
+    })
+
+    it('takes both kinds of workflow off with the one entry', () => {
+        const narrowed = applyVisibility(map, {'workflows': false})
+        expect(narrowed.checkpoints.map(it => it.type))
+            .toEqual(['promotion-level', 'validation-stamp'])
+    })
+
+    it('folds every entry over the map, one after the other', () => {
+        const narrowed = applyVisibility(map, {'validation-stamps': false, 'workflows': false})
+        expect(narrowed.checkpoints.map(it => it.type)).toEqual(['promotion-level'])
     })
 
     it('has nothing to narrow before the map arrives', () => {
