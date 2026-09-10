@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {theme} from "antd";
-import {FaEye, FaEyeSlash, FaProjectDiagram} from "react-icons/fa";
+import {FaProjectDiagram} from "react-icons/fa";
 import {applyNodeChanges, Background, ControlButton, Controls, ReactFlow} from "reactflow";
 import {autoLayout} from "@components/links/GraphUtils";
 import CheckpointNode from "@components/branches/views/deliverymap/CheckpointNode";
@@ -35,22 +35,16 @@ const nodeTypes = {
  * the rest of the time. Laying out again on every fetch would reshuffle the whole map under the
  * user's cursor once a minute, and throw away every node they had dragged.
  *
- * Its own controls sit in React Flow's control bar, where every other graph of the product puts
- * theirs. They act on the drawing and on nothing else: the validation stamp filter, which is a
- * statement about the branch, lives above the view switch so that it follows the user from one
- * content view to the next.
+ * Its control bar holds what acts on the DRAWING - zooming, fitting, the layout - which is where
+ * every other graph of the product puts those. What is drawn AT ALL is a different kind of question,
+ * and is asked in the view's own toolbar instead, in words: see `visibilityKinds`. The validation
+ * stamp filter is a third thing again - a statement about the branch rather than about this graph -
+ * and lives above the view switch so that it follows the user from one content view to the next.
  *
  * @param map The delivery map to draw
- * @param showValidationStamps Whether the validation stamps are drawn, for the control's own state
- * @param onToggleValidationStamps Called when the user asks for the stamps to be shown or hidden
  * @param height Height of the drawing area
  */
-export default function DeliveryMapGraph({
-                                             map,
-                                             showValidationStamps = true,
-                                             onToggleValidationStamps,
-                                             height = 600,
-                                         }) {
+export default function DeliveryMapGraph({map, height = 600}) {
 
     // The edges are painted in a theme colour rather than React Flow's own, whose default all but
     // hides the arrowheads (#1717). Read here and applied below because the mapping is a pure
@@ -145,17 +139,6 @@ export default function DeliveryMapGraph({
                         data-testid="delivery-map-relayout"
                     >
                         <FaProjectDiagram/>
-                    </ControlButton>
-                    <ControlButton
-                        title={
-                            showValidationStamps ?
-                                "Hide the validation stamps" :
-                                "Show the validation stamps"
-                        }
-                        onClick={onToggleValidationStamps}
-                        data-testid="delivery-map-toggle-stamps"
-                    >
-                        {showValidationStamps ? <FaEye/> : <FaEyeSlash/>}
                     </ControlButton>
                 </Controls>
             </ReactFlow>

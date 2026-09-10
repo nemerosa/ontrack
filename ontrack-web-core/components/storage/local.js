@@ -198,22 +198,38 @@ export function setLocalGridLayout(id, layout) {
     localStorage.setItem(id, JSON.stringify(layout))
 }
 
-const deliveryMapValidationStamps = 'delivery-map-validation-stamps'
+const deliveryMapVisibility = 'delivery-map-visibility'
 
 /**
- * Are the validation stamps drawn on the delivery map?
+ * What the reader has turned OFF on the delivery map, keyed by the id of each visibility entry.
+ *
+ * What is turned off rather than what is on, so that a kind added to the map later is drawn for
+ * everyone rather than hidden from every reader who happens to have a preference stored. Everything
+ * is shown by default: a map opening on a chain of promotions with no visible cause hides the very
+ * thing which explains them.
  *
  * A per-screen convenience rather than a server preference: it says how one reader is looking at one
  * graph right now, and the server preference is already carrying the branch content view key, which
  * is a choice worth following the user from one browser to the next.
  *
- * @returns true unless the user has turned them off. ON is the default on purpose: a map opening on
- * a chain of promotions with no visible cause hides the very thing which explains them.
+ * @returns the preferences, or an empty object when there are none or they cannot be read
  */
-export function getLocalDeliveryMapValidationStamps() {
-    return localStorage.getItem(deliveryMapValidationStamps) !== 'no'
+export function getLocalDeliveryMapVisibility() {
+    const json = localStorage.getItem(deliveryMapVisibility)
+    if (json) {
+        try {
+            const parsed = JSON.parse(json)
+            // A corrupted entry must not leave the reader looking at a map missing half its
+            // vocabulary, and neither must one holding something which is not an object
+            return parsed && typeof parsed === 'object' ? parsed : {}
+        } catch (ignored) {
+            return {}
+        }
+    } else {
+        return {}
+    }
 }
 
-export function setLocalDeliveryMapValidationStamps(shown) {
-    localStorage.setItem(deliveryMapValidationStamps, shown ? 'yes' : 'no')
+export function setLocalDeliveryMapVisibility(visibility) {
+    localStorage.setItem(deliveryMapVisibility, JSON.stringify(visibility))
 }

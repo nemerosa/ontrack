@@ -1,35 +1,46 @@
 import {
-    getLocalDeliveryMapValidationStamps,
-    setLocalDeliveryMapValidationStamps,
+    getLocalDeliveryMapVisibility,
+    setLocalDeliveryMapVisibility,
 } from "@components/storage/local";
 
-describe('delivery map validation stamp preference', () => {
+describe('delivery map visibility preference', () => {
 
     beforeEach(() => {
         localStorage.clear()
     })
 
-    it('shows the validation stamps until the user says otherwise', () => {
-        // Off by default would make the map's first impression a chain of promotions with no
-        // visible cause
-        expect(getLocalDeliveryMapValidationStamps()).toBe(true)
+    it('has nothing turned off until the reader turns something off', () => {
+        // Everything on the map is drawn by default: a map opening on a chain of promotions with no
+        // visible cause hides the very thing which explains them
+        expect(getLocalDeliveryMapVisibility()).toEqual({})
     })
 
-    it('remembers that they were hidden', () => {
-        setLocalDeliveryMapValidationStamps(false)
-        expect(getLocalDeliveryMapValidationStamps()).toBe(false)
+    it('remembers what was turned off', () => {
+        setLocalDeliveryMapVisibility({'validation-stamps': false})
+        expect(getLocalDeliveryMapVisibility()).toEqual({'validation-stamps': false})
     })
 
-    it('remembers that they were shown again', () => {
-        setLocalDeliveryMapValidationStamps(false)
-        setLocalDeliveryMapValidationStamps(true)
-        expect(getLocalDeliveryMapValidationStamps()).toBe(true)
+    it('remembers what was turned back on', () => {
+        setLocalDeliveryMapVisibility({'validation-stamps': false})
+        setLocalDeliveryMapVisibility({'validation-stamps': true})
+        expect(getLocalDeliveryMapVisibility()).toEqual({'validation-stamps': true})
     })
 
-    it('shows them for a value it does not recognise', () => {
-        // A corrupted entry must not leave the reader looking at a map missing half its vocabulary
-        localStorage.setItem('delivery-map-validation-stamps', 'perhaps')
-        expect(getLocalDeliveryMapValidationStamps()).toBe(true)
+    it('says nothing about a kind it has never heard of', () => {
+        // Which is how a kind added to the map later is drawn for everyone, rather than hidden from
+        // every reader who happens to have a preference stored
+        setLocalDeliveryMapVisibility({'validation-stamps': false})
+        expect(getLocalDeliveryMapVisibility()['slots']).toBeUndefined()
+    })
+
+    it('falls back to showing everything for an entry it cannot read', () => {
+        localStorage.setItem('delivery-map-visibility', 'not json at all')
+        expect(getLocalDeliveryMapVisibility()).toEqual({})
+    })
+
+    it('falls back to showing everything for an entry which is not an object', () => {
+        localStorage.setItem('delivery-map-visibility', '"yes"')
+        expect(getLocalDeliveryMapVisibility()).toEqual({})
     })
 
 })

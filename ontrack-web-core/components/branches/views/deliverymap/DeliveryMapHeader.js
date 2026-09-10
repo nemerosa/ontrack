@@ -29,30 +29,34 @@ export default function DeliveryMapHeader({head, extra}) {
     // `width: 100%` here resolves against a shrink-to-fit box and folds "Latest build" onto three
     // lines. Left-aligned is also what the pipeline view's toolbar does.
     return (
-        <Space size={token.marginXS} data-testid="delivery-map-header">
-            <Typography.Text
-                type="secondary"
-                title="Each checkpoint below says how far behind this build it is"
-            >
-                Latest build
-            </Typography.Text>
-            {
-                head ?
-                    <>
-                        <BuildLink build={head} displayTooltip={true}/>
-                        {
-                            head.creation?.time &&
-                            <Typography.Text type="secondary">
-                                <TimestampText value={head.creation.time} relative={true}/>
-                            </Typography.Text>
-                        }
-                    </> :
-                    // Said in words rather than left blank: it is also why no checkpoint on the map
-                    // carries a lag marker, and the reader should not have to guess at the link
-                    <Typography.Text type="secondary" italic>
-                        No build on this branch yet
-                    </Typography.Text>
-            }
+        // Two levels of spacing on purpose: what the build IS holds together tightly, and the
+        // controls stand apart from it rather than reading as more of the same sentence
+        <Space size="large" data-testid="delivery-map-header">
+            <Space size={token.marginXS}>
+                <Typography.Text
+                    type="secondary"
+                    title="Each checkpoint below says how far behind this build it is"
+                >
+                    Latest build
+                </Typography.Text>
+                {
+                    head ?
+                        <>
+                            <BuildLink build={head} displayTooltip={true}/>
+                            {
+                                head.creation?.time &&
+                                <Typography.Text type="secondary">
+                                    <TimestampText value={head.creation.time} relative={true}/>
+                                </Typography.Text>
+                            }
+                        </> :
+                        // Said in words rather than left blank: it is also why no checkpoint on the
+                        // map carries a lag marker, and the reader should not have to guess at it
+                        <Typography.Text type="secondary" italic>
+                            No build on this branch yet
+                        </Typography.Text>
+                }
+            </Space>
             {extra}
         </Space>
     )

@@ -7,16 +7,17 @@ import LoadingContainer from "@components/common/LoadingContainer";
 import {ValidationStampFilterContext} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
 import {gqlDeliveryMap} from "@components/branches/views/deliverymap/deliveryMapQueries";
 import {
-    getLocalDeliveryMapValidationStamps,
-    setLocalDeliveryMapValidationStamps,
+    getLocalDeliveryMapVisibility,
+    setLocalDeliveryMapVisibility,
 } from "@components/storage/local";
 import {
     applyValidationStampFilter,
     hasNoDependencies,
     isMapEmpty,
-    withValidationStamps,
 } from "@components/branches/views/deliverymap/deliveryMapModel";
+import {applyVisibility} from "@components/branches/views/deliverymap/visibilityKinds";
 import DeliveryMapHeader from "@components/branches/views/deliverymap/DeliveryMapHeader";
+import DeliveryMapVisibility from "@components/branches/views/deliverymap/DeliveryMapVisibility";
 import DeliveryMapGraph from "@components/branches/views/deliverymap/DeliveryMapGraph";
 import DeliveryMapEmpty from "@components/branches/views/deliverymap/DeliveryMapEmpty";
 import DeliveryMapNoDependencies from "@components/branches/views/deliverymap/DeliveryMapNoDependencies";
@@ -31,8 +32,8 @@ import DeliveryMapNoDependencies from "@components/branches/views/deliverymap/De
  * map by it.
  *
  * What it does own is the branch head in its header - the build every checkpoint's lag is counted
- * against - whether the validation stamps are drawn at all, and its own auto refresh. All three are
- * ways of reading this one graph rather than statements about the branch.
+ * against - what is drawn on the map at all, and its own auto refresh. All three are ways of reading
+ * this one graph rather than statements about the branch.
  *
  * The auto refresh context is provided HERE and consumed by the view below, which is why the two are
  * separate components: a component cannot read a context it provides itself.
@@ -56,18 +57,18 @@ function DeliveryMapContent({branch}) {
 
     const vsfContext = useContext(ValidationStampFilterContext)
 
-    // Starting shown, which is also the stored default, so that the map never lays itself out twice
-    // on arrival. The preference is read in an effect rather than at first render because the local
-    // storage is not there to be read while the page is being rendered on the server.
-    const [showValidationStamps, setShowValidationStamps] = useState(true)
+    // Starting with everything shown, which is also the stored default, so that the map never lays
+    // itself out twice on arrival. The preference is read in an effect rather than at first render
+    // because the local storage is not there to be read while the page is rendered on the server.
+    const [visibility, setVisibility] = useState({})
     useEffect(() => {
-        setShowValidationStamps(getLocalDeliveryMapValidationStamps())
+        setVisibility(getLocalDeliveryMapVisibility())
     }, [])
 
-    const onToggleValidationStamps = () => {
-        const shown = !showValidationStamps
-        setLocalDeliveryMapValidationStamps(shown)
-        setShowValidationStamps(shown)
+    const onToggleVisibility = (id, shown) => {
+        const updated = {...visibility, [id]: shown}
+        setLocalDeliveryMapVisibility(updated)
+        setVisibility(updated)
     }
 
     // Refetched on every tick of the auto refresh, as `BranchLinksGraph` does it: the count is an
@@ -93,11 +94,11 @@ function DeliveryMapContent({branch}) {
     // re-render of this component while a filter is selected - starting inline edition of that
     // filter, say - would reshuffle the whole map and throw away any node the user had dragged.
     const map = useMemo(
-        () => withValidationStamps(
+        () => applyVisibility(
             applyValidationStampFilter(data, vsfContext.selectedFilter),
-            showValidationStamps,
+            visibility,
         ),
-        [data, vsfContext.selectedFilter, showValidationStamps],
+        [data, vsfContext.selectedFilter, visibility],
     )
 
     return (
@@ -132,7 +133,15 @@ function DeliveryMapContent({branch}) {
                     build, and still refreshes. */}
                 <DeliveryMapHeader
                     head={data?.head}
-                    extra={<AutoRefreshButton size="small"/>}
+                    extra={
+                        <>
+                            <DeliveryMapVisibility
+                                visibility={visibility}
+                                onToggle={onToggleVisibility}
+                            />
+                            <AutoRefreshButton size="small"/>
+                        </>
+                    }
                 />
                 {
                     // A failed fetch is said in words. It is NOT left to the empty state: a refresh
@@ -156,11 +165,7 @@ function DeliveryMapContent({branch}) {
                                 hiding the stamps - or filtering them out - must not make the map
                                 ask for configuration which is already there. */}
                             {hasNoDependencies(data) && <DeliveryMapNoDependencies/>}
-                            <DeliveryMapGraph
-                                map={map}
-                                showValidationStamps={showValidationStamps}
-                                onToggleValidationStamps={onToggleValidationStamps}
-                            />
+                            <DeliveryMapGraph map={map}/>
                         </>
                 }
             </LoadingContainer>
