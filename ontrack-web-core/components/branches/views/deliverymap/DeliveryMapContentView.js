@@ -127,47 +127,53 @@ function DeliveryMapContent({branch}) {
                 dragged with it. `finished` stays true once the first fetch has answered, which is
                 exactly the "have we ever had a map" this needs. */}
             <LoadingContainer loading={!finished}>
-                {/* Above the empty state as well as above the map: the header is this view's
-                    toolbar, and a control which comes and goes with the data is a control the
-                    reader cannot count on. A branch with nothing on its map still has a latest
-                    build, and still refreshes. */}
-                <DeliveryMapHeader
-                    head={data?.head}
-                    extra={
-                        <>
-                            <DeliveryMapVisibility
-                                visibility={visibility}
-                                onToggle={onToggleVisibility}
-                            />
-                            <AutoRefreshButton size="small"/>
-                        </>
+                {/* The same 16px rhythm as the outer stack, and it cannot BE the outer stack:
+                    everything below is one child of the `LoadingContainer`, which renders no wrapper
+                    of its own between them. Without it the toolbar sits flush against whatever
+                    follows - the "nothing joins these checkpoints" notice most visibly. */}
+                <Space direction="vertical" size={16} className="ot-line">
+                    {/* Above the empty state as well as above the map: the header is this view's
+                        toolbar, and a control which comes and goes with the data is a control the
+                        reader cannot count on. A branch with nothing on its map still has a latest
+                        build, and still refreshes. */}
+                    <DeliveryMapHeader
+                        head={data?.head}
+                        extra={
+                            <>
+                                <DeliveryMapVisibility
+                                    visibility={visibility}
+                                    onToggle={onToggleVisibility}
+                                />
+                                <AutoRefreshButton size="small"/>
+                            </>
+                        }
+                    />
+                    {
+                        // A failed fetch is said in words. It is NOT left to the empty state: a
+                        // refresh which fails - a backend restart, one bad response out of sixty -
+                        // nulls the data, and "this branch has nothing on its map" is then a claim
+                        // about the branch which happens to be false. The header stays above it, so
+                        // the reader can still turn the refresh off.
+                        error ?
+                            <Alert
+                                type="error"
+                                showIcon
+                                data-testid="delivery-map-error"
+                                message="The delivery map could not be loaded"
+                                description={error}
+                            /> :
+                        isMapEmpty(map) ?
+                            <DeliveryMapEmpty/> :
+                            <>
+                                {/* Read on the map the SERVER sent, never on the narrowed one: this
+                                    notice tells the reader to go and configure auto promotion, and
+                                    hiding the stamps - or filtering them out - must not make the map
+                                    ask for configuration which is already there. */}
+                                {hasNoDependencies(data) && <DeliveryMapNoDependencies/>}
+                                <DeliveryMapGraph map={map}/>
+                            </>
                     }
-                />
-                {
-                    // A failed fetch is said in words. It is NOT left to the empty state: a refresh
-                    // which fails - a backend restart, one bad response out of sixty - nulls the
-                    // data, and "this branch has nothing on its map" is then a claim about the
-                    // branch which happens to be false. The header stays above it, so the reader can
-                    // still turn the refresh off.
-                    error ?
-                        <Alert
-                            type="error"
-                            showIcon
-                            data-testid="delivery-map-error"
-                            message="The delivery map could not be loaded"
-                            description={error}
-                        /> :
-                    isMapEmpty(map) ?
-                        <DeliveryMapEmpty/> :
-                        <>
-                            {/* Read on the map the SERVER sent, never on the narrowed one: this
-                                notice tells the reader to go and configure auto promotion, and
-                                hiding the stamps - or filtering them out - must not make the map
-                                ask for configuration which is already there. */}
-                            {hasNoDependencies(data) && <DeliveryMapNoDependencies/>}
-                            <DeliveryMapGraph map={map}/>
-                        </>
-                }
+                </Space>
             </LoadingContainer>
         </Space>
     )
