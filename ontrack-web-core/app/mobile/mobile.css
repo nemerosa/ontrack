@@ -1,0 +1,127 @@
+/**
+ * The mobile shell's own layout.
+ *
+ * `/mobile` is a separate App Router root with its own <html>, so it is covered
+ * by neither `pages/_app.js` nor the desktop layout components. The theme tokens
+ * still come from `styles/globals.css`, imported by the layout - that file is
+ * the single source of truth for the palette, and the two UIs must not drift
+ * into different colours. What lives here is only what is specific to a phone:
+ * the fixed header, the bottom bar and the safe areas around them.
+ */
+
+:root {
+    /*
+     * The lit tab. Brand purple reads on the light surface; on the dark one it
+     * does not, so the identity's other half takes over.
+     */
+    --ot-mobile-nav-active: var(--ot-brand-purple);
+    --ot-mobile-nav-idle: rgba(0, 0, 0, 0.45);
+
+    /*
+     * Both bars are fixed, so the content has to reserve their room itself.
+     * Declared once here rather than repeated in the padding below, where a
+     * change to either bar would otherwise have to be tracked by hand.
+     * 56px on the bar is comfortably above the 44px minimum for a touch target.
+     */
+    --ot-mobile-header-height: 48px;
+    --ot-mobile-nav-height: 56px;
+}
+
+:root[data-theme="dark"] {
+    --ot-mobile-nav-active: var(--ot-brand-lilac);
+    --ot-mobile-nav-idle: rgba(255, 255, 255, 0.45);
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--ot-bg-page);
+    color: var(--ot-text);
+    /* Stops iOS Safari inflating text in whichever direction it calls "up". */
+    -webkit-text-size-adjust: 100%;
+}
+
+.ot-mobile-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 12px;
+    /* Below the notch, not under it. */
+    padding-top: env(safe-area-inset-top);
+    height: calc(var(--ot-mobile-header-height) + env(safe-area-inset-top));
+    background-color: var(--ot-header-bg);
+    color: var(--ot-header-fg);
+}
+
+.ot-mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ot-header-fg);
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.ot-mobile-user {
+    /* Never pushes the brand off the screen, however long the name is. */
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.ot-mobile-main {
+    /* Each bar's own height, plus a gutter, plus whatever the device eats. */
+    padding-top: calc(var(--ot-mobile-header-height) + 12px + env(safe-area-inset-top));
+    padding-bottom: calc(var(--ot-mobile-nav-height) + 16px + env(safe-area-inset-bottom));
+    padding-left: 12px;
+    padding-right: 12px;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.ot-mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    background-color: var(--ot-bg-elevated);
+    border-top: 1px solid var(--ot-border-subtle);
+    /* Clear of the home indicator on a gesture-navigation phone. */
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.ot-mobile-nav-item {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: var(--ot-mobile-nav-height);
+    padding: 6px 0;
+    font-size: 11px;
+    text-decoration: none;
+    color: var(--ot-mobile-nav-idle);
+    /* Removes the grey flash iOS paints over a tapped link. */
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ot-mobile-nav-item svg {
+    font-size: 20px;
+}
+
+.ot-mobile-nav-item[aria-current="page"] {
+    color: var(--ot-mobile-nav-active);
+}

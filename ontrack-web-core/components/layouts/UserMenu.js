@@ -21,6 +21,7 @@ import {
     FaMagic,
     FaMailBulk,
     FaMedal,
+    FaMobileAlt,
     FaPaperPlane,
     FaProjectDiagram,
     FaReceipt,
@@ -41,6 +42,7 @@ import {signOut} from "next-auth/react";
 import Link from "next/link";
 import TFCIcon from "@components/extension/tfc/TFCIcon";
 import ThemeSwitch from "@components/layouts/ThemeSwitch";
+import {switchToMobileUI} from "@components/mobile/desktopPreference";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -138,6 +140,21 @@ export default function UserMenu({userMenu}) {
             label: "Full view",
             icon: <FaExpandArrowsAlt/>,
             onClick: expandFullView,
+        })
+        // Mobile version. Shown to everyone, not only to phones: the desktop
+        // UI is also where someone lands after choosing it on a phone, and that
+        // choice is remembered per device rather than per user agent.
+        //
+        // The switch to the desktop UI is one-way navigationally - every link on
+        // every desktop page stays on it - so this entry is the only thing
+        // standing between a phone user who once tapped "open the desktop
+        // version" and being stranded on it for good.
+        menu.push({
+            key: 'mobile',
+            label: "Mobile version",
+            title: "Switch this device to the mobile version of Yontrack",
+            icon: <FaMobileAlt/>,
+            onClick: switchToMobileUI,
         })
         // Theme switch. Not selectable and not closing the drawer, so the user
         // can compare the themes without reopening the menu each time.

@@ -9,6 +9,7 @@ with the API to its pure client aspects.
 * [Global UI permissions](global-ui-permissions.md)
 * [GraphQL calls](ui-graphql-call.md)
 * [Local page events](local-events.md)
+* [The mobile UI](mobile-ui.md)
 * [Page tools](page-tools.md)
 * [Permalinks](ui-permalink.md)
 * [UI form dialogs](ui-form-dialog.md)
