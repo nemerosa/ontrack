@@ -130,6 +130,115 @@ test.describe('the mobile UI on a phone', () => {
         await expect(row).toContainText(project.name)
     })
 
+    test('a user gets from the home screen to a build, on a phone', async ({page, ontrack}) => {
+        // The whole path the project and branch screens exist for. A build
+        // carrying a release, a promotion and nothing else - the card has to
+        // show the version people talk about rather than the timestamp-run pair
+        // Yontrack calls a build.
+        const project = await ontrack.createProject()
+        const branch = await project.createBranch()
+        const promotionLevel = await branch.createPromotionLevel()
+        const build = await branch.createBuild()
+        await build.setRelease('1.4.0')
+        await build.promote(promotionLevel)
+
+        // The narrowest phone the acceptance names. The device profile above is
+        // 393px wide, and 375 is where a layout breaks first.
+        await page.setViewportSize({width: 375, height: 812})
+
+        await signInOnPhone(page, ontrack)
+        await page.goto(`${ontrack.connection.ui}/mobile`)
+
+        // Home -> the project list, one tap from the bottom bar.
+        await page.getByTestId('mobile-nav-projects').click()
+        await page.getByTestId('mobile-projects-filter').fill(project.name)
+        await expect(page.getByTestId(`mobile-project-${project.id}`)).toBeVisible()
+
+        // -> the project.
+        await page.getByTestId(`mobile-project-${project.id}`).getByRole('link').click()
+        await expect(page).toHaveURL(new RegExp(`/mobile/project/${project.id}$`))
+        await expect(page.getByTestId('mobile-screen-title')).toContainText(project.name)
+
+        // The branch list is limited, so the filter is how a branch beyond the
+        // limit is reached - and it has to find this one whatever else the
+        // project holds.
+        await page.getByTestId('mobile-branches-filter').fill(branch.name)
+        await expect(page.getByTestId(`mobile-branch-${branch.id}`)).toBeVisible()
+
+        // -> the branch.
+        await page.getByTestId(`mobile-branch-${branch.id}`).getByRole('link').click()
+        await expect(page).toHaveURL(new RegExp(`/mobile/branch/${branch.id}$`))
+        await expect(page.getByTestId('mobile-screen-title')).toContainText(branch.name)
+        // Which project this branch belongs to, and the way back up to it.
+        await expect(page.getByTestId('mobile-screen-subtitle')).toContainText(project.name)
+
+        // -> the build, as a card rather than as a row of a matrix.
+        const card = page.getByTestId(`mobile-build-${build.id}`)
+        await expect(card).toContainText('1.4.0')
+        // Legible without zooming: the promotion is named, not only drawn.
+        await expect(card).toContainText(promotionLevel.name)
+
+        // And none of it scrolls sideways, which is the acceptance criterion the
+        // desktop branch matrix cannot meet at any width.
+        const overflows = await page.evaluate(() =>
+            document.documentElement.scrollWidth > document.documentElement.clientWidth)
+        expect(overflows).toBe(false)
+    })
+
+    test('a favourite branch on the home screen taps through to itself', async ({page, ontrack}) => {
+        const project = await ontrack.createProject()
+        const branch = await project.createBranch()
+        await branch.favourite()
+
+        await signInOnPhone(page, ontrack)
+        await page.goto(`${ontrack.connection.ui}/mobile`)
+
+        await page.getByTestId(`mobile-branch-${branch.id}`).getByRole('link').click()
+        await expect(page).toHaveURL(new RegExp(`/mobile/branch/${branch.id}$`))
+    })
+
+    test('the favourite toggles work on the project and branch screens', async ({page, ontrack}) => {
+        const project = await ontrack.createProject()
+        const branch = await project.createBranch()
+
+        await signInOnPhone(page, ontrack)
+
+        // On the project screen: the project itself, and each of its branches.
+        await page.goto(`${ontrack.connection.ui}/mobile/project/${project.id}`)
+        const projectStar = page.getByTestId(`mobile-favourite-project-${project.id}`)
+        await expect(projectStar).toHaveAttribute('aria-pressed', 'false')
+        await projectStar.click()
+        await expect(projectStar).toHaveAttribute('aria-pressed', 'true')
+
+        const branchStar = page.getByTestId(`mobile-favourite-branch-${branch.id}`)
+        await branchStar.click()
+        await expect(branchStar).toHaveAttribute('aria-pressed', 'true')
+
+        // And on the branch screen, where the star acts on the branch being
+        // looked at. It is already starred, so this one unstars it.
+        await page.goto(`${ontrack.connection.ui}/mobile/branch/${branch.id}`)
+        const ownStar = page.getByTestId(`mobile-favourite-branch-${branch.id}`)
+        await expect(ownStar).toHaveAttribute('aria-pressed', 'true')
+        await ownStar.click()
+        await expect(ownStar).toHaveAttribute('aria-pressed', 'false')
+    })
+
+    test('a link to a desktop project or branch lands on its mobile screen', async ({page, ontrack}) => {
+        // The point of the route map: a link shared from a desktop session has
+        // to keep its entity, not drop the phone on the home screen or on the
+        // interstitial.
+        const project = await ontrack.createProject()
+        const branch = await project.createBranch()
+
+        await signInOnPhone(page, ontrack)
+
+        await page.goto(`${ontrack.connection.ui}/project/${project.id}`)
+        await expect(page).toHaveURL(new RegExp(`/mobile/project/${project.id}$`))
+
+        await page.goto(`${ontrack.connection.ui}/branch/${branch.id}`)
+        await expect(page).toHaveURL(new RegExp(`/mobile/branch/${branch.id}$`))
+    })
+
     test('a route with no mobile equivalent gets the interstitial', async ({page, ontrack}) => {
         await signInOnPhone(page, ontrack)
         await page.goto(`${ontrack.connection.ui}/search`)

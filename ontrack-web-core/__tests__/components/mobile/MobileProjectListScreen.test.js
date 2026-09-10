@@ -58,6 +58,16 @@ describe('the mobile project list', () => {
         expect(screen.getByTestId('mobile-favourite-project-2')).toHaveAttribute('aria-pressed', 'false')
     })
 
+    it('sends each row to that project on the phone, not to the desktop page', () => {
+        // Leaving `/mobile` would bounce the user through the redirect and,
+        // once the app is installed as a PWA scoped to that prefix, out of the
+        // app itself.
+        projects(project(1, 'petclinic'))
+        render(<MobileProjectListScreen/>)
+        expect(screen.getByTestId('mobile-project-1').querySelector('a'))
+            .toHaveAttribute('href', '/mobile/project/1')
+    })
+
     it('says which projects are disabled', () => {
         projects(project(3, 'retired-thing', false, true))
         render(<MobileProjectListScreen/>)

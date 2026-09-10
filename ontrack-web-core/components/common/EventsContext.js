@@ -2,12 +2,23 @@ import {createContext, useContext, useState} from "react";
 
 export const EventsContext = createContext({})
 
+/*
+ * `subscribeToEvent?.(...)` and not `subscribeToEvent(...)`: the context's
+ * default value is an empty object, so a subscriber rendered outside any
+ * provider would throw and take its whole tree down. That is not hypothetical -
+ * the mobile UI is its own App Router root with a deliberately shorter provider
+ * stack and no `EventsContextProvider`, and shared primitives which only ever
+ * want the refresh (`EntityIcon`, and so every promotion medal) are used from
+ * it. Outside a provider nothing is ever fired, so there is nothing to refresh
+ * on, and a counter stuck at 0 is the right answer rather than a degraded one.
+ */
+
 export const useEventForRefresh = (name) => {
     const dashboardEventsContext = useContext(EventsContext)
 
     const [refreshCount, setRefreshCount] = useState(0)
 
-    dashboardEventsContext.subscribeToEvent(name, (_) => {
+    dashboardEventsContext.subscribeToEvent?.(name, (_) => {
         setRefreshCount(refreshCount + 1)
     })
 
@@ -20,7 +31,7 @@ export const useEventsForRefresh = (names) => {
     const [refreshCount, setRefreshCount] = useState(0)
 
     for (const name of names) {
-        dashboardEventsContext.subscribeToEvent(name, (_) => {
+        dashboardEventsContext.subscribeToEvent?.(name, (_) => {
             setRefreshCount(refreshCount + 1)
         })
     }

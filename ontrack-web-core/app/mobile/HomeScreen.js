@@ -19,6 +19,7 @@ import MobileAsyncContent from "@components/mobile/layout/MobileAsyncContent"
 import {MobileEntityGroup, MobileEntityRow} from "@components/mobile/entities/MobileEntityList"
 import MobileFavourite from "@components/mobile/favourites/MobileFavourite"
 import MobileFavouritesEmpty from "@components/mobile/favourites/MobileFavouritesEmpty"
+import {mobileBranchUri, mobileProjectUri} from "@components/mobile/mobileRoutes"
 
 export default function MobileHomeScreen() {
 
@@ -78,6 +79,7 @@ export default function MobileHomeScreen() {
                                     key={project.id}
                                     testId={`mobile-project-${project.id}`}
                                     name={project.name}
+                                    href={mobileProjectUri(project.id)}
                                     action={
                                         <MobileFavourite
                                             type="project"
@@ -101,6 +103,7 @@ export default function MobileHomeScreen() {
                                     key={branch.id}
                                     testId={`mobile-branch-${branch.id}`}
                                     name={branch.displayName || branch.name}
+                                    href={mobileBranchUri(branch.id)}
                                     // Favourite branches come from every project
                                     // at once, so a bare branch name says too
                                     // little - two projects can both have a `main`.

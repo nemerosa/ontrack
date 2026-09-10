@@ -14,6 +14,7 @@
  * The look lives in `app/mobile/mobile.css`.
  */
 
+import Link from "next/link"
 import {Typography} from "antd"
 
 /**
@@ -41,17 +42,41 @@ export function MobileEntityGroup({title, testId, children}) {
  *   unambiguous, such as the project a branch belongs to.
  * @param {React.ReactNode} [action] The trailing control, such as the favourite
  *   star. One at most: a phone row has no space for a toolbar.
+ * @param {string} [href] Where tapping the row goes. Only ever a mobile route:
+ *   sending a tap to a desktop page would bounce the user through the redirect
+ *   and, once the app is installed as a PWA scoped to `/mobile`, out of the app.
+ *   A row with no screen behind it yet takes no `href` - a tap that 404s is
+ *   worse than a row that does not move.
  */
-export function MobileEntityRow({testId, name, context, action}) {
+export function MobileEntityRow({testId, name, context, action, href}) {
+
+    /*
+     * The link wraps the text and NOT the whole row: the trailing action is
+     * itself a control, and nesting a button inside an anchor is invalid markup
+     * that browsers and screen readers then resolve differently. The text block
+     * grows to fill the row, so everything left of the star is tappable anyway.
+     */
+    const text = (
+        <>
+            <span className="ot-mobile-row-name">{name}</span>
+            {
+                context &&
+                <span className="ot-mobile-row-context">{context}</span>
+            }
+        </>
+    )
+
     return (
         <li className="ot-mobile-row" data-testid={testId}>
-            <div className="ot-mobile-row-text">
-                <span className="ot-mobile-row-name">{name}</span>
-                {
-                    context &&
-                    <span className="ot-mobile-row-context">{context}</span>
-                }
-            </div>
+            {
+                href ?
+                    <Link href={href} className="ot-mobile-row-text ot-mobile-row-link">
+                        {text}
+                    </Link> :
+                    <div className="ot-mobile-row-text">
+                        {text}
+                    </div>
+            }
             {
                 action &&
                 <div className="ot-mobile-row-action">{action}</div>

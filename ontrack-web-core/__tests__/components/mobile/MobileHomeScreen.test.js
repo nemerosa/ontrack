@@ -44,6 +44,18 @@ describe('the mobile home screen', () => {
         expect(row).toHaveTextContent('petclinic')
     })
 
+    it('is one tap from each favourite to its own screen', () => {
+        // What home is for: the thing someone reached for their phone to check
+        // should be a tap away, and inside `/mobile` - a desktop link would
+        // bounce through the redirect and, in the installed PWA, out of the app.
+        favourites([project(1, 'petclinic')], [branch(5, 'main', 'petclinic')])
+        render(<MobileHomeScreen/>)
+        expect(screen.getByTestId('mobile-project-1').querySelector('a'))
+            .toHaveAttribute('href', '/mobile/project/1')
+        expect(screen.getByTestId('mobile-branch-5').querySelector('a'))
+            .toHaveAttribute('href', '/mobile/branch/5')
+    })
+
     it('offers to unfavourite from the home screen itself', () => {
         favourites([project(1, 'petclinic')], [branch(5, 'main', 'petclinic')])
         render(<MobileHomeScreen/>)

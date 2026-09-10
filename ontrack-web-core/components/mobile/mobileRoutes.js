@@ -23,6 +23,22 @@ export const MOBILE_HOME = MOBILE_PREFIX
 /** The project list, which is also where the home screen's empty state points. */
 export const MOBILE_PROJECTS = `${MOBILE_PREFIX}/projects`
 
+/**
+ * One project's screen: its branches.
+ *
+ * @param {string|number} id
+ * @returns {string}
+ */
+export const mobileProjectUri = (id) => `${MOBILE_PREFIX}/project/${id}`
+
+/**
+ * One branch's screen: its latest builds.
+ *
+ * @param {string|number} id
+ * @returns {string}
+ */
+export const mobileBranchUri = (id) => `${MOBILE_PREFIX}/branch/${id}`
+
 /** Where a phone lands when its destination has no mobile equivalent. */
 export const MOBILE_INTERSTITIAL = `${MOBILE_PREFIX}/desktop-only`
 
@@ -43,6 +59,24 @@ export const DESKTOP_HOME = '/'
 const EQUIVALENTS = {
     [DESKTOP_HOME]: MOBILE_HOME,
 }
+
+/**
+ * Desktop routes carrying an entity id, and the mobile screen standing in for
+ * each.
+ *
+ * Separate from `EQUIVALENTS` because these are not paths but shapes: the id in
+ * `/project/12` has to come through to `/mobile/project/12`, or the redirect
+ * would land the user on a screen for some other project - or none.
+ *
+ * The patterns are exact by design. `/project/[id]` is the whole desktop route;
+ * anything deeper is a different page, and an id that is not a number is not a
+ * project, so both fall through to the interstitial rather than to a mobile
+ * screen that would ask the server a question with no answer.
+ */
+const ENTITY_EQUIVALENTS = [
+    [/^\/project\/(\d+)$/, mobileProjectUri],
+    [/^\/branch\/(\d+)$/, mobileBranchUri],
+]
 
 /**
  * Paths the redirect must never touch.
@@ -96,10 +130,16 @@ export function isRedirectExempt(pathname) {
  */
 export function mobileEquivalent(pathname) {
     if (typeof pathname !== 'string') return null
-    // An exact-path map, because every entry so far is an exact path. The first
-    // parameterised route to earn an equivalent - `/project/[id]` and friends -
-    // turns this into a pattern scan; there is no point guessing that shape now.
-    return Object.prototype.hasOwnProperty.call(EQUIVALENTS, pathname) ? EQUIVALENTS[pathname] : null
+    // The exact paths first: they are the cheaper lookup, and no entity pattern
+    // can match one of them anyway.
+    if (Object.prototype.hasOwnProperty.call(EQUIVALENTS, pathname)) {
+        return EQUIVALENTS[pathname]
+    }
+    for (const [pattern, uri] of ENTITY_EQUIVALENTS) {
+        const match = pattern.exec(pathname)
+        if (match) return uri(match[1])
+    }
+    return null
 }
 
 /**
@@ -109,6 +149,9 @@ export function mobileEquivalent(pathname) {
  * Most specific first: the list is scanned in order.
  */
 const DESCRIPTIONS = [
+    // A project or a branch only reaches the interstitial through a path the
+    // patterns above do not match - `/project/abc`, say. `/build/[id]` reaches
+    // it for real, until the build screen lands.
     [/^\/extension\/scm\/(.+\/)?changelog$/, 'a change log'],
     [/^\/extension\/scm\/[^/]+\/commit-info\//, 'a commit'],
     [/^\/extension\/scm\/[^/]+\/issue-info\//, 'an issue'],

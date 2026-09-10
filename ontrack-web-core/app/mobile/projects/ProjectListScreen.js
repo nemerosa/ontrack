@@ -11,71 +11,30 @@
  * through on a phone, so the list is filterable by name. The filter runs on the
  * server (`projects(pattern:)`, an `ILIKE '%...%'` ordered by name): a
  * client-side one could only narrow the answer to the last query and would never
- * reach a project the server had not already sent.
+ * reach a project the server had not already sent. The typing itself is handled
+ * by `useMobileFilter`, shared with the project screen's branch filter.
  *
- * The project screen behind each row is #1721; until it exists a row is a name
- * and its star, which is all this screen has to do for the home screen to work.
+ * Each row goes to that project's mobile screen, which is where its branches are.
  */
 
-import {useEffect, useMemo, useState} from "react"
+import {useState} from "react"
 import {gql} from "graphql-request"
-import debounce from "lodash.debounce"
-import {Empty, Input, Tag} from "antd"
+import {Empty, Tag} from "antd"
 import {useQuery} from "@components/services/GraphQL"
 import MobileScreen from "@components/mobile/layout/MobileScreen"
 import MobileAsyncContent from "@components/mobile/layout/MobileAsyncContent"
 import {MobileEntityGroup, MobileEntityRow} from "@components/mobile/entities/MobileEntityList"
+import {MobileFilterInput, useMobileFilter} from "@components/mobile/entities/MobileFilter"
 import MobileFavourite from "@components/mobile/favourites/MobileFavourite"
-
-/**
- * How long the typing has to settle before the list is fetched again. Long
- * enough that a word is one request rather than one per letter, short enough
- * that it does not read as lag.
- */
-const FILTER_DEBOUNCE_MS = 400
+import {mobileProjectUri} from "@components/mobile/mobileRoutes"
 
 export default function MobileProjectListScreen() {
 
-    // What is in the box, and what has been asked for - two values, because the
-    // second lags the first by the debounce and the input must not.
-    const [typed, setTyped] = useState('')
-    const [pattern, setPattern] = useState('')
+    const filter = useMobileFilter()
 
     // Refetched rather than patched in place, for the reason the home screen
     // gives: one source of truth for whether something is a favourite.
     const [refresh, setRefresh] = useState(0)
-
-    const applyPattern = useMemo(
-        () => debounce((value) => setPattern(value), FILTER_DEBOUNCE_MS),
-        []
-    )
-
-    // A timer must not outlive the screen that armed it - leaving the tab within
-    // the debounce would otherwise fire a state update into an unmounted tree.
-    useEffect(() => () => applyPattern.cancel(), [applyPattern])
-
-    const onFilterChange = (event) => {
-        const value = event.target.value
-        setTyped(value)
-        if (value) {
-            applyPattern(value)
-        } else {
-            // Clearing is immediate: the user asking for the whole list back
-            // should not wait on a debounce that is only there to spare the
-            // server a request per keystroke.
-            applyPattern.cancel()
-            setPattern('')
-        }
-    }
-
-    /*
-     * Trimmed, because the server tests the pattern with `isNullOrBlank` and
-     * answers a blank one with the *whole* list. A screen that called itself
-     * filtered on a lone space would head every project on the instance with
-     * "Matching projects".
-     */
-    const filter = pattern.trim()
-    const filtering = filter.length > 0
 
     const query = useQuery(
         gql`
@@ -94,8 +53,8 @@ export default function MobileProjectListScreen() {
              * `pattern` alongside any other argument, and it tells the two apart
              * by whether the argument was *supplied* - a null one is not.
              */
-            variables: {pattern: filtering ? filter : null},
-            deps: [pattern, refresh],
+            variables: {pattern: filter.filtering ? filter.filter : null},
+            deps: [filter.filter, refresh],
         }
     )
 
@@ -103,13 +62,10 @@ export default function MobileProjectListScreen() {
 
     return (
         <MobileScreen title="Projects">
-            <Input
-                allowClear
-                value={typed}
-                onChange={onFilterChange}
-                placeholder="Filter by name"
-                aria-label="Filter the projects by name"
-                data-testid="mobile-projects-filter"
+            <MobileFilterInput
+                filter={filter}
+                label="Filter the projects by name"
+                testId="mobile-projects-filter"
             />
             <MobileAsyncContent
                 state={query}
@@ -124,8 +80,8 @@ export default function MobileProjectListScreen() {
                                 // Two different facts, and telling them apart is
                                 // the difference between "type something else"
                                 // and "there is nothing here to find".
-                                filtering
-                                    ? `No project matches "${filter}".`
+                                filter.filtering
+                                    ? `No project matches "${filter.filter}".`
                                     : "There is no project on this instance yet."
                             }
                         />
@@ -133,7 +89,7 @@ export default function MobileProjectListScreen() {
                 }
             >
                 <MobileEntityGroup
-                    title={filtering ? "Matching projects" : "All projects"}
+                    title={filter.filtering ? "Matching projects" : "All projects"}
                     testId="mobile-projects"
                 >
                     {
@@ -142,6 +98,7 @@ export default function MobileProjectListScreen() {
                                 key={project.id}
                                 testId={`mobile-project-${project.id}`}
                                 name={project.name}
+                                href={mobileProjectUri(project.id)}
                                 context={
                                     project.disabled ? <Tag color="default">Disabled</Tag> : undefined
                                 }

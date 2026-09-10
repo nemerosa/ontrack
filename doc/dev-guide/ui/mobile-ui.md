@@ -85,6 +85,10 @@ tested without a request or the edge runtime. `middleware.js` is the adapter ove
 
 - `mobileEquivalent(pathname)` — the desktop routes that have a mobile screen. Deliberately
   short: a route earns an entry only once the mobile screen behind it exists and does the job.
+  Two kinds of entry: exact paths, and **entity patterns** for the parameterised routes
+  (`/project/[id]`, `/branch/[id]`), which carry the id through so a shared link keeps its
+  subject. The patterns are exact — `/project/abc` and `/project/12/anything` fall through to
+  the interstitial rather than to a screen that would ask the server an unanswerable question.
 - `isRedirectExempt(pathname)` — the paths the redirect must not touch at all: `/mobile`,
   `/auth` (redirecting the sign-in page would loop), `/api`, `/display` and static files.
 - `describeDesktopRoute(pathname)` — what to call a desktop route in the interstitial.
@@ -105,8 +109,15 @@ the interstitial, which may well be right, but should be a choice rather than an
 |---|---|---|
 | Home | `/mobile` | The user's favourite projects and branches |
 | Projects | `/mobile/projects` | Every project, filterable by name, with the favourite toggle |
+| Project | `/mobile/project/[id]` | The project's branches, limited and filterable |
+| Branch | `/mobile/branch/[id]` | The branch's latest builds, as cards |
 | Search | `/mobile/search` | Not built yet — placeholder |
 | Interstitial | `/mobile/desktop-only` | A route with no mobile equivalent |
+
+Home → project → branch → build is the path the mobile UI exists for, and all of it stays
+inside `/mobile`: every row links to a mobile route, never to a desktop one. A desktop link
+would bounce through the redirect and, once the app is installed as a PWA scoped to that
+prefix, out of the app itself.
 
 **Home is the favourites, not a project list.** Someone reaching for their phone is checking
 something they already care about; the full list is one tap away in the bottom bar for the
@@ -136,19 +147,71 @@ The mobile provider stack has no `EventsContextProvider`, so a screen cannot ref
 `project.favourite` page event the desktop widgets use. A local counter in the screen's
 `deps` does the same job for one screen, which is all a phone shows at a time.
 
+That absence has one consequence worth knowing: `useEventForRefresh` reads a context whose
+default value is an empty object, so a shared primitive that only ever wants the refresh —
+`EntityIcon`, and so every promotion medal — would throw and take a whole mobile screen with
+it. The hook now calls `subscribeToEvent?.()`. Outside a provider nothing is ever fired, so
+a counter stuck at 0 is the right answer rather than a degraded one.
+
+### The project screen
+
+`/mobile/project/[id]` is the project's branches and nothing else. The desktop project page
+carries branch boxes with their last promotions, decorations, an info drawer and a row of
+commands; none of that is what someone opens on a phone for. They are on their way to a
+branch, and from there to a build.
+
+The branch list is **limited and filterable**, for the reason the project list is: a project
+can hold hundreds of branches and a phone shows a handful of rows. It asks for
+`MOBILE_BRANCH_LIMIT + 1` branches ordered by build activity (`branches(count:, order: true)`)
+and shows the limit: `branches` answers with a plain list and no total, so the extra row is
+the only way to know whether anything was left out — and it costs exactly one row. When it
+was, the screen says so and points at the filter, which is how a branch beyond the limit is
+reached.
+
+### The branch screen
+
+`/mobile/branch/[id]` is the one screen that genuinely diverges rather than restyling.
+`BranchBuilds` renders builds as a matrix with a column per validation stamp: wide by
+construction, and no amount of narrowing turns a matrix into something readable at 375px. A
+phone gets **a card per build** instead (`MobileBuildCard`) — what the build is called, when
+it happened, how far it has been promoted, and where it is deployed.
+
+- The name is `displayName`, which is already the release property when there is one. A build
+  name is a timestamp-run pair, not a version.
+- Promotions are `promotionRuns(lastPerLevel: true)`, drawn as the level's medal **beside its
+  name**. The acceptance criterion is that promotions read without zooming, and a 16px medal
+  on a phone is a coloured dot.
+- Deployments are `Build.currentDeployments` — where the build is *now*, which is the question
+  a phone user has; the pipeline history is a desktop surface. The slot's qualifier is shown
+  when it has one, or two slots of the same project in one environment would render as the
+  same badge twice.
+- Validation status is deliberately absent: per-stamp status is the build screen's job, and a
+  strip of validation chips here would rebuild the matrix one card at a time.
+
+"Load more" grows the page rather than accumulating pages in the browser. Merging pages by
+hand means owning a second copy of the list and keeping it in step with the favourite
+toggle's refetches; refetching a longer first page cannot drift.
+
 ### Filtering a long list
 
-An instance holds hundreds of projects, which is more than anyone scrolls through on a
-phone, so the project list filters by name. It filters **on the server**, through
-`projects(pattern:)` — an `ILIKE '%…%'` ordered by name. A client-side filter could only
-narrow the answer to the last query, and would never reach a project the server had not
-already sent.
+An instance holds hundreds of projects and a project holds hundreds of branches, which is
+more than anyone scrolls through on a phone. Both lists filter by name, and both filter **on
+the server**: the browser only holds the answer to the last query, so a client-side filter
+could narrow that but never reach a row the server had not already sent. The typing itself —
+the debounce, the two values, the trim — lives once, in `useMobileFilter`.
 
-Two things about that argument are worth knowing before reusing it: the server refuses
-`pattern` alongside any *other* argument, and it tells "no pattern" from "empty pattern" by
-whether the argument was supplied at all — so the screen sends `null`, never `''`. The
-typing is debounced, because the alternative is one query per keystroke against that
-`ILIKE`.
+What the two screens send differs, and the difference matters:
+
+- `projects(pattern:)` is an `ILIKE '%…%'` ordered by name. The server refuses `pattern`
+  alongside any *other* argument, and it tells "no pattern" from "empty pattern" by whether
+  the argument was supplied at all — so the screen sends `null`, never `''`.
+- `Project.branches(name:)` is **a regular expression**, matched with Postgres' `~`. Handing
+  it the typed text raw would be wrong twice over: `release/1.0` would match `release/1x0`,
+  and a lone `(` would not narrow the list but fail the whole query with an
+  `INTERNAL_ERROR`. `branchNamePattern` escapes the text to a literal and prefixes `(?i)`,
+  which Postgres' advanced regular expressions support — giving the same case-insensitive
+  substring match the project list has, which is what a user moving between the two screens
+  expects.
 
 ### The list shape
 
@@ -157,8 +220,13 @@ context under it, and a single trailing action. Plain `ul`/`li` rather than antd
 whose paddings and split lines are sized for a desktop page — and which is a layout
 component, on the wrong side of the boundary above.
 
-Rows are not links yet. The project and branch screens behind them are #1721; until they
-exist, linking would send a tap to a 404, which is worse than a row that does not move.
+A row links to the screen behind it through its **text**, not through the whole row: the
+trailing action is itself a control, and nesting a button inside an anchor is invalid markup
+that browsers and screen readers then resolve differently. The text block grows to fill the
+row, so everything left of the star is tappable anyway.
+
+A row with no screen behind it takes no `href` — a tap that 404s is worse than a row that
+does not move. That is why build cards do not link: the build screen is its own issue.
 
 ## Adding a mobile screen
 

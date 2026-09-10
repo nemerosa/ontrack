@@ -142,6 +142,35 @@ html, body {
 }
 
 /*
+ * A screen's heading: its name, what places it, and one control acting on the
+ * screen's own subject - see `components/mobile/layout/MobileScreen.js`.
+ */
+
+.ot-mobile-screen-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ot-mobile-screen-heading {
+    /* Lets the title ellipsis rather than push the star off the screen. */
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.ot-mobile-screen-subtitle {
+    font-size: 13px;
+    opacity: 0.75;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ot-mobile-screen-extra {
+    flex: 0 0 auto;
+}
+
+/*
  * The list shape every mobile screen uses - see
  * `components/mobile/entities/MobileEntityList.js`.
  */
@@ -204,8 +233,132 @@ html, body {
     white-space: nowrap;
 }
 
+/*
+ * A row whose text is a link to the screen behind it. Everything left of the
+ * trailing action is the tap target - the row is 52px tall, so it is a
+ * comfortable one - and the link is deliberately not styled as one: a list of
+ * blue underlined names reads as a page of links rather than as a list.
+ */
+.ot-mobile-row-link {
+    color: inherit;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ot-mobile-row-link:hover .ot-mobile-row-name {
+    color: var(--ot-mobile-nav-active);
+}
+
+.ot-mobile-row-link:focus-visible {
+    outline: 2px solid var(--ot-mobile-nav-active);
+    outline-offset: -2px;
+    border-radius: 4px;
+}
+
 .ot-mobile-row-action {
     flex: 0 0 auto;
+}
+
+/*
+ * The card list: the branch screen's builds - see
+ * `components/mobile/builds/MobileBuildCard.js`. A separate shape from
+ * `.ot-mobile-list` because a card is not a row: it is several lines tall and
+ * its content wraps, which is the whole reason the desktop build matrix cannot
+ * come to a phone.
+ */
+
+.ot-mobile-cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ot-mobile-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background-color: var(--ot-bg-elevated);
+    border: 1px solid var(--ot-border-subtle);
+    border-radius: 8px;
+}
+
+.ot-mobile-card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.ot-mobile-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ot-text);
+    /* A version can be long; the age beside it never is, and must stay whole. */
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ot-mobile-card-time {
+    flex: 0 0 auto;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+/*
+ * Promotions and deployments. They wrap: a build can carry more of either than
+ * fits a 375px line, and the alternative to wrapping is a row that scrolls
+ * sideways - which the acceptance criterion rules out.
+ */
+.ot-mobile-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ot-mobile-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    border: 1px solid var(--ot-border-subtle);
+    border-radius: 12px;
+    /* 13px, not the 11-12px a desktop tag uses: the criterion is that these read
+       without zooming. */
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.ot-mobile-badge-text {
+    color: var(--ot-text);
+}
+
+.ot-mobile-badge-qualifier {
+    font-size: 12px;
+}
+
+.ot-mobile-badge-icon {
+    /*
+     * Deployments and promotions are different facts about a build and sit on
+     * consecutive lines. A promotion carries its level's medal; a deployment
+     * carries this one, which is the environments icon the desktop UI uses. The
+     * two strips are told apart by shape rather than by colour - a fill would
+     * have to differ from the card's, and in the light theme the elevated and
+     * page surfaces are the same white.
+     */
+    display: flex;
+    opacity: 0.6;
+}
+
+/* A line of explanation under a list - what was left out, or how to get more. */
+.ot-mobile-note {
+    margin: 12px 0 0 0 !important;
+    font-size: 13px;
 }
 
 /*

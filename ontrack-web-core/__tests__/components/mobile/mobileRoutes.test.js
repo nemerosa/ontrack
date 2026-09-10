@@ -1,8 +1,10 @@
 import {
     describeDesktopRoute,
     isRedirectExempt,
+    mobileBranchUri,
     MOBILE_HOME,
     mobileEquivalent,
+    mobileProjectUri,
 } from "@components/mobile/mobileRoutes"
 
 describe('mobileEquivalent', () => {
@@ -17,9 +19,32 @@ describe('mobileEquivalent', () => {
      * is still a placeholder is worse than the interstitial, which at least
      * offers the desktop page that does work.
      */
+    it('maps a project to its mobile screen, keeping the id', () => {
+        // The point of following a link to a project from a phone is to land on
+        // *that* project, so the id has to survive the redirect.
+        expect(mobileEquivalent('/project/12')).toEqual(mobileProjectUri('12'))
+        expect(mobileEquivalent('/project/12')).toEqual('/mobile/project/12')
+    })
+
+    it('maps a branch to its mobile screen, keeping the id', () => {
+        expect(mobileEquivalent('/branch/34')).toEqual(mobileBranchUri('34'))
+        expect(mobileEquivalent('/branch/34')).toEqual('/mobile/branch/34')
+    })
+
     it.each([
-        '/project/12',
-        '/branch/34',
+        '/project/12/something',
+        '/branch/',
+        '/project/not-a-number',
+    ])('does not mistake %s for an entity screen', (pathname) => {
+        // The desktop routes are `/project/[id]` and `/branch/[id]` and nothing
+        // else. A looser match would send a phone to a mobile screen that then
+        // asked the server for a project whose id is a word.
+        expect(mobileEquivalent(pathname)).toBeNull()
+    })
+
+    it.each([
+        // The build screen is its own issue; until it lands, a phone following a
+        // link to a build is better served by the desktop page than by nothing.
         '/build/56',
         '/search',
         '/graphiql',
