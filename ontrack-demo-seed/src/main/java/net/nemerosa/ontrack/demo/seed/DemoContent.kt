@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.demo.seed
 
 import net.nemerosa.ontrack.demo.seed.BuildCreation.At
 import net.nemerosa.ontrack.demo.seed.BuildCreation.DaysAgo
+import net.nemerosa.ontrack.demo.seed.BuildCreation.HoursAgo
 import net.nemerosa.ontrack.demo.seed.ValidationStatus.FAILED
 import net.nemerosa.ontrack.demo.seed.ValidationStatus.PASSED
 import net.nemerosa.ontrack.demo.seed.ValidationStatus.WARNING
@@ -409,7 +410,10 @@ object DemoContent {
                         name = "107",
                         release = "1.4.6",
                         description = "Owner export as CSV, canary rollout.",
-                        creation = DaysAgo(0),
+                        // Hours rather than `DaysAgo(0)`: the head of the demo's busiest branch
+                        // carries four promotions, and an offset is the only way to be sure they
+                        // fit behind the reset whatever zone it runs in
+                        creation = HoursAgo(5),
                         promotionLevels = listOf(BRONZE, SILVER, CANARY, GOLD),
                         validations = listOf(
                             ValidationSpec(BUILD, PASSED),

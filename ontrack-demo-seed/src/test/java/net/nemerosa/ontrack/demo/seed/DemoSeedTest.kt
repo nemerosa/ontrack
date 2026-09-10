@@ -134,6 +134,43 @@ class DemoSeedTest {
         )
     }
 
+    /**
+     * A build promoted in two hours' time reads as a defect in Yontrack rather than in the dataset,
+     * and it is what a naive hour-per-rung produces for the newest build of the demo: `DaysAgo(0)`
+     * is a time of DAY, so every reset running before it - and before the rungs stacked on top of
+     * it - dated the whole ladder in the future.
+     */
+    @Test
+    fun `nothing of the demo is dated after the reset which created it`() {
+        val target = InMemoryDemoTarget()
+        // Early enough in the day that the curated dataset's own hour is still ahead of it, which
+        // is the case this exists to catch
+        val now = LocalDateTime.of(2026, 9, 1, 6, 30)
+        val early = Clock.fixed(now.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
+        DemoSeed(target, early, log = {}).run(DemoContent.dataset(changelog))
+
+        target.projects().forEach { project ->
+            (project as InMemoryDemoTarget.InMemoryProject).branches.forEach { branch ->
+                branch.builds.forEach { build ->
+                    assertTrue(
+                        !build.creation.isAfter(now),
+                        "Build ${build.name} of ${project.name}/${branch.name} is created in the future",
+                    )
+                    build.promotions.forEach { (promotion, time) ->
+                        assertTrue(
+                            !time.isAfter(now),
+                            "Promotion $promotion of build ${build.name} is dated in the future",
+                        )
+                        assertTrue(
+                            !time.isBefore(build.creation),
+                            "Promotion $promotion of build ${build.name} is dated before the build",
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     @Test
     fun `the demo dashboard is reset like everything else`() {
         val target = InMemoryDemoTarget()

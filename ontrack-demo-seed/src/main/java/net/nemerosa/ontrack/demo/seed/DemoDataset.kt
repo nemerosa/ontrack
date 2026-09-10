@@ -155,10 +155,29 @@ sealed interface BuildCreation {
     /**
      * Relative to the run, so that the curated dataset reads as recent work however long
      * ago it was written.
+     *
+     * Never in the future, which `DaysAgo(0)` otherwise is for every reset before its [hour]: the
+     * hour is a time of day rather than an offset, and a demo built at 09:00 by a reset which ran
+     * at 08:30 reads as a defect in Yontrack rather than in the dataset.
      */
     data class DaysAgo(val days: Long, val hour: Int = 9, val minute: Int = 0) : BuildCreation {
         override fun resolve(now: LocalDateTime): LocalDateTime =
-            now.minusDays(days).withHour(hour).withMinute(minute).withSecond(0).withNano(0)
+            minOf(
+                now.minusDays(days).withHour(hour).withMinute(minute).withSecond(0).withNano(0),
+                now,
+            )
+    }
+
+    /**
+     * Relative to the run in HOURS, for the newest build of a branch.
+     *
+     * [DaysAgo] pins a time of day, which is a time of day in the zone the reset runs in and not in
+     * the reader's - so `DaysAgo(0)` is an hour or two into the future for half the world, and the
+     * promotion rungs stacked on top of it more so. An offset in hours means the same thing to
+     * everyone, and leaves the newest build room for its own promotions.
+     */
+    data class HoursAgo(val hours: Long) : BuildCreation {
+        override fun resolve(now: LocalDateTime): LocalDateTime = now.minusHours(hours)
     }
 
     /**

@@ -82,6 +82,40 @@ const promotionLevelInstance = (branch, data) => {
         return promotionLevel
     }
 
+    /**
+     * The promotions this one cannot be granted without.
+     *
+     * Set through the GENERIC property mutation rather than a dedicated one, because there is no
+     * dedicated one: the property has no `PropertyMutationProvider`, so `setPromotionLevelPropertyById`
+     * and the type's own FQCN are the whole API.
+     */
+    promotionLevel.setPromotionDependenciesProperty = async ({dependencies = []} = {}) => {
+        await graphQLCallMutation(
+            promotionLevel.ontrack.connection,
+            'setPromotionLevelPropertyById',
+            gql`
+                mutation SetPromotionDependencies(
+                    $id: Int!,
+                    $value: JSON!,
+                ) {
+                    setPromotionLevelPropertyById(input: {
+                        id: $id,
+                        property: "net.nemerosa.ontrack.extension.general.PromotionDependenciesPropertyType",
+                        value: $value,
+                    }) {
+                        errors { message }
+                    }
+                }
+            `,
+            {
+                id: Number(promotionLevel.id),
+                // The property takes NAMES, like the auto promotion one above
+                value: {dependencies: dependencies.map(it => it.name)},
+            }
+        )
+        return promotionLevel
+    }
+
     promotionLevel.getAutoPromotionProperty = async () => {
         const data = await graphQLCall(
             promotionLevel.ontrack.connection,

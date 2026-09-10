@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.demo.seed
 
 import java.time.Clock
+import java.time.Duration
 import java.time.LocalDateTime
 
 /**
@@ -156,10 +157,18 @@ class DemoSeed(
                 .map { message -> branch.registerCommit(message) }
                 .lastOrNull()
                 ?.let { build.setCommit(it) }
-            // One hour per rung, so the promotions of a build are ordered and the lead
-            // time charts have something other than a flat zero to draw.
-            buildSpec.promotionLevels.forEachIndexed { index, promotionLevel ->
-                build.promote(promotionLevel, "", creation.plusHours(index + 1L))
+            // One hour per rung, so the promotions of a build are ordered and the lead time
+            // charts have something other than a flat zero to draw - but squeezed into whatever
+            // time the build actually has behind it, because the newest build of the dataset is
+            // hours old and an hour per rung would date its promotions in the FUTURE. A checkpoint
+            // saying a build was promoted in four hours' time reads as a defect in Yontrack.
+            val rungs = buildSpec.promotionLevels.size
+            if (rungs > 0) {
+                val available = Duration.between(creation, now).coerceAtLeast(Duration.ZERO)
+                val step = minOf(Duration.ofHours(1), available.dividedBy(rungs.toLong()))
+                buildSpec.promotionLevels.forEachIndexed { index, promotionLevel ->
+                    build.promote(promotionLevel, "", creation.plus(step.multipliedBy(index + 1L)))
+                }
             }
             buildSpec.validations.forEach { validation ->
                 build.validate(validation.validationStamp, validation.status, validation.description)

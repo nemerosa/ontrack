@@ -150,6 +150,8 @@ the latest build to have **arrived** at it and when.
 Arriving is not the same as succeeding, which is why only the validation stamp shows a status: a
 build can arrive at a stamp and fail there, while a build cannot be promoted and fail.
 
+![A validation stamp showing a build which arrived and failed](branch-delivery-map-failed.png)
+
 Every promotion level of the branch is on the map, connected or not - a level with no configuration
 behind it is exactly the thing you want to see. Validation stamps are the opposite: only the ones
 taking part in a dependency are drawn, because an unconnected stamp teaches nothing on a map whose
@@ -157,6 +159,29 @@ subject is dependencies, and a branch with forty of them would have no readable 
 whose [auto promotion](../model/auto-promotion.md) selects stamps *by pattern* gets one
 *aggregate checkpoint* labelled with the pattern, standing for all of them; click it to see the
 stamps it covers.
+
+### How far behind the branch is
+
+A checkpoint naming build 42 means little until you know the branch is at 47. The view's header names
+the branch's **latest build**, and every checkpoint says how far behind that build its own is:
+
+![The toolbar of the Delivery map view](branch-delivery-map-toolbar.png)
+
+* **at head** - the latest build of the branch has reached this checkpoint;
+* **3 behind** - three more recent builds of the branch have not.
+
+The count is in **builds**, not in time. How long ago a build got there is the timestamp beside it,
+and it answers a different question: a checkpoint reached an hour ago by a build from last week is
+not up to date.
+
+The latest build is stated once, in the header, and is deliberately **not** drawn as a checkpoint on
+the map. Every line on the map means *unlocks* or *requires*; a line from the latest build to each
+checkpoint would mean neither, and would fan out across the whole map at once. Twenty checkpoints each
+stating their own lag are read one at a time.
+
+A slot showing a build of **another branch** carries no marker at all. Counting that build against
+this branch's latest one would answer a question nobody asked, and would answer it with a number,
+which reads as a fact rather than as a mistake.
 
 ### Dependencies
 
@@ -256,9 +281,33 @@ promotion level or a slot because of a *validation* filter would be a different 
 aggregate checkpoint disappears when the filter leaves it standing for nothing, and any line left
 with a missing end goes with it.
 
-Checkpoints can be dragged about; nothing on the map can be edited from it. It is a reading of the
-configuration, and the configuration is changed where it lives - on the promotion level, on the
-branch, or on the slot the checkpoint links to.
+### What the map draws, and how it draws it
+
+Two sets of controls, and the difference between them is worth knowing.
+
+**What is on the map** is chosen in the view's own toolbar, beside the latest build. **Show ›
+Validation stamps** takes every stamp checkpoint off the map, aggregates included, together with the
+lines which ended on one. It is on by default - a map opening on a chain of promotions with no
+visible cause hides the very thing which explains them - and off is worth having on a branch whose
+stamps outnumber everything else on screen. The choice is remembered in **your browser**, per screen
+rather than per account, unlike the view selection itself.
+
+**How the map is drawn** is the small control bar in the corner of the graph: zoom, fit, and a
+**layout** button which puts the map back in order after you have dragged it about. Checkpoints can be
+dragged; nothing on the map can be edited from it. It is a reading of the configuration, and the
+configuration is changed where it lives - on the promotion level, on the branch, or on the slot the
+checkpoint links to.
+
+### Refreshing
+
+**Auto refresh** in the toolbar reloads the map on an interval you pick, like the other graphs of the
+product.
+
+The map does **not** rearrange itself when it refreshes. Almost nothing on it changes minute to
+minute: the configuration is static, and what moves is which build has arrived where. So a refresh
+that finds the same checkpoints and the same lines updates the builds in place and leaves every
+checkpoint where it is - including any you dragged. The layout is recomputed only when the map's
+*shape* has genuinely changed: a checkpoint or a line appearing or disappearing.
 
 ## Not to be confused with
 
