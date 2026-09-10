@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.general.deliverymap
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import net.nemerosa.ontrack.extension.general.PreviousPromotionConditionResolution
 import net.nemerosa.ontrack.extension.general.PreviousPromotionConditionService
 import net.nemerosa.ontrack.model.deliverymap.DeliveryMapEdgeKind
@@ -25,11 +26,23 @@ class PreviousPromotionConditionDeliveryMapContributorTest {
     private lateinit var previousPromotionConditionService: PreviousPromotionConditionService
     private lateinit var contributor: PreviousPromotionConditionDeliveryMapContributor
 
+    /**
+     * What the service would answer for each promotion level, defaulting to *not required*. Held as
+     * state rather than stubbed per call because the contributor asks for the whole branch at once.
+     */
+    private val resolutions = mutableMapOf<ID, PreviousPromotionConditionResolution>()
+
     @BeforeEach
     fun setup() {
         previousPromotionConditionService = mockk()
-        every { previousPromotionConditionService.resolvePreviousPromotionCondition(any()) } returns
-                PreviousPromotionConditionResolution(required = false, source = null)
+        every { previousPromotionConditionService.resolvePreviousPromotionConditions(any()) } answers {
+            firstArg<List<PromotionLevel>>().associate { promotionLevel ->
+                promotionLevel.id to (
+                        resolutions[promotionLevel.id]
+                            ?: PreviousPromotionConditionResolution(required = false, source = null)
+                        )
+            }
+        }
         contributor = PreviousPromotionConditionDeliveryMapContributor(
             structureService = mockk<StructureService>().apply {
                 every { getPromotionLevelListForBranch(branch.id) } returns listOf(bronze, silver, gold)
@@ -39,8 +52,7 @@ class PreviousPromotionConditionDeliveryMapContributorTest {
     }
 
     private fun required(promotionLevel: PromotionLevel, source: ProjectEntity?) {
-        every { previousPromotionConditionService.resolvePreviousPromotionCondition(promotionLevel) } returns
-                PreviousPromotionConditionResolution(required = true, source = source)
+        resolutions[promotionLevel.id] = PreviousPromotionConditionResolution(required = true, source = source)
     }
 
     @Test
@@ -104,6 +116,15 @@ class PreviousPromotionConditionDeliveryMapContributorTest {
             listOf("promotion-level:1" to "promotion-level:2"),
             contributor.contribute(branch).edges.map { it.source to it.target },
         )
+    }
+
+    @Test
+    fun `The whole branch is resolved in one call`() {
+        // One call per map rather than one per promotion level: see the service's own test for why
+        contributor.contribute(branch)
+        verify(exactly = 1) {
+            previousPromotionConditionService.resolvePreviousPromotionConditions(listOf(bronze, silver, gold))
+        }
     }
 
     @Test

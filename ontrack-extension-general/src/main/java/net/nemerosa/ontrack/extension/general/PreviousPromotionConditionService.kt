@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
+import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 
 /**
@@ -25,5 +26,21 @@ interface PreviousPromotionConditionService {
      * not any particular build already carries the predecessor promotion.
      */
     fun resolvePreviousPromotionCondition(promotionLevel: PromotionLevel): PreviousPromotionConditionResolution
+
+    /**
+     * The same question for a whole list of promotion levels at once, keyed by promotion level id.
+     *
+     * Not a convenience over [resolvePreviousPromotionCondition]: every property read is a database
+     * query, and the branch and the project cannot answer differently between two levels under them,
+     * so answering one level at a time re-reads each of those once per level. A ten-rung branch asks
+     * the same two questions ten times each. The delivery map resolves every promotion level of a
+     * branch on every refresh, which is what makes that worth a method rather than a comment.
+     *
+     * Levels of different branches may be mixed; each is resolved against its own branch and project.
+     * A level appearing twice appears once in the result, which is what a map keyed by id means.
+     */
+    fun resolvePreviousPromotionConditions(
+        promotionLevels: List<PromotionLevel>,
+    ): Map<ID, PreviousPromotionConditionResolution>
 
 }

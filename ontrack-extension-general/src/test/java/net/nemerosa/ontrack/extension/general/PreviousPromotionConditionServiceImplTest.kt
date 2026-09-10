@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.general
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
@@ -15,7 +16,9 @@ class PreviousPromotionConditionServiceImplTest {
 
     private val project = Project.of(nd("P", "")).withId(ID.of(1))
     private val branch = Branch.of(project, nd("B", "")).withId(ID.of(1))
+    private val bronze = PromotionLevel.of(branch, nd("BRONZE", "")).withId(ID.of(1))
     private val silver = PromotionLevel.of(branch, nd("SILVER", "")).withId(ID.of(2))
+    private val gold = PromotionLevel.of(branch, nd("GOLD", "")).withId(ID.of(3))
 
     private lateinit var propertyService: PropertyService
     private lateinit var cachedSettingsService: CachedSettingsService
@@ -110,6 +113,72 @@ class PreviousPromotionConditionServiceImplTest {
         property(branch, false)
         property(silver, true)
         assertSame(silver, resolve().source)
+    }
+
+    @Test
+    fun `The batch answers each promotion level exactly as the single call does`() {
+        property(gold, false)
+        property(branch, true)
+        val resolutions = service.resolvePreviousPromotionConditions(listOf(bronze, silver, gold))
+        assertEquals(setOf(bronze.id, silver.id, gold.id), resolutions.keys)
+        listOf(bronze, silver, gold).forEach { promotionLevel ->
+            assertEquals(
+                service.resolvePreviousPromotionCondition(promotionLevel),
+                resolutions.getValue(promotionLevel.id),
+                "${promotionLevel.name} resolves the same either way",
+            )
+        }
+    }
+
+    @Test
+    fun `The batch reads the branch and the project once, not once per promotion level`() {
+        // Every property read is a query, and the branch and the project cannot answer differently
+        // between two levels of the same branch. This is the whole reason the batch exists.
+        service.resolvePreviousPromotionConditions(listOf(bronze, silver, gold))
+        verify(exactly = 1) {
+            propertyService.getPropertyValue(branch, PreviousPromotionConditionPropertyType::class.java)
+        }
+        verify(exactly = 1) {
+            propertyService.getPropertyValue(project, PreviousPromotionConditionPropertyType::class.java)
+        }
+    }
+
+    @Test
+    fun `The batch reads each promotion level once`() {
+        service.resolvePreviousPromotionConditions(listOf(bronze, silver, gold))
+        listOf(bronze, silver, gold).forEach { promotionLevel ->
+            verify(exactly = 1) {
+                propertyService.getPropertyValue(promotionLevel, PreviousPromotionConditionPropertyType::class.java)
+            }
+        }
+    }
+
+    @Test
+    fun `The batch caches an ABSENT branch property too`() {
+        // The common case, and the one a naive `getOrPut` would re-query every time: nothing is set
+        // on the branch, so the memoised value is null and a `get`-based cache never hits
+        property(project, true)
+        service.resolvePreviousPromotionConditions(listOf(bronze, silver, gold))
+        verify(exactly = 1) {
+            propertyService.getPropertyValue(branch, PreviousPromotionConditionPropertyType::class.java)
+        }
+    }
+
+    @Test
+    fun `A promotion level answered on its own stops the walk and never reads the branch`() {
+        property(silver, true)
+        service.resolvePreviousPromotionConditions(listOf(silver))
+        verify(exactly = 0) {
+            propertyService.getPropertyValue(branch, PreviousPromotionConditionPropertyType::class.java)
+        }
+    }
+
+    @Test
+    fun `An empty batch reads nothing at all`() {
+        assertEquals(emptyMap(), service.resolvePreviousPromotionConditions(emptyList()))
+        verify(exactly = 0) {
+            propertyService.getPropertyValue(any(), PreviousPromotionConditionPropertyType::class.java)
+        }
     }
 
 }

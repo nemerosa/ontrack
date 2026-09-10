@@ -46,11 +46,20 @@ class PreviousPromotionConditionDeliveryMapContributor(
         // against: the check extension names `promotions[index - 1]` out of this very list
         val promotionLevels = structureService.getPromotionLevelListForBranch(branch.id)
 
+        // Resolved for the whole branch in one go: every level under it shares a branch and a
+        // project, and asking one level at a time would re-read both of those properties - a query
+        // each - once per level, on every refresh of the map
+        val resolutions = previousPromotionConditionService.resolvePreviousPromotionConditions(promotionLevels)
+
         val edges = promotionLevels.drop(1).mapIndexedNotNull { index, promotionLevel ->
             // `drop(1)` shifted the indices, so the predecessor of the element at `index` is the one
             // at `index` in the original list
             val previous = promotionLevels[index]
-            val resolution = previousPromotionConditionService.resolvePreviousPromotionCondition(promotionLevel)
+            // `getValue`, not a null-tolerant read: the service answers for every level it was
+            // given, and quietly treating a missing answer as "not required" would produce exactly
+            // the under-drawn map this contributor exists to avoid. A missing key is a bug, and
+            // `DeliveryMapServiceImpl` isolates a throwing contributor.
+            val resolution = resolutions.getValue(promotionLevel.id)
             if (resolution.required) {
                 DeliveryMapEdge.of(
                     kind = DeliveryMapEdgeKind.REQUIRES,
