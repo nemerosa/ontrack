@@ -137,12 +137,11 @@ describe('the mobile branch screen', () => {
         expect(screen.queryByTestId('mobile-build-100-deployments')).not.toBeInTheDocument()
     })
 
-    it('does not send a build card anywhere yet', () => {
-        // The build screen is its own issue. A tap that 404s is worse than a
-        // card that does not move.
+    it('sends a build card to that build on the phone', () => {
         branch([build(100, '1')])
         render(<MobileBranchScreen id="10"/>)
-        expect(screen.getByTestId('mobile-build-100').querySelector('a')).toBeNull()
+        expect(screen.getByTestId('mobile-build-100').querySelector('a'))
+            .toHaveAttribute('href', '/mobile/build/100')
     })
 
     describe('reaching older builds', () => {

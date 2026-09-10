@@ -260,6 +260,65 @@ html, body {
 }
 
 /*
+ * A name that is a mark and a word read as one thing - a promotion medal and its
+ * level, an environment glyph and its name. Inline-flex so it sits on the name's
+ * single line and still aligns the two vertically.
+ */
+.ot-mobile-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    /* The line's own ellipsis does the truncating; this must not add a second. */
+    max-width: 100%;
+}
+
+/*
+ * A row whose subject is a chip rather than a line of text - the build screen's
+ * validations. The chip is a bordered box with its own internal ellipsis, so it
+ * takes the room and the trailing time keeps its own.
+ */
+.ot-mobile-row-chip {
+    justify-content: space-between;
+}
+
+.ot-mobile-row-chip > :first-child {
+    min-width: 0;
+    flex: 0 1 auto;
+}
+
+.ot-mobile-row-chip > .ot-mobile-row-context {
+    flex: 0 0 auto;
+}
+
+/* An aside under a control, saying what it will do. */
+.ot-mobile-caption {
+    font-size: 12px;
+}
+
+/*
+ * A screen whose content is a run of blocks rather than one list - the build
+ * screen's identity, actions and three sections. One gap between every pair, so
+ * the rhythm does not depend on which block happens to follow which.
+ *
+ * The group-adjacency margin is neutralised inside it: it exists for the screens
+ * that stack sections with no wrapper, and here it would be added to the gap.
+ */
+.ot-mobile-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ot-mobile-stack .ot-mobile-group + .ot-mobile-group {
+    margin-top: 0;
+}
+
+/* Inside the stack the gap already spaces this; it needs no margin of its own. */
+.ot-mobile-stack .ot-mobile-note {
+    margin: 0 !important;
+}
+
+/*
  * The card list: the branch screen's builds - see
  * `components/mobile/builds/MobileBuildCard.js`. A separate shape from
  * `.ot-mobile-list` because a card is not a row: it is several lines tall and

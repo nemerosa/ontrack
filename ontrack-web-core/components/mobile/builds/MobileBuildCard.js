@@ -14,13 +14,17 @@
  * screen's job, and a strip of validation chips here would rebuild the matrix
  * one card at a time.
  *
- * The card is not a link. The build screen is its own issue; until it exists, a
- * tap that 404s is worse than a card that does not move.
+ * The whole head of the card is the tap target for the build screen - the card
+ * carries no other control, so there is no button to nest inside a link here,
+ * unlike `MobileEntityRow`. The badges below are not links: they say something
+ * about this build, not about somewhere else to go.
  */
 
+import Link from "next/link"
 import {FaServer} from "react-icons/fa"
 import TimestampText from "@components/common/TimestampText"
 import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage"
+import {mobileBuildUri} from "@components/mobile/mobileRoutes"
 
 /**
  * The size of a promotion medal on a card.
@@ -42,7 +46,7 @@ export default function MobileBuildCard({build}) {
 
     return (
         <li className="ot-mobile-card" data-testid={`mobile-build-${build.id}`}>
-            <div className="ot-mobile-card-head">
+            <Link href={mobileBuildUri(build.id)} className="ot-mobile-card-head">
                 <span className="ot-mobile-card-title">{build.displayName || build.name}</span>
                 <span className="ot-mobile-card-time" data-testid={`mobile-build-${build.id}-time`}>
                     {/*
@@ -53,7 +57,7 @@ export default function MobileBuildCard({build}) {
                     */}
                     <TimestampText value={build.creation?.time} relative/>
                 </span>
-            </div>
+            </Link>
             {
                 promotions.length > 0 &&
                 <div className="ot-mobile-badges" data-testid={`mobile-build-${build.id}-promotions`}>

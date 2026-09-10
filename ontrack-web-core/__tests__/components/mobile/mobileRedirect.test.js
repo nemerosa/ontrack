@@ -47,9 +47,9 @@ describe('decideMobileRedirect', () => {
 
         it('tells the interstitial where the user was going', () => {
             // Dropping them on the mobile home instead would lose their intent.
-            const decision = decide({pathname: '/build/56', search: '?tab=validations'})
+            const decision = decide({pathname: '/extension/scm/my-project/changelog', search: '?from=1&to=2'})
             const target = new URLSearchParams(decision.search).get('target')
-            expect(target).toEqual('/build/56?tab=validations')
+            expect(target).toEqual('/extension/scm/my-project/changelog?from=1&to=2')
         })
 
         it('does not let the target escape to another site', () => {

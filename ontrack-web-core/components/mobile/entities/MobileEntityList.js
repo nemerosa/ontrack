@@ -15,7 +15,7 @@
  */
 
 import Link from "next/link"
-import {Typography} from "antd"
+import MobileSection from "@components/mobile/layout/MobileSection"
 
 /**
  * @param {string} title The section's heading.
@@ -24,14 +24,11 @@ import {Typography} from "antd"
  */
 export function MobileEntityGroup({title, testId, children}) {
     return (
-        <section className="ot-mobile-group" data-testid={testId}>
-            <Typography.Title level={5} className="ot-mobile-group-title">
-                {title}
-            </Typography.Title>
+        <MobileSection title={title} testId={testId}>
             <ul className="ot-mobile-list">
                 {children}
             </ul>
-        </section>
+        </MobileSection>
     )
 }
 

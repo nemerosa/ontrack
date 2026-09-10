@@ -185,6 +185,58 @@ test.describe('the mobile UI on a phone', () => {
         expect(overflows).toBe(false)
     })
 
+    test('the build screen carries the promotions, deployments and validations', async ({page, ontrack}) => {
+        // The decision surface: everything needed to answer "should I promote or
+        // deploy this?", on one phone screen.
+        const project = await ontrack.createProject()
+        const branch = await project.createBranch()
+        const promotionLevel = await branch.createPromotionLevel()
+        const validationStamp = await branch.createValidationStamp()
+        const build = await branch.createBuild()
+        await build.setRelease('1.4.0')
+        await build.promote(promotionLevel)
+        await build.validate(validationStamp, {status: 'PASSED'})
+
+        await page.setViewportSize({width: 375, height: 812})
+        await signInOnPhone(page, ontrack)
+
+        // Reached from the branch screen, by tapping the build's card.
+        await page.goto(`${ontrack.connection.ui}/mobile/branch/${branch.id}`)
+        await page.getByTestId(`mobile-build-${build.id}`).getByRole('link').click()
+        await expect(page).toHaveURL(new RegExp(`/mobile/build/${build.id}$`))
+
+        // Identity, and the way back up to both the branch and the project.
+        await expect(page.getByTestId('mobile-screen-title')).toContainText('1.4.0')
+        await expect(page.getByTestId('mobile-screen-subtitle')).toContainText(project.name)
+        await expect(page.getByTestId('mobile-screen-subtitle')).toContainText(branch.name)
+
+        await expect(page.getByTestId('mobile-build-promotions')).toContainText(promotionLevel.name)
+        // Validations are read-only here, and deliberately present: whether the
+        // build is green is the input to the decision this screen serves.
+        await expect(page.getByTestId('mobile-build-validations')).toContainText(validationStamp.name)
+
+        // Nothing deployed, and the screen says so rather than showing a gap.
+        await expect(page.getByTestId('mobile-build-deployments')).toContainText(/not deployed/i)
+
+        // And none of it scrolls sideways at 375px.
+        const overflows = await page.evaluate(() =>
+            document.documentElement.scrollWidth > document.documentElement.clientWidth)
+        expect(overflows).toBe(false)
+    })
+
+    test('the build actions are gated by what the user may do', async ({page, ontrack}) => {
+        // The admin account the suite runs as may promote, so the entry point is
+        // there. The negative half is covered by the component tests, which can
+        // hand the screen an unauthorized build without needing a second account.
+        const project = await ontrack.createProject()
+        const branch = await project.createBranch()
+        const build = await branch.createBuild()
+
+        await signInOnPhone(page, ontrack)
+        await page.goto(`${ontrack.connection.ui}/mobile/build/${build.id}`)
+        await expect(page.getByTestId('mobile-build-promote')).toBeVisible()
+    })
+
     test('a favourite branch on the home screen taps through to itself', async ({page, ontrack}) => {
         const project = await ontrack.createProject()
         const branch = await project.createBranch()
@@ -237,6 +289,10 @@ test.describe('the mobile UI on a phone', () => {
 
         await page.goto(`${ontrack.connection.ui}/branch/${branch.id}`)
         await expect(page).toHaveURL(new RegExp(`/mobile/branch/${branch.id}$`))
+
+        const build = await branch.createBuild()
+        await page.goto(`${ontrack.connection.ui}/build/${build.id}`)
+        await expect(page).toHaveURL(new RegExp(`/mobile/build/${build.id}$`))
     })
 
     test('a route with no mobile equivalent gets the interstitial', async ({page, ontrack}) => {

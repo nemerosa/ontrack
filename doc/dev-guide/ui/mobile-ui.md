@@ -111,6 +111,7 @@ the interstitial, which may well be right, but should be a choice rather than an
 | Projects | `/mobile/projects` | Every project, filterable by name, with the favourite toggle |
 | Project | `/mobile/project/[id]` | The project's branches, limited and filterable |
 | Branch | `/mobile/branch/[id]` | The branch's latest builds, as cards |
+| Build | `/mobile/build/[id]` | The decision surface: promotions, deployments, validations |
 | Search | `/mobile/search` | Not built yet — placeholder |
 | Interstitial | `/mobile/desktop-only` | A route with no mobile equivalent |
 
@@ -207,6 +208,39 @@ it happened, how far it has been promoted, and where it is deployed.
 hand means owning a second copy of the list and keeping it in step with the favourite
 toggle's refetches; refetching a longer first page cannot drift.
 
+### The build screen
+
+`/mobile/build/[id]` is the **decision surface**: everything needed to answer "should I
+promote or deploy this build?", and then act. Identity, promotions with their times and
+authors, current deployments, validations, and the two action entry points.
+
+**Validations are here on purpose**, though validations are otherwise out of scope for the
+mobile UI. Someone about to promote or deploy from a phone needs to know whether the build
+passed; leaving it out would mean switching to the desktop UI to check and switching back,
+which defeats the flow the whole initiative exists to enable. They are a read-only list and
+nothing more — no matrix, no filter, no drill-down into a run — drawn with the shared
+`ValidationChip`, which spells the status out in words and repeats its glyph, so the state
+survives greyscale.
+
+The actions sit directly under the identity rather than at the foot of the screen. The issue
+lists them last, but a validation list can be long and a user who already knows they want to
+promote should not scroll past every stamp to reach the button.
+
+#### The action entry points
+
+`MobileBuildActions` gates them off the build's own `authorizations`, exactly as the desktop
+UI does: `build/promote` and `slotPipeline/create`. A user without the right sees no button
+rather than one that fails — and the second is answered `false` on an instance with no
+environments licence, so the deploy entry point disappears there without the component
+knowing anything about licences.
+
+**What they do today.** Promoting (#1724) and deploying (#1725) are their own issues; #1722
+delivered the entry points and the gating. Until those land the buttons switch this device to
+the desktop UI on the build's own page, through the same `switchToDesktopUI` cookie-then-
+navigate pair the interstitial uses — and a caption under them says so. The alternative was a
+button that does nothing, which is worse than one that is honest about where it goes. When
+the two action issues land, each `onClick` becomes its dialog and the caption goes.
+
 ### Filtering a long list
 
 An instance holds hundreds of projects and a project holds hundreds of branches, which is
@@ -236,7 +270,9 @@ What the two screens send differs, and the difference matters:
 ### The list shape
 
 `MobileEntityGroup` and `MobileEntityRow` are the mobile UI's one list: a name, a line of
-context under it, and a single trailing action. Plain `ul`/`li` rather than antd's `List`,
+context under it, and a single trailing action. `MobileSection` is the heading half on its
+own, for the sections that are a list *or* a line saying there is none — the build screen's
+three. `MobileEntityGroup` is that plus the list, so the two cannot drift apart. Plain `ul`/`li` rather than antd's `List`,
 whose paddings and split lines are sized for a desktop page — and which is a layout
 component, on the wrong side of the boundary above.
 
@@ -246,7 +282,7 @@ that browsers and screen readers then resolve differently. The text block grows 
 row, so everything left of the star is tappable anyway.
 
 A row with no screen behind it takes no `href` — a tap that 404s is worse than a row that
-does not move. That is why build cards do not link: the build screen is its own issue.
+does not move.
 
 ## Adding a mobile screen
 

@@ -39,6 +39,14 @@ export const mobileProjectUri = (id) => `${MOBILE_PREFIX}/project/${id}`
  */
 export const mobileBranchUri = (id) => `${MOBILE_PREFIX}/branch/${id}`
 
+/**
+ * One build's screen: the decision surface.
+ *
+ * @param {string|number} id
+ * @returns {string}
+ */
+export const mobileBuildUri = (id) => `${MOBILE_PREFIX}/build/${id}`
+
 /** Where a phone lands when its destination has no mobile equivalent. */
 export const MOBILE_INTERSTITIAL = `${MOBILE_PREFIX}/desktop-only`
 
@@ -47,6 +55,20 @@ export const INTERSTITIAL_TARGET_PARAM = 'target'
 
 /** The desktop UI's home page. */
 export const DESKTOP_HOME = '/'
+
+/**
+ * One build's page on the **desktop** UI.
+ *
+ * The mobile build screen's promote and deploy entry points go there until those
+ * actions have mobile screens of their own - see `MobileBuildActions`. Named
+ * `desktop*` rather than sitting beside the `mobile*` builders, because handing
+ * it to a `<Link>` would send the user out of the mobile UI by accident;
+ * `switchToDesktopUI` is the only thing that should take it.
+ *
+ * @param {string|number} id
+ * @returns {string}
+ */
+export const desktopBuildUri = (id) => `/build/${id}`
 
 /**
  * Desktop routes with a mobile equivalent.
@@ -76,6 +98,7 @@ const EQUIVALENTS = {
 const ENTITY_EQUIVALENTS = [
     [/^\/project\/(\d+)$/, mobileProjectUri],
     [/^\/branch\/(\d+)$/, mobileBranchUri],
+    [/^\/build\/(\d+)$/, mobileBuildUri],
 ]
 
 /**
@@ -149,9 +172,8 @@ export function mobileEquivalent(pathname) {
  * Most specific first: the list is scanned in order.
  */
 const DESCRIPTIONS = [
-    // A project or a branch only reaches the interstitial through a path the
-    // patterns above do not match - `/project/abc`, say. `/build/[id]` reaches
-    // it for real, until the build screen lands.
+    // A project, a branch or a build only reaches the interstitial through a
+    // path the patterns above do not match - `/project/abc`, say.
     [/^\/extension\/scm\/(.+\/)?changelog$/, 'a change log'],
     [/^\/extension\/scm\/[^/]+\/commit-info\//, 'a commit'],
     [/^\/extension\/scm\/[^/]+\/issue-info\//, 'an issue'],

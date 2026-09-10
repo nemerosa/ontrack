@@ -2,6 +2,7 @@ import {
     describeDesktopRoute,
     isRedirectExempt,
     mobileBranchUri,
+    mobileBuildUri,
     MOBILE_HOME,
     mobileEquivalent,
     mobileProjectUri,
@@ -31,6 +32,11 @@ describe('mobileEquivalent', () => {
         expect(mobileEquivalent('/branch/34')).toEqual('/mobile/branch/34')
     })
 
+    it('maps a build to its mobile screen, keeping the id', () => {
+        expect(mobileEquivalent('/build/56')).toEqual(mobileBuildUri('56'))
+        expect(mobileEquivalent('/build/56')).toEqual('/mobile/build/56')
+    })
+
     it.each([
         '/project/12/something',
         '/branch/',
@@ -43,9 +49,6 @@ describe('mobileEquivalent', () => {
     })
 
     it.each([
-        // The build screen is its own issue; until it lands, a phone following a
-        // link to a build is better served by the desktop page than by nothing.
-        '/build/56',
         '/search',
         '/graphiql',
         '/core/admin/settings',
