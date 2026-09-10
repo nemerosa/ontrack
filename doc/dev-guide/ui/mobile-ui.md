@@ -79,10 +79,72 @@ loses what they came for.
 decision is recorded in this map — a desktop route added without one silently sends phones to
 the interstitial, which may well be right, but should be a choice rather than an oversight.
 
+## The screens
+
+| Screen | Route | What it is |
+|---|---|---|
+| Home | `/mobile` | The user's favourite projects and branches |
+| Projects | `/mobile/projects` | Every project, filterable by name, with the favourite toggle |
+| Search | `/mobile/search` | Not built yet — placeholder |
+| Interstitial | `/mobile/desktop-only` | A route with no mobile equivalent |
+
+**Home is the favourites, not a project list.** Someone reaching for their phone is checking
+something they already care about; the full list is one tap away in the bottom bar for the
+times it is not. Both screens read the existing `projects(favourites: true)` and
+`branches(favourite: true)` — the mobile UI adds no GraphQL of its own.
+
+A user who has never curated favourites on the desktop UI would otherwise open a blank home
+screen, which reads as a broken app rather than as an empty list. Two things stop that: the
+empty state (`MobileFavouritesEmpty`), which says what favourites are and links to the
+project list, and the favourite toggle on the project list, which is where those favourites
+get made. The demo seed marks a couple of its own, so the demo is populated on a phone —
+see `doc/dev-guide/demo-seed.md`.
+
+### Favourites
+
+`MobileFavourite` is **controlled**: the favourite state lives in the list that renders the
+toggle, and the toggle owns only whether its own call is in flight. Its parent then refetches
+rather than patching its copy of the list, so there is one answer to "is this a favourite"
+and it is the server's.
+
+It is deliberately not the desktop `Favourite`, which is a 14px icon inside a
+`Typography.Text` with a click handler — neither a 44px touch target nor a control a screen
+reader announces. Same four mutations, own affordance; the mapping from entity type to
+mutation is a pure module, `components/mobile/favourites/favouriteMutations.js`.
+
+The mobile provider stack has no `EventsContextProvider`, so a screen cannot refresh off the
+`project.favourite` page event the desktop widgets use. A local counter in the screen's
+`deps` does the same job for one screen, which is all a phone shows at a time.
+
+### Filtering a long list
+
+An instance holds hundreds of projects, which is more than anyone scrolls through on a
+phone, so the project list filters by name. It filters **on the server**, through
+`projects(pattern:)` — an `ILIKE '%…%'` ordered by name. A client-side filter could only
+narrow the answer to the last query, and would never reach a project the server had not
+already sent.
+
+Two things about that argument are worth knowing before reusing it: the server refuses
+`pattern` alongside any *other* argument, and it tells "no pattern" from "empty pattern" by
+whether the argument was supplied at all — so the screen sends `null`, never `''`. The
+typing is debounced, because the alternative is one query per keystroke against that
+`ILIKE`.
+
+### The list shape
+
+`MobileEntityGroup` and `MobileEntityRow` are the mobile UI's one list: a name, a line of
+context under it, and a single trailing action. Plain `ul`/`li` rather than antd's `List`,
+whose paddings and split lines are sized for a desktop page — and which is a layout
+component, on the wrong side of the boundary above.
+
+Rows are not links yet. The project and branch screens behind them are #1721; until they
+exist, linking would send a tap to a 404, which is worse than a row that does not move.
+
 ## Adding a mobile screen
 
 1. Add the page under `app/mobile/`, replacing its `MobileScreenPending` placeholder if it has
-   one.
+   one. Keep the page itself to the route and put the screen in a client component beside it,
+   as `app/mobile/page.js` and `app/mobile/HomeScreen.js` do.
 2. Add a row to `EQUIVALENTS` in `components/mobile/mobileRoutes.js`, so phones stop getting
    the interstitial for the desktop route it stands in for.
 3. If it belongs in the bottom bar, add it to `MOBILE_NAV_ITEMS` in

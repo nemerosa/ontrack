@@ -326,11 +326,16 @@ object DemoContent {
         name = SERVICE,
         description = "Sample application - the demo's main project.",
         scm = serviceScm(),
+        // The demo's favourites, which is what the mobile UI opens on. Both branches of the
+        // main project, so the home screen shows the project each branch belongs to doing
+        // real work - two branches called differently under one project name.
+        favourite = true,
         branches = listOf(
             BranchSpec(
                 name = MAIN,
                 description = "Main development branch.",
                 scmBranch = SCM_MAIN,
+                favourite = true,
                 promotionLevels = fullPromotions + canaryPass,
                 validationStamps = fullValidationStamps,
                 builds = listOf(
@@ -469,6 +474,7 @@ object DemoContent {
                 name = MAINTENANCE,
                 description = "Maintenance of the previous minor version.",
                 scmBranch = SCM_MAINTENANCE,
+                favourite = true,
                 promotionLevels = fullPromotions + canaryFail,
                 validationStamps = fullValidationStamps,
                 builds = listOf(
@@ -558,6 +564,8 @@ object DemoContent {
     private fun ui() = ProjectSpec(
         name = UI,
         description = "Front-end for the sample application.",
+        // A second favourite project, so the home screen is a list rather than one row.
+        favourite = true,
         branches = listOf(
             BranchSpec(
                 name = MAIN,

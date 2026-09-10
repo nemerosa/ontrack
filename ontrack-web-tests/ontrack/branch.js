@@ -80,8 +80,30 @@ const branchInstance = (ontrack, data, project) => {
     branch.createValidationStamp = async (name) => createValidationStamp(branch, name)
     branch.createBuild = async (name) => createBuild(branch, name)
     branch.disableBranch = async () => disableBranch(branch)
+    branch.favourite = async () => favouriteBranch(branch)
 
     return branch
+}
+
+/**
+ * Marks the branch as a favourite of the account the connection authenticates as - which is
+ * the same account the browser signs in with, so what this sets is what the UI then shows.
+ */
+const favouriteBranch = async (branch) => {
+    await graphQLCallMutation(
+        branch.ontrack.connection,
+        'favouriteBranch',
+        gql`
+            mutation FavouriteBranch($branchId: Int!) {
+                favouriteBranch(input: {id: $branchId}) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `,
+        {branchId: Number(branch.id)}
+    )
 }
 
 const disableBranch = async (branch) => {

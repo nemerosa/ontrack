@@ -10,11 +10,11 @@
  * `doc/dev-guide/ui/mobile-ui.md` on why the layouts stay separate.
  */
 import {FaHome, FaSearch, FaSitemap} from "react-icons/fa"
-import {MOBILE_PREFIX} from "@components/mobile/mobileRoutes"
+import {MOBILE_PREFIX, MOBILE_PROJECTS} from "@components/mobile/mobileRoutes"
 
 export const MOBILE_NAV_ITEMS = [
     {key: 'home', href: MOBILE_PREFIX, label: "Home", icon: <FaHome/>},
-    {key: 'projects', href: `${MOBILE_PREFIX}/projects`, label: "Projects", icon: <FaSitemap/>},
+    {key: 'projects', href: MOBILE_PROJECTS, label: "Projects", icon: <FaSitemap/>},
     {key: 'search', href: `${MOBILE_PREFIX}/search`, label: "Search", icon: <FaSearch/>},
 ]
 

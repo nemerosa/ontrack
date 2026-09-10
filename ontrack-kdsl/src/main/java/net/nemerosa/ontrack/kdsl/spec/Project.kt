@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.BranchListQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateBranchMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.DeleteProjectByIdMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FavouriteProjectMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
@@ -31,6 +32,20 @@ class Project(
             DeleteProjectByIdMutation(id.toInt())
         ) {
             it?.deleteProject?.payloadUserErrors?.convert()
+        }
+    }
+
+    /**
+     * Marks this project as a favourite of the account the connector authenticates as.
+     *
+     * Favourites are per user, not per project: this says nothing about the project and
+     * everything about who is asking.
+     */
+    fun favourite() {
+        graphqlConnector.mutate(
+            FavouriteProjectMutation(id.toInt())
+        ) {
+            it?.favouriteProject?.payloadUserErrors?.convert()
         }
     }
 

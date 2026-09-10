@@ -281,6 +281,13 @@ server involved.
   shows commits dated within the same second of the reset. Validation runs used to share this
   limitation and no longer do (#1718); the mock SCM's endpoint still takes no time, so fixing
   this one needs a server-side change of its own.
+- **Favourites belong to the seeding account.** The dataset marks a couple of projects and
+  branches as favourites so that the mobile UI — whose home screen is the current user's
+  favourites and nothing else — is populated rather than blank on a phone (#1720). A
+  favourite is per user and Yontrack has no shared scope for one, unlike a dashboard, so what
+  the seed marks is marked for whatever account `YONTRACK_TOKEN` belongs to. If visitors
+  browse the demo as a different account from the one that seeds it, their mobile home is
+  still empty — and shows the empty state, which at least says what favourites are.
 - **`KdslDemoTarget` has no automated test.** The seed is destructive by definition, so it
   cannot share an instance with the acceptance suite. Changes to it are verified by running
   the program against a throwaway instance — the local dev stack does fine — twice, and

@@ -20,6 +20,9 @@ export const MOBILE_PREFIX = '/mobile'
 /** Where a phone lands when its destination has a mobile equivalent of its own. */
 export const MOBILE_HOME = MOBILE_PREFIX
 
+/** The project list, which is also where the home screen's empty state points. */
+export const MOBILE_PROJECTS = `${MOBILE_PREFIX}/projects`
+
 /** Where a phone lands when its destination has no mobile equivalent. */
 export const MOBILE_INTERSTITIAL = `${MOBILE_PREFIX}/desktop-only`
 

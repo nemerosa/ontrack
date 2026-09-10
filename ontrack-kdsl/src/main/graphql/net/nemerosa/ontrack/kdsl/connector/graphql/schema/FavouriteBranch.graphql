@@ -1,0 +1,7 @@
+mutation FavouriteBranch(
+    $id: Int!,
+) {
+    favouriteBranch(input: {id: $id}) {
+        ...PayloadUserErrors
+    }
+}

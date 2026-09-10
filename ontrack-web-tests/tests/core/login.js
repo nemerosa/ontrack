@@ -30,6 +30,10 @@ export const login = async (
     // Launching the login
     await page.getByRole("button", {name: "Sign In", exact: true}).click()
 
+    // If we expect a specific element to be there once signed in
+    if (options.ready) {
+        return expect(options.ready(page)).toBeVisible()
+    }
     // If we expect a message
     if (options.message) {
         return expect(page.getByText(options.message)).toBeVisible()

@@ -72,6 +72,7 @@ class DemoSeed(
             // project is pointed at here, and a commit is linked to its issues as it is
             // registered, so the issues have to be in place first.
             spec.scm?.let { project.configureScm(it) }
+            if (spec.favourite) project.markAsFavourite()
             spec.branches.forEach { branchSpec ->
                 createBranch(spec, branchSpec, project, now, builds)
             }
@@ -146,6 +147,7 @@ class DemoSeed(
     ) {
         val branch = project.createBranch(spec.name, spec.description)
         spec.scmBranch?.let { branch.configureScmBranch(it) }
+        if (spec.favourite) branch.markAsFavourite()
         spec.promotionLevels.forEach { branch.createPromotionLevel(it.name, it.description, it.workflow) }
         spec.validationStamps.forEach { branch.createValidationStamp(it.name, it.description) }
         // A third pass, after both: auto promotion and promotion dependencies name other promotion

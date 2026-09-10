@@ -28,11 +28,18 @@ data class DemoDataset(
  * commits the seed writes itself: a real repository would trade a self-contained reset for
  * one depending on credentials and network egress.
  */
+/**
+ * @property favourite Whether the seeding account marks this project as one of its
+ * favourites. A favourite is per user rather than per project, so this says what the demo
+ * user sees on the mobile home screen - which is their favourites and nothing else, and so
+ * would be blank on a demo that curated none (#1720).
+ */
 data class ProjectSpec(
     val name: String,
     val description: String,
     val branches: List<BranchSpec>,
     val scm: ScmSpec? = null,
+    val favourite: Boolean = false,
 )
 
 /**
@@ -62,11 +69,14 @@ data class IssueSpec(
 
 /**
  * @property scmBranch The branch of the project's SCM repository this branch follows.
+ * @property favourite Whether the seeding account marks this branch as one of its
+ * favourites, as [ProjectSpec.favourite] does for a project.
  */
 data class BranchSpec(
     val name: String,
     val description: String,
     val scmBranch: String? = null,
+    val favourite: Boolean = false,
     val promotionLevels: List<PromotionLevelSpec> = emptyList(),
     val validationStamps: List<ValidationStampSpec> = emptyList(),
     val builds: List<BuildSpec> = emptyList(),

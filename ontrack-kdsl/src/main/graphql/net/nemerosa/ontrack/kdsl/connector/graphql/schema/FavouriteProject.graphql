@@ -1,0 +1,7 @@
+mutation FavouriteProject(
+    $id: Int!,
+) {
+    favouriteProject(input: {id: $id}) {
+        ...PayloadUserErrors
+    }
+}

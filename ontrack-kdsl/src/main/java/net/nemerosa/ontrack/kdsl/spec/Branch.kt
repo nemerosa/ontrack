@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateBuildMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreatePromotionLevelMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateValidationStampMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.DeleteBranchByIdMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FavouriteBranchMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.PromotionLevelFieldInput
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.RunInfoInput
@@ -42,6 +43,19 @@ class Branch(
             DeleteBranchByIdMutation(id.toInt())
         ) {
             it?.deleteBranchById?.payloadUserErrors?.convert()
+        }
+    }
+
+    /**
+     * Marks this branch as a favourite of the account the connector authenticates as.
+     *
+     * Favourites are per user, exactly as [Project.favourite] is.
+     */
+    fun favourite() {
+        graphqlConnector.mutate(
+            FavouriteBranchMutation(id.toInt())
+        ) {
+            it?.favouriteBranch?.payloadUserErrors?.convert()
         }
     }
 

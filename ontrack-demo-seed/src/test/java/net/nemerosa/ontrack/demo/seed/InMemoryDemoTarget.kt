@@ -74,6 +74,7 @@ class InMemoryDemoTarget(
     fun snapshot(): String = buildList {
         projects.forEach { project ->
             add("project ${project.name} \"${project.description}\"")
+            if (project.favourite) add("  favourite")
             project.scmRepositoryName?.let { repositoryName ->
                 val repository = scmRepositories.getValue(repositoryName)
                 add("  scm ${repository.name}")
@@ -82,6 +83,7 @@ class InMemoryDemoTarget(
             }
             project.branches.forEach { branch ->
                 add("  branch ${branch.name} \"${branch.description}\"")
+                if (branch.favourite) add("    favourite")
                 branch.scmBranch?.let { add("    scm branch $it") }
                 branch.promotionLevels.forEach { promotionLevel ->
                     add("    promotion level $promotionLevel")
@@ -143,6 +145,14 @@ class InMemoryDemoTarget(
          */
         var scmRepositoryName: String? = null
 
+        /** A favourite of the seeding account, which is the only account this fake has. */
+        var favourite: Boolean = false
+            private set
+
+        override fun markAsFavourite() {
+            favourite = true
+        }
+
         override fun delete() {
             projects -= this
         }
@@ -179,6 +189,14 @@ class InMemoryDemoTarget(
         val autoPromotions = mutableMapOf<String, AutoPromotionSpec>()
         val promotionDependencies = mutableMapOf<String, List<String>>()
         val previousPromotionRequired = mutableSetOf<String>()
+
+        /** A favourite of the seeding account, as [InMemoryProject.favourite] is. */
+        var favourite: Boolean = false
+            private set
+
+        override fun markAsFavourite() {
+            favourite = true
+        }
 
         override fun configureScmBranch(scmBranch: String) {
             requireNotNull(project.scmRepositoryName) {

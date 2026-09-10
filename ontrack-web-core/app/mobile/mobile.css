@@ -125,3 +125,112 @@ html, body {
 .ot-mobile-nav-item[aria-current="page"] {
     color: var(--ot-mobile-nav-active);
 }
+
+/*
+ * The list shape every mobile screen uses - see
+ * `components/mobile/entities/MobileEntityList.js`.
+ */
+
+.ot-mobile-group + .ot-mobile-group {
+    margin-top: 20px;
+}
+
+.ot-mobile-group-title {
+    /* antd's own margins on a Title are sized for a desktop page. */
+    margin: 0 0 8px 0 !important;
+}
+
+.ot-mobile-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background-color: var(--ot-bg-elevated);
+    border: 1px solid var(--ot-border-subtle);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ot-mobile-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    /* Comfortably above the 44px minimum for a touch target. */
+    min-height: 52px;
+    padding: 8px 4px 8px 12px;
+}
+
+.ot-mobile-row + .ot-mobile-row {
+    border-top: 1px solid var(--ot-border-subtle);
+}
+
+.ot-mobile-row-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    /* Lets the name ellipsis rather than push the star off the screen. */
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.ot-mobile-row-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ot-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ot-mobile-row-context {
+    font-size: 12px;
+    opacity: 0.65;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ot-mobile-row-action {
+    flex: 0 0 auto;
+}
+
+/*
+ * The favourite star. A real <button>, sized for a thumb rather than for a
+ * pointer - which is why it is not the desktop `Favourite`.
+ */
+.ot-mobile-favourite {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 22px;
+    color: orange;
+    font-size: 20px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ot-mobile-favourite:disabled {
+    /* In flight, not unavailable: the star stays where the thumb left it. */
+    cursor: default;
+}
+
+.ot-mobile-favourite:focus-visible {
+    outline: 2px solid var(--ot-mobile-nav-active);
+    outline-offset: -2px;
+}
+
+/*
+ * Content being refetched: still the previous answer, visibly not the current
+ * one. A skeleton over it would flash on every favourite toggle, which is the
+ * one thing a user does from these screens.
+ */
+.ot-mobile-async[data-loading="true"] {
+    opacity: 0.55;
+    /* No pointer events either: a tap on a row about to be replaced acts on the
+       old list. */
+    pointer-events: none;
+}

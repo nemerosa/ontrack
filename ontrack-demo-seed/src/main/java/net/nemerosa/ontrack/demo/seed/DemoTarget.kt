@@ -80,6 +80,15 @@ interface DemoProject {
      * reset deletes — and declaring its issues.
      */
     fun configureScm(scm: ScmSpec)
+
+    /**
+     * Marks this project as a favourite of the account the seed runs as.
+     *
+     * The only per-user thing the seed writes. It is here because the mobile UI's home
+     * screen is the current user's favourites and nothing else, so a demo with none opens
+     * blank on a phone.
+     */
+    fun markAsFavourite()
 }
 
 interface DemoBranch {
@@ -90,6 +99,12 @@ interface DemoBranch {
      * [DemoProject.configureScm].
      */
     fun configureScmBranch(scmBranch: String)
+
+    /**
+     * Marks this branch as a favourite of the account the seed runs as, as
+     * [DemoProject.markAsFavourite] does for a project.
+     */
+    fun markAsFavourite()
 
     /**
      * Registers a commit on this branch's SCM branch.

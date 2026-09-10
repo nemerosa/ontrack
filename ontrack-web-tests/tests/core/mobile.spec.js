@@ -27,8 +27,11 @@ const {defaultBrowserType: _ignored, ...PHONE} = devices['Pixel 5']
 /** Signs in from a phone - which already goes through the redirect. */
 const signInOnPhone = (page, ontrack) => login(page, ontrack, undefined, undefined, {
     // The sign-in page has to be exempt from the redirect, or this never
-    // completes. Landing on the mobile home is the proof that it is.
-    message: 'This screen is not part of the mobile UI yet.',
+    // completes. Landing on the mobile home is the proof that it is. Matched on
+    // the screen's own test id rather than on its text: "Home" is also the label
+    // of a bottom-bar tab, and Next's route announcer repeats a page title on
+    // top of that.
+    ready: page => page.getByTestId('mobile-screen-title'),
 })
 
 test.describe('the mobile UI on a phone', () => {
@@ -57,6 +60,52 @@ test.describe('the mobile UI on a phone', () => {
         await page.reload()
         await expect(page.getByTestId('mobile-header')).toBeVisible()
         await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+    })
+
+    test('the home screen is the favourites, and the project list is one tap away', async ({page, ontrack}) => {
+        // A project nothing has starred yet, so the loop below starts where a
+        // first-time user starts.
+        const project = await ontrack.createProject()
+
+        await signInOnPhone(page, ontrack)
+        await page.goto(`${ontrack.connection.ui}/mobile`)
+
+        // One tap, from the bottom bar.
+        await page.getByTestId('mobile-nav-projects').click()
+        await expect(page).toHaveURL(/\/mobile\/projects$/)
+
+        // Through the filter rather than by scrolling: an instance holds far more
+        // projects than a phone screen, which is what the filter is for.
+        await page.getByTestId('mobile-projects-filter').fill(project.name)
+        await expect(page.getByTestId('mobile-projects')).toContainText(project.name)
+
+        const star = page.getByTestId(`mobile-favourite-project-${project.id}`)
+        await expect(star).toHaveAttribute('aria-pressed', 'false')
+        await star.click()
+        await expect(star).toHaveAttribute('aria-pressed', 'true')
+
+        // Home is the favourites, so what was just starred is on it.
+        await page.getByTestId('mobile-nav-home').click()
+        await expect(page.getByTestId(`mobile-project-${project.id}`)).toContainText(project.name)
+
+        // And unstarring from the home screen itself takes it away again.
+        await page.getByTestId(`mobile-favourite-project-${project.id}`).click()
+        await expect(page.getByTestId(`mobile-project-${project.id}`)).toHaveCount(0)
+    })
+
+    test('a favourite branch is on the home screen, under the project it belongs to', async ({page, ontrack}) => {
+        // Favourite branches come from every project at once, so the home screen
+        // has to say which project each one belongs to.
+        const project = await ontrack.createProject()
+        const branch = await project.createBranch()
+        await branch.favourite()
+
+        await signInOnPhone(page, ontrack)
+        await page.goto(`${ontrack.connection.ui}/mobile`)
+
+        const row = page.getByTestId(`mobile-branch-${branch.id}`)
+        await expect(row).toContainText(branch.name)
+        await expect(row).toContainText(project.name)
     })
 
     test('a route with no mobile equivalent gets the interstitial', async ({page, ontrack}) => {

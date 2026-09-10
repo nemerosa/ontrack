@@ -1,18 +1,11 @@
-import MobileScreen from "@components/mobile/layout/MobileScreen"
-import MobileScreenPending from "@components/mobile/MobileScreenPending"
+import MobileHomeScreen from "./HomeScreen"
 
 /**
- * The mobile home screen.
+ * The mobile home screen: the current user's favourite projects and branches.
  *
- * A placeholder until the favourites and project list land - the shell, the
- * redirect and the way back are what this change is about, and shipping them
- * with a screen that lies about being finished would be worse than one that
- * says so.
+ * The screen itself is a client component - it reads the favourites and lets the
+ * user unstar them - so the page is only the route.
  */
 export default function MobileHomePage() {
-    return (
-        <MobileScreen title="Home">
-            <MobileScreenPending desktopHref="/"/>
-        </MobileScreen>
-    )
+    return <MobileHomeScreen/>
 }

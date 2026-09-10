@@ -180,6 +180,8 @@ private class KdslDemoProject(
         project.mockScmProjectProperty = scm.repository
         this.scm = repository
     }
+
+    override fun markAsFavourite() = project.favourite()
 }
 
 private class KdslDemoBranch(
@@ -198,6 +200,8 @@ private class KdslDemoBranch(
         branch.mockScmBranchProperty = scmBranch
         this.scmBranch = scmBranch
     }
+
+    override fun markAsFavourite() = branch.favourite()
 
     override fun registerCommit(message: String): String {
         val repository = requireNotNull(project.scm) {

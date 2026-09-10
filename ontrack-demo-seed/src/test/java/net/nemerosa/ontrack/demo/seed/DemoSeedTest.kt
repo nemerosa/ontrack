@@ -845,6 +845,61 @@ class DemoSeedTest {
     }
 
     @Test
+    fun `the demo user is left with favourites, so the mobile home is not blank`() {
+        // The mobile home screen is the user's favourites and nothing else, so a demo
+        // seeded without any opens blank on a phone - which reads as a broken app rather
+        // than as an empty list (#1720).
+        val target = InMemoryDemoTarget()
+
+        seed(target).run(DemoContent.dataset(changelog))
+
+        val snapshot = target.snapshot()
+        assertTrue("favourite" in snapshot, "Something is marked as a favourite")
+        assertTrue(
+            target.projects().filterIsInstance<InMemoryDemoTarget.InMemoryProject>().any { it.favourite },
+            "At least one project is a favourite",
+        )
+        assertTrue(
+            target.projects().filterIsInstance<InMemoryDemoTarget.InMemoryProject>()
+                .flatMap { it.branches }.any { it.favourite },
+            "At least one branch is a favourite",
+        )
+    }
+
+    @Test
+    fun `a favourite is marked on the entity the dataset names`() {
+        val target = InMemoryDemoTarget()
+
+        seed(target).run(
+            DemoDataset(
+                projects = listOf(
+                    ProjectSpec(
+                        name = "starred",
+                        description = "",
+                        favourite = true,
+                        branches = listOf(BranchSpec(name = "main", description = "", favourite = true)),
+                    ),
+                    ProjectSpec(
+                        name = "plain",
+                        description = "",
+                        branches = listOf(BranchSpec(name = "main", description = "")),
+                    ),
+                ),
+            )
+        )
+
+        val projects = target.projects().filterIsInstance<InMemoryDemoTarget.InMemoryProject>()
+        assertEquals(
+            listOf("starred" to true, "plain" to false),
+            projects.map { it.name to it.favourite },
+        )
+        assertEquals(
+            listOf(true, false),
+            projects.map { project -> project.branches.single().favourite },
+        )
+    }
+
+    @Test
     fun `every problem is reported at once, not one reset at a time`() {
         val error = assertFailsWith<IllegalArgumentException> {
             seed(InMemoryDemoTarget()).run(

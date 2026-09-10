@@ -1,11 +1,6 @@
-import MobileScreen from "@components/mobile/layout/MobileScreen"
-import MobileScreenPending from "@components/mobile/MobileScreenPending"
+import MobileProjectListScreen from "./ProjectListScreen"
 
-/** The project list. A placeholder until the project screens land. */
+/** The full project list, one tap from the home screen's bottom bar. */
 export default function MobileProjectsPage() {
-    return (
-        <MobileScreen title="Projects">
-            <MobileScreenPending desktopHref="/"/>
-        </MobileScreen>
-    )
+    return <MobileProjectListScreen/>
 }
