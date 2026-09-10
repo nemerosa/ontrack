@@ -69,6 +69,26 @@ not these forty named things. A promotion whose stamps are named explicitly gets
 one checkpoint each instead.
 _Avoid_: group node, collapsed node, stamp group
 
+**Branch head**:
+The branch's latest build, stated once in the delivery map view's header and
+never drawn as a checkpoint: edges on that map mean *unlocks* or *requires*, and
+an edge from the latest build to every checkpoint would mean neither while
+fanning out across the whole map at once. Each checkpoint carries its own
+*checkpoint lag* instead. The view labels it "Latest build", which is what the
+pipeline view's own stat calls it.
+_Avoid_: tip, HEAD, latest. *HEAD* is git's, and this is a build rather than a
+commit.
+
+**Checkpoint lag**:
+How many builds of the branch are more recent than the one a checkpoint names: a
+checkpoint at the *branch head* is behind by none, and is marked as being at the
+head rather than as behind by zero. It is unknown rather than zero on a slot
+naming another branch's build (ADR 0009) - where counting against this branch's
+head answers a question nobody asked - and on a branch with no head, and nothing
+is drawn in either case.
+_Avoid_: staleness, drift, age. *Age* is the arrival's timestamp, which is a
+different reading and is drawn beside it.
+
 **Unreachable slot**:
 A slot checkpoint no build of the branch being read can ever be deployed to,
 because an admission rule excludes the branch outright. It is drawn, marked as

@@ -28,6 +28,7 @@ import UnknownCheckpoint from "@components/branches/views/deliverymap/checkpoint
 import UnresolvedCheckpoint
     from "@components/branches/views/deliverymap/checkpoints/UnresolvedCheckpoint";
 import SlotCheckpoint from "@components/extension/environments/deliverymap/SlotCheckpoint";
+import CheckpointArrival from "@components/branches/views/deliverymap/checkpoints/CheckpointArrival";
 
 beforeEach(() => {
     // The entity icon fetches its image on mount; it is not what these tests are about
@@ -275,6 +276,53 @@ describe('unknown checkpoint', () => {
         }}/>)
         expect(screen.getByText("Friday freeze")).toBeInTheDocument()
         expect(screen.getByText("20260901-4")).toBeInTheDocument()
+    })
+
+})
+
+describe('checkpoint lag', () => {
+
+    const arrival = (lag) => ({build: build("20260901-1"), time: "2026-09-01T10:00:00", lag})
+
+    it('marks a checkpoint the branch head has reached', () => {
+        // "Build 42" means little until you know whether the branch is still at 42
+        withEvents(<CheckpointArrival arrival={arrival(0)}/>)
+        expect(screen.getByTestId('checkpoint-lag')).toHaveTextContent("at head")
+    })
+
+    it('says how many builds behind the head a checkpoint is', () => {
+        withEvents(<CheckpointArrival arrival={arrival(5)}/>)
+        expect(screen.getByTestId('checkpoint-lag')).toHaveTextContent("5 behind")
+    })
+
+    it('counts one build in the singular', () => {
+        withEvents(<CheckpointArrival arrival={arrival(1)}/>)
+        expect(screen.getByTestId('checkpoint-lag')).toHaveTextContent("1 behind")
+    })
+
+    it('marks nothing when the lag cannot be counted', () => {
+        // A slot naming another branch's build, and a branch with no build at all: a number there
+        // would read as a fact rather than as a category error
+        withEvents(<CheckpointArrival arrival={arrival(null)}/>)
+        expect(screen.queryByTestId('checkpoint-lag')).not.toBeInTheDocument()
+    })
+
+    it('marks nothing on a checkpoint nothing has reached', () => {
+        withEvents(<CheckpointArrival arrival={null}/>)
+        expect(screen.getByText("Never reached")).toBeInTheDocument()
+        expect(screen.queryByTestId('checkpoint-lag')).not.toBeInTheDocument()
+    })
+
+    it('is shown on every kind of checkpoint, not only on promotion levels', () => {
+        // Arriving is what the unlike kinds have in common, and so is having fallen behind
+        withEvents(<SlotCheckpoint checkpoint={{
+            id: 'slot:abc',
+            type: 'slot',
+            name: "production",
+            data: {slotId: 'abc', unreachable: false, otherBranch: null},
+            arrival: arrival(3),
+        }}/>)
+        expect(screen.getByTestId('checkpoint-lag')).toHaveTextContent("3 behind")
     })
 
 })

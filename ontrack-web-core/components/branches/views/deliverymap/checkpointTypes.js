@@ -30,18 +30,23 @@ import SlotCheckpoint from "@components/extension/environments/deliverymap/SlotC
  * rendered, and a layout computed against one size and drawn at another overlaps. That is also why
  * no checkpoint may grow after it is laid out: the aggregate shows its members in a popover, drawn
  * outside the flow, rather than by growing to fit them.
+ *
+ * Every kind which can name a build reserves room for the LAG MARKER beside it - "at head" or
+ * "5 behind" - which is why the widths here are not the widths of a name and a build alone.
  */
 export const checkpointTypes = {
     'promotion-level': {
         component: PromotionLevelCheckpoint,
-        width: 240,
+        width: 310,
         height: 90,
     },
     'validation-stamp': {
         component: ValidationStampCheckpoint,
-        width: 260,
+        width: 330,
         height: 90,
     },
+    // No wider than before the lag marker: the aggregate names no build of its own. Its members do,
+    // and they are drawn in a popover outside the flow, which the layout does not pay for.
     'validation-stamp-pattern': {
         component: ValidationStampPatternCheckpoint,
         width: 260,
@@ -54,7 +59,7 @@ export const checkpointTypes = {
     // leaves a gap, while one wider than it covers whatever elk placed beside it.
     'slot': {
         component: SlotCheckpoint,
-        width: 360,
+        width: 430,
         height: 110,
     },
     // A name a configuration asked for and which matches nothing. Two lines only - the name and what
@@ -77,7 +82,7 @@ export const checkpointTypes = {
 export function getCheckpointType(type) {
     return checkpointTypes[type] ?? {
         component: UnknownCheckpoint,
-        width: 240,
+        width: 310,
         height: 90,
     }
 }

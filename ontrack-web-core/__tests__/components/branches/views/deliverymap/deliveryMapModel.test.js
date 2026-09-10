@@ -6,6 +6,7 @@ import {
     toFlowEdges,
     toFlowNodes,
     withEdgeColor,
+    withValidationStamps,
 } from "@components/branches/views/deliverymap/deliveryMapModel"
 
 describe('delivery map model', () => {
@@ -226,6 +227,72 @@ describe('validation stamp filter on a delivery map', () => {
         applyValidationStampFilter(map, {vsNames: ["QUALITY"]})
         expect(map.checkpoints).toHaveLength(4)
         expect(aggregate.members).toHaveLength(2)
+    })
+
+})
+
+describe('validation stamps shown or hidden on a delivery map', () => {
+
+    const promotion = {id: 'promotion-level:12', type: 'promotion-level', name: "SILVER"}
+    const gold = {id: 'promotion-level:13', type: 'promotion-level', name: "GOLD"}
+    const slot = {id: 'slot:abc', type: 'slot', name: "production"}
+    const quality = {id: 'validation-stamp:1', type: 'validation-stamp', name: "QUALITY"}
+    const aggregate = {
+        id: 'validation-stamp-pattern:12',
+        type: 'validation-stamp-pattern',
+        name: "CI-.*",
+        members: [{id: 'validation-stamp:3', type: 'validation-stamp', name: "CI-BUILD"}],
+    }
+
+    const edge = (source, target) => ({id: `${source}->${target}`, kind: 'UNLOCKS', source, target})
+
+    const map = {
+        checkpoints: [promotion, gold, slot, quality, aggregate],
+        edges: [
+            edge(quality.id, promotion.id),
+            edge(aggregate.id, promotion.id),
+            edge(promotion.id, gold.id),
+        ],
+    }
+
+    it('leaves the map alone when the stamps are shown', () => {
+        // The default: a map opening on a chain of promotions with no visible cause says nothing
+        // about why any of them is granted
+        expect(withValidationStamps(map, true)).toBe(map)
+    })
+
+    it('drops every validation stamp when they are hidden', () => {
+        const hidden = withValidationStamps(map, false)
+        expect(hidden.checkpoints.map(it => it.name)).toEqual(["SILVER", "GOLD", "production"])
+    })
+
+    it('drops the aggregate checkpoints too, which stand for stamps', () => {
+        const hidden = withValidationStamps(map, false)
+        expect(hidden.checkpoints.find(it => it.type === 'validation-stamp-pattern')).toBeUndefined()
+    })
+
+    it('hides nothing but stamps', () => {
+        // Promotion levels and slots are what a build passes through whether or not the stamps
+        // which grant them are on screen
+        const hidden = withValidationStamps(map, false)
+        expect(hidden.checkpoints.map(it => it.type))
+            .toEqual(['promotion-level', 'promotion-level', 'slot'])
+    })
+
+    it('drops the edges of the checkpoints it removed, and keeps the others', () => {
+        const hidden = withValidationStamps(map, false)
+        expect(hidden.edges.map(it => it.id)).toEqual(['promotion-level:12->promotion-level:13'])
+    })
+
+    it('does not mutate the map it was given', () => {
+        withValidationStamps(map, false)
+        expect(map.checkpoints).toHaveLength(5)
+        expect(map.edges).toHaveLength(3)
+    })
+
+    it('has nothing to hide on a map which is not there yet', () => {
+        expect(withValidationStamps(null, false)).toBeNull()
+        expect(withValidationStamps(undefined, false)).toBeUndefined()
     })
 
 })

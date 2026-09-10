@@ -33,6 +33,7 @@ const gqlDeliveryMapCheckpoint = gql`
                 name
                 passed
             }
+            lag
         }
     }
 `
@@ -53,6 +54,17 @@ export const gqlDeliveryMap = gql`
                     kind
                     source
                     target
+                }
+                head {
+                    id
+                    name
+                    displayName
+                    releaseProperty {
+                        value
+                    }
+                    creation {
+                        time
+                    }
                 }
             }
         }

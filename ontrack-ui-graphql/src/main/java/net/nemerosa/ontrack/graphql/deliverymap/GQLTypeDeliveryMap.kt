@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.graphql.deliverymap
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.listField
 import net.nemerosa.ontrack.model.deliverymap.DeliveryMap
 import org.springframework.stereotype.Component
@@ -18,5 +19,6 @@ class GQLTypeDeliveryMap : GQLType {
             .description("What a build on a branch has to pass through on its way to an environment")
             .listField(DeliveryMap::checkpoints)
             .listField(DeliveryMap::edges)
+            .field(DeliveryMap::head)
             .build()
 }

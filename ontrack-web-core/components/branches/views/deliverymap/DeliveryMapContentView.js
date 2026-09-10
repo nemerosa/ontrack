@@ -1,4 +1,4 @@
-import {useContext, useMemo} from "react";
+import {useContext, useEffect, useMemo, useState} from "react";
 import {Space, Typography} from "antd";
 import {useQuery} from "@components/services/GraphQL";
 import CloseableAlert from "@components/common/CloseableAlert";
@@ -6,10 +6,16 @@ import LoadingContainer from "@components/common/LoadingContainer";
 import {ValidationStampFilterContext} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
 import {gqlDeliveryMap} from "@components/branches/views/deliverymap/deliveryMapQueries";
 import {
+    getLocalDeliveryMapValidationStamps,
+    setLocalDeliveryMapValidationStamps,
+} from "@components/storage/local";
+import {
     applyValidationStampFilter,
     hasNoDependencies,
     isMapEmpty,
+    withValidationStamps,
 } from "@components/branches/views/deliverymap/deliveryMapModel";
+import DeliveryMapHeader from "@components/branches/views/deliverymap/DeliveryMapHeader";
 import DeliveryMapGraph from "@components/branches/views/deliverymap/DeliveryMapGraph";
 import DeliveryMapEmpty from "@components/branches/views/deliverymap/DeliveryMapEmpty";
 import DeliveryMapNoDependencies from "@components/branches/views/deliverymap/DeliveryMapNoDependencies";
@@ -23,11 +29,29 @@ import DeliveryMapNoDependencies from "@components/branches/views/deliverymap/De
  * switch so that a user's filter follows them from one view to the next. It reads it and narrows the
  * map by it.
  *
+ * What it does own is the branch head in its header - the build every checkpoint's lag is counted
+ * against - and whether the validation stamps are drawn at all, which is a way of reading this one
+ * graph rather than a statement about the branch.
+ *
  * @param branch Branch being displayed
  */
 export default function DeliveryMapContentView({branch}) {
 
     const vsfContext = useContext(ValidationStampFilterContext)
+
+    // Starting shown, which is also the stored default, so that the map never lays itself out twice
+    // on arrival. The preference is read in an effect rather than at first render because the local
+    // storage is not there to be read while the page is being rendered on the server.
+    const [showValidationStamps, setShowValidationStamps] = useState(true)
+    useEffect(() => {
+        setShowValidationStamps(getLocalDeliveryMapValidationStamps())
+    }, [])
+
+    const onToggleValidationStamps = () => {
+        const shown = !showValidationStamps
+        setLocalDeliveryMapValidationStamps(shown)
+        setShowValidationStamps(shown)
+    }
 
     const {data, loading, finished} = useQuery(
         gqlDeliveryMap,
@@ -48,8 +72,11 @@ export default function DeliveryMapContentView({branch}) {
     // re-render of this component while a filter is selected - starting inline edition of that
     // filter, say - would reshuffle the whole map and throw away any node the user had dragged.
     const map = useMemo(
-        () => applyValidationStampFilter(data, vsfContext.selectedFilter),
-        [data, vsfContext.selectedFilter],
+        () => withValidationStamps(
+            applyValidationStampFilter(data, vsfContext.selectedFilter),
+            showValidationStamps,
+        ),
+        [data, vsfContext.selectedFilter, showValidationStamps],
     )
 
     return (
@@ -79,8 +106,17 @@ export default function DeliveryMapContentView({branch}) {
                     isMapEmpty(map) ?
                         <DeliveryMapEmpty/> :
                         <>
-                            {hasNoDependencies(map) && <DeliveryMapNoDependencies/>}
-                            <DeliveryMapGraph map={map}/>
+                            {/* Read on the map the SERVER sent, never on the narrowed one: this
+                                notice tells the reader to go and configure auto promotion, and
+                                hiding the stamps - or filtering them out - must not make the map
+                                ask for configuration which is already there. */}
+                            {hasNoDependencies(data) && <DeliveryMapNoDependencies/>}
+                            <DeliveryMapHeader head={data?.head}/>
+                            <DeliveryMapGraph
+                                map={map}
+                                showValidationStamps={showValidationStamps}
+                                onToggleValidationStamps={onToggleValidationStamps}
+                            />
                         </>
                 }
             </LoadingContainer>

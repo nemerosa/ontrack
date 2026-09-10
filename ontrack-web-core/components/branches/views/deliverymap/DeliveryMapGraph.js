@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {theme} from "antd";
-import {applyNodeChanges, Background, Controls, ReactFlow} from "reactflow";
+import {FaEye, FaEyeSlash, FaProjectDiagram} from "react-icons/fa";
+import {applyNodeChanges, Background, ControlButton, Controls, ReactFlow} from "reactflow";
 import {autoLayout} from "@components/links/GraphUtils";
 import CheckpointNode from "@components/branches/views/deliverymap/CheckpointNode";
 import {getCheckpointType} from "@components/branches/views/deliverymap/checkpointTypes";
@@ -22,10 +23,22 @@ const nodeTypes = {
  * A node's size comes from its checkpoint kind rather than from measuring it, because elk needs the
  * sizes before anything is rendered.
  *
+ * Its own controls sit in React Flow's control bar, where every other graph of the product puts
+ * theirs. They act on the drawing and on nothing else: the validation stamp filter, which is a
+ * statement about the branch, lives above the view switch so that it follows the user from one
+ * content view to the next.
+ *
  * @param map The delivery map to draw
+ * @param showValidationStamps Whether the validation stamps are drawn, for the control's own state
+ * @param onToggleValidationStamps Called when the user asks for the stamps to be shown or hidden
  * @param height Height of the drawing area
  */
-export default function DeliveryMapGraph({map, height = 600}) {
+export default function DeliveryMapGraph({
+                                             map,
+                                             showValidationStamps = true,
+                                             onToggleValidationStamps,
+                                             height = 600,
+                                         }) {
 
     // The edges are painted in a theme colour rather than React Flow's own, whose default all but
     // hides the arrowheads (#1717). Read here and applied below because the mapping is a pure
@@ -35,6 +48,10 @@ export default function DeliveryMapGraph({map, height = 600}) {
 
     const [nodes, setNodes] = useState([])
     const [edges, setEdges] = useState([])
+
+    // Bumped by the manual relayout control. A counter rather than a boolean: asking for the layout
+    // again after having dragged one node about has to work a second time.
+    const [relayoutCount, setRelayoutCount] = useState(0)
 
     useEffect(() => {
         if (!map) return
@@ -58,7 +75,7 @@ export default function DeliveryMapGraph({map, height = 600}) {
         return () => {
             current = false
         }
-    }, [map])
+    }, [map, relayoutCount])
 
     // Painted at render rather than inside the layout effect: a change of theme then repaints the
     // map instead of relaying it out, which would throw away every node the user had dragged.
@@ -84,7 +101,29 @@ export default function DeliveryMapGraph({map, height = 600}) {
                 deleteKeyCode={null}
             >
                 <Background/>
-                <Controls showInteractive={false}/>
+                <Controls showInteractive={false}>
+                    {/* The layout is not recomputed while the map is unchanged, so a map the user
+                        has pulled apart - or one whose nodes elk placed awkwardly - is put back in
+                        order from here. The same control the other graphs of the product carry. */}
+                    <ControlButton
+                        title="Adjust the layout"
+                        onClick={() => setRelayoutCount(count => count + 1)}
+                        data-testid="delivery-map-relayout"
+                    >
+                        <FaProjectDiagram/>
+                    </ControlButton>
+                    <ControlButton
+                        title={
+                            showValidationStamps ?
+                                "Hide the validation stamps" :
+                                "Show the validation stamps"
+                        }
+                        onClick={onToggleValidationStamps}
+                        data-testid="delivery-map-toggle-stamps"
+                    >
+                        {showValidationStamps ? <FaEye/> : <FaEyeSlash/>}
+                    </ControlButton>
+                </Controls>
             </ReactFlow>
         </div>
     )

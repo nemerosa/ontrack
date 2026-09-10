@@ -103,6 +103,14 @@ interface StructureService {
     fun getBuildCount(branch: Branch): Int
 
     /**
+     * Gets the number of builds of a build's own branch which are more recent than it.
+     *
+     * How far behind its branch a build has fallen, in builds rather than in time: 0 when it is the
+     * branch's latest build.
+     */
+    fun getNewerBuildCount(build: Build): Int
+
+    /**
      * Gets the number of builds for a project.
      *
      * @param project Project to get the build count for

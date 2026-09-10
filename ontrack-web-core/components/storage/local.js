@@ -197,3 +197,23 @@ export function getLocalGridLayout(id) {
 export function setLocalGridLayout(id, layout) {
     localStorage.setItem(id, JSON.stringify(layout))
 }
+
+const deliveryMapValidationStamps = 'delivery-map-validation-stamps'
+
+/**
+ * Are the validation stamps drawn on the delivery map?
+ *
+ * A per-screen convenience rather than a server preference: it says how one reader is looking at one
+ * graph right now, and the server preference is already carrying the branch content view key, which
+ * is a choice worth following the user from one browser to the next.
+ *
+ * @returns true unless the user has turned them off. ON is the default on purpose: a map opening on
+ * a chain of promotions with no visible cause hides the very thing which explains them.
+ */
+export function getLocalDeliveryMapValidationStamps() {
+    return localStorage.getItem(deliveryMapValidationStamps) !== 'no'
+}
+
+export function setLocalDeliveryMapValidationStamps(shown) {
+    localStorage.setItem(deliveryMapValidationStamps, shown ? 'yes' : 'no')
+}

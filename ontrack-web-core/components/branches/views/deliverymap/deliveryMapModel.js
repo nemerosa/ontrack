@@ -160,6 +160,54 @@ export function hasNoDependencies(map) {
 }
 
 /**
+ * The checkpoint kinds a validation stamp is drawn as.
+ *
+ * The aggregate belongs here as much as the stamp itself: it IS validation stamps, standing for the
+ * ones an auto promotion pattern matches, so anything acting on stamps has to act on it too.
+ */
+const VALIDATION_STAMP = 'validation-stamp'
+const VALIDATION_STAMP_PATTERN = 'validation-stamp-pattern'
+const validationStampKinds = [VALIDATION_STAMP, VALIDATION_STAMP_PATTERN]
+
+/**
+ * Rebuilds a map around the checkpoints it keeps, dropping the edges left with a missing end.
+ *
+ * The one rule shared by everything which narrows a map - the stamp filter and the stamp toggle
+ * alike - and the same rule the server applies when a contributor leaves a checkpoint out: a line to
+ * nowhere reads as a broken map rather than as a hidden checkpoint.
+ *
+ * @param map The map being narrowed
+ * @param kept The checkpoints which survive
+ */
+function keepCheckpoints(map, kept) {
+    const ids = new Set(kept.map(it => it.id))
+    return {
+        ...map,
+        checkpoints: kept,
+        edges: (map.edges ?? []).filter(edge => ids.has(edge.source) && ids.has(edge.target)),
+    }
+}
+
+/**
+ * Shows or hides the validation stamps of a map.
+ *
+ * The reader's own switch, unlike [applyValidationStampFilter] which honours the branch's selected
+ * filter. It is ON by default: a map opening on a chain of promotions with no visible cause would
+ * hide the very thing which explains why any of them is granted. Turning it off is for reading the
+ * promotion and slot shape of a branch whose stamps outnumber everything else on screen.
+ *
+ * @param map The map, narrowed by the filter or not
+ * @param show Whether the validation stamps are drawn
+ */
+export function withValidationStamps(map, show = true) {
+    if (!map || show) return map
+    return keepCheckpoints(
+        map,
+        (map.checkpoints ?? []).filter(it => !validationStampKinds.includes(it.type)),
+    )
+}
+
+/**
  * Narrows a map by the branch's selected validation stamp filter.
  *
  * The filter lives above the view switch precisely so that a user's filter follows them from one
@@ -181,20 +229,15 @@ export function applyValidationStampFilter(map, selectedFilter) {
     if (!map || !vsNames) return map
 
     const kept = (map.checkpoints ?? []).flatMap(checkpoint => {
-        if (checkpoint.type === 'validation-stamp') {
+        if (checkpoint.type === VALIDATION_STAMP) {
             return vsNames.includes(checkpoint.name) ? [checkpoint] : []
         }
-        if (checkpoint.type === 'validation-stamp-pattern') {
+        if (checkpoint.type === VALIDATION_STAMP_PATTERN) {
             const members = (checkpoint.members ?? []).filter(it => vsNames.includes(it.name))
             return members.length > 0 ? [{...checkpoint, members}] : []
         }
         return [checkpoint]
     })
 
-    const ids = new Set(kept.map(it => it.id))
-    return {
-        ...map,
-        checkpoints: kept,
-        edges: (map.edges ?? []).filter(edge => ids.has(edge.source) && ids.has(edge.target)),
-    }
+    return keepCheckpoints(map, kept)
 }

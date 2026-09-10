@@ -1195,12 +1195,16 @@ type DeliveryMap {
   checkpoints: [DeliveryMapCheckpoint!]!
   "Dependencies between the checkpoints"
   edges: [DeliveryMapEdge!]!
+  "The branch's latest build, which every checkpoint's lag is counted against"
+  head: Build
 }
 
 "Latest build to have arrived at a checkpoint, and what became of it there"
 type DeliveryMapArrival {
   "Latest build to have arrived at this checkpoint"
   build: Build!
+  "Builds of the branch more recent than this one, null when it cannot be counted"
+  lag: Int
   "What became of the build here, null when arriving is the whole outcome"
   status: ValidationRunStatusID
   "When the build arrived"

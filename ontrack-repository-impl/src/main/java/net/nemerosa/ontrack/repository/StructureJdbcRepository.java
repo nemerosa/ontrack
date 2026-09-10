@@ -423,6 +423,17 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
+    public int getNewerBuildCount(Build build) {
+        // Ordered by ID, like getPreviousBuild and getNextBuild just below: on one branch a higher
+        // build ID is a later build, and that is the ordering the whole build model rests on
+        return getNamedParameterJdbcTemplate().queryForObject(
+                "SELECT COUNT(ID) FROM BUILDS WHERE BRANCHID = :branchId AND ID > :buildId",
+                params("branchId", build.getBranch().id()).addValue("buildId", build.id()),
+                Integer.class
+        );
+    }
+
+    @Override
     public int getBuildCountForProject(Project project) {
         return getNamedParameterJdbcTemplate().queryForObject(
                 "SELECT COUNT(B.ID) " +

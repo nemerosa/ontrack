@@ -242,6 +242,8 @@ class StructureServiceImpl(
         return structureRepository.getBuildCount(branch)
     }
 
+    override fun getNewerBuildCount(build: Build): Int = structureRepository.getNewerBuildCount(build)
+
     override fun getBuildCountForProject(project: Project): Int = structureRepository.getBuildCountForProject(project)
 
     override fun deleteBuild(buildId: ID): Ack {

@@ -234,9 +234,67 @@ class DeliveryMapIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `The map's head is the branch's latest build`() {
+        asAdmin {
+            project {
+                branch {
+                    promotionLevel("SILVER")
+                    build("1")
+                    val latest = build("2")
+                    assertEquals(latest.name, deliveryMap(this).head?.getRequiredTextField("name"))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `A branch with no build at all has no head`() {
+        asAdmin {
+            project {
+                branch {
+                    promotionLevel("SILVER")
+                    assertNull(deliveryMap(this).head)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `A checkpoint the latest build has reached is at the head`() {
+        asAdmin {
+            project {
+                branch {
+                    val silver = promotionLevel("SILVER")
+                    build("1")
+                    build("2") { promote(silver) }
+                    val arrival = deliveryMap(this).checkpoints.single().path("arrival")
+                    assertEquals(0, arrival.path("lag").asInt())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `A checkpoint says how many builds behind the head it is`() {
+        asAdmin {
+            project {
+                branch {
+                    val silver = promotionLevel("SILVER")
+                    build("1") { promote(silver) }
+                    build("2")
+                    build("3")
+                    val arrival = deliveryMap(this).checkpoints.single().path("arrival")
+                    assertEquals(2, arrival.path("lag").asInt())
+                }
+            }
+        }
+    }
+
     private data class RenderedMap(
         val checkpoints: List<JsonNode>,
         val edges: List<JsonNode>,
+        val head: JsonNode?,
     )
 
     private fun deliveryMap(branch: Branch): RenderedMap =
@@ -255,10 +313,12 @@ class DeliveryMapIT : AbstractQLKTITSupport() {
                                     build { name }
                                     time
                                     status { id }
+                                    lag
                                 }
                                 members { id name }
                             }
                             edges { id kind source target }
+                            head { name }
                         }
                     }
                 }
@@ -268,6 +328,7 @@ class DeliveryMapIT : AbstractQLKTITSupport() {
             RenderedMap(
                 checkpoints = map.path("checkpoints").toList(),
                 edges = map.path("edges").toList(),
+                head = map.path("head").takeIf { !it.isNull },
             )
         }
 

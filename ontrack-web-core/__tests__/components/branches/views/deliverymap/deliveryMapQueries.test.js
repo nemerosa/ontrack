@@ -28,6 +28,16 @@ describe('delivery map queries', () => {
         expect(gqlDeliveryMap).toContain('members')
     })
 
+    it("asks for the branch's latest build, which the lags are counted against", () => {
+        // Without it the header has nothing to say, and every lag marker on the map is a number
+        // with no stated frame of reference
+        expect(gqlDeliveryMap).toMatch(/^\s+head \{$/m)
+    })
+
+    it('asks each arrival how far behind the head it is', () => {
+        expect(gqlDeliveryMap).toMatch(/^\s+lag$/m)
+    })
+
     it('reads the checkpoint payload as opaque JSON', () => {
         // Checkpoint kinds are open, so a typed field per kind would mean this query changing every
         // time an extension contributes one

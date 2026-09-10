@@ -101,6 +101,14 @@ public interface StructureRepository {
     int getBuildCount(Branch branch);
 
     /**
+     * Gets the number of builds of the branch of a build which are more recent than this build.
+     *
+     * @param build Build to count from
+     * @return Number of builds after this one on its own branch, 0 when it is the branch's latest
+     */
+    int getNewerBuildCount(Build build);
+
+    /**
      * Gets the number of builds for a project.
      *
      * @param project Project to get the build count for

@@ -63,6 +63,8 @@ class SlotDeliveryMapIT : AbstractQLKTITSupport() {
             val checkpoint = slotCheckpoint(deliveryMap(branch), staging)
             assertEquals(latest.build.name, checkpoint.path("arrival").path("build").getRequiredTextField("name"))
             assertNull(checkpoint.path("data").path("otherBranch").takeIf { !it.isNull })
+            // The deployed build IS the branch's latest one here, so the slot is at the head
+            assertEquals(0, checkpoint.path("arrival").path("lag").asInt())
         }
     }
 
@@ -77,6 +79,9 @@ class SlotDeliveryMapIT : AbstractQLKTITSupport() {
             val checkpoint = slotCheckpoint(deliveryMap(main), staging)
             assertEquals(deployment.build.name, checkpoint.path("arrival").path("build").getRequiredTextField("name"))
             assertEquals("release-1.3", checkpoint.path("data").getRequiredTextField("otherBranch"))
+            // No lag, rather than a lag of some number: counting another branch's build against this
+            // branch's head would answer a question nobody asked, and would do it in a number
+            assertTrue(checkpoint.path("arrival").path("lag").isNull)
         }
     }
 
@@ -280,6 +285,7 @@ class SlotDeliveryMapIT : AbstractQLKTITSupport() {
                                 arrival {
                                     build { name }
                                     time
+                                    lag
                                 }
                             }
                             edges { id kind source target }
