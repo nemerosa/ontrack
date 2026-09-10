@@ -481,6 +481,31 @@ object DemoContent {
                             "docs: record the session cookie settings",
                         ),
                     ),
+                    // The head of this branch, and the only build of the demo which ARRIVED
+                    // SOMEWHERE AND FAILED. That reading is the delivery map's central subtlety -
+                    // a promotion level names a build which was promoted and a slot one which was
+                    // deployed, so a validation stamp is the only checkpoint which can show it -
+                    // and it belongs on the branch which is already carrying the map's other
+                    // awkward readings rather than on [MAIN], whose picture is what the rest of
+                    // the demo is read against.
+                    //
+                    // Nothing else runs: [BUILD] failing is what stops the tests from running at
+                    // all, which is why this build declares one validation and not four. On the
+                    // map it leaves BUILD showing a failed run at the branch head, the aggregate
+                    // and every promotion level one build behind, and the whole branch stuck -
+                    // which is what a broken build looks like, drawn.
+                    BuildSpec(
+                        name = "90",
+                        release = "1.3.10",
+                        description = "Cookie lifetime made configurable. The build does not compile.",
+                        creation = DaysAgo(1),
+                        validations = listOf(
+                            ValidationSpec(BUILD, FAILED, "Unresolved symbol in the session config."),
+                        ),
+                        commits = listOf(
+                            "feat(security): make the session cookie lifetime configurable",
+                        ),
+                    ),
                 ),
             ),
         ),

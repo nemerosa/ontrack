@@ -303,6 +303,50 @@ class DemoSeedTest {
     }
 
     /**
+     * *Arriving is not the same as succeeding* is the delivery map's central subtlety, and only a
+     * validation stamp can show it: a promotion level names a build which WAS promoted, a slot one
+     * which WAS deployed, and only a stamp names a build which got there and failed.
+     *
+     * The demo has to carry one, or the documentation explains a reading nothing on screen shows.
+     * A checkpoint's build is the LATEST one to have run that stamp, which is what makes this
+     * fragile in an edit: adding a greener build after the failing one takes the reading away
+     * without touching anything that looks related.
+     */
+    @Test
+    fun `the demo shows a validation stamp whose latest build arrived and failed`() {
+        val failing = DemoContent.dataset(changelog).projects.flatMap { project ->
+            project.branches.flatMap { branch ->
+                // On the map at all: a stamp is drawn only when some auto promotion of the branch
+                // names it or matches it
+                val onTheMap = branch.promotionLevels
+                    .mapNotNull { it.autoPromotion }
+                    .flatMap { auto ->
+                        branch.validationStamps.map { it.name }.filter { autoPromotionSelectsStamp(it, auto) }
+                    }
+                    .toSet()
+                onTheMap.mapNotNull { stamp ->
+                    // Builds are declared oldest first, so the last one to have run the stamp is
+                    // the build its checkpoint names
+                    val latest = branch.builds.lastOrNull { build ->
+                        build.validations.any { it.validationStamp == stamp }
+                    }
+                    val run = latest?.validations?.last { it.validationStamp == stamp }
+                    if (run != null && !validationStatusPasses(run.status)) {
+                        "${project.name}/${branch.name} ${latest.name} $stamp"
+                    } else {
+                        null
+                    }
+                }
+            }
+        }
+
+        assertTrue(
+            failing.isNotEmpty(),
+            "At least one validation stamp of the demo is drawn showing a build which arrived and failed",
+        )
+    }
+
+    /**
      * Auto promotion must reproduce the promotions the dataset declares rather than add any: a
      * promotion nobody wrote down would be stamped with the time of the reset instead of the
      * build's own, and the counts the pipeline view shows would stop matching the dataset.

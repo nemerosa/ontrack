@@ -188,6 +188,23 @@ own, and the counts every view shows stop matching the dataset.
 That is what keeps `fullPromotions` off the changelog project, whose builds stop at BRONZE
 with both stamps green and would otherwise promote themselves to SILVER on the next reset.
 
+### The build which fails is load-bearing
+
+`petclinic/maintenance` ends on a build whose `BUILD` validation FAILED and which is promoted
+nowhere. It is the demo's only build that arrived somewhere and failed, and it is there for the
+delivery map: a promotion level names a build which *was promoted* and a slot one which *was
+deployed*, so a validation stamp is the only checkpoint able to show a build which got there and
+did not succeed. Without it the documentation explains a reading nothing on screen shows.
+
+A checkpoint names the **latest** build to have run its stamp, which is what makes this fragile:
+adding a greener build after the failing one takes the reading away without touching anything that
+looks related. `DemoSeedTest.the demo shows a validation stamp whose latest build arrived and
+failed` fails when that happens.
+
+It also declares one validation rather than four, which is the point rather than an omission: a
+build that does not compile never runs its tests, so the aggregate checkpoint and every promotion
+level stay a build behind while the branch head shows a failure.
+
 ### Deployments are a sequence, not a slot property
 
 `DemoDataset.deployments` is an ordered list, run after every slot exists, rather than a
