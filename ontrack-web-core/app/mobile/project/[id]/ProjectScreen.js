@@ -16,9 +16,8 @@
  * left out. Both run on the server - see `MobileFilter` and `branchNamePattern`.
  */
 
-import {useState} from "react"
 import {gql} from "graphql-request"
-import {Alert, Empty, Tag, Typography} from "antd"
+import {Empty, Space, Tag, Typography} from "antd"
 import {useQuery} from "@components/services/GraphQL"
 import MobileScreen from "@components/mobile/layout/MobileScreen"
 import MobileAsyncContent from "@components/mobile/layout/MobileAsyncContent"
@@ -26,6 +25,7 @@ import {MobileEntityGroup, MobileEntityRow} from "@components/mobile/entities/Mo
 import {MobileFilterInput, useMobileFilter} from "@components/mobile/entities/MobileFilter"
 import {branchNamePattern} from "@components/mobile/entities/branchNamePattern"
 import MobileFavourite from "@components/mobile/favourites/MobileFavourite"
+import {useFavouriteRefresh} from "@components/mobile/favourites/useFavouriteRefresh"
 import {mobileBranchUri} from "@components/mobile/mobileRoutes"
 
 /**
@@ -37,13 +37,31 @@ import {mobileBranchUri} from "@components/mobile/mobileRoutes"
  */
 export const MOBILE_BRANCH_LIMIT = 20
 
+/**
+ * The line under a branch's name: its own name when that is not what is shown,
+ * and whether it is disabled.
+ *
+ * The name matters because the **filter matches it**, not the display name -
+ * `branches(name:)` runs against `BRANCHES.NAME`. A branch showing as `PRJ-1234`
+ * and named `feature/PRJ-1234-search` would otherwise look like it ignored a
+ * filter that in fact matched it, or refused one it could not.
+ */
+function BranchContext({branch}) {
+    const named = branch.displayName && branch.displayName !== branch.name
+    if (!named && !branch.disabled) return undefined
+    return (
+        <Space size={6}>
+            {named && branch.name}
+            {branch.disabled && <Tag color="default">Disabled</Tag>}
+        </Space>
+    )
+}
+
 export default function MobileProjectScreen({id}) {
 
     const filter = useMobileFilter()
 
-    // Refetched rather than patched in place, for the reason the home screen
-    // gives: one source of truth for whether something is a favourite.
-    const [refresh, setRefresh] = useState(0)
+    const {refresh, onToggled} = useFavouriteRefresh()
 
     const query = useQuery(
         gql`
@@ -82,10 +100,15 @@ export default function MobileProjectScreen({id}) {
         }
     )
 
+    /*
+     * No "no such project" state of its own, deliberately. `project(id:)` is a
+     * nullable field, but the server never answers a bad id with a null: it
+     * raises `ProjectNotFoundException` (and `AccessDeniedException` for one the
+     * user cannot see), which arrive as GraphQL *errors* carrying the reason.
+     * The error alert below therefore already says what happened, and a
+     * null-checking branch beside it would be code that never runs.
+     */
     const project = query.data?.project
-    // A project that is not there is a different answer from a project with no
-    // branch, and the screen must not tell the second story for the first.
-    const missing = query.finished && !query.loading && !project
 
     const found = project?.branches ?? []
     const branches = found.slice(0, MOBILE_BRANCH_LIMIT)
@@ -101,42 +124,34 @@ export default function MobileProjectScreen({id}) {
                     id={project.id}
                     name={project.name}
                     favourite={project.favourite}
-                    onToggled={() => setRefresh(count => count + 1)}
+                    onToggled={onToggled}
                 />
             }
         >
-            {
-                !missing &&
-                <MobileFilterInput
-                    filter={filter}
-                    label="Filter the branches by name"
-                    testId="mobile-branches-filter"
-                />
-            }
+            <MobileFilterInput
+                filter={filter}
+                label="Filter the branches by name"
+                testId="mobile-branches-filter"
+            />
             <MobileAsyncContent
                 state={query}
                 errorMessage="Could not load the project."
-                isEmpty={missing || branches.length === 0}
+                isEmpty={branches.length === 0}
                 rows={6}
                 empty={
-                    missing ?
-                        <Alert
-                            data-testid="mobile-project-not-found"
-                            type="warning"
-                            showIcon
-                            message="No such project"
-                            description="It may have been deleted, or you may not be allowed to see it."
-                        /> :
-                        <div data-testid="mobile-branches-empty">
-                            <Empty
-                                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                                description={
-                                    filter.filtering
-                                        ? `No branch matches "${filter.filter}".`
-                                        : "This project has no branch yet."
-                                }
-                            />
-                        </div>
+                    <div data-testid="mobile-branches-empty">
+                        <Empty
+                            image={Empty.PRESENTED_IMAGE_SIMPLE}
+                            description={
+                                // Two different facts, and telling them apart is
+                                // the difference between "type something else"
+                                // and "there is nothing here to find".
+                                filter.filtering
+                                    ? `No branch matches "${filter.filter}".`
+                                    : "This project has no branch yet."
+                            }
+                        />
+                    </div>
                 }
             >
                 <MobileEntityGroup
@@ -150,16 +165,14 @@ export default function MobileProjectScreen({id}) {
                                 testId={`mobile-branch-${branch.id}`}
                                 name={branch.displayName || branch.name}
                                 href={mobileBranchUri(branch.id)}
-                                context={
-                                    branch.disabled ? <Tag color="default">Disabled</Tag> : undefined
-                                }
+                                context={<BranchContext branch={branch}/>}
                                 action={
                                     <MobileFavourite
                                         type="branch"
                                         id={branch.id}
                                         name={branch.displayName || branch.name}
                                         favourite={branch.favourite}
-                                        onToggled={() => setRefresh(count => count + 1)}
+                                        onToggled={onToggled}
                                     />
                                 }
                             />

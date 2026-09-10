@@ -17,7 +17,6 @@
  * Each row goes to that project's mobile screen, which is where its branches are.
  */
 
-import {useState} from "react"
 import {gql} from "graphql-request"
 import {Empty, Tag} from "antd"
 import {useQuery} from "@components/services/GraphQL"
@@ -26,15 +25,14 @@ import MobileAsyncContent from "@components/mobile/layout/MobileAsyncContent"
 import {MobileEntityGroup, MobileEntityRow} from "@components/mobile/entities/MobileEntityList"
 import {MobileFilterInput, useMobileFilter} from "@components/mobile/entities/MobileFilter"
 import MobileFavourite from "@components/mobile/favourites/MobileFavourite"
+import {useFavouriteRefresh} from "@components/mobile/favourites/useFavouriteRefresh"
 import {mobileProjectUri} from "@components/mobile/mobileRoutes"
 
 export default function MobileProjectListScreen() {
 
     const filter = useMobileFilter()
 
-    // Refetched rather than patched in place, for the reason the home screen
-    // gives: one source of truth for whether something is a favourite.
-    const [refresh, setRefresh] = useState(0)
+    const {refresh, onToggled} = useFavouriteRefresh()
 
     const query = useQuery(
         gql`
@@ -108,7 +106,7 @@ export default function MobileProjectListScreen() {
                                         id={project.id}
                                         name={project.name}
                                         favourite={project.favourite}
-                                        onToggled={() => setRefresh(count => count + 1)}
+                                        onToggled={onToggled}
                                     />
                                 }
                             />

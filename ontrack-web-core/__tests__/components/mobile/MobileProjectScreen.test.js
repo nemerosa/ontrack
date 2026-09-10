@@ -80,6 +80,21 @@ describe('the mobile project screen', () => {
         expect(screen.getByTestId('mobile-branch-10')).toHaveTextContent('PRJ-1234')
     })
 
+    it('still shows the branch name when the display name hides it', () => {
+        // The filter matches the *name* - `branches(name:)` runs against
+        // `BRANCHES.NAME` - so a row showing only `PRJ-1234` would look like it
+        // had ignored a filter that in fact matched it.
+        project([branch(10, 'feature/PRJ-1234-search', {displayName: 'PRJ-1234'})])
+        render(<MobileProjectScreen id="1"/>)
+        expect(screen.getByTestId('mobile-branch-10')).toHaveTextContent('feature/PRJ-1234-search')
+    })
+
+    it('does not repeat the name when it is already what is shown', () => {
+        project([branch(10, 'main')])
+        render(<MobileProjectScreen id="1"/>)
+        expect(screen.getByTestId('mobile-branch-10').textContent.match(/main/g)).toHaveLength(1)
+    })
+
     it('sends each branch row to that branch on the phone, not to the desktop page', () => {
         project([branch(10, 'main')])
         render(<MobileProjectScreen id="1"/>)
@@ -215,17 +230,15 @@ describe('the mobile project screen', () => {
     })
 
     it('says so when the project could not be loaded', () => {
-        setResult({data: null, error: "Boom"})
+        // Also how "no such project" arrives. `project(id:)` is a nullable
+        // field, but the server never answers a bad id with a null: it raises
+        // `ProjectNotFoundException`, and `AccessDeniedException` for one the
+        // user cannot see - both GraphQL errors carrying the reason. An empty
+        // branch list here would tell the user the project exists and holds
+        // nothing, which is a different and wrong answer.
+        setResult({data: null, error: "Project ID not found: 1"})
         render(<MobileProjectScreen id="1"/>)
-        expect(screen.getByText(/Boom/)).toBeInTheDocument()
-    })
-
-    it('says so when there is no such project, rather than showing an empty one', () => {
-        // A link to a project since deleted, or one this user cannot see. An
-        // empty branch list would tell them the project exists and has nothing
-        // in it, which is a different and wrong answer.
-        setResult({data: null, finished: true})
-        render(<MobileProjectScreen id="1"/>)
-        expect(screen.getByTestId('mobile-project-not-found')).toBeInTheDocument()
+        expect(screen.getByText(/not found/)).toBeInTheDocument()
+        expect(screen.queryByTestId('mobile-branches-empty')).not.toBeInTheDocument()
     })
 })

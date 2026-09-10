@@ -136,7 +136,8 @@ see `doc/dev-guide/demo-seed.md`.
 `MobileFavourite` is **controlled**: the favourite state lives in the list that renders the
 toggle, and the toggle owns only whether its own call is in flight. Its parent then refetches
 rather than patching its copy of the list, so there is one answer to "is this a favourite"
-and it is the server's.
+and it is the server's. `useFavouriteRefresh` is that refetch: a counter in the screen's
+`deps` and the `onToggled` its stars share.
 
 It is deliberately not the desktop `Favourite`, which is a 14px icon inside a
 `Typography.Text` with a click handler — neither a 44px touch target nor a control a screen
@@ -168,6 +169,13 @@ the only way to know whether anything was left out — and it costs exactly one 
 was, the screen says so and points at the filter, which is how a branch beyond the limit is
 reached.
 
+Neither screen has a "no such project/branch" state of its own. `project(id:)` is a nullable
+field and `branch(id:)` is not, but it makes no difference: the server never answers a bad id
+with a null — it raises `ProjectNotFoundException`, or `AccessDeniedException` for one the
+user cannot see — and both arrive as GraphQL *errors* carrying the reason. The error alert
+already says what happened, and a null-checking branch beside it would be code that never
+runs.
+
 ### The branch screen
 
 `/mobile/branch/[id]` is the one screen that genuinely diverges rather than restyling.
@@ -182,9 +190,16 @@ it happened, how far it has been promoted, and where it is deployed.
   name**. The acceptance criterion is that promotions read without zooming, and a 16px medal
   on a phone is a coloured dot.
 - Deployments are `Build.currentDeployments` — where the build is *now*, which is the question
-  a phone user has; the pipeline history is a desktop surface. The slot's qualifier is shown
-  when it has one, or two slots of the same project in one environment would render as the
-  same badge twice.
+  a phone user has; the pipeline history is a desktop surface.
+
+  **Known gap: qualified slots are not shown.** `currentDeployments` declares its `qualifier`
+  argument with a default of `""`, and `findSlotsByProject` treats that as a *strict* filter
+  rather than as "any", so the field only ever answers with unqualified slots — a build
+  deployed into a qualified one shows no badge. The two honest alternatives are both worse
+  for now: `slotPipelines(status: DEPLOYED)` answers with deployments since superseded by a
+  newer build, and reproducing "last deployed pipeline per slot, if it is this build" over
+  `Build.slots` puts a server rule in a second place. Fixing the argument's default is a
+  backend change with its own blast radius.
 - Validation status is deliberately absent: per-stamp status is the build screen's job, and a
   strip of validation chips here would rebuild the matrix one card at a time.
 
@@ -213,6 +228,11 @@ What the two screens send differs, and the difference matters:
   substring match the project list has, which is what a user moving between the two screens
   expects.
 
+  It matches the branch's **name**, not its display name — the repository runs `B.NAME ~ ?`.
+  A row therefore carries its name under its display name whenever the two differ, or a
+  branch showing as `PRJ-1234` would look as though it had ignored a filter that in fact
+  matched `feature/PRJ-1234-search`.
+
 ### The list shape
 
 `MobileEntityGroup` and `MobileEntityRow` are the mobile UI's one list: a name, a line of
@@ -233,8 +253,9 @@ does not move. That is why build cards do not link: the build screen is its own 
 1. Add the page under `app/mobile/`, replacing its `MobileScreenPending` placeholder if it has
    one. Keep the page itself to the route and put the screen in a client component beside it,
    as `app/mobile/page.js` and `app/mobile/HomeScreen.js` do.
-2. Add a row to `EQUIVALENTS` in `components/mobile/mobileRoutes.js`, so phones stop getting
-   the interstitial for the desktop route it stands in for.
+2. Add the desktop route it stands in for to `components/mobile/mobileRoutes.js`, so phones
+   stop getting the interstitial for it: `EQUIVALENTS` for a fixed path, `ENTITY_EQUIVALENTS`
+   for one carrying an id.
 3. If it belongs in the bottom bar, add it to `MOBILE_NAV_ITEMS` in
    `components/mobile/layout/mobileNav.js` — and think hard first: three destinations are what
    fits a thumb.

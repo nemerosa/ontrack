@@ -338,10 +338,6 @@ html, body {
     color: var(--ot-text);
 }
 
-.ot-mobile-badge-qualifier {
-    font-size: 12px;
-}
-
 .ot-mobile-badge-icon {
     /*
      * Deployments and promotions are different facts about a build and sit on
@@ -355,7 +351,11 @@ html, body {
     opacity: 0.6;
 }
 
-/* A line of explanation under a list - what was left out, or how to get more. */
+/*
+ * What comes under a list - the line saying what was left out, or the button
+ * that gets more. `!important` because one of the two is an antd
+ * `Typography.Paragraph`, whose own margins are sized for a desktop page.
+ */
 .ot-mobile-note {
     margin: 12px 0 0 0 !important;
     font-size: 13px;

@@ -17,11 +17,12 @@
 import {useState} from "react"
 import {gql} from "graphql-request"
 import Link from "next/link"
-import {Button, Empty, Spin, Tag, Typography} from "antd"
+import {Button, Empty, Spin, Tag} from "antd"
 import {useQuery} from "@components/services/GraphQL"
 import MobileScreen from "@components/mobile/layout/MobileScreen"
 import MobileAsyncContent from "@components/mobile/layout/MobileAsyncContent"
 import MobileFavourite from "@components/mobile/favourites/MobileFavourite"
+import {useFavouriteRefresh} from "@components/mobile/favourites/useFavouriteRefresh"
 import MobileBuildCard from "@components/mobile/builds/MobileBuildCard"
 import {mobileProjectUri} from "@components/mobile/mobileRoutes"
 
@@ -45,9 +46,7 @@ export default function MobileBranchScreen({id}) {
      */
     const [size, setSize] = useState(MOBILE_BUILD_PAGE_SIZE)
 
-    // Refetched rather than patched in place, for the reason the home screen
-    // gives: one source of truth for whether something is a favourite.
-    const [refresh, setRefresh] = useState(0)
+    const {refresh, onToggled} = useFavouriteRefresh()
 
     const query = useQuery(
         gql`
@@ -95,7 +94,6 @@ export default function MobileBranchScreen({id}) {
                                 id
                                 slot {
                                     id
-                                    qualifier
                                     environment {
                                         id
                                         name
@@ -135,7 +133,7 @@ export default function MobileBranchScreen({id}) {
                     id={branch.id}
                     name={branchName}
                     favourite={branch.favourite}
-                    onToggled={() => setRefresh(count => count + 1)}
+                    onToggled={onToggled}
                 />
             }
         >
@@ -171,7 +169,7 @@ export default function MobileBranchScreen({id}) {
                 </ul>
                 {
                     hasMore &&
-                    <Typography.Paragraph className="ot-mobile-note">
+                    <div className="ot-mobile-note">
                         <Button
                             block
                             data-testid="mobile-builds-more"
@@ -180,7 +178,7 @@ export default function MobileBranchScreen({id}) {
                         >
                             {query.loading ? <Spin size="small"/> : "Load more"}
                         </Button>
-                    </Typography.Paragraph>
+                    </div>
                 }
             </MobileAsyncContent>
         </MobileScreen>

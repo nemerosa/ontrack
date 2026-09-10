@@ -11,7 +11,6 @@
  * are what the desktop dashboard widgets already read.
  */
 
-import {useState} from "react"
 import {gql} from "graphql-request"
 import {useQuery} from "@components/services/GraphQL"
 import MobileScreen from "@components/mobile/layout/MobileScreen"
@@ -19,21 +18,16 @@ import MobileAsyncContent from "@components/mobile/layout/MobileAsyncContent"
 import {MobileEntityGroup, MobileEntityRow} from "@components/mobile/entities/MobileEntityList"
 import MobileFavourite from "@components/mobile/favourites/MobileFavourite"
 import MobileFavouritesEmpty from "@components/mobile/favourites/MobileFavouritesEmpty"
+import {useFavouriteRefresh} from "@components/mobile/favourites/useFavouriteRefresh"
 import {mobileBranchUri, mobileProjectUri} from "@components/mobile/mobileRoutes"
 
 export default function MobileHomeScreen() {
 
     /*
      * Unstarring from this screen has to take the row away, and the only honest
-     * way to know it did is to ask the server again. A local copy of the two
-     * lists would be a second source of truth for the same fact, and the lists
-     * are short enough that refetching them costs nothing.
-     *
-     * The mobile provider stack has no `EventsContextProvider` - the desktop
-     * favourite widgets refresh off a page event - so the counter is local.
+     * way to know it did is to ask the server again - see `useFavouriteRefresh`.
      */
-    const [refresh, setRefresh] = useState(0)
-    const onToggled = () => setRefresh(count => count + 1)
+    const {refresh, onToggled} = useFavouriteRefresh()
 
     const query = useQuery(
         gql`

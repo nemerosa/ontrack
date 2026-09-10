@@ -19,7 +19,6 @@
  */
 
 import {FaServer} from "react-icons/fa"
-import {Typography} from "antd"
 import TimestampText from "@components/common/TimestampText"
 import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage"
 
@@ -95,21 +94,19 @@ export default function MobileBuildCard({build}) {
                                 <span className="ot-mobile-badge-icon" aria-hidden="true">
                                     <FaServer/>
                                 </span>
+                                {/*
+                                  No qualifier beside the environment, because
+                                  there can never be one here: `currentDeployments`
+                                  defaults its `qualifier` argument to `""` and
+                                  `findSlotsByProject` treats that as a strict
+                                  filter, so every slot it answers with is the
+                                  unqualified one. That also means a deployment
+                                  into a *qualified* slot is not shown at all -
+                                  see `doc/dev-guide/ui/mobile-ui.md`.
+                                */}
                                 <span className="ot-mobile-badge-text">
                                     {pipeline.slot?.environment?.name}
                                 </span>
-                                {
-                                    /*
-                                     * A project can hold several slots in the
-                                     * same environment, told apart only by their
-                                     * qualifier. Without it two deployments show
-                                     * as the same badge twice.
-                                     */
-                                    pipeline.slot?.qualifier &&
-                                    <Typography.Text type="secondary" className="ot-mobile-badge-qualifier">
-                                        {pipeline.slot.qualifier}
-                                    </Typography.Text>
-                                }
                             </span>
                         )
                     }

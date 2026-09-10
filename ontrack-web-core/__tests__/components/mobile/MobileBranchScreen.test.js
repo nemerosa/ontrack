@@ -28,9 +28,9 @@ const build = (id, name, {displayName, time, promotions = [], deployments = []} 
         id: runId,
         promotionLevel: {id: levelId, name: levelName, image: false},
     })),
-    currentDeployments: deployments.map(([pipelineId, environmentName, qualifier = '']) => ({
+    currentDeployments: deployments.map(([pipelineId, environmentName]) => ({
         id: pipelineId,
-        slot: {id: `slot-${pipelineId}`, qualifier, environment: {id: environmentName, name: environmentName}},
+        slot: {id: `slot-${pipelineId}`, environment: {id: environmentName, name: environmentName}},
     })),
 })
 
@@ -128,14 +128,6 @@ describe('the mobile branch screen', () => {
         branch([build(100, '1', {deployments: [[800, 'staging']]})])
         render(<MobileBranchScreen id="10"/>)
         expect(screen.getByTestId('mobile-deployment-800')).toHaveTextContent('staging')
-    })
-
-    it('says which slot a deployment is in when the project has more than one', () => {
-        // A project can have several slots in the same environment, told apart
-        // only by their qualifier. Dropping it would show two identical rows.
-        branch([build(100, '1', {deployments: [[800, 'staging', 'blue']]})])
-        render(<MobileBranchScreen id="10"/>)
-        expect(screen.getByTestId('mobile-deployment-800')).toHaveTextContent('blue')
     })
 
     it('shows nothing about promotions or deployments when a build has neither', () => {
